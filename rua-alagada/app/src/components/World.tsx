@@ -402,7 +402,7 @@ const House: React.FC<{green: number; redirect: number}> = ({green, redirect}) =
 };
 
 /* ================= MUNDO ================= */
-export const World: React.FC<{gf: number; sunny?: boolean}> = ({gf, sunny = false}) => {
+export const World: React.FC<{gf: number; sunny?: boolean; hideMascot?: boolean}> = ({gf, sunny = false, hideMascot = false}) => {
   const s3 = S("s3"), s2 = S("s2"), s4 = S("s4"), s5 = S("s5"), s6 = S("s6"), s9 = S("s9"), s10 = S("s10"), s11 = S("s11");
   const before = (s: typeof s3) => gf < s.startFrame;
 
@@ -741,7 +741,7 @@ export const World: React.FC<{gf: number; sunny?: boolean}> = ({gf, sunny = fals
       {grassScale > 0.01 && <Flowers scale={grassScale} spots={[[-1.8, 0.4], [-0.6, -0.8], [0.7, 0.5], [1.6, -1.4], [-1.1, -2.5]]} />}
 
       {/* ---------- MASCOTE ---------- */}
-      {mascotVis > 0.01 && (
+      {!hideMascot && mascotVis > 0.01 && (
         <Mascot position={[mx, CURB + my, FACE - 0.6]} scale={0.58 * mascotVis} pose={mascotPose(gf)} gf={gf} />
       )}
 

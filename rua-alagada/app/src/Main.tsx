@@ -53,14 +53,15 @@ export const Background: React.FC<{at?: number}> = ({at}) => {
   return <AbsoluteFill style={{background: `linear-gradient(180deg, ${top} 0%, ${bot} 70%)`}} />;
 };
 
-export const Scene3D: React.FC<{at?: number; fixed?: FixedPose; sunny?: boolean}> = ({at, fixed, sunny}) => {
+export const Scene3D: React.FC<{at?: number; fixed?: FixedPose; sunny?: boolean; hideMascot?: boolean; children?: React.ReactNode}> = ({at, fixed, sunny, hideMascot, children}) => {
   const cur = useCurrentFrame();
   const gf = at ?? cur;
   const {width, height} = useVideoConfig();
   return (
     <ThreeCanvas width={width} height={height} camera={{fov: FOV, near: 0.1, far: 400, position: [0, 2, 40]}}>
       <CamRig at={at} fixed={fixed} />
-      <World gf={gf} sunny={sunny} />
+      <World gf={gf} sunny={sunny} hideMascot={hideMascot} />
+      {children}
     </ThreeCanvas>
   );
 };
