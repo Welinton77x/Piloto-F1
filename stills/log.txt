@@ -1,45 +1,60 @@
-
-Running kernel seems to be up-to-date.
-
-No services need to be restarted.
-
-No containers need to be restarted.
-
-No user sessions are running outdated binaries.
-
-No VM guests are running outdated hypervisor (qemu) binaries on this host.
-Welcome to Remotion!
-Installing dependencies...
-
-added 339 packages, and audited 340 packages in 48s
-
-80 packages are looking for funding
-  run `npm fund` for details
-
-10 moderate severity vulnerabilities
-
-To address issues that do not require attention, run:
-  npm audit fix
-
-To address all issues (including breaking changes), run:
-  npm audit fix --force
-
-Run `npm audit` for details.
-
-Copied to app.
-
-Get started by running:
- cd app
- npm run dev
-
-To render a video, run:
- npx remotion render
-
-See the documentation:
- https://www.remotion.dev/docs
-
-Remotion is free for teams of up to 3.
-Adopting Remotion in your company? Visit https://www.remotion.pro/license
-
-Installing 2 packages (@remotion/three, @remotion/google-fonts)
-[90m$ npm i --save-exact --no-fund --no-audit --loglevel=error @remotion/three@4.0.541 @remotion/google-fonts@4.0.541[39m
+Rendered 1/1
+[34m+                    out/s10_a.png[39m
+Bundling 6%
+Bundling 19%
+Bundling 31%
+Bundling 61%
+Bundling 69%
+Bundling 74%
+Bundling 80%
+Bundling 85%
+Bundling 90%
+Bundling 95%
+Bundling 100%
+Getting composition
+[90mComposition          PilotoF1[39m
+[90mFormat               png[39m
+[90mOutput               out/s10_b.png[39m
+Rendered 0/1
+Rendered 0/1
+Rendered 0/1
+Rendered 1/1
+[34m+                    out/s10_b.png[39m
+Bundling 6%
+Bundling 19%
+Bundling 61%
+Bundling 69%
+Bundling 74%
+Bundling 80%
+Bundling 85%
+Bundling 90%
+Bundling 95%
+Bundling 100%
+Getting composition
+[90mComposition          PilotoF1[39m
+[90mFormat               png[39m
+[90mOutput               out/s11_a.png[39m
+Rendered 0/1
+Rendered 0/1
+Rendered 0/1
+Rendered 1/1
+[34m+                    out/s11_a.png[39m
+Bundling 6%
+Bundling 19%
+Bundling 61%
+Bundling 69%
+Bundling 74%
+Bundling 80%
+Bundling 85%
+Bundling 90%
+Bundling 95%
+Bundling 100%
+Getting composition
+[90mComposition          PilotoF1[39m
+[90mFormat               png[39m
+[90mOutput               out/s11_b.png[39m
+Rendered 0/1
+Rendered 0/1
+Rendered 0/1
+Rendered 1/1
+[34m+                    out/s11_b.png[39m
