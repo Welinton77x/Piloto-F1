@@ -1,5 +1,6 @@
 import React from "react";
-import {AbsoluteFill, Audio, Sequence, continueRender, delayRender, staticFile, useCurrentFrame} from "remotion";
+import {AbsoluteFill, Audio, Sequence, continueRender, delayRender, staticFile, useCurrentFrame, useVideoConfig} from "remotion";
+import * as THREE from "three";
 import {ThreeCanvas} from "@remotion/three";
 import {useThree} from "@react-three/fiber";
 import {VO_OFFSET, config, finalCut, hasVO, timed} from "./data/scenes";
@@ -22,11 +23,14 @@ if (typeof document !== "undefined") {
   Promise.all([document.fonts.load('900 40px "Montserrat"'), document.fonts.load('800 40px "Montserrat"')]).then(() => continueRender(fontHandle), () => continueRender(fontHandle));
 } else continueRender(fontHandle);
 
-const CamRig: React.FC<{at?: number}> = ({at}) => {
+export type FixedPose = {pos: [number, number, number]; target: [number, number, number]};
+const CamRig: React.FC<{at?: number; fixed?: FixedPose}> = ({at, fixed}) => {
   const cur = useCurrentFrame();
   const gf = at ?? cur;
   const camera = useThree((s) => s.camera);
-  const {pos, target} = poseAt(gf);
+  const p0 = poseAt(gf);
+  const pos = fixed ? new THREE.Vector3(...fixed.pos) : p0.pos;
+  const target = fixed ? new THREE.Vector3(...fixed.target) : p0.target;
   camera.position.copy(pos);
   camera.lookAt(target);
   camera.updateProjectionMatrix();
@@ -49,13 +53,14 @@ export const Background: React.FC<{at?: number}> = ({at}) => {
   return <AbsoluteFill style={{background: `linear-gradient(180deg, ${top} 0%, ${bot} 70%)`}} />;
 };
 
-export const Scene3D: React.FC<{at?: number}> = ({at}) => {
+export const Scene3D: React.FC<{at?: number; fixed?: FixedPose; sunny?: boolean}> = ({at, fixed, sunny}) => {
   const cur = useCurrentFrame();
   const gf = at ?? cur;
+  const {width, height} = useVideoConfig();
   return (
-    <ThreeCanvas width={config.width} height={config.height} camera={{fov: FOV, near: 0.1, far: 400, position: [0, 2, 40]}}>
-      <CamRig at={at} />
-      <World gf={gf} />
+    <ThreeCanvas width={width} height={height} camera={{fov: FOV, near: 0.1, far: 400, position: [0, 2, 40]}}>
+      <CamRig at={at} fixed={fixed} />
+      <World gf={gf} sunny={sunny} />
     </ThreeCanvas>
   );
 };

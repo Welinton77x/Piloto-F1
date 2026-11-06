@@ -402,7 +402,7 @@ const House: React.FC<{green: number; redirect: number}> = ({green, redirect}) =
 };
 
 /* ================= MUNDO ================= */
-export const World: React.FC<{gf: number}> = ({gf}) => {
+export const World: React.FC<{gf: number; sunny?: boolean}> = ({gf, sunny = false}) => {
   const s3 = S("s3"), s2 = S("s2"), s4 = S("s4"), s5 = S("s5"), s6 = S("s6"), s9 = S("s9"), s10 = S("s10"), s11 = S("s11");
   const before = (s: typeof s3) => gf < s.startFrame;
 
@@ -747,20 +747,20 @@ export const World: React.FC<{gf: number}> = ({gf}) => {
 
       {/* ---------- BAIRRO AO FUNDO + NÉVOA DE DISTÂNCIA ---------- */}
       <Backdrop city={before(s3) ? city : house} />
-      <fog attach="fog" args={[mixHex(mixHex("#cfe2f2", "#5a6576", track("sky.darkness", gf, 0)), "#f7c7a0", clamp01((gf - finalCut) / 15)), camDist + 10, camDist + 60]} />
+      <fog attach="fog" args={[sunny ? "#d6ecfb" : mixHex(mixHex("#cfe2f2", "#5a6576", track("sky.darkness", gf, 0)), "#f7c7a0", clamp01((gf - finalCut) / 15)), camDist + 10, camDist + 60]} />
       {/* ---------- NUVENS E CHUVA ---------- */}
-      <Clouds gf={gf} />
-      {gf < finalCut + 15 && <Rain gf={gf} density={density} opacity={0.55} floorAt={groundAt} />}
+      <Clouds gf={gf} sunny={sunny} />
+      {!sunny && gf < finalCut + 15 && <Rain gf={gf} density={density} opacity={0.55} floorAt={groundAt} />}
       <ambientLight intensity={0.3} />
       <hemisphereLight args={["#d6ecff", "#5d7a3a", 0.9]} />
-      <directionalLight position={[5, 10, 8]} intensity={1.7 - track("sky.darkness", gf, 0) * 0.6} color="#fff1d6" />
+      <directionalLight position={[5, 10, 8]} intensity={sunny ? 1.8 : 1.7 - track("sky.darkness", gf, 0) * 0.6} color="#fff1d6" />
       <directionalLight position={[-6, 4, 9]} intensity={0.35} color="#cfe3ff" />
     </group>
   );
 };
 
-const Clouds: React.FC<{gf: number}> = ({gf}) => {
-  const dark = track("sky.darkness", gf, 0);
+const Clouds: React.FC<{gf: number; sunny?: boolean}> = ({gf, sunny}) => {
+  const dark = sunny ? 0 : track("sky.darkness", gf, 0);
   const col = mixHex("#ffffff", "#5b6577", dark);
   const colB = mixHex("#dfe6ee", "#454e5e", dark);
   const drop = dark * 1.0;
