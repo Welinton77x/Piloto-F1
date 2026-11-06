@@ -1,0 +1,17 @@
+name: Stills
+on: workflow_dispatch
+jobs:
+  s:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: unzip -q por-que-piloto-f1.zip && bash por-que-piloto-f1/ci/stills.sh
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with: {name: imagens, path: app/out/*.png}
+        
