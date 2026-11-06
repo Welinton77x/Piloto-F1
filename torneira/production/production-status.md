@@ -8,3 +8,8 @@
 - **Preferências herdadas:** explicação calma e técnica; legenda uma fala por vez; estilo 3D liso v5; mascote do vídeo com reações; trilha leve sem direitos; chuva/ambiente baixos; final sem ícones de comentar/compartilhar; CTA "comente X / comente Y".
 - **Reaproveitamento previsto:** pipeline de `rua-alagada/app` (cenas, câmera, legendas, selos, mascote, áudio), com diorama novo.
 - **Pendências:** voz, implementação, render e verificação.
+
+## Fase 2 — registro técnico
+- **Voz:** a API do plano gratuito recusou a voz da biblioteca ("Free users cannot use library voices via the API", erro 402 no workflow). Gerada então pelo conector da ElevenLabs no chat (mesma voz Matheus, `eleven_multilingual_v2`, uma tomada, 1.104 créditos), baixada (host `elevenlabsusercontent.com` liberado no ambiente `piloto-f1`) e transcrita com `eleven_scribe_v1` (0 crédito) para os tempos por palavra; cortada por cena em `app/public/vo/sN.mp3` + `app/src/data/timing.json`. Narração completa: `production/narracao-completa-matheus.mp3` (85,5 s).
+- **Cortes derivados da voz:** 2912 frames ≈ 97,1 s.
+- **Ajustes de enquadramento/geometria (conteúdo inalterado):** canos e bomba subterrâneos na face do corte; morro menor; câmeras das cenas da ETA centradas nos tanques; cozinha mais à frente; hidrômetro e subida no muro externo; resumo da s11 como panorâmica da represa até a casa (o sistema inteiro não cabe em 9:16).
