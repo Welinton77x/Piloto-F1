@@ -1,0 +1,10 @@
+{
+  "title": "Por que o piloto de F1 parece só ficar sentado?",
+  "subtitle": "Roteiro do vídeo",
+  "author": "Piloto F1",
+  "company": "Canal Piloto F1",
+  "sections": [
+    {"id": "introducao", "title": "Introdução", "body": "Conteúdo da introdução..."},
+    {"id": "metodologia", "title": "Metodologia", "body": "Conteúdo da metodologia..."}
+  ]
+}
