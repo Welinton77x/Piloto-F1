@@ -1,16 +1,16 @@
-"""Narração da rua alagada com ElevenLabs (voz Liam, aprovada pelo usuário) + tempos por palavra.
+"""Narração do vídeo da torneira com ElevenLabs (voz Matheus, escolhida pelo usuário) + tempos por palavra.
 Uso (uma vez; cobra créditos a cada execução):
-    ELEVENLABS_API_KEY=... python rua-alagada/app/scripts/tts_elevenlabs.py
+    ELEVENLABS_API_KEY=... python torneira/app/scripts/tts_elevenlabs.py
 Lê src/data/scene-plan.ts, escreve public/vo/sN.mp3 e src/data/timing.json.
 Configuração calma (roteiro v2): stability 0,6, style 0,2, speed 0,95."""
-import base64, json, os, re, subprocess, urllib.request
+import base64, json, os, re, subprocess, urllib.error, urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 KEY = os.environ["ELEVENLABS_API_KEY"]
-VOICE = os.environ.get("ELEVENLABS_VOICE_ID", "TX3LPaxmHKxFdv7VOQHJ")  # Liam
+VOICE = os.environ.get("ELEVENLABS_VOICE_ID", "NQmLEqxcRTkWYIYZSYod")  # Matheus - Energetic and Dynamic (escolhida pelo usuário)
 MODEL = os.environ.get("ELEVENLABS_MODEL", "eleven_multilingual_v2")
-SETTINGS = {"stability": 0.6, "similarity_boost": 0.8, "style": 0.2, "use_speaker_boost": True, "speed": 0.95}
+SETTINGS = {"stability": 0.5, "similarity_boost": 0.8, "style": 0.3, "use_speaker_boost": True, "speed": 1.0}
 
 src = (ROOT / "src/data/scene-plan.ts").read_text(encoding="utf-8")
 items = re.findall(r'voKey: "(s\d+)".*?narration: "((?:[^"\\]|\\.)*)"', src, flags=re.S)
@@ -57,7 +57,10 @@ for k, text in items:
         data=json.dumps(body).encode(),
         headers={"xi-api-key": KEY, "Content-Type": "application/json"},
     )
-    r = json.load(urllib.request.urlopen(req))
+    try:
+        r = json.load(urllib.request.urlopen(req))
+    except urllib.error.HTTPError as e:
+        raise SystemExit(f"ElevenLabs {e.code}: {e.read()[:400]!r}")
     mp3 = ROOT / f"public/vo/{k}.mp3"
     mp3.write_bytes(base64.b64decode(r["audio_base64"]))
     al = r["alignment"]
