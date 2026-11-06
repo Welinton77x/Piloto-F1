@@ -1,7 +1,7 @@
 import React from "react";
 import {AbsoluteFill, useCurrentFrame} from "remotion";
 import type {Badge, Kind} from "../data/scene-plan";
-import {TAIL, VO_OFFSET, norm, wordLocal} from "../data/scenes";
+import {TAIL, VO_OFFSET, finalCut, norm, wordLocal} from "../data/scenes";
 import type {TimedScene} from "../data/scenes";
 import {L, SP, clamp01, easeOut, mixHex} from "../lib/anim";
 import {project} from "../lib/camera";
@@ -104,23 +104,26 @@ const buildPhrases = (s: TimedScene): Phrase[] => {
   }
   if (cur.length) groups.push(cur);
   const out: Phrase[] = [];
-  for (const g of groups) {
+  // trechos longos são divididos (recursivamente, perto do meio) até caberem em 2 linhas
+  const push = (g: W[]) => {
     const len = g.map((w) => w.t).join(" ").length;
-    if (len <= 38) out.push({words: g, start: g[0].start, end: g[g.length - 1].end});
-    else {
-      // divide perto do meio, em limite de palavra
-      let best = 1, bestD = 1e9, accLen = 0;
-      for (let i = 0; i < g.length - 1; i++) {
-        accLen += g[i].t.length + 1;
-        const d = Math.abs(accLen - len / 2);
-        if (d < bestD) {
-          bestD = d;
-          best = i + 1;
-        }
-      }
-      for (const part of [g.slice(0, best), g.slice(best)]) out.push({words: part, start: part[0].start, end: part[part.length - 1].end});
+    if (len <= 34 || g.length < 2) {
+      out.push({words: g, start: g[0].start, end: g[g.length - 1].end});
+      return;
     }
-  }
+    let best = 1, bestD = 1e9, accLen = 0;
+    for (let i = 0; i < g.length - 1; i++) {
+      accLen += g[i].t.length + 1;
+      const d = Math.abs(accLen - len / 2);
+      if (d < bestD) {
+        bestD = d;
+        best = i + 1;
+      }
+    }
+    push(g.slice(0, best));
+    push(g.slice(best));
+  };
+  groups.forEach(push);
   return out;
 };
 
@@ -288,7 +291,7 @@ const Hydrograph: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
 /* s11 (a): balança "chega × sai" */
 const Balance: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
   const k = s.k;
-  const a = Math.round(70 * k), b = Math.round(216 * k);
+  const a = Math.round(70 * k), b = finalCut - s.startFrame;
   if (f < a || f >= b) return null;
   const inflow = track("inflowBar.value", s.startFrame + f, 0);
   const outflow = track("outflowBar.value", s.startFrame + f, 0);
@@ -311,15 +314,16 @@ const Balance: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
 
 /* s11 (b): marca + ícones */
 const Brand: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
-  const wf = Math.round(318 * s.k);
-  const ci = wordLocal(s, "Comenta") ?? Math.round(274 * s.k);
+  const wf = wordLocal(s, "Dentro") ?? Math.round(318 * s.k);
+  const ci = wordLocal(s, "comente") ?? Math.round(274 * s.k);
+  const sh = wordLocal(s, "manda") ?? ci + 60;
   if (f < ci - 4) return null;
-  const pulse = 1 + 0.08 * Math.max(0, Math.sin((f - ci) * 0.3)) * (f < ci + 40 ? 1 : 0);
+  const pulseAt = (f0: number) => 1 + 0.1 * Math.max(0, Math.sin((f - f0) * 0.3)) * (f >= f0 && f < f0 + 40 ? 1 : 0);
   return (
     <>
       <div style={{position: "absolute", left: 0, right: 0, top: 1060, display: "flex", justifyContent: "center", gap: 560, opacity: clamp01((f - ci) / 6)}}>
         {[0, 1].map((i) => (
-          <svg key={i} width={96} height={96} viewBox="0 0 24 24" style={{transform: `scale(${i === 0 ? pulse : 1})`}}>
+          <svg key={i} width={96} height={96} viewBox="0 0 24 24" style={{transform: `scale(${i === 0 ? pulseAt(ci) : pulseAt(sh)})`, opacity: i === 0 ? 1 : clamp01((f - sh + 6) / 6)}}>
             {i === 0 ? <path d="M4 4h16v12H9l-5 4z" fill="#fff" stroke="#101820" strokeWidth="1.4" strokeLinejoin="round" /> : <path d="M4 12l16-8-6 16-3-7z" fill="#fff" stroke="#101820" strokeWidth="1.4" strokeLinejoin="round" />}
           </svg>
         ))}

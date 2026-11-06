@@ -2,16 +2,16 @@
 import React, {useLayoutEffect, useMemo, useRef} from "react";
 import * as THREE from "three";
 import {random} from "remotion";
-import {S, timed} from "../data/scenes";
+import {S, finalCut, timed} from "../data/scenes";
 import {track} from "../lib/track";
 import {clamp01, mixHex, rad} from "../lib/anim";
-import {mapX} from "../lib/camera";
+import {mapX, poseAt} from "../lib/camera";
 import {Mascot} from "./Mascot";
 
 export const FACE = 1; // face cortada (z) voltada para a câmera
-const ZB = -2.6; // fundo do diorama
-const DEPTH = FACE - ZB;
-const ZC = (FACE + ZB) / 2;
+const ZB = -2.6; // profundidade das peças locais (piscinão, juntas...)
+const FAR = -48; // rua, solo e rio continuam até o horizonte
+const DEPTH = FACE - FAR;
 
 // layout real (u3d, esquemático)
 export const X = {
@@ -21,7 +21,7 @@ export const X = {
   inlet: 2.0, green: [3.0, 4.8] as const, river: [4.8, 6.2] as const,
   res: [3.1, 4.6] as const,
 };
-export const Y = {soilBottom: -3.6, riverBed: -2.9, resTop: -1.6, resBottom: -2.75, pipeIn: -0.9, pipeOut: -1.25};
+export const Y = {soilBottom: -18, riverBed: -2.9, resTop: -1.6, resBottom: -2.75, pipeIn: -0.9, pipeOut: -1.25};
 const CURB = 0.18;
 
 const C = {
@@ -36,7 +36,7 @@ const M: React.FC<{c: string; o?: number; e?: string; ei?: number; metal?: numbe
 );
 
 /** caixa por limites: x0..x1, y0..y1, z0..z1 */
-const B: React.FC<{x: [number, number]; y: [number, number]; z?: [number, number]; c: string; o?: number; e?: string; ei?: number}> = ({x, y, z = [ZB, FACE], c, o, e, ei}) => {
+const B: React.FC<{x: [number, number]; y: [number, number]; z?: [number, number]; c: string; o?: number; e?: string; ei?: number}> = ({x, y, z = [FAR, FACE], c, o, e, ei}) => {
   const w = x[1] - x[0], h = y[1] - y[0], d = z[1] - z[0];
   if (w <= 0.0001 || h <= 0.0001 || d <= 0.0001) return null;
   return (
@@ -90,7 +90,7 @@ const Rain: React.FC<{gf: number; density: number; opacity: number; floorAt: (x:
         tmp.scale.set(0, 0, 0);
       } else {
         const x = -5.2 + random("rx" + i) * 12.2;
-        const z = ZB + random("rz" + i) * (DEPTH + 1.2);
+        const z = -4 + random("rz" + i) * 6.4;
         const top = 9.5, bottom = floorAt(x);
         const span = top - bottom;
         const speed = 0.55 + random("rs" + i) * 0.15;
@@ -162,6 +162,97 @@ const Tree: React.FC<{x: number; z: number; s?: number}> = ({x, z, s = 1}) => (
   </group>
 );
 
+/* ---------------- telhado (prisma triangular extrudado em z) ---------------- */
+const RoofGeo: React.FC<{w: number; h: number; d: number}> = ({w, h, d}) => {
+  const shape = useMemo(() => {
+    const sh = new THREE.Shape();
+    sh.moveTo(-w / 2, 0);
+    sh.lineTo(w / 2, 0);
+    sh.lineTo(0, h);
+    sh.closePath();
+    return sh;
+  }, [w, h]);
+  return <extrudeGeometry args={[shape, {depth: d, bevelEnabled: false}]} />;
+};
+
+/* ---------------- calçada de placas (instanciada) ---------------- */
+const Pavers: React.FC<{x: [number, number]; perm: number}> = ({x, perm}) => {
+  const ref = useRef<THREE.InstancedMesh>(null);
+  const tmp = useMemo(() => new THREE.Object3D(), []);
+  const size = 0.38;
+  const cols = Math.max(1, Math.round((x[1] - x[0] - 0.08) / size));
+  const rows = 40;
+  const n = cols * rows;
+  const gap = 0.035 + perm * 0.03;
+  const tw = (x[1] - x[0] - 0.08) / cols;
+  useLayoutEffect(() => {
+    const m = ref.current;
+    if (!m) return;
+    let k = 0;
+    for (let r = 0; r < rows; r++)
+      for (let c = 0; c < cols; c++) {
+        tmp.position.set(x[0] + 0.04 + tw * (c + 0.5), CURB - 0.005, FACE - size * (r + 0.5));
+        tmp.scale.set(tw - gap, 0.03, size - gap);
+        tmp.updateMatrix();
+        m.setMatrixAt(k++, tmp.matrix);
+      }
+    m.instanceMatrix.needsUpdate = true;
+  });
+  return (
+    <instancedMesh ref={ref} args={[undefined, undefined, n]}>
+      <boxGeometry args={[1, 1, 1]} />
+      <M c={mixHex("#d3d7dd", "#b7bdb0", perm)} />
+    </instancedMesh>
+  );
+};
+
+/* ---------------- casas, árvores e morros ao fundo (o bairro continua) ---------------- */
+const Backdrop: React.FC<{city: number}> = ({city}) => {
+  const houses: [number, number, string, string][] = [
+    [-5.3, -4.6, "#f2e6d0", "#b24a36"],
+    [-5.3, -8.2, "#dfe9f2", "#4f6d8f"],
+    [-5.3, -11.8, "#f5d9b8", "#b24a36"],
+    [-5.3, -15.4, "#e8e2f0", "#6b4f8f"],
+    [-8.4, -3.0, "#f2e6d0", "#4f6d8f"],
+    [-8.4, -7.0, "#f5d9b8", "#b24a36"],
+    [8.2, -2.5, "#dfe9f2", "#b24a36"],
+    [8.2, -6.4, "#f2e6d0", "#4f6d8f"],
+    [8.2, -10.3, "#f5d9b8", "#6b4f8f"],
+    [11.4, -4.0, "#e8e2f0", "#b24a36"],
+  ];
+  return (
+    <group>
+      {city > 0.01 &&
+        houses.map(([x, z, wall, roof], i) => (
+          <group key={i} position={[x, 0.06, z]} scale={[1, city, 1]}>
+            <mesh position={[0, 0.75, 0]}>
+              <boxGeometry args={[1.6, 1.5, 2.2]} />
+              <M c={wall} />
+            </mesh>
+            <mesh position={[0, 1.5, -1.25]}>
+              <RoofGeo w={1.9} h={0.62} d={2.5} />
+              <M c={roof} />
+            </mesh>
+            <mesh position={[x > 0 ? -0.81 : 0.81, 0.6, 0.3]}>
+              <boxGeometry args={[0.02, 0.36, 0.36]} />
+              <M c="#9ad4ff" />
+            </mesh>
+          </group>
+        ))}
+      {[[-7, -1.2], [-2.8, -6], [3.8, -5.5], [7.2, -13], [-7.2, -18], [4.2, -12], [10, -8]].map(([x, z], i) => (
+        <Tree key={i} x={x} z={z} s={0.9 + (i % 3) * 0.15} />
+      ))}
+      {/* morros distantes */}
+      {[[-30, -46, 12], [-8, -50, 15], [16, -48, 13], [36, -44, 10]].map(([x, z, r], i) => (
+        <mesh key={i} position={[x, -r * 0.55, z]} scale={[1.6, 1, 1]}>
+          <icosahedronGeometry args={[r, 1]} />
+          <M c={i % 2 ? "#5f8f5a" : "#6f9a63"} />
+        </mesh>
+      ))}
+    </group>
+  );
+};
+
 /* ---------------- casa ---------------- */
 const House: React.FC<{green: number; redirect: number}> = ({green, redirect}) => {
   const w = X.houseR - X.houseL, cx = (X.houseL + X.houseR) / 2;
@@ -179,10 +270,15 @@ const House: React.FC<{green: number; redirect: number}> = ({green, redirect}) =
         <boxGeometry args={[0.36, 0.32, 0.02]} />
         <M c="#9ad4ff" />
       </mesh>
-      {/* telhado (prisma) */}
-      <mesh position={[0, 1.5 + 0.4, 0]} rotation={[Math.PI / 2, 0, Math.PI / 2]} scale={[1, 1, 1]}>
-        <cylinderGeometry args={[0.95, 0.95, 2.5, 3]} />
+      {/* telhado de duas águas, apoiado no topo das paredes, com beiral */}
+      <mesh position={[0, 1.5, -1.25]}>
+        <RoofGeo w={w + 0.3} h={0.62} d={2.5} />
         <M c={mixHex(C.roof, C.grass2, green)} />
+      </mesh>
+      {/* oitão (triângulo da parede) */}
+      <mesh position={[0, 1.5, -1.1]}>
+        <RoofGeo w={w} h={0.56} d={2.2} />
+        <M c={C.wall} />
       </mesh>
       {green > 0.02 &&
         [-0.45, 0, 0.45].map((x) => (
@@ -247,11 +343,11 @@ export const World: React.FC<{gf: number}> = ({gf}) => {
   const roofGreen = track("roof.green", gf, 0);
 
   // fluxo superficial (setas e filetes)
-  const runoff = gf >= s3.startFrame && gf < s6.startFrame ? track("runoff.flow", gf, 0) : gf >= s11.startFrame && gf < s11.startFrame + s11.durationInFrames * 0.47 ? 1 : 0;
+  const runoff = gf >= s3.startFrame && gf < s6.startFrame ? track("runoff.flow", gf, 0) : gf >= s11.startFrame && gf < finalCut ? 1 : 0;
   const crown = gf >= s4.startFrame && gf < s5.startFrame ? track("crownLine.opacity", gf, 0) : 0;
   const gutterGlow = gf >= s4.startFrame && gf < s6.startFrame ? track("gutter.glow", gf, 0) : 0;
   const pipeFlowSpeed = gf >= S("s8").startFrame && gf < s9.startFrame ? track("pipeFlowArrows.speed", gf, 1) : 1;
-  const flowArrowsAll = gf >= s11.startFrame && gf < s11.startFrame + s11.durationInFrames * 0.47 ? track("flowArrowsAll.opacity", gf, 0) : 0;
+  const flowArrowsAll = gf >= s11.startFrame && gf < finalCut ? track("flowArrowsAll.opacity", gf, 0) : 0;
   const outletRed = gf >= S("s8").startFrame && gf < s9.startFrame + 40 ? clamp01((gf - S("s8").startFrame - S("s8").durationInFrames * 0.27) / (S("s8").durationInFrames * 0.18)) : 0;
 
   // infiltração: natural (s2), cai na s3, volta em pontos na s10
@@ -271,12 +367,12 @@ export const World: React.FC<{gf: number}> = ({gf}) => {
   const binX = 2.75; // lixeira na calçada, atrás (não cobre a grade)
 
   // mascote
-  const mx = mapX(track("mascot.x", gf, -3.0));
+  const mx = gf >= S("s7").startFrame ? mapX(-3.0) : mapX(track("mascot.x", gf, -3.0));
   const my = track("mascot.y", gf, 0);
   const s1 = S("s1");
   const umbrellaTilt = gf < s2.startFrame ? track("umbrella.rotZ", gf, 0) : 0;
   const umbrellaClose = track("umbrella.close", gf, 0);
-  const wave = gf >= s11.startFrame + s11.durationInFrames * 0.55 ? Math.sin((gf - s11.startFrame) * 0.35) * 25 + 60 : 0;
+  const wave = gf >= finalCut + 20 ? Math.sin((gf - s11.startFrame) * 0.35) * 25 + 60 : 0;
   const mascotVis = gf < s2.startFrame ? 1 : before(s3) ? 0 : sidewalks;
   const waterAtMascot = streetWater > CURB ? streetWater - CURB : 0;
 
@@ -285,6 +381,7 @@ export const World: React.FC<{gf: number}> = ({gf}) => {
     return Math.max(streetWater, 0.05);
   };
 
+  const camDist = poseAt(gf).pos.distanceTo(poseAt(gf).target);
   // cores do solo (umedece)
   const soilCol = (c: string) => mixHex(c, C.wet, wet * 0.55);
 
@@ -311,22 +408,31 @@ export const World: React.FC<{gf: number}> = ({gf}) => {
       <B x={[X.res[1], X.river[0]]} y={[-0.5, 0]} c={soilCol(C.soil1)} />
       <B x={[X.river[1], X.soilR]} y={[Y.soilBottom, -0.5]} c={soilCol(C.soil2)} />
       <B x={[X.river[1], X.soilR]} y={[-0.5, 0]} c={soilCol(C.soil1)} />
+      {/* solo e chão além do layout (o mundo continua para os lados) */}
+      <B x={[-44, X.soilL]} y={[Y.soilBottom, -0.5]} c={soilCol(C.soil2)} />
+      <B x={[-44, X.soilL]} y={[-0.5, 0]} c={soilCol(C.soil1)} />
+      <B x={[X.soilR, 44]} y={[Y.soilBottom, -0.5]} c={soilCol(C.soil2)} />
+      <B x={[X.soilR, 44]} y={[-0.5, 0]} c={soilCol(C.soil1)} />
+      {/* camadas mais fundas escurecem (leitura do corte) */}
+      <B x={[-44, 44]} y={[Y.soilBottom, -4.2]} z={[FACE - 0.6, FACE + 0.002]} c={soilCol(C.soil3)} />
+      {/* gramado do lote da casa e das margens (todas as épocas) */}
+      <B x={[-44, X.swL[0]]} y={[0, 0.06]} c={C.grass} />
+      <B x={[X.river[1], 44]} y={[0, 0.06]} c={C.grass} />
       {/* fundo e paredes de concreto do canal do rio */}
       <B x={[X.river[0], X.river[1]]} y={[Y.soilBottom, Y.riverBed]} c={C.concreteD} />
       <B x={[X.river[0], X.river[0] + 0.12]} y={[Y.riverBed, 0.1]} c={C.concrete} />
       <B x={[X.river[1] - 0.12, X.river[1]]} y={[Y.riverBed, 0.1]} c={C.concrete} />
-      <B x={[X.river[0] + 0.12, X.river[1] - 0.12]} y={[Y.riverBed, 0.1]} z={[ZB, ZB + 0.12]} c={C.concreteD} />
-      {/* água do rio */}
-      <B x={[X.river[0] + 0.12, X.river[1] - 0.12]} y={[Y.riverBed, riverLevel]} z={[ZB + 0.12, FACE - 0.02]} c={mixHex(C.water, C.waterD, 0.35)} o={0.82} />
+            {/* água do rio */}
+      <B x={[X.river[0] + 0.12, X.river[1] - 0.12]} y={[Y.riverBed, riverLevel]} z={[FAR, FACE - 0.02]} c={mixHex(C.water, C.waterD, 0.35)} o={0.82} />
 
       {/* ---------- PISCINÃO ---------- */}
       {resVis > 0.01 && (
         <group position={[0, Y.resBottom - 0.15, 0]} scale={[1, resVis, 1]}>
           <group position={[0, -(Y.resBottom - 0.15), 0]}>
-            <B x={[X.res[0], X.res[1]]} y={[Y.resBottom - 0.15, Y.resBottom]} c={C.concreteD} />
-            <B x={[X.res[0], X.res[0] + 0.12]} y={[Y.resBottom, Y.resTop + 0.15]} c={C.concrete} />
-            <B x={[X.res[1] - 0.12, X.res[1]]} y={[Y.resBottom, Y.resTop + 0.15]} c={C.concrete} />
-            <B x={[X.res[0], X.res[1]]} y={[Y.resTop, Y.resTop + 0.15]} c={C.concrete} />
+            <B x={[X.res[0], X.res[1]]} y={[Y.resBottom - 0.15, Y.resBottom]} z={[ZB, FACE]} c={C.concreteD} />
+            <B x={[X.res[0], X.res[0] + 0.12]} y={[Y.resBottom, Y.resTop + 0.15]} z={[ZB, FACE]} c={C.concrete} />
+            <B x={[X.res[1] - 0.12, X.res[1]]} y={[Y.resBottom, Y.resTop + 0.15]} z={[ZB, FACE]} c={C.concrete} />
+            <B x={[X.res[0], X.res[1]]} y={[Y.resTop, Y.resTop + 0.15]} z={[ZB, FACE]} c={C.concrete} />
             <B x={[X.res[0] + 0.12, X.res[1] - 0.12]} y={[Y.resBottom, Y.resTop]} z={[ZB, ZB + 0.12]} c={C.concreteD} />
             {/* pilares internos */}
             {[0.4, 0.8, 1.15].map((f) => (
@@ -376,7 +482,7 @@ export const World: React.FC<{gf: number}> = ({gf}) => {
       {/* ---------- SUPERFÍCIE NATURAL ---------- */}
       {grassScale > 0.01 && (
         <group>
-          <B x={[X.soilL, X.river[0]]} y={[0, 0.06 * grassScale]} c={C.grass} />
+          <B x={[-44, X.river[0]]} y={[0, 0.075 * grassScale]} c={C.grass} />
           {[-4.1, -3.3, -1.6, -0.4, 0.9, 1.8].map((x, i) => (
             <mesh key={x} position={[x, 0.15 * grassScale, -0.5 - (i % 3) * 0.6]} scale={grassScale}>
               <icosahedronGeometry args={[0.28, 0]} />
@@ -397,13 +503,13 @@ export const World: React.FC<{gf: number}> = ({gf}) => {
       {/* rua */}
       {asphalt > 0.01 && (
         <group scale={[1, asphalt, 1]}>
-          <mesh position={[0, 0, ZB]}>
+          <mesh position={[0, 0, FAR]}>
             <StreetGeo />
             <M c={C.asphalt} />
           </mesh>
           {/* faixa central */}
-          {[-1.8, -0.6, 0.6, 1.8].map((z) => (
-            <mesh key={z} position={[0, 0.165, z + ZC + 0.2]}>
+          {Array.from({length: 20}).map((_, i) => FACE - 0.4 - i * 2.4).map((z) => (
+            <mesh key={z} position={[0, 0.165, z]}>
               <boxGeometry args={[0.08, 0.01, 0.5]} />
               <M c="#f2d14b" />
             </mesh>
@@ -420,15 +526,13 @@ export const World: React.FC<{gf: number}> = ({gf}) => {
       {/* calçadas e meio-fio */}
       {sidewalks > 0.01 && (
         <group scale={[1, sidewalks, 1]}>
-          <B x={[X.swL[0], X.swL[1]]} y={[0, CURB]} c={perm > 0.5 ? "#a9b3a0" : C.sidewalk} />
-          <B x={[X.swL[1] - 0.06, X.swL[1]]} y={[0, CURB + 0.01]} c={C.curb} />
-          <B x={[X.swR[0], X.swR[1]]} y={[0, CURB]} c={C.sidewalk} />
-          <B x={[X.swR[0], X.swR[0] + 0.06]} y={[0, CURB + 0.01]} c={C.curb} />
-          {/* juntas do pavimento permeável */}
-          {perm > 0.05 &&
-            [0, 1, 2, 3, 4, 5, 6].map((i) => (
-              <B key={i} x={[X.swL[0] + 0.05, X.swL[1] - 0.05]} y={[CURB, CURB + 0.012]} z={[ZB + 0.25 + i * 0.5, ZB + 0.29 + i * 0.5]} c="#4c7a3f" o={perm} />
-            ))}
+          <B x={[X.swL[0], X.swL[1]]} y={[0, CURB - 0.02]} c={mixHex("#8f969f", "#4c7a3f", perm)} />
+          <Pavers x={[X.swL[0], X.swL[1]]} perm={perm} />
+          <B x={[X.swL[1] - 0.08, X.swL[1]]} y={[0, CURB + 0.02]} c={C.curb} />
+          <B x={[X.swR[0], X.swR[1]]} y={[0, CURB - 0.02]} c="#8f969f" />
+          <Pavers x={[X.swR[0], X.swR[1]]} perm={0} />
+          <B x={[X.swR[0], X.swR[0] + 0.08]} y={[0, CURB + 0.02]} c={C.curb} />
+
           {/* boca de lobo: grade na sarjeta */}
           <B x={[X.inlet - 0.22, X.inlet + 0.2]} y={[0.04, 0.075]} z={[FACE - 0.64, FACE - 0.02]} c="#0d1014" />
           {[0, 1, 2, 3, 4, 5].map((i) => (
@@ -482,7 +586,7 @@ export const World: React.FC<{gf: number}> = ({gf}) => {
       {/* ---------- ÁGUA ACUMULADA NA RUA ---------- */}
       {streetWater > 0.02 && asphalt > 0.5 && (
         <group>
-          <B x={[X.swL[0] - (streetWater > CURB ? 0 : -0.8), X.swR[1] + (streetWater > CURB ? 0 : -0.8)]} y={[0.02, streetWater + 0.012 * Math.sin(gf * 0.3)]} z={[ZB + 0.01, FACE + 0.01]} c={C.water} o={0.62} />
+          <B x={[X.swL[0] - (streetWater > CURB ? 0 : -0.8), X.swR[1] + (streetWater > CURB ? 0 : -0.8)]} y={[0.02, streetWater + 0.012 * Math.sin(gf * 0.3)]} z={[-14, FACE + 0.01]} c={C.water} o={0.62} />
         </group>
       )}
       {/* jato saindo pela boca de lobo (galeria em carga) */}
@@ -539,9 +643,12 @@ export const World: React.FC<{gf: number}> = ({gf}) => {
         />
       )}
 
+      {/* ---------- BAIRRO AO FUNDO + NÉVOA DE DISTÂNCIA ---------- */}
+      <Backdrop city={before(s3) ? city : house} />
+      <fog attach="fog" args={[mixHex("#8fa8c2", "#3d4a5e", track("sky.darkness", gf, 0)), camDist + 8, camDist + 55]} />
       {/* ---------- NUVENS E CHUVA ---------- */}
       <Clouds gf={gf} />
-      {gf < s11.startFrame + s11.durationInFrames * 0.52 && <Rain gf={gf} density={density} opacity={0.55} floorAt={groundAt} />}
+      {gf < finalCut + 15 && <Rain gf={gf} density={density} opacity={0.55} floorAt={groundAt} />}
       <ambientLight intensity={0.55} />
       <hemisphereLight args={["#dbe8ff", "#4a3a2a", 0.55]} />
       <directionalLight position={[4, 9, 7]} intensity={1.25} />

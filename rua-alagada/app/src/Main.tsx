@@ -2,7 +2,7 @@ import React from "react";
 import {AbsoluteFill, Audio, Sequence, continueRender, delayRender, staticFile, useCurrentFrame} from "remotion";
 import {ThreeCanvas} from "@remotion/three";
 import {useThree} from "@react-three/fiber";
-import {VO_OFFSET, config, hasVO, sceneAt, timed} from "./data/scenes";
+import {VO_OFFSET, config, finalCut, hasVO, timed} from "./data/scenes";
 import {World} from "./components/World";
 import {Overlay} from "./components/Overlay";
 import {FOV, poseAt} from "./lib/camera";
@@ -36,8 +36,7 @@ const Background: React.FC = () => {
   const gf = useCurrentFrame();
   const dark = track("sky.darkness", gf, 0);
   const under = track("bgGradient.mix", gf, 0);
-  const s = sceneAt(gf);
-  const brand = s.id === "s11" ? clamp01((gf - s.startFrame - s.durationInFrames * 0.5) / 15) : 0;
+  const brand = clamp01((gf - finalCut) / 15);
   let top = mixHex("#9db7d3", "#3d4a5e", dark);
   let bot = mixHex("#5f7d9e", "#1d2533", dark);
   top = mixHex(top, "#17325c", under);

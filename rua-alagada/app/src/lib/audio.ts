@@ -1,4 +1,4 @@
-import {VO_OFFSET, sceneAt, timed} from "../data/scenes";
+import {VO_OFFSET, finalCut, timed} from "../data/scenes";
 import {track} from "./track";
 import {clamp01} from "./anim";
 
@@ -31,8 +31,7 @@ export const musicVolume = (f: number) => {
 };
 
 export const rainVolume = (f: number) => {
-  const s = sceneAt(f);
   const d = track("rain.density", f, 1);
-  const end = s.id === "s11" && f > s.startFrame + s.durationInFrames * 0.52 ? 0 : 1;
-  return (speaking(f) ? 0.1 : 0.16) * d * end;
+  const end = clamp01((finalCut + 20 - f) / 20);
+  return (speaking(f) ? 0.045 : 0.075) * d * end; // chuva mais baixa (pedido do usuário)
 };

@@ -1,9 +1,9 @@
 // Contrato de dados da Fase 1 — roteiro v2 (AGUARDANDO APROVAÇÃO; v1 aprovada com pedido de mudanças). Derivado de roteiro.md.
 // Mesmos tipos do projeto da F1 (vid/production/scene-plan.ts) para reaproveitar Overlay, badges e legendas.
 export type Kind = "problem" | "solution" | "neutral" | "attention";
-export type CamKey = { f: number; az: number; el: number; dist: number; target: [number, number, number] };
+export type CamKey = { f: number; az: number; el: number; dist: number; target: [number, number, number]; atWord?: string; wordOffset?: number };
 export type Anim = { target: string; unit: string; from: number | string; to: number | string; f0: number; f1: number; fn: "linear" | "easeInOut" | "easeOut" | "easeIn" | "spring" | "sin" | "seeded" };
-export type Badge = { text: string; kind: Kind; f0: number; f1?: number; anchorWord?: string };
+export type Badge = { text: string; kind: Kind; f0: number; f1?: number; anchorWord?: string; untilWord?: string };
 export type AudioCue = { id: string; f: number; kind: "sfx" | "music"; status: "planned" };
 export type ScenePlan = {
   id: string; voKey: string; startFrame: number; durationInFrames: number; narration: string;
@@ -205,7 +205,7 @@ export const scenes: ScenePlan[] = [
 
   { id: "s11", voKey: "s11", startFrame: 3030, durationInFrames: 420,
     narration: "Resumindo: a rua alaga quando chega mais água do que o solo infiltra e a drenagem escoa. Parabéns, agora você sabe para onde a água da chuva vai. Se você sabia, comente chuva. Se não sabia, comente alagado. E segue o Por Dentro Lab e manda para um amigo que ainda acha que a água da chuva vai pro céu de novo.",
-    camera: [{ f: 0, az: 0, el: 8, dist: 48, target: [1.5, -0.8, 0] }, { f: 216, az: 10, el: 8, dist: 44, target: [1.5, -0.8, 0] }, { f: 217, az: 0, el: 4, dist: 10, target: [-3.0, 0.35, 0] }, { f: 420, az: 4, el: 4, dist: 9.5, target: [-3.0, 0.35, 0] }],
+    camera: [{ f: 0, az: 0, el: 8, dist: 48, target: [1.5, -0.8, 0] }, { f: 216, az: 10, el: 8, dist: 44, target: [1.5, -0.8, 0], atWord: "Parabéns", wordOffset: -6 }, { f: 217, az: 0, el: 4, dist: 10, target: [-3.0, 0.6, 0], atWord: "Parabéns", wordOffset: -5 }, { f: 420, az: 4, el: 4, dist: 9.5, target: [-3.0, 0.6, 0] }],
     objects: ["world", "flowArrowsAll", "inflowBar", "outflowBar", "mascot", "umbrella", "wordmark", "iconComment", "iconShare", "bgBrand"],
     animations: [
       { target: "flowArrowsAll.opacity", unit: "0-1", from: 0, to: 1, f0: 13, f1: 76, fn: "easeOut" },
@@ -217,9 +217,10 @@ export const scenes: ScenePlan[] = [
       { target: "iconComment.scale", unit: "x", from: 1, to: 1.15, f0: 274, f1: 305, fn: "sin" },
     ],
     badges: [
-      { text: "CHUVA > INFILTRA + ESCOA", kind: "neutral", f0: 115, anchorWord: "escoa" },
-      { text: "NA SUA RUA ACONTECE?", kind: "attention", f0: 242, anchorWord: "acontece" },
-    ], highlights: ["infiltra", "escoa", "Por Dentro Lab"], captions: cap,
+      { text: "CHUVA > INFILTRA + ESCOA", kind: "neutral", f0: 115, anchorWord: "escoa", untilWord: "Parabéns" },
+      { text: "SABIA? COMENTE CHUVA", kind: "solution", f0: 300, anchorWord: "sabia" },
+      { text: "NÃO SABIA? COMENTE ALAGADO", kind: "attention", f0: 380, anchorWord: "não" },
+    ], highlights: ["infiltra", "escoa", "Parabéns", "chuva", "alagado", "Por Dentro Lab", "amigo", "céu"], captions: cap,
     audioCues: [cue("system-flow", 0), cue("pop-badge", 242), cue("music-out", 382, "music")] },
 ];
 

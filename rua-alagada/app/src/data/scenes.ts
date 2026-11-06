@@ -49,26 +49,38 @@ export const timed: TimedScene[] = planned.map((s, i) => {
     k,
     voWords: tm?.words,
     voSeconds: tm?.duration,
-    camera: s.camera.map((c: CamKey, j: number, arr: CamKey[]) => {
-      // preserva cortes secos (keys consecutivas)
-      const prev = arr[j - 1];
-      const f = prev && c.f - prev.f === 1 ? sc(prev.f) + 1 : sc(c.f);
-      return {...c, f};
-    }),
+    camera: [],
     animations: s.animations.map((a: Anim) => ({...a, f0: sc(a.f0), f1: sc(a.f1)})),
     audioCues: s.audioCues.map((c) => ({...c, f: sc(c.f)})),
     badges: [],
   };
+  // câmera: frames reescalados; keys com atWord seguem a palavra; cortes secos preservados
+  const cam: CamKey[] = [];
+  s.camera.forEach((c: CamKey, j: number) => {
+    const prev = s.camera[j - 1];
+    const wf = c.atWord ? wordLocal(base, c.atWord) : undefined;
+    let f = wf !== undefined ? wf + (c.wordOffset ?? 0) : prev && c.f - prev.f === 1 ? cam[j - 1].f + 1 : sc(c.f);
+    if (j > 0 && f <= cam[j - 1].f) f = cam[j - 1].f + 1;
+    cam.push({...c, f: Math.min(f, d - 1)});
+  });
+  base.camera = cam;
   base.badges = s.badges.map((b: Badge) => {
     const wf = b.anchorWord ? wordLocal(base, b.anchorWord) : undefined;
+    const uf = b.untilWord ? wordLocal(base, b.untilWord) : undefined;
     const f0 = wf ?? sc(b.f0);
-    return {...b, f0, f1: b.f1 !== undefined ? sc(b.f1) : undefined};
+    return {...b, f0, f1: uf !== undefined ? uf - 4 : b.f1 !== undefined ? sc(b.f1) : undefined};
   });
   t += d;
   return base;
 });
 
 export const totalFrames = t;
+/** frame global do corte para o close final (s11): plano geral antes, mascote depois */
+export const finalCut = (() => {
+  const s11 = timed[timed.length - 1];
+  const k = s11.camera.find((c) => c.atWord && (c.wordOffset ?? 0) > -6) ?? s11.camera[2];
+  return s11.startFrame + (k ? k.f : Math.round(s11.durationInFrames * 0.5));
+})();
 export const hasVO = (key: string) => Boolean(timing[key]);
 export const sceneAt = (gf: number) => timed.find((s) => gf >= s.startFrame && gf < s.startFrame + s.durationInFrames) ?? timed[timed.length - 1];
 export const S = (id: string) => timed.find((s) => s.id === id)!;
