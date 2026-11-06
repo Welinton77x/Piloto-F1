@@ -29,7 +29,7 @@ export const layout = {
 export const scenes: ScenePlan[] = [
   { id: "s1", voKey: "s1", startFrame: 0, durationInFrames: 210,
     narration: "Uma chuva forte, e a rua vira rio. Para onde essa água deveria ir?",
-    camera: [{ f: 0, az: 20, el: 4, dist: 9, target: [-1.4, 0.6, 0] }, { f: 210, az: 8, el: 4, dist: 7, target: [-1.4, 0.6, 0] }],
+    camera: [{ f: 0, az: 22, el: 6, dist: 9, target: [-3.0, 0.75, 0.2] }, { f: 210, az: 10, el: 6, dist: 7.5, target: [-3.0, 0.75, 0.2] }],
     objects: ["street", "sidewalkL", "sidewalkR", "house", "mascot", "umbrella", "rain", "streetWater", "bottle"],
     animations: [
       { target: "streetWater.level", unit: "u3d", from: 0.35, to: 0.35, f0: 0, f1: 210, fn: "linear" },
@@ -80,7 +80,7 @@ export const scenes: ScenePlan[] = [
 
   { id: "s4", voKey: "s4", startFrame: 945, durationInFrames: 330,
     narration: "Por isso a rua tem caimento para as bordas. A água corre pela sarjeta até a boca de lobo, a entrada da drenagem.",
-    camera: [{ f: 0, az: 35, el: 22, dist: 14, target: [0, 0.1, 0.3] }, { f: 142, az: 35, el: 22, dist: 12, target: [0, 0.1, 0.3] }, { f: 144, az: 35, el: 18, dist: 6, target: [2.6, 0, 0.6] }, { f: 330, az: 50, el: 18, dist: 6, target: [2.6, 0, 0.6] }],
+    camera: [{ f: 0, az: -25, el: 24, dist: 15, target: [0, 0.1, 0.3] }, { f: 142, az: -25, el: 24, dist: 13, target: [0, 0.1, 0.3] }, { f: 143, az: -30, el: 38, dist: 6.5, target: [2.4, 0, 0.6] }, { f: 330, az: -42, el: 38, dist: 6.5, target: [2.4, 0, 0.6] }],
     objects: ["street", "crownLine", "flowLines", "gutter", "inlet", "inletWaterfall", "labelSlope"],
     animations: [
       { target: "crownLine.opacity", unit: "0-1", from: 0, to: 1, f0: 0, f1: 39, fn: "easeOut" },
@@ -96,7 +96,7 @@ export const scenes: ScenePlan[] = [
 
   { id: "s5", voKey: "s5", startFrame: 1275, durationInFrames: 210,
     narration: "Embaixo da rua, as galerias pluviais levam essa água até um córrego ou rio.",
-    camera: [{ f: 0, az: 50, el: 18, dist: 6, target: [2.6, 0, 0.6] }, { f: 115, az: 0, el: 0, dist: 18, target: [4.4, -1.2, 0] }, { f: 210, az: 0, el: 0, dist: 18, target: [4.4, -1.2, 0] }],
+    camera: [{ f: 0, az: -42, el: 38, dist: 6.5, target: [2.4, 0, 0.6] }, { f: 115, az: 0, el: 0, dist: 18, target: [4.4, -1.2, 0] }, { f: 210, az: 0, el: 0, dist: 18, target: [4.4, -1.2, 0] }],
     objects: ["galeria", "pipeWater", "pipeFlowArrows", "river", "galeriaOutlet", "labelRiver", "bgGradient"],
     animations: [
       { target: "camera.pose", unit: "spring(damping 200)", from: "inlet", to: "subsolo", f0: 0, f1: 115, fn: "spring" },
@@ -110,7 +110,7 @@ export const scenes: ScenePlan[] = [
 
   { id: "s6", voKey: "s6", startFrame: 1485, durationInFrames: 315,
     narration: "Primeiro problema: lixo e folhas obstruem a boca de lobo, e a água se acumula. Limpeza e descarte correto evitam isso.",
-    camera: [{ f: 0, az: 40, el: 25, dist: 7, target: [2.4, 0.1, 0.5] }, { f: 166, az: 40, el: 25, dist: 7, target: [2.4, 0.1, 0.5] }, { f: 167, az: 25, el: 14, dist: 13, target: [0, 0.2, 0] }, { f: 243, az: 25, el: 14, dist: 13, target: [0, 0.2, 0] }, { f: 244, az: 30, el: 18, dist: 8, target: [1.8, 0.4, 0.4] }, { f: 315, az: 30, el: 18, dist: 8, target: [1.8, 0.4, 0.4] }],
+    camera: [{ f: 0, az: -35, el: 36, dist: 7, target: [2.3, 0.1, 0.5] }, { f: 166, az: -35, el: 36, dist: 7, target: [2.3, 0.1, 0.5] }, { f: 167, az: -20, el: 16, dist: 14, target: [0, 0.2, 0] }, { f: 243, az: -20, el: 16, dist: 14, target: [0, 0.2, 0] }, { f: 244, az: -25, el: 22, dist: 9, target: [1.4, 0.4, 0.4] }, { f: 315, az: -25, el: 22, dist: 9, target: [1.4, 0.4, 0.4] }],
     objects: ["trashBags", "leaves", "inlet", "inletWaterfall", "streetWater", "mascot", "trashBin", "bgGradient"],
     animations: [
       { target: "bgGradient.mix", unit: "azul profundo→céu", from: 1, to: 0, f0: 0, f1: 22, fn: "easeInOut" },
@@ -167,7 +167,7 @@ export const scenes: ScenePlan[] = [
 
   { id: "s9", voKey: "s9", startFrame: 2460, durationInFrames: 360,
     narration: "Por isso existem os reservatórios de detenção, os piscinões. Eles guardam o excesso no pico da chuva e devolvem aos poucos, reduzindo a vazão máxima.",
-    camera: [{ f: 0, az: 0, el: 6, dist: 20, target: [4.6, -2.0, 0] }, { f: 360, az: 10, el: 6, dist: 18, target: [4.6, -2.0, 0] }],
+    camera: [{ f: 0, az: 0, el: 6, dist: 20, target: [4.6, -3.4, 0] }, { f: 360, az: 10, el: 6, dist: 18, target: [4.6, -3.4, 0] }],
     objects: ["reservoir", "weir", "weirFlow", "outletPipe", "river", "streetWater", "levelRuler", "clockIcon", "reservoirLabel", "hydrograph"],
     animations: [
       { target: "reservoir.scaleY", unit: "x", from: 0, to: 1, f0: 60, f1: 100, fn: "spring" },
@@ -205,7 +205,7 @@ export const scenes: ScenePlan[] = [
 
   { id: "s11", voKey: "s11", startFrame: 3030, durationInFrames: 420,
     narration: "Resumindo: a rua alaga quando chega mais água do que o solo infiltra e a drenagem escoa. Na sua rua, isso acontece? Comenta aí e segue o Por Dentro Lab.",
-    camera: [{ f: 0, az: 0, el: 8, dist: 46, target: [0, 0.5, 0] }, { f: 216, az: 12, el: 8, dist: 40, target: [0, 0.5, 0] }, { f: 218, az: 0, el: 4, dist: 7, target: [-3.0, 1.0, 0] }, { f: 420, az: 0, el: 4, dist: 7, target: [-3.0, 1.0, 0] }],
+    camera: [{ f: 0, az: 0, el: 8, dist: 48, target: [1.5, -0.8, 0] }, { f: 216, az: 10, el: 8, dist: 44, target: [1.5, -0.8, 0] }, { f: 217, az: 0, el: 4, dist: 10, target: [-3.0, 0.35, 0] }, { f: 420, az: 4, el: 4, dist: 9.5, target: [-3.0, 0.35, 0] }],
     objects: ["world", "flowArrowsAll", "inflowBar", "outflowBar", "mascot", "umbrella", "wordmark", "iconComment", "iconShare", "bgBrand"],
     animations: [
       { target: "flowArrowsAll.opacity", unit: "0-1", from: 0, to: 1, f0: 13, f1: 76, fn: "easeOut" },
