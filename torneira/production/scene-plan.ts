@@ -10,9 +10,9 @@ export type ScenePlan = {
   camera: CamKey[]; objects: string[]; animations: Anim[]; badges: Badge[]; highlights: string[];
   captions: { mode: "one-phrase-at-a-time"; maxChars: 20; maxLines: 2; gapFrames: 4; status: "provisional" }; audioCues: AudioCue[];
 };
-export type VideoConfig = { width: 1080; height: 1920; fps: 30; durationInFrames: 2700; theme: "smooth-3d-water-city"; language: "pt-BR" };
+export type VideoConfig = { width: 1080; height: 1920; fps: 30; durationInFrames: 2910; theme: "smooth-3d-water-city"; language: "pt-BR" };
 
-export const config: VideoConfig = { width: 1080, height: 1920, fps: 30, durationInFrames: 2700, theme: "smooth-3d-water-city", language: "pt-BR" };
+export const config: VideoConfig = { width: 1080, height: 1920, fps: 30, durationInFrames: 2910, theme: "smooth-3d-water-city", language: "pt-BR" };
 const cap = { mode: "one-phrase-at-a-time", maxChars: 20, maxLines: 2, gapFrames: 4, status: "provisional" } as const;
 const cue = (id: string, f: number, kind: "sfx" | "music" = "sfx"): AudioCue => ({ id, f, kind, status: "planned" });
 
@@ -147,19 +147,20 @@ export const scenes: ScenePlan[] = [
     badges: [{ text: "RESERVA EM CASA", kind: "solution", f0: 40, anchorWord: "reserva" }], highlights: ["reserva", "gravidade", "torneira"], captions: cap,
     audioCues: [cue("water-glass", 150)] },
 
-  { id: "s11", voKey: "s11", startFrame: 2265, durationInFrames: 435,
-    narration: "Resumindo: represa, tratamento, reservatório, rede, caixa d'água e torneira. Se você já sabia, comente TORNEIRA. Se não sabia, comente REPRESA. E segue o Por Dentro Lab.",
-    camera: [{ f: 0, az: 0, el: 12, dist: 34, target: [-1, 1, 0] }, { f: 199, az: 6, el: 12, dist: 32, target: [-1, 1, 0], atWord: "Se", wordOffset: -6 }, { f: 200, az: 0, el: 4, dist: 7.6, target: [10.2, 1.3, 0.4], atWord: "Se", wordOffset: -5 }, { f: 435, az: 5, el: 4, dist: 7.2, target: [10.2, 1.3, 0.4] }],
+  { id: "s11", voKey: "s11", startFrame: 2265, durationInFrames: 645,
+    narration: "Resumindo: represa, tratamento, reservatório, rede, caixa d'água e torneira. Agora você sabe de onde vem a água que sai na sua torneira! Se você já sabia, comente TORNEIRA. Se não sabia, comente REPRESA. E segue o Por Dentro Lab pra descobrir mais coisas por dentro.",
+    camera: [{ f: 0, az: 0, el: 12, dist: 34, target: [-1, 1, 0] }, { f: 199, az: 6, el: 12, dist: 32, target: [-1, 1, 0], atWord: "Agora", wordOffset: -6 }, { f: 200, az: 0, el: 4, dist: 7.6, target: [10.2, 1.3, 0.4], atWord: "Agora", wordOffset: -5 }, { f: 645, az: 5, el: 4, dist: 7.2, target: [10.2, 1.3, 0.4] }],
     objects: ["world", "flowHighlight", "mascot", "confetti2D", "hearts2D", "wordmark"],
     animations: [
       { target: "flowHighlight.stage", unit: "etapa 0-6", from: 0, to: 6, f0: 10, f1: 190, fn: "linear" },
     ],
     badges: [
-      { text: "REPRESA → TORNEIRA", kind: "neutral", f0: 10, anchorWord: "Resumindo", untilWord: "Se" },
+      { text: "REPRESA → TORNEIRA", kind: "neutral", f0: 10, anchorWord: "Resumindo", untilWord: "Agora" },
+      { text: "AGORA VOCÊ SABE!", kind: "solution", f0: 200, anchorWord: "Agora", untilWord: "sabia" },
       { text: "SABIA? COMENTE TORNEIRA", kind: "solution", f0: 240, anchorWord: "sabia", untilWord: "segue" },
       { text: "NÃO SABIA? COMENTE REPRESA", kind: "attention", f0: 300, anchorWord: "não", untilWord: "segue" },
     ], highlights: ["represa", "tratamento", "reservatório", "rede", "caixa", "torneira", "TORNEIRA", "REPRESA", "Por Dentro Lab"], captions: cap,
-    audioCues: [cue("system-flow", 0), cue("celebrate", 200), cue("music-out", 405, "music")] },
+    audioCues: [cue("system-flow", 0), cue("celebrate", 200), cue("music-out", 615, "music")] },
 ];
 
 export const checkPlan = () => {
