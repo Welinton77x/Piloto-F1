@@ -37,7 +37,7 @@ export const S1: React.FC = () => {
       <World frame={f} />
       <Stripes speed={0.1} z={-1.2} />
       <Stripes speed={0.1} z={1.4} />
-      <Driver outfit="racing" position={[0, 0.2, 0]} headTilt={Math.sin(f / 9) * 1.5} />
+      <Driver outfit="racing" position={[0, 0.2, 0]} headTilt={Math.sin(f / 9) * 1.5} mood={f < 60 ? "wow" : "happy"} wave={f < 60 ? 15 : 0} waveL={f < 60 ? 15 : 0} />
     </group>
   );
 };
@@ -52,7 +52,7 @@ export const S2: React.FC = () => {
       <World frame={f} />
       <group rotation={[0, Math.PI / 2, 0]} position={[0, 0.02, 0]}>
         <Car opacity={bodyOp} />
-        <Driver outfit="racing" seated position={[0, 0.2, -0.45]} scale={0.8} xray={1 - bodyOp} />
+        <Driver outfit="racing" seated position={[0, 0.2, -0.45]} scale={0.8} xray={1 - bodyOp} mood="wow" />
       </group>
       {Array.from({length: 40}).map((_, i) => {
         const period = 45;
@@ -96,12 +96,12 @@ export const S3: React.FC = () => {
         <>
           <group rotation={[0, Math.PI / 2 + (yaw * Math.PI) / 180 * 0.25, 0]} position={[0, 0.02, 0]}>
             <Car />
-            <Driver outfit="racing" seated position={[0, 0.2, -0.45]} scale={0.8} headTilt={tilt} xray={0.7} />
+            <Driver outfit="racing" seated position={[0, 0.2, -0.45]} scale={0.8} headTilt={tilt} xray={0.7} mood="effort" />
           </group>
         </>
       ) : (
         <>
-          <Driver outfit="racing" position={[-0.4, 0, 0]} headTilt={tilt} />
+          <Driver outfit="racing" position={[-0.4, 0, 0]} headTilt={tilt} mood="shock" waveL={25} wave={25} />
           {/* seta lateral */}
           <group position={[0.4, 1.1, 0]} scale={[arrow, 1, 1]}>
             <mesh position={[0.3, 0, 0]} rotation={[0, 0, -Math.PI / 2]}>
@@ -155,6 +155,7 @@ export const S4: React.FC = () => {
         helmetScale={helm}
         helmetColor={f > 220 ? "#8e1b17" : undefined}
         xray={0.8}
+        mood={f < 170 ? "worry" : "effort"}
         position={[0, 0, 0]}
       />
       {/* músculos do pescoço: segmentos que engrossam */}
@@ -229,7 +230,7 @@ export const S6: React.FC = () => {
   return (
     <group>
       <LabFloor />
-      <Driver outfit="racing" position={[-0.5, 0, 0]} xray={0.5} />
+      <Driver outfit="racing" position={[-0.5, 0, 0]} xray={0.5} mood="worry" />
       {/* termômetro */}
       <group position={[0.5, 0.2, 0]}>
         <mesh position={[0, 0.7, 0]}>
@@ -314,7 +315,7 @@ export const S7: React.FC = () => {
         <boxGeometry args={[0.6, 0.8, 0.1]} />
         <Mat color="#222831" />
       </mesh>
-      <Driver outfit="racing" seated position={[0, 0, 0.2]} lean={lean * 0.6} harness={harness} coreGlow={core} xray={0.55} />
+      <Driver outfit="racing" seated position={[0, 0, 0.2]} lean={lean * 0.6} harness={harness} coreGlow={core} xray={0.55} mood="shock" />
       {/* pedal e pé */}
       <group position={[0, 0.2, 0.85]}>
         <mesh position={[0, 0, depth]} rotation={[rad(-20), 0, 0]}>
@@ -428,7 +429,7 @@ export const S9: React.FC = () => {
             <boxGeometry args={[0.9, 0.4, 0.5]} />
             <Mat color="#6b7686" />
           </mesh>
-          <Driver outfit="training" position={[0, 0.4, 0]} scale={0.9} />
+          <Driver outfit="training" position={[0, 0.4, 0]} scale={0.9} mood="happy" wave={20} />
           <mesh position={[-1.3, 1.2, 0]}>
             <boxGeometry args={[0.14, 0.5, 0.14]} />
             <Mat color="#6b7686" />
@@ -440,12 +441,12 @@ export const S9: React.FC = () => {
               <Mat color="#9aa4b2" />
             </mesh>
           ))}
-          <Driver outfit="training" position={[0, 0.25, 0]} scale={0.9} lean={8 + Math.sin(lf * 0.4) * 3} />
+          <Driver outfit="training" position={[0, 0.25, 0]} scale={0.9} lean={8 + Math.sin(lf * 0.4) * 3} mood="effort" />
         </group>
       )}
       {cut === 2 && (
         <group>
-          <Driver outfit="training" position={[0, Math.abs(Math.sin(lf * 0.1)) * -0.3 + 0.0, 0]} scale={0.9} coreGlow={1} />
+          <Driver outfit="training" position={[0, Math.abs(Math.sin(lf * 0.1)) * -0.3 + 0.0, 0]} scale={0.9} coreGlow={1} mood="joy" />
           <mesh position={[0, 1.3 - Math.abs(Math.sin(lf * 0.1)) * 0.3, 0]} rotation={[0, 0, Math.PI / 2]}>
             <cylinderGeometry args={[0.03, 0.03, 1.6, 6]} />
             <Mat color="#9aa4b2" />
@@ -485,7 +486,7 @@ export const S10: React.FC = () => {
       {f < 120 ? (
         <group>
           {/* cadeira gigante */}
-          <group scale={1.6}>
+          <group scale={1.0}>
             <mesh position={[0, 0.2, 0]}>
               <boxGeometry args={[0.8, 0.1, 0.8]} />
               <Mat color="#d83a34" />
@@ -501,7 +502,7 @@ export const S10: React.FC = () => {
               </mesh>
             ))}
           </group>
-          <Driver outfit="racing" seated position={[0, 0.42, -0.1]} scale={0.38} />
+          <Driver outfit="racing" seated position={[0, 0.24, -0.05]} scale={0.85} mood="joy" waveL={30} wave={30} />
         </group>
       ) : (
         <Driver outfit="racing" neckScale={neckS} legMetal={metal} position={[0, 0, 0]} headTilt={Math.sin(f * 0.15) * 2} />
@@ -528,7 +529,7 @@ export const S11: React.FC = () => {
   return (
     <group>
       <World frame={f} />
-      <Driver outfit="mechanic" position={[0, 0, 0]} wave={wave} scale={0.95} />
+      <Driver outfit="mechanic" position={[0, 0, 0]} wave={wave} waveL={20} mood="joy" scale={0.95} />
     </group>
   );
 };

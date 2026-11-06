@@ -1,6 +1,6 @@
 import React from "react";
 import * as THREE from "three";
-import {random} from "remotion";
+import {random, useCurrentFrame} from "remotion";
 import {rad} from "../lib/anim";
 
 export const Mat: React.FC<{
@@ -41,6 +41,9 @@ export type DriverProps = {
   scale?: number;
   position?: [number, number, number];
   rotationY?: number;
+  mood?: Mood;
+  look?: number; // -1..1 olhar lateral
+  waveL?: number; // graus do braço esquerdo (para fora)
 };
 
 const OUT = {
@@ -64,6 +67,84 @@ const Cap: React.FC<{r: number; l: number; color: string; opacity?: number; posi
   </mesh>
 );
 
+
+type Mood = "happy" | "wow" | "shock" | "worry" | "effort" | "joy";
+
+/** Rosto expressivo: olhos com brilho, sobrancelhas e boca mudam conforme o humor. */
+const Face: React.FC<{mood: Mood; f: number; look?: number}> = ({mood, f, look = 0}) => {
+  const blink = f % 96 < 4 ? 0.15 : 1;
+  const m = {
+    happy: {eye: 1, brow: 0.0, bz: 0, by: 0.0, mouth: "smile"},
+    joy: {eye: 0.9, brow: 0.0, bz: 0, by: 0.03, mouth: "grin"},
+    wow: {eye: 1.3, brow: 0.0, bz: 0, by: 0.06, mouth: "o"},
+    shock: {eye: 1.45, brow: 0.0, bz: 0, by: 0.08, mouth: "big"},
+    worry: {eye: 1.1, brow: 0.35, bz: 0, by: 0.03, mouth: "frown"},
+    effort: {eye: 0.8, brow: -0.4, bz: 0, by: -0.02, mouth: "grit"},
+  }[mood];
+  const shake = mood === "shock" ? Math.sin(f * 1.7) * 0.004 : 0;
+  return (
+    <group position={[shake, 0, 0]}>
+      {[-1, 1].map((s) => (
+        <group key={s}>
+          <mesh position={[s * 0.125, -0.015, 0.275]} scale={[1, 1.15 * m.eye * blink, 0.55]}>
+            <sphereGeometry args={[0.078, 14, 10]} />
+            <Mat color="#ffffff" />
+          </mesh>
+          <mesh position={[s * 0.125 + look * 0.025, -0.015, 0.32]} scale={[1, 1.15 * Math.min(1, m.eye) * blink, 0.4]}>
+            <sphereGeometry args={[0.044, 12, 8]} />
+            <Mat color="#1b1b1b" />
+          </mesh>
+          <mesh position={[s * 0.125 + look * 0.025 + 0.015, 0.012, 0.337]} scale={[1, 1, 0.3]}>
+            <sphereGeometry args={[0.016, 8, 6]} />
+            <Mat color="#ffffff" emissive="#ffffff" ei={0.5} />
+          </mesh>
+          {/* sobrancelha */}
+          <mesh position={[s * 0.125, 0.105 + m.by, 0.29]} rotation={[0, 0, s * -m.brow]}>
+            <boxGeometry args={[0.1, 0.022, 0.02]} />
+            <Mat color="#4a2f1f" />
+          </mesh>
+          {/* bochecha */}
+          <mesh position={[s * 0.2, -0.1, 0.25]} scale={[1, 0.7, 0.4]}>
+            <sphereGeometry args={[0.04, 8, 6]} />
+            <Mat color="#ff8a80" />
+          </mesh>
+        </group>
+      ))}
+      {/* boca */}
+      {m.mouth === "smile" && (
+        <mesh position={[0, -0.115, 0.3]} rotation={[0, 0, Math.PI]}>
+          <torusGeometry args={[0.06, 0.014, 5, 12, Math.PI]} />
+          <Mat color="#8a3b2a" />
+        </mesh>
+      )}
+      {m.mouth === "frown" && (
+        <mesh position={[0, -0.16, 0.3]}>
+          <torusGeometry args={[0.05, 0.013, 5, 12, Math.PI]} />
+          <Mat color="#8a3b2a" />
+        </mesh>
+      )}
+      {(m.mouth === "grin" || m.mouth === "o" || m.mouth === "big") && (
+        <group position={[0, m.mouth === "grin" ? -0.11 : -0.13, 0.295]}>
+          <mesh scale={m.mouth === "grin" ? [1.5, 0.8, 0.4] : m.mouth === "o" ? [0.9, 1.15, 0.4] : [1.3, 1.7, 0.4]}>
+            <sphereGeometry args={[0.055, 12, 8]} />
+            <Mat color="#3a1414" />
+          </mesh>
+          <mesh position={[0, -0.03, 0.012]} scale={[1, 0.5, 0.3]}>
+            <sphereGeometry args={[0.045, 8, 6]} />
+            <Mat color="#ff7a85" />
+          </mesh>
+        </group>
+      )}
+      {m.mouth === "grit" && (
+        <mesh position={[0, -0.13, 0.305]}>
+          <boxGeometry args={[0.12, 0.045, 0.02]} />
+          <Mat color="#ffffff" />
+        </mesh>
+      )}
+    </group>
+  );
+};
+
 /** Personagem original, low-poly arredondado ("chibi"). 'mechanic' = mascote do canal (calça, camisa e boné azuis). */
 export const Driver: React.FC<DriverProps> = ({
   outfit = "racing",
@@ -81,7 +162,12 @@ export const Driver: React.FC<DriverProps> = ({
   scale = 1,
   position = [0, 0, 0],
   rotationY = 0,
+  mood = "happy",
+  look = 0,
+  waveL = 0,
 }) => {
+  const fr = useCurrentFrame();
+  const sway = Math.sin(fr / 14) * 3;
   const c = OUT[outfit];
   const op = 1 - xray * 0.65;
   const legColor = legMetal > 0.5 ? "#aab4c0" : c.pants;
@@ -141,7 +227,7 @@ export const Driver: React.FC<DriverProps> = ({
           </group>
         )}
         {/* braço esquerdo (do personagem) */}
-        <group position={[-0.28, 0.4, 0]} rotation={[0, 0, rad(-5)]}>
+        <group position={[-0.28, 0.4, 0]} rotation={[0, 0, rad(-5 - waveL - sway)]}>
           <Cap r={0.07} l={0.2} color={c.shirt} opacity={op} position={[0, -0.17, 0]} />
           <mesh position={[0, -0.36, 0]}>
             <icosahedronGeometry args={[0.085, 1]} />
@@ -161,7 +247,7 @@ export const Driver: React.FC<DriverProps> = ({
           )}
         </group>
         {/* braço direito: gira PARA FORA (+wave) */}
-        <group position={[0.28, 0.4, 0]} rotation={[0, 0, rad(wave + 5)]}>
+        <group position={[0.28, 0.4, 0]} rotation={[0, 0, rad(wave + 5 + sway)]}>
           <Cap r={0.07} l={0.2} color={c.shirt} opacity={op} position={[0, -0.17, 0]} />
           <mesh position={[0, -0.36, 0]}>
             <icosahedronGeometry args={[0.085, 1]} />
@@ -175,92 +261,72 @@ export const Driver: React.FC<DriverProps> = ({
         </mesh>
         {/* cabeça grande e arredondada */}
         <group position={[0, 0.78, 0]} rotation={[0, 0, rad(headTilt)]} scale={helmetScale}>
+          {/* cabeça (pele) */}
+          <mesh>
+            <icosahedronGeometry args={[0.33, 3]} />
+            <Mat color={c.skin} />
+          </mesh>
+          <Face mood={mood} f={fr} look={look} />
           {outfit === "racing" ? (
             <>
-              {/* casco de F1: casca branca aerodinâmica */}
-              <mesh scale={[0.98, 0.94, 1.12]}>
-                <sphereGeometry args={[0.37, 24, 18]} />
-                <Mat color="#f6f7f9" metal={0.25} />
+              {/* capacete clássico de corrida (aberto na frente): calota */}
+              <mesh>
+                <sphereGeometry args={[0.37, 24, 12, 0, Math.PI * 2, 0, 1.08]} />
+                <Mat color={headCol === "#f4f4f4" ? "#f6f7f9" : headCol} metal={0.2} />
               </mesh>
-              {/* queixeira saliente */}
-              <mesh position={[0, -0.2, 0.24]} scale={[1, 0.7, 1]}>
-                <sphereGeometry args={[0.2, 16, 10]} />
-                <Mat color="#f6f7f9" metal={0.25} />
+              {/* laterais e nuca */}
+              <mesh>
+                <sphereGeometry args={[0.37, 24, 12, Math.PI / 2 + 1.05, Math.PI * 2 - 2.1, 1.08, 0.95]} />
+                <Mat color={headCol === "#f4f4f4" ? "#f6f7f9" : headCol} metal={0.2} double />
               </mesh>
-              {/* viseira escura espelhada (faixa larga na frente) */}
-              <mesh scale={[0.98, 0.94, 1.12]}>
-                <sphereGeometry args={[0.378, 24, 10, Math.PI / 2 - 1.05, 2.1, 1.22, 0.62]} />
-                <Mat color="#0c1220" emissive="#1b3a66" ei={0.35} metal={0.9} />
+              {/* listra central laranja + fio azul-escuro */}
+              <mesh position={[0, 0.0, 0]}>
+                <sphereGeometry args={[0.378, 24, 4, Math.PI / 2 - 0.1, 0.2, 0, 1.08]} />
+                <Mat color="#ff7a00" />
               </mesh>
-              {/* moldura da viseira */}
-              <mesh scale={[0.98, 0.94, 1.12]}>
-                <sphereGeometry args={[0.374, 24, 4, Math.PI / 2 - 1.1, 2.2, 1.17, 0.05]} />
-                <Mat color="#222a38" />
+              <mesh>
+                <sphereGeometry args={[0.382, 24, 3, Math.PI / 2 - 0.2, 0.06, 0, 1.08]} />
+                <Mat color="#1b2a6b" />
               </mesh>
-              <mesh scale={[0.98, 0.94, 1.12]}>
-                <sphereGeometry args={[0.374, 24, 4, Math.PI / 2 - 1.1, 2.2, 1.84, 0.05]} />
-                <Mat color="#222a38" />
+              <mesh>
+                <sphereGeometry args={[0.382, 24, 3, Math.PI / 2 + 0.14, 0.06, 0, 1.08]} />
+                <Mat color="#1b2a6b" />
               </mesh>
-              {/* entrada de ar no topo */}
-              <mesh position={[0, 0.34, -0.05]}>
-                <boxGeometry args={[0.14, 0.07, 0.24]} />
-                <Mat color="#1a1d24" />
+              {/* faixa em volta da borda */}
+              <mesh position={[0, 0.17, 0]} rotation={[0, 0, 0]}>
+                <torusGeometry args={[0.328, 0.018, 5, 28, Math.PI * 2]} />
+                <Mat color="#1b2a6b" />
               </mesh>
-              {/* aerofólio traseiro do capacete */}
-              <mesh position={[0, 0.14, -0.4]} rotation={[rad(-20), 0, 0]}>
-                <boxGeometry args={[0.34, 0.03, 0.14]} />
-                <Mat color="#1a1d24" />
+              {/* óculos levantado na testa */}
+              <mesh position={[0, 0.22, 0.305]} rotation={[-0.62, 0, 0]}>
+                <boxGeometry args={[0.27, 0.085, 0.04]} />
+                <Mat color="#101624" emissive="#4dd0ff" ei={0.25} metal={0.6} />
               </mesh>
-              {/* listras do capacete (vermelho e azul) */}
-              <mesh position={[0, 0.2, 0]} scale={[1, 0.94, 1.12]}>
-                <boxGeometry args={[0.1, 0.4, 0.76]} />
-                <Mat color="#d83a34" />
+              <mesh position={[0, 0.22, 0.285]} rotation={[-0.62, 0, 0]}>
+                <boxGeometry args={[0.31, 0.11, 0.02]} />
+                <Mat color="#f0b400" />
               </mesh>
-              <mesh position={[0, 0.18, 0]} scale={[1, 0.94, 1.12]}>
-                <boxGeometry args={[0.03, 0.42, 0.78]} />
-                <Mat color="#1e4fd8" />
-              </mesh>
-              {/* gola protetora do pescoço */}
-              <mesh position={[0, -0.33, 0]}>
-                <cylinderGeometry args={[0.15, 0.17, 0.08, 10]} />
-                <Mat color="#d83a34" />
-              </mesh>
+              {/* jugular */}
+              {[-1, 1].map((s) => (
+                <mesh key={s} position={[s * 0.3, -0.18, 0.1]} rotation={[0, 0, s * 0.15]}>
+                  <boxGeometry args={[0.018, 0.26, 0.03]} />
+                  <Mat color="#1a1d24" />
+                </mesh>
+              ))}
             </>
           ) : (
             <>
-              <mesh>
-                <icosahedronGeometry args={[0.32, 2]} />
-                <Mat color={c.skin} />
-              </mesh>
-              {/* boné */}
-              <mesh position={[0, 0.03, -0.01]}>
-                <sphereGeometry args={[0.335, 12, 6, 0, Math.PI * 2, 0, 1.05]} />
+              {/* boné: calota concêntrica com a cabeça */}
+              <mesh rotation={[-0.12, 0, 0]}>
+                <sphereGeometry args={[0.35, 20, 10, 0, Math.PI * 2, 0, 1.12]} />
                 <Mat color={headCol} />
               </mesh>
-              <mesh position={[0, 0.1, 0.3]} rotation={[rad(-8), 0, 0]} scale={[1, 0.25, 1]}>
-                <cylinderGeometry args={[0.2, 0.22, 0.2, 10, 1, false, -Math.PI / 2, Math.PI]} />
+              {/* aba curta, para a frente */}
+              <mesh position={[0, 0.16, 0.14]} rotation={[0.18, 0, 0]}>
+                <cylinderGeometry args={[0.24, 0.24, 0.025, 16, 1, false, -Math.PI / 2, Math.PI]} />
                 <Mat color={headCol} />
               </mesh>
             </>
-          )}
-          {/* olhos, bochechas e sorriso (só sem capacete fechado) */}
-          {outfit !== "racing" && [-0.1, 0.1].map((x) => (
-            <group key={x}>
-              <mesh position={[x, 0.0, outfit === "racing" ? 0.34 : 0.3]} scale={[1, 1.35, 0.5]}>
-                <icosahedronGeometry args={[0.04, 1]} />
-                <Mat color="#1b1b1b" />
-              </mesh>
-              <mesh position={[x * 1.6, -0.1, outfit === "racing" ? 0.33 : 0.29]} scale={[1, 0.7, 0.4]}>
-                <icosahedronGeometry args={[0.04, 1]} />
-                <Mat color="#ff8a80" />
-              </mesh>
-            </group>
-          ))}
-          {outfit !== "racing" && (
-            <mesh position={[0, -0.1, 0.31]} rotation={[0, 0, Math.PI]}>
-              <torusGeometry args={[0.055, 0.014, 5, 10, Math.PI]} />
-              <Mat color="#8a3b2a" />
-            </mesh>
           )}
         </group>
       </group>
@@ -274,8 +340,8 @@ export const Car: React.FC<{opacity?: number; yaw?: number; position?: [number, 
   yaw = 0,
   position = [0, 0, 0],
 }) => {
-  const body = "#d83a34";
-  const dark = "#222831";
+  const body = "#f4f4f4";
+  const dark = "#1b2a6b";
   const wheelOp = Math.max(opacity, 0.5);
   return (
     <group position={position} rotation={[0, rad(yaw), 0]}>
@@ -291,15 +357,15 @@ export const Car: React.FC<{opacity?: number; yaw?: number; position?: [number, 
       </mesh>
       {/* faixa branca */}
       <mesh position={[0, 0.415, 0.7]}>
-        <boxGeometry args={[0.12, 0.012, 1.4]} />
-        <Mat color="#f4f4f4" opacity={opacity} />
+        <boxGeometry args={[0.18, 0.012, 1.6]} />
+        <Mat color="#ff7a00" opacity={opacity} />
       </mesh>
       {/* laterais (sidepods) */}
       {[-1, 1].map((s) => (
         <group key={s}>
           <mesh position={[s * 0.45, 0.26, -0.2]}>
             <boxGeometry args={[0.36, 0.24, 1.2]} />
-            <Mat color="#b82f2a" opacity={opacity} />
+            <Mat color="#ff7a00" opacity={opacity} />
           </mesh>
           <mesh position={[s * 0.45, 0.28, 0.42]}>
             <boxGeometry args={[0.3, 0.14, 0.12]} />
@@ -321,10 +387,10 @@ export const Car: React.FC<{opacity?: number; yaw?: number; position?: [number, 
         <boxGeometry args={[0.34, 0.05, 0.6]} />
         <Mat color="#101318" opacity={opacity} />
       </mesh>
-      {/* halo */}
-      <mesh position={[0, 0.62, 0.3]} rotation={[rad(90), 0, 0]}>
-        <torusGeometry args={[0.2, 0.025, 4, 10, Math.PI]} />
-        <Mat color="#9aa4b2" opacity={wheelOp} />
+      {/* arco de proteção (carro clássico, sem halo) */}
+      <mesh position={[0, 0.6, -0.15]}>
+        <boxGeometry args={[0.1, 0.22, 0.1]} />
+        <Mat color="#1b2a6b" opacity={opacity} />
       </mesh>
       {/* asa dianteira */}
       <mesh position={[0, 0.1, 2.15]}>
