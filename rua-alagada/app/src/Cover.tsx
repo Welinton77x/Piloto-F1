@@ -20,12 +20,7 @@ export const Cover: React.FC = () => (
       <div style={{fontSize: 118}}>A RUA</div>
       <div style={{fontSize: 156, color: "#FFD400"}}>ALAGA?</div>
     </div>
-    <div style={{position: "absolute", top: 1420, left: 0, right: 0, display: "flex", justifyContent: "center"}}>
-      <div style={{display: "flex", alignItems: "center", gap: 14, background: "#1E88E5", color: "#fff", fontFamily: FONT, fontWeight: 900, fontSize: 46, padding: "12px 30px", borderRadius: 26, border: "4px solid rgba(0,0,0,0.35)", boxShadow: "0 6px 0 rgba(0,0,0,0.3)"}}>
-        A CIDADE EM RAIO-X 3D
-      </div>
-    </div>
-    <div style={{position: "absolute", top: 1530, left: 0, right: 0, textAlign: "center", fontFamily: FONT, fontWeight: 900, fontSize: 54, color: "#fff", WebkitTextStroke: "9px #101820", paintOrder: "stroke fill"}}>
+    <div style={{position: "absolute", top: 1440, left: 0, right: 0, textAlign: "center", fontFamily: FONT, fontWeight: 900, fontSize: 54, color: "#fff", WebkitTextStroke: "9px #101820", paintOrder: "stroke fill"}}>
       POR DENTRO <span style={{color: "#4DD0FF"}}>LAB</span>
     </div>
   </AbsoluteFill>
