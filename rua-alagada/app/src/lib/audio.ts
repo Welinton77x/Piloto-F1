@@ -27,11 +27,11 @@ export const musicVolume = (f: number) => {
   const total = timed[timed.length - 1].startFrame + timed[timed.length - 1].durationInFrames;
   const fadeIn = clamp01(f / 30);
   const fadeOut = clamp01((total - f) / 45);
-  return (speaking(f) ? 0.06 : 0.13) * fadeIn * fadeOut;
+  return (speaking(f) ? 0.07 : 0.14) * fadeIn * fadeOut;
 };
 
 export const rainVolume = (f: number) => {
   const d = track("rain.density", f, 1);
   const end = clamp01((finalCut + 20 - f) / 20);
-  return (speaking(f) ? 0.045 : 0.075) * d * end; // chuva mais baixa (pedido do usuário)
+  return (speaking(f) ? 0.025 : 0.042) * d * end; // chuva mais baixa (pedidos do usuário)
 };

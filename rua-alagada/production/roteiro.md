@@ -89,3 +89,9 @@ Pedido: "observe o cenário então quero no mesmo estilo use o personagem dele d
 - **Cenário:** materiais lisos (sem facetado), cores vivas, grama em folhas que balança, flores, árvores de copa redonda, pinheiros, morros suaves, nuvens fofas, luz de sol quente; pôr do sol quando a chuva passa no fecho.
 - **Mascote:** formato arredondado de blocos, cabeça grande, cabelo, orelhas; rosto com sobrancelhas, olhos com brilho, nariz, bochechas e bocas (sorriso, falando, "O", preocupado, bravo, gargalhada); respira, pisca, mexe a boca junto com a narração.
 - **Reações por cena:** susto/preocupação (s1), preocupado (s3), bravo com o lixo e feliz ao jogar na lixeira (s6), medo e tremor no temporal (s7–s8), alívio (s9), mostra a calçada (s10), comemora com braços para cima, pulos, confete e corações no "Parabéns", aponta para o comentário e acena (s11).
+
+## v5 — ajustes finais do usuário (2026-11-06)
+Pedido: "corrige esse bug da calçada e troque essa música e abaixa um pouco o som da chuva".
+- Calçada: removido o desvio do cano da calha que atravessava a calçada (barra cinza atrás do mascote); base da calçada permeável volta a ser cinza na face do corte, com o verde só nas juntas do topo; a saída do cano cai no gramado.
+- Música nova (composta por código): marimba, baixo pizzicato, chocalho, bumbo leve e estalos, Dó maior, 104 bpm, loop de 18,5 s.
+- Chuva: volume reduzido de novo (~45% menor que a v4).

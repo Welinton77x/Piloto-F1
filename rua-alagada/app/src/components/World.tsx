@@ -390,11 +390,11 @@ const House: React.FC<{green: number; redirect: number}> = ({green, redirect}) =
         <boxGeometry args={[0.08, 1.46, 0.08]} />
         <M c="#8b939d" />
       </mesh>
-      {/* desvio do cano para o jardim de chuva */}
+      {/* saída do cano no gramado (a água cai na grama, não na calçada) */}
       {redirect > 0.02 && (
-        <mesh position={[w / 2 + 0.05 + 0.35 * redirect, 0.06, 1.15]}>
-          <boxGeometry args={[0.7 * redirect, 0.07, 0.08]} />
-          <M c="#8b939d" />
+        <mesh position={[w / 2 + 0.05, 0.02, 1.15]} rotation={[-Math.PI / 2, 0, 0]} scale={redirect}>
+          <circleGeometry args={[0.12, 16]} />
+          <M c="#3fa9f5" o={0.7} />
         </mesh>
       )}
     </group>
@@ -618,7 +618,9 @@ export const World: React.FC<{gf: number}> = ({gf}) => {
       {/* calçadas e meio-fio */}
       {sidewalks > 0.01 && (
         <group scale={[1, sidewalks, 1]}>
-          <B x={[X.swL[0], X.swL[1]]} y={[0, CURB - 0.02]} c={mixHex("#8f969f", "#4c7a3f", perm)} />
+          <B x={[X.swL[0], X.swL[1]]} y={[0, CURB - 0.035]} c="#8f969f" />
+          {/* camada entre as placas: cinza (comum) ou grama nas juntas (permeável), só no topo */}
+          <B x={[X.swL[0] + 0.01, X.swL[1] - 0.01]} y={[CURB - 0.035, CURB - 0.02]} z={[FAR, FACE - 0.01]} c={mixHex("#8f969f", "#4c7a3f", perm)} />
           <Pavers x={[X.swL[0], X.swL[1]]} perm={perm} />
           <B x={[X.swL[1] - 0.08, X.swL[1]]} y={[0, CURB + 0.02]} c={C.curb} />
           <B x={[X.swR[0], X.swR[1]]} y={[0, CURB - 0.02]} c="#8f969f" />

@@ -66,24 +66,73 @@ loop = rain[:n].copy()
 loop[:fade] = loop[:fade] * np.linspace(0, 1, fade) + rain[n : n + fade] * np.linspace(1, 0, fade)
 save("rain.wav", norm(loop, 0.7), 0.6)
 
-# trilha: pad calmo em lá menor (Am–F–C–G), 4 compassos de 4 s, loop de 16 s
-chords = [[57, 60, 64], [53, 57, 60], [48, 52, 55], [55, 59, 62]]
-mus = np.zeros(SR * 16)
-for i, ch in enumerate(chords):
-    tt = t(4)
-    seg = np.zeros_like(tt)
-    for m in ch:
-        f = 440 * 2 ** ((m - 69) / 12)
-        seg += np.sin(2 * np.pi * f * tt) * 0.5 + np.sin(2 * np.pi * f * 2 * tt + 0.3) * 0.12
-    e = np.minimum(1, tt / 0.8) * np.minimum(1, (4 - tt) / 0.8)
-    mus[i * SR * 4 : (i + 1) * SR * 4] += seg * e
-    # pulso suave de baixo
-    f0 = 440 * 2 ** ((ch[0] - 12 - 69) / 12)
-    for b in range(4):
-        bt = t(0.9)
-        start = i * SR * 4 + b * SR
-        mus[start : start + len(bt)] += 0.5 * np.sin(2 * np.pi * f0 * bt) * np.exp(-bt * 4)
-save("music.wav", norm(lp_fast(mus, 0.3), 0.6), 0.5)
+# trilha (v5): leve e animada — marimba + baixo pizzicato + chocalho + bumbo leve + estalos, Dó maior, 104 bpm,
+# progressão C–G–Am–F em 8 compassos (loop de ~18,5 s). Composta por código, sem direitos de terceiros.
+BPM = 104
+beat = 60 / BPM
+bars = 8
+mus = np.zeros(int(SR * beat * 4 * bars) + SR)
+
+
+def note(m):
+    return 440 * 2 ** ((m - 69) / 12)
+
+
+def add(x, start_s, sig):
+    i = int(start_s * SR)
+    j = min(len(x), i + len(sig))
+    x[i:j] += sig[: j - i]
+
+
+def marimba(f, dur=0.45, vel=1.0):
+    tt = t(dur)
+    env_ = np.exp(-tt * 9)
+    return vel * env_ * (np.sin(2 * np.pi * f * tt) + 0.35 * np.sin(2 * np.pi * f * 4 * tt) * np.exp(-tt * 30) + 0.15 * np.sin(2 * np.pi * f * 2 * tt))
+
+
+def pluck_bass(f, dur=0.5):
+    tt = t(dur)
+    return np.exp(-tt * 6) * (np.sin(2 * np.pi * f * tt) + 0.3 * np.sin(2 * np.pi * f * 2 * tt))
+
+
+prog = [(48, [60, 64, 67]), (43, [59, 62, 67]), (45, [60, 64, 69]), (41, [60, 65, 69])] * 2
+# motivo de melodia (graus por colcheia, None = pausa), varia na segunda volta
+motif = [[0, None, 2, 1, 0, None, 2, None], [1, None, 0, 2, 1, None, None, 2]]
+for b, (root, triad) in enumerate(prog):
+    t0 = b * 4 * beat
+    # baixo: tempo 1 e 3 (+ passagem no 4)
+    add(mus, t0, 0.55 * pluck_bass(note(root)))
+    add(mus, t0 + 2 * beat, 0.45 * pluck_bass(note(root + 7)))
+    add(mus, t0 + 3.5 * beat, 0.3 * pluck_bass(note(root + 12), 0.25))
+    # acordes em marimba suave nos contratempos
+    for k in (1, 3):
+        for m in triad:
+            add(mus, t0 + k * beat + beat / 2, 0.12 * marimba(note(m), 0.3))
+    # melodia uma oitava acima
+    mt = motif[(b // 2) % 2]
+    for i, d in enumerate(mt):
+        if d is None:
+            continue
+        m = triad[d] + 12
+        add(mus, t0 + i * beat / 2, 0.32 * marimba(note(m), 0.4, 1.0 - 0.15 * (i % 2)))
+    # bumbo leve (1 e 3), estalo (2 e 4), chocalho (colcheias)
+    for k in range(4):
+        tk = t0 + k * beat
+        if k in (0, 2):
+            tt = t(0.25)
+            add(mus, tk, 0.6 * np.sin(2 * np.pi * (110 * np.exp(-tt * 18) + 45) * tt) * np.exp(-tt * 14))
+        else:
+            tt = t(0.12)
+            add(mus, tk, 0.18 * (lp_fast(rng.standard_normal(len(tt)), 0.6) - lp_fast(rng.standard_normal(len(tt)), 0.1)) * np.exp(-tt * 45))
+        for h in (0, 0.5):
+            tt = t(0.07)
+            sh = rng.standard_normal(len(tt))
+            add(mus, tk + h * beat, 0.07 * (sh - lp_fast(sh, 0.3)) * np.exp(-tt * 50))
+loop_len = int(SR * beat * 4 * bars)
+tail = mus[loop_len:]
+mus = mus[:loop_len]
+mus[: len(tail)] += tail  # dobra a cauda no começo: loop sem emenda
+save("music.wav", norm(mus, 0.6), 0.35)
 
 # pop dos selos
 tt = t(0.18)
