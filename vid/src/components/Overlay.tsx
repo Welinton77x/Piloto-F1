@@ -300,7 +300,7 @@ const Closing: React.FC = () => {
           position: "absolute",
           left: 90,
           right: 90,
-          top: 1130,
+          top: 1200,
           textAlign: "center",
           fontFamily,
           fontWeight: 900,
@@ -314,10 +314,10 @@ const Closing: React.FC = () => {
       >
         POR DENTRO <span style={{color: "#4DD0FF"}}>LAB</span>
       </div>
-      <svg width={110} height={110} viewBox="0 0 24 24" style={{position: "absolute", left: 250, top: 1230, transform: `scale(${pulse})`}}>
+      <svg width={110} height={110} viewBox="0 0 24 24" style={{position: "absolute", left: 250, top: 1310, transform: `scale(${pulse})`}}>
         <path d="M4 4h16v12H9l-5 4z" fill="#fff" stroke="#101820" strokeWidth="1.4" strokeLinejoin="round" />
       </svg>
-      <svg width={110} height={110} viewBox="0 0 24 24" style={{position: "absolute", right: 250, top: 1230}}>
+      <svg width={110} height={110} viewBox="0 0 24 24" style={{position: "absolute", right: 250, top: 1310}}>
         <path d="M4 12l16-8-6 16-3-7z" fill="#fff" stroke="#101820" strokeWidth="1.4" strokeLinejoin="round" />
       </svg>
     </>

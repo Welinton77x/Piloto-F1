@@ -20,6 +20,14 @@ jobs:
           cd app && mkdir -p out
           npx remotion render PilotoF1 out/raw.mp4 --gl=swangle --concurrency=100% --crf=18
           ffmpeg -y -i out/raw.mp4 -af loudnorm=I=-14:TP=-1.5:LRA=11 -c:v copy -c:a aac out/piloto-f1.mp4
+      - run: |
+          mkdir -p out && cp app/out/piloto-f1.mp4 out/piloto-f1.mp4
+          git config user.name "Claude"
+          git config user.email "noreply@anthropic.com"
+          git add -f out/piloto-f1.mp4
+          git commit -m "Video final" || true
+          git pull --rebase -q || true
+          git push || true
       - if: always()
         uses: actions/upload-artifact@v4
         with: {name: video-final, path: app/out/piloto-f1.mp4}
