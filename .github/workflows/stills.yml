@@ -10,8 +10,7 @@ jobs:
         with: {node-version: 22}
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
-      - run: unzip -q por-que-piloto-f1.zip && bash por-que-piloto-f1/ci/stills.sh
+      - run: unzip -q "por-que-piloto-f1 (1).zip" && bash por-que-piloto-f1/ci/stills.sh
       - if: always()
         uses: actions/upload-artifact@v4
         with: {name: imagens, path: app/out/*.png}
-        
