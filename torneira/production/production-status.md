@@ -1,6 +1,6 @@
 # production-status — Como a água chega na sua torneira?
 
-- **Fase:** 2 EM ANDAMENTO — **roteiro v2 APROVADO** pelo usuário em 2026-11-06 ("Agora sim, eu aprovo pode executar o processo do vídeo, use a voz do Matheus Dynamics energy").
+- **Fase:** 2 CONCLUÍDO — **roteiro v2 APROVADO** pelo usuário em 2026-11-06 ("Agora sim, eu aprovo pode executar o processo do vídeo, use a voz do Matheus Dynamics energy").
 - **Roteiro:** v2 (2026-11-06): final mais caloroso a pedido do usuário ("Agora você sabe de onde vem a água que sai na sua torneira!"), ~97 s, 201 palavras. v1 não aprovada. Tema escolhido pelo usuário ("Como a água chega na torneira", "Cerca de 90 s") entre ideias sugeridas.
 - **Arquivos:** `torneira/production/roteiro.md`, `torneira/production/scene-plan.ts`, este arquivo.
 - **Formato:** 1080×1920, 30 fps, ~97 s = 2910 frames, 11 cenas; 201 palavras, 1.104 caracteres.
@@ -13,3 +13,8 @@
 - **Voz:** a API do plano gratuito recusou a voz da biblioteca ("Free users cannot use library voices via the API", erro 402 no workflow). Gerada então pelo conector da ElevenLabs no chat (mesma voz Matheus, `eleven_multilingual_v2`, uma tomada, 1.104 créditos), baixada (host `elevenlabsusercontent.com` liberado no ambiente `piloto-f1`) e transcrita com `eleven_scribe_v1` (0 crédito) para os tempos por palavra; cortada por cena em `app/public/vo/sN.mp3` + `app/src/data/timing.json`. Narração completa: `production/narracao-completa-matheus.mp3` (85,5 s).
 - **Cortes derivados da voz:** 2912 frames ≈ 97,1 s.
 - **Ajustes de enquadramento/geometria (conteúdo inalterado):** canos e bomba subterrâneos na face do corte; morro menor; câmeras das cenas da ETA centradas nos tanques; cozinha mais à frente; hidrômetro e subida no muro externo; resumo da s11 como panorâmica da represa até a casa (o sistema inteiro não cabe em 9:16).
+
+## Entrega
+- **Fase 2 CONCLUÍDA.** `torneira/out/torneira.mp4`: H.264 1080×1920, 30 fps, 2912 frames, 97,1 s; AAC 48 kHz; −15,4 LUFS, pico −2,3 dBFS; áudio em todos os segundos (51 MB).
+- Mudanças pedidas pelo usuário durante a Fase 2: boné encaixado sem nome/lâmpada e com aba para frente; legendas uma palavra por vez (estilo da referência); mascote maior.
+- Verificado: `tsc --noEmit`, stills revisados em 6 rodadas, 18 quadros do MP4 revisados (`torneira/out/folha-de-contato.png`). Não verificado por audição.
