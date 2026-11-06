@@ -1,5 +1,10 @@
 name: Stills
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+  push:
+    paths: ["vid/**"]
+permissions:
+  contents: write
 jobs:
   s:
     runs-on: ubuntu-24.04
@@ -10,7 +15,16 @@ jobs:
         with: {node-version: 22}
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
-      - run: unzip -q "por-que-piloto-f1 (1).zip" && bash por-que-piloto-f1/ci/stills.sh
+      - run: bash vid/ci/stills.sh 2>&1 | tee run.log
       - if: always()
-        uses: actions/upload-artifact@v4
-        with: {name: imagens, path: app/out/*.png}
+        run: |
+          mkdir -p stills
+          rm -f stills/*
+          cp app/out/*.png stills/ 2>/dev/null || true
+          tail -n 60 run.log > stills/log.txt
+          git config user.name "Claude"
+          git config user.email "noreply@anthropic.com"
+          git add stills
+          git commit -m "Imagens de teste" || true
+          git pull --rebase -q || true
+          git push || true
