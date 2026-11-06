@@ -95,3 +95,4 @@ Pedido: "corrige esse bug da calçada e troque essa música e abaixa um pouco o 
 - Calçada: removido o desvio do cano da calha que atravessava a calçada (barra cinza atrás do mascote); base da calçada permeável volta a ser cinza na face do corte, com o verde só nas juntas do topo; a saída do cano cai no gramado.
 - Música nova (composta por código): marimba, baixo pizzicato, chocalho, bumbo leve e estalos, Dó maior, 104 bpm, loop de 18,5 s.
 - Chuva: volume reduzido de novo (~45% menor que a v4).
+- Final: removidos o balão de comentar e a seta de compartilhar (pedido do usuário); no "comente" o mascote aponta para quem assiste.

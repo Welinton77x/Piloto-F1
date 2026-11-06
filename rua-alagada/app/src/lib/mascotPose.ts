@@ -84,8 +84,8 @@ export const mascotPose = (gf: number): MascotPose => {
         pose.rArm = [-10, 15 + 140 * up - Math.sin(gf * 0.5) * 8];
         pose.jump = Math.abs(Math.sin(c * 0.22)) * 0.18 * (1 - clamp01((c - 60) / 20));
       } else if (lf >= ci - 6 && lf < ci + 45) {
-        pose.lArm = [-75, 45]; // aponta para o ícone de comentário (à esquerda)
-        pose.rArm = [4, 10];
+        pose.lArm = [4, 10];
+        pose.rArm = [-88, 8]; // aponta para quem está assistindo ("comente")
       } else if (lf >= fw - 10) {
         pose.lArm = [4, 10];
         pose.rArm = [-10, 150 + Math.sin(gf * 0.35) * 20]; // acena

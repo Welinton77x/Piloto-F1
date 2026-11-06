@@ -312,28 +312,14 @@ const Balance: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
   );
 };
 
-/* s11 (b): marca + ícones */
+/* s11 (b): marca do canal (sem ícones de comentar/compartilhar, a pedido do usuário) */
 const Brand: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
   const wf = (wordLocal(s, "segue") ?? Math.round(318 * s.k)) + 2;
-  const ci = wordLocal(s, "comente") ?? Math.round(274 * s.k);
-  const sh = wordLocal(s, "manda") ?? ci + 60;
-  if (f < ci - 4) return null;
-  const pulseAt = (f0: number) => 1 + 0.1 * Math.max(0, Math.sin((f - f0) * 0.3)) * (f >= f0 && f < f0 + 40 ? 1 : 0);
+  if (f < wf) return null;
   return (
-    <>
-      <div style={{position: "absolute", left: 0, right: 0, top: 1100, display: "flex", justifyContent: "center", gap: 600, opacity: clamp01((f - ci) / 6)}}>
-        {[0, 1].map((i) => (
-          <svg key={i} width={96} height={96} viewBox="0 0 24 24" style={{transform: `scale(${i === 0 ? pulseAt(ci) : pulseAt(sh)})`, opacity: i === 0 ? 1 : clamp01((f - sh + 6) / 6)}}>
-            {i === 0 ? <path d="M4 4h16v12H9l-5 4z" fill="#fff" stroke="#101820" strokeWidth="1.4" strokeLinejoin="round" /> : <path d="M4 12l16-8-6 16-3-7z" fill="#fff" stroke="#101820" strokeWidth="1.4" strokeLinejoin="round" />}
-          </svg>
-        ))}
-      </div>
-      {f >= wf && (
-        <div style={{position: "absolute", left: 0, right: 0, top: 290, textAlign: "center", fontFamily: FONT, fontWeight: 900, fontSize: 92, color: "#fff", WebkitTextStroke: "12px #101820", paintOrder: "stroke fill", transform: `scale(${SP(f, wf, 12, 140)})`}}>
-          POR DENTRO <span style={{color: "#4DD0FF"}}>LAB</span>
-        </div>
-      )}
-    </>
+    <div style={{position: "absolute", left: 0, right: 0, top: 290, textAlign: "center", fontFamily: FONT, fontWeight: 900, fontSize: 92, color: "#fff", WebkitTextStroke: "12px #101820", paintOrder: "stroke fill", transform: `scale(${SP(f, wf, 12, 140)})`}}>
+      POR DENTRO <span style={{color: "#4DD0FF"}}>LAB</span>
+    </div>
   );
 };
 
