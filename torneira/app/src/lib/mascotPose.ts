@@ -19,9 +19,9 @@ export const mascotLook = (gf: number): MascotLook => {
   const f = gf - s.startFrame;
   if (s.id === "s11" && gf >= finalCut) {
     const ci = wordLocal(s, "comente") ?? 0;
-    if (f >= ci - 6 && f < ci + 45) return {capLogo: true, rHand: "point"};
+    if (f >= ci - 6 && f < ci + 45) return {rHand: "point"};
   }
-  return {capLogo: true};
+  return {};
 };
 
 export const mascotPose = (gf: number): MascotPose => {

@@ -421,20 +421,30 @@ export const Mascot: React.FC<{position: [number, number, number]; scale?: numbe
           <CurlyHair />
         ) : (
           <>
-            <RB w={0.58} h={0.22} d={0.5} r={0.08} c={col.hair} position={[0, 0.16, -0.03]} />
-            <RB w={0.57} h={0.34} d={0.12} r={0.06} c={col.hair} position={[0, 0.02, -0.2]} />
-            <RB w={0.4} h={0.07} d={0.08} r={0.03} c={col.hair} position={[-0.04, 0.2, 0.22]} rotation={[0, 0, rad(-6)]} />
+            {/* cabelo por baixo do boné: só aparece nas laterais (costeletas) e na nuca */}
+            <RB w={0.565} h={0.16} d={0.42} r={0.06} c={col.hair} position={[0, 0.1, -0.06]} />
+            <RB w={0.57} h={0.3} d={0.12} r={0.06} c={col.hair} position={[0, 0.02, -0.2]} />
           </>
         )}
-        <RB w={0.6} h={look.capLogo ? 0.3 : 0.17} d={0.52} r={0.08} c={col.cap} position={[0, look.capLogo ? 0.35 : 0.3, -0.02]} />
-        <RB w={0.42} h={0.04} d={0.24} r={0.02} c={col.capD} position={[0, 0.23, 0.3]} rotation={[rad(8), 0, 0]} />
-        {look.capLogo && (
-          <>
-            {/* friso amarelo na aba, como na arte do canal */}
-            <RB w={0.44} h={0.018} d={0.03} r={0.008} c="#FFD400" position={[0, 0.236, 0.415]} rotation={[rad(8), 0, 0]} />
-            <CapLogo />
-          </>
-        )}
+        {/* boné encaixado: copa arredondada sobre o topo da cabeça, faixa, aba na testa e botão */}
+        <mesh position={[0, 0.15, -0.01]} scale={[1.0, 0.6, 0.96]}>
+          <sphereGeometry args={[0.345, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2]} />
+          <Mat c={col.cap} />
+        </mesh>
+        <mesh position={[0, 0.165, -0.01]} scale={[1.0, 1, 0.96]}>
+          <cylinderGeometry args={[0.347, 0.347, 0.05, 32, 1, true]} />
+          <Mat c={col.capD} side={THREE.DoubleSide} />
+        </mesh>
+        <mesh position={[0, 0.358, -0.01]}>
+          <sphereGeometry args={[0.03, 12, 8]} />
+          <Mat c={col.capD} />
+        </mesh>
+        <group position={[0, 0.155, 0.29]} rotation={[rad(10), 0, 0]}>
+          <mesh position={[0, 0, 0.09]} scale={[1, 0.12, 0.62]}>
+            <cylinderGeometry args={[0.22, 0.22, 0.2, 32, 1, false, -Math.PI / 2, Math.PI]} />
+            <Mat c={col.capD} />
+          </mesh>
+        </group>
         {curly && (
           <group position={[0, 0.31, 0.245]}>
             <mesh>
