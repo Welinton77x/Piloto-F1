@@ -29,3 +29,7 @@
 - `rua-alagada/out/rua-alagada.mp4` (cópia do repositório recomprimida em CRF 22 para caber no limite de 100 MB do GitHub; o original CRF 17 tem 106,5 MB): H.264 1080×1920, 30 fps, 3657 frames, 122,0 s; AAC 48 kHz; −14,3 LUFS, pico −2,0 dBFS; áudio em todos os segundos.
 - Voz: só a s11 regenerada (novo fecho, 21,3 s). Chuva ~50% mais baixa.
 - Verificado: `tsc --noEmit`, stills revisados, 16 quadros do MP4 revisados. Não verificado por audição.
+
+## Entrega v5
+- Calçada corrigida, música nova (marimba, 104 bpm), chuva mais baixa, final sem ícones de comentar/compartilhar.
+- MP4: 1080×1920, 30 fps, 3657 frames, 122,0 s; −14,3 LUFS, pico −2,3 dBFS; áudio em todos os segundos. Cópia do repositório em CRF 22 (limite de 100 MB do GitHub).
