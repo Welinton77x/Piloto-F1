@@ -55,7 +55,13 @@ const SFX_FILE = (id: string) => {
   if (/pop/.test(id)) return "pop.wav";
   if (/whoosh/.test(id)) return "whoosh.wav";
   if (/heart/.test(id)) return "beat.wav";
-  if (/thud|brake|metal|boing|belt|squeal|band/.test(id)) return "thud.wav";
+  if (/engine/.test(id)) return "engine.wav";
+  if (/squeal/.test(id)) return "squeal.wav";
+  if (/sizzle|drips/.test(id)) return "sizzle.wav";
+  if (/belt|click/.test(id)) return "click.wav";
+  if (/boing|band/.test(id)) return "boing.wav";
+  if (/metal|ping|sparkle/.test(id)) return "sparkle.wav";
+  if (/thud|brake/.test(id)) return "thud.wav";
   return "tick.wav";
 };
 
@@ -85,11 +91,28 @@ export const Main: React.FC = () => (
             <Audio src={staticFile(`vo/${s.voKey}.mp3`)} />
           </Sequence>
         )}
+        {/* whoosh na troca de cena + motor nas cenas do carro */}
+        {s.id !== "s1" && (
+          <Sequence from={0} durationInFrames={30}>
+            <Audio src={staticFile("sfx/whoosh.wav")} volume={0.3} />
+          </Sequence>
+        )}
+        {(s.id === "s2" || s.id === "s3") && (
+          <Sequence from={4} durationInFrames={60}>
+            <Audio src={staticFile("sfx/engine.wav")} volume={0.22} />
+          </Sequence>
+        )}
+        {/* som em cada selo: ding (solução), alerta (problema), pop (demais) */}
+        {s.badges.map((b, i) => (
+          <Sequence key={"bs" + i} from={b.f0} durationInFrames={45}>
+            <Audio src={staticFile(`sfx/${b.kind === "solution" ? "ding" : b.kind === "problem" ? "alert" : "pop"}.wav`)} volume={0.3} />
+          </Sequence>
+        ))}
         {s.audioCues
           .filter((c) => c.kind === "sfx")
           .map((c) => (
             <Sequence key={c.id + c.f} from={c.f} durationInFrames={45}>
-              <Audio src={staticFile(`sfx/${SFX_FILE(c.id)}`)} volume={0.35} />
+              <Audio src={staticFile(`sfx/${SFX_FILE(c.id)}`)} volume={0.4} />
             </Sequence>
           ))}
       </Sequence>

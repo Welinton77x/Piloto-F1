@@ -7,7 +7,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 KEY = os.environ["ELEVENLABS_API_KEY"]
-VOICE = os.environ["ELEVENLABS_VOICE_ID"]
+VOICE = os.environ.get("ELEVENLABS_VOICE_ID", "TX3LPaxmHKxFdv7VOQHJ")  # Liam
 MODEL = os.environ.get("ELEVENLABS_MODEL", "eleven_multilingual_v2")
 SPEED = float(os.environ.get("ELEVENLABS_SPEED", "1.05"))  # até ~1,12 soa natural
 
@@ -43,7 +43,7 @@ for k, text in items:
     text = text.replace('\\"', '"')
     req = urllib.request.Request(
         f"https://api.elevenlabs.io/v1/text-to-speech/{VOICE}/with-timestamps?output_format=mp3_44100_128",
-        data=json.dumps({"text": text, "model_id": MODEL, "voice_settings": {"speed": SPEED}}).encode(),
+        data=json.dumps({"text": text, "model_id": MODEL, "voice_settings": {"stability": 0.35, "similarity_boost": 0.8, "style": 0.55, "use_speaker_boost": True, "speed": SPEED}}).encode(),
         headers={"xi-api-key": KEY, "Content-Type": "application/json"},
     )
     r = json.load(urllib.request.urlopen(req))

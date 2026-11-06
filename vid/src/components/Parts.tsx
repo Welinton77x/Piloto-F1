@@ -177,23 +177,52 @@ export const Driver: React.FC<DriverProps> = ({
         <group position={[0, 0.78, 0]} rotation={[0, 0, rad(headTilt)]} scale={helmetScale}>
           {outfit === "racing" ? (
             <>
-              <mesh>
-                <icosahedronGeometry args={[0.34, 2]} />
-                <Mat color={headCol} />
+              {/* casco de F1: casca branca aerodinâmica */}
+              <mesh scale={[0.98, 0.94, 1.12]}>
+                <sphereGeometry args={[0.37, 24, 18]} />
+                <Mat color="#f6f7f9" metal={0.25} />
               </mesh>
-              {/* janela do rosto */}
-              <mesh position={[0, -0.04, 0.2]} scale={[1, 0.95, 0.62]}>
-                <icosahedronGeometry args={[0.25, 2]} />
-                <Mat color={c.skin} />
+              {/* queixeira saliente */}
+              <mesh position={[0, -0.2, 0.24]} scale={[1, 0.7, 1]}>
+                <sphereGeometry args={[0.2, 16, 10]} />
+                <Mat color="#f6f7f9" metal={0.25} />
               </mesh>
-              {/* viseira levantada */}
-              <mesh rotation={[0, 0, 0]}>
-                <sphereGeometry args={[0.35, 12, 6, Math.PI / 2 - 0.95, 1.9, 0.5, 0.42]} />
-                <Mat color="#1d2b45" emissive="#12203a" ei={0.2} />
+              {/* viseira escura espelhada (faixa larga na frente) */}
+              <mesh scale={[0.98, 0.94, 1.12]}>
+                <sphereGeometry args={[0.378, 24, 10, Math.PI / 2 - 1.05, 2.1, 1.22, 0.62]} />
+                <Mat color="#0c1220" emissive="#1b3a66" ei={0.35} metal={0.9} />
               </mesh>
-              {/* faixa */}
-              <mesh position={[0, 0.33, 0]}>
-                <boxGeometry args={[0.09, 0.04, 0.5]} />
+              {/* moldura da viseira */}
+              <mesh scale={[0.98, 0.94, 1.12]}>
+                <sphereGeometry args={[0.374, 24, 4, Math.PI / 2 - 1.1, 2.2, 1.17, 0.05]} />
+                <Mat color="#222a38" />
+              </mesh>
+              <mesh scale={[0.98, 0.94, 1.12]}>
+                <sphereGeometry args={[0.374, 24, 4, Math.PI / 2 - 1.1, 2.2, 1.84, 0.05]} />
+                <Mat color="#222a38" />
+              </mesh>
+              {/* entrada de ar no topo */}
+              <mesh position={[0, 0.34, -0.05]}>
+                <boxGeometry args={[0.14, 0.07, 0.24]} />
+                <Mat color="#1a1d24" />
+              </mesh>
+              {/* aerofólio traseiro do capacete */}
+              <mesh position={[0, 0.14, -0.4]} rotation={[rad(-20), 0, 0]}>
+                <boxGeometry args={[0.34, 0.03, 0.14]} />
+                <Mat color="#1a1d24" />
+              </mesh>
+              {/* listras do capacete (vermelho e azul) */}
+              <mesh position={[0, 0.2, 0]} scale={[1, 0.94, 1.12]}>
+                <boxGeometry args={[0.1, 0.4, 0.76]} />
+                <Mat color="#d83a34" />
+              </mesh>
+              <mesh position={[0, 0.18, 0]} scale={[1, 0.94, 1.12]}>
+                <boxGeometry args={[0.03, 0.42, 0.78]} />
+                <Mat color="#1e4fd8" />
+              </mesh>
+              {/* gola protetora do pescoço */}
+              <mesh position={[0, -0.33, 0]}>
+                <cylinderGeometry args={[0.15, 0.17, 0.08, 10]} />
                 <Mat color="#d83a34" />
               </mesh>
             </>
@@ -214,8 +243,8 @@ export const Driver: React.FC<DriverProps> = ({
               </mesh>
             </>
           )}
-          {/* olhos, bochechas e sorriso */}
-          {[-0.1, 0.1].map((x) => (
+          {/* olhos, bochechas e sorriso (só sem capacete fechado) */}
+          {outfit !== "racing" && [-0.1, 0.1].map((x) => (
             <group key={x}>
               <mesh position={[x, 0.0, outfit === "racing" ? 0.34 : 0.3]} scale={[1, 1.35, 0.5]}>
                 <icosahedronGeometry args={[0.04, 1]} />
@@ -227,10 +256,12 @@ export const Driver: React.FC<DriverProps> = ({
               </mesh>
             </group>
           ))}
-          <mesh position={[0, -0.1, outfit === "racing" ? 0.35 : 0.31]} rotation={[0, 0, Math.PI]}>
-            <torusGeometry args={[0.055, 0.014, 5, 10, Math.PI]} />
-            <Mat color="#8a3b2a" />
-          </mesh>
+          {outfit !== "racing" && (
+            <mesh position={[0, -0.1, 0.31]} rotation={[0, 0, Math.PI]}>
+              <torusGeometry args={[0.055, 0.014, 5, 10, Math.PI]} />
+              <Mat color="#8a3b2a" />
+            </mesh>
+          )}
         </group>
       </group>
     </group>

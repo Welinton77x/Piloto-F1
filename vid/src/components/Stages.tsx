@@ -50,8 +50,10 @@ export const S2: React.FC = () => {
   return (
     <group>
       <World frame={f} />
-      <Car opacity={bodyOp} />
-      <Driver outfit="racing" seated position={[0, 0.2, -0.45]} scale={0.8} xray={1 - bodyOp} />
+      <group rotation={[0, Math.PI / 2, 0]} position={[0, 0.02, 0]}>
+        <Car opacity={bodyOp} />
+        <Driver outfit="racing" seated position={[0, 0.2, -0.45]} scale={0.8} xray={1 - bodyOp} />
+      </group>
       {Array.from({length: 40}).map((_, i) => {
         const period = 45;
         const ph = ((f + random("hp" + i) * period) % period) / period;
@@ -65,12 +67,12 @@ export const S2: React.FC = () => {
         );
       })}
       {Array.from({length: 12}).map((_, i) => {
-        const x = (random("sl" + i) - 0.5) * 6;
+        const z = (random("sl" + i) - 0.5) * 4 - 1;
         const y = 0.2 + random("sy" + i) * 1.6;
-        const z = ((((random("sz" + i) * 10 - f * 0.9) % 10) + 10) % 10) - 3;
+        const x = ((((random("sz" + i) * 12 + f * 0.9) % 12) + 12) % 12) - 6;
         return (
           <mesh key={i} position={[x, y, z]} scale={[1, 1, 1]}>
-            <boxGeometry args={[0.02, 0.02, 1.2]} />
+            <boxGeometry args={[1.2, 0.02, 0.02]} />
             <meshBasicMaterial color="#ffffff" transparent opacity={lines} />
           </mesh>
         );
@@ -92,8 +94,10 @@ export const S3: React.FC = () => {
       <World frame={f} />
       {extCar ? (
         <>
-          <Car yaw={yaw} />
-          <Driver outfit="racing" seated position={[0, 0.2, -0.45]} scale={0.8} headTilt={tilt} xray={0.7} />
+          <group rotation={[0, Math.PI / 2 + (yaw * Math.PI) / 180 * 0.25, 0]} position={[0, 0.02, 0]}>
+            <Car />
+            <Driver outfit="racing" seated position={[0, 0.2, -0.45]} scale={0.8} headTilt={tilt} xray={0.7} />
+          </group>
         </>
       ) : (
         <>

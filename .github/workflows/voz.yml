@@ -1,0 +1,27 @@
+name: Gerar voz Liam
+on:
+  push:
+    paths: ["vid/VOZ.txt"]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  voz:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Instalar ffmpeg
+        run: sudo apt-get update -y >/dev/null && sudo apt-get install -y ffmpeg >/dev/null
+      - name: Gerar narração (uma vez)
+        working-directory: vid
+        env:
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+        run: python scripts/tts_elevenlabs.py
+      - name: Guardar no repositório
+        run: |
+          echo "ok" > vid/VOZ_OK.txt
+          git config user.name "claude-bot"; git config user.email "bot@users.noreply.github.com"
+          git add vid/public vid/src/data/timing.json vid/VOZ_OK.txt
+          git commit -m "Voz Liam gerada" || true
+          git pull --rebase origin main || true
+          git push

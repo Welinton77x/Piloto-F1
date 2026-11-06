@@ -60,6 +60,59 @@ wav(
 // tique
 wav("tick", make(0.08, (t) => Math.sin(2 * Math.PI * 1500 * t) * Math.exp(-t * 60) * 0.5));
 
+
+// ding de solução (duas notas brilhantes)
+wav("ding", make(0.6, (t) => (Math.sin(2 * Math.PI * 988 * t) + 0.6 * Math.sin(2 * Math.PI * 1480 * Math.max(0, t - 0.09))) * Math.exp(-t * 6) * 0.35));
+
+// alerta de problema (bipe duplo grave)
+wav("alert", make(0.45, (t) => {
+  const on = t < 0.15 || (t > 0.22 && t < 0.37);
+  return on ? Math.sign(Math.sin(2 * Math.PI * 330 * t)) * 0.18 + Math.sin(2 * Math.PI * 220 * t) * 0.2 : 0;
+}));
+
+// motor de F1 (zumbido que sobe)
+{
+  let ph = 0;
+  wav("engine", make(1.6, (t) => {
+    const fr = 140 + 520 * (t / 1.6) ** 1.5;
+    ph += (2 * Math.PI * fr) / SR;
+    const env = Math.min(1, t * 8) * Math.min(1, (1.6 - t) * 5);
+    return (Math.sin(ph) + 0.5 * Math.sin(2 * ph) + 0.3 * Math.sin(3 * ph) + 0.15 * rnd()) * 0.28 * env;
+  }));
+}
+
+// freada / rangido de pneu
+{
+  let y = 0;
+  wav("squeal", make(0.8, (t) => {
+    y += (rnd() - y) * 0.25;
+    const env = Math.min(1, t * 10) * Math.exp(-t * 2.2);
+    return (Math.sin(2 * Math.PI * (2400 - 700 * t) * t) * 0.25 + y * 0.5) * env;
+  }));
+}
+
+// brilho / faísca
+wav("sparkle", make(0.5, (t) => {
+  let v = 0;
+  for (const [t0, f] of [[0, 1760], [0.07, 2217], [0.14, 2637], [0.21, 3520]]) if (t > t0) v += Math.sin(2 * Math.PI * f * (t - t0)) * Math.exp(-(t - t0) * 14);
+  return v * 0.18;
+}));
+
+// chiado (suor / calor)
+{
+  let y = 0;
+  wav("sizzle", make(1.0, (t) => {
+    y += (rnd() - y) * 0.7;
+    return (y - 0.0) * 0.28 * Math.min(1, t * 12) * Math.exp(-t * 2.5);
+  }));
+}
+
+// clique de cinto / metal
+wav("click", make(0.25, (t) => (Math.sin(2 * Math.PI * 2800 * t) * Math.exp(-t * 90) + 0.7 * Math.sin(2 * Math.PI * 1200 * Math.max(0, t - 0.06)) * Math.exp(-Math.max(0, t - 0.06) * 70)) * 0.5));
+
+// boing de mola
+wav("boing", make(0.6, (t) => Math.sin(2 * Math.PI * (300 + 220 * Math.sin(2 * Math.PI * 9 * t)) * t) * Math.exp(-t * 5) * 0.5));
+
 // trilha: 8 s em loop, 120 bpm, Am - F - C - G
 {
   const beat = 0.5;

@@ -7,11 +7,12 @@ npx --yes create-video@latest --yes --blank --no-tailwind app
 cd app
 rm -rf src public
 cp -r ../vid/src ../vid/scripts ../vid/tsconfig.json ../vid/remotion.config.ts .
+mkdir -p public
+[ -d ../vid/public ] && cp -r ../vid/public/. public/ || true
 npx remotion add @remotion/three @remotion/google-fonts
 npm i three @react-three/fiber @react-three/drei
 npm i -D @types/three
 node scripts/make_sfx.mjs
-pip install edge-tts
-python scripts/tts_edge.py
+if [ -f public/vo/s1.mp3 ] && [ -f src/data/timing.json ] && [ -f ../vid/VOZ_OK.txt ]; then echo "usando voz Liam ja gerada"; else pip install edge-tts; python scripts/tts_edge.py; fi
 npx tsc --noEmit 2>&1 | tee ../tsc.log
 npx remotion browser ensure

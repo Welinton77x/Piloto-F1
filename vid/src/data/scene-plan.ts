@@ -17,7 +17,7 @@ const cue = (id: string, f: number, kind: "sfx" | "music" = "sfx"): AudioCue => 
 
 export const scenes: ScenePlan[] = [
   { id: "s1", voKey: "s1", startFrame: 0, durationInFrames: 120,
-    narration: "Por que o piloto de F1 parece só ficar sentado?",
+    narration: "Por que o piloto de Fórmula 1 parece só ficar sentado?",
     camera: [{ f: 0, az: 15, el: 5, dist: 3.0, target: [0, 1, 0] }, { f: 120, az: 0, el: 5, dist: 2.6, target: [0, 1, 0] }],
     objects: ["driver", "helmet", "visor", "trackStripes", "titleCard"],
     animations: [
@@ -28,7 +28,7 @@ export const scenes: ScenePlan[] = [
     badges: [{ text: "SÓ SENTADO?", kind: "attention", f0: 12, anchorWord: "sentado" }], highlights: ["sentado"], captions: cap,
     audioCues: [cue("music-in", 0, "music"), cue("pop-badge", 12)] },
   { id: "s2", voKey: "s2", startFrame: 120, durationInFrames: 210,
-    narration: "São até duas horas numa caixinha quente, a mais de 300 por hora. Bora entrar.",
+    narration: "Ele passa até duas horas numa caixinha quente, a mais de 300 quilômetros por hora. Vamos entender como funciona na prática!",
     camera: [{ f: 0, az: 35, el: 12, dist: 14, target: [0, 0.5, 0] }, { f: 40, az: 35, el: 12, dist: 14, target: [0, 0.5, 0] }, { f: 150, az: 10, el: 20, dist: 3.2, target: [0, 0.9, 0.3] }, { f: 210, az: 13, el: 20, dist: 3.2, target: [0, 0.9, 0.3] }],
     objects: ["car", "wheels", "halo", "driver", "heatParticles", "speedLines", "label300"],
     animations: [
@@ -40,7 +40,7 @@ export const scenes: ScenePlan[] = [
     badges: [{ text: "ATÉ 2 HORAS", kind: "neutral", f0: 100, anchorWord: "duas horas" }], highlights: ["duas horas", "300"], captions: cap,
     audioCues: [cue("whoosh-xray", 40)] },
   { id: "s3", voKey: "s3", startFrame: 330, durationInFrames: 360,
-    narration: "Na curva, o corpo é jogado pro lado com 4 a 6 vezes o seu peso. Cabeça e capacete passam de 30 quilos: mais que um botijão de gás cheio.",
+    narration: "Olha só: na curva, o corpo é empurrado para o lado com 4 a 6 vezes o peso dele! A cabeça com o capacete passa de 30 quilos, mais do que um botijão de gás cheio!",
     camera: [{ f: 0, az: 30, el: 15, dist: 10, target: [0, 1, 0.2] }, { f: 140, az: 60, el: 15, dist: 10, target: [0, 1, 0.2] }, { f: 150, az: 20, el: 8, dist: 3.0, target: [0, 1, 0.2] }, { f: 360, az: 25, el: 8, dist: 3.0, target: [0, 1, 0.2] }],
     objects: ["car", "driver", "head", "arrowLateral", "scale", "scaleDisplay", "gasCylinder", "labelG"],
     animations: [
@@ -53,7 +53,7 @@ export const scenes: ScenePlan[] = [
     badges: [{ text: "4 A 6 G", kind: "problem", f0: 40, anchorWord: "4" }, { text: "≈ 35 KG", kind: "problem", f0: 160 }], highlights: ["4 a 6", "30 quilos", "botijão"], captions: cap,
     audioCues: [cue("tire-squeal", 20), cue("thud-weight", 230)] },
   { id: "s4", voKey: "s4", startFrame: 690, durationInFrames: 300,
-    narration: "Esses músculos são tipo cordas: se estão fracos, a cabeça tomba. Por isso treinam puxando elástico preso na cabeça, às vezes com capacete mais pesado.",
+    narration: "Os músculos do pescoço funcionam como cordas: se ficam fracos, a cabeça cai para o lado. Por isso eles treinam puxando um elástico preso na cabeça, às vezes até com um capacete mais pesado!",
     camera: [{ f: 0, az: -20, el: 10, dist: 3.0, target: [0, 0.85, 0] }, { f: 40, az: -20, el: 10, dist: 2.2, target: [0, 0.85, 0] }, { f: 300, az: -5, el: 10, dist: 2.2, target: [0, 0.85, 0] }],
     objects: ["neck", "neckMuscles", "helmet", "elasticBand", "wallAnchor", "labelNeck"],
     animations: [
@@ -66,7 +66,7 @@ export const scenes: ScenePlan[] = [
     badges: [{ text: "ELÁSTICO + CAPACETE PESADO", kind: "solution", f0: 170, anchorWord: "elástico" }], highlights: ["cordas", "elástico", "capacete mais pesado"], captions: cap,
     audioCues: [cue("band-stretch", 170)] },
   { id: "s5", voKey: "s5", startFrame: 990, durationInFrames: 270,
-    narration: "Parado, o coração bate uns 60 vezes por minuto. Na corrida chega à casa dos 170 e fica assim quase duas horas. É maratona... sentado.",
+    narration: "Parado, o coração bate cerca de 60 vezes por minuto. Na corrida, ele chega a 170 e fica assim por quase duas horas. É uma maratona... sentado!",
     camera: [{ f: 0, az: 0, el: 5, dist: 6, target: [0, 0, 0] }, { f: 270, az: 5, el: 5, dist: 6, target: [0, 0, 0] }],
     objects: ["heartCalm", "heartRacing", "bpmCounterL", "bpmCounterR", "stopwatch", "chairIcon"],
     animations: [
@@ -79,7 +79,7 @@ export const scenes: ScenePlan[] = [
     badges: [{ text: "60 → 170+ BPM", kind: "problem", f0: 60 }], highlights: ["60", "170", "maratona"], captions: cap,
     audioCues: [cue("heartbeat-calm", 0), cue("heartbeat-accel", 60)] },
   { id: "s6", voKey: "s6", startFrame: 1260, durationInFrames: 270,
-    narration: "Lá dentro é um forninho. O piloto pode suar de 3 a 4 quilos numa corrida: umas duas garrafas grandes de refri.",
+    narration: "Lá dentro é um forno! O piloto pode perder de 3 a 4 quilos de suor numa corrida: é como duas garrafas grandes de refrigerante.",
     camera: [{ f: 0, az: 10, el: 12, dist: 3.5, target: [0, 1, 0.2] }, { f: 100, az: 10, el: 12, dist: 4.5, target: [0, 1, 0.2] }, { f: 270, az: 14, el: 12, dist: 4.5, target: [0, 1, 0.2] }],
     objects: ["thermometer", "sweatDrops", "bottle1", "bottle2", "scaleDisplay", "steam"],
     animations: [
@@ -89,10 +89,10 @@ export const scenes: ScenePlan[] = [
       { target: "bottle2.liquid", unit: "0-1", from: 1, to: 0, f0: 150, f1: 210, fn: "linear" },
       { target: "scaleDisplay.value", unit: "kg", from: 0, to: -4.0, f0: 110, f1: 220, fn: "easeOut" },
     ],
-    badges: [{ text: "−3 A −4 KG", kind: "problem", f0: 130, anchorWord: "3" }], highlights: ["forninho", "3 a 4 quilos", "duas garrafas"], captions: cap,
+    badges: [{ text: "−3 A −4 KG", kind: "problem", f0: 130, anchorWord: "3" }], highlights: ["forno", "3 a 4 quilos", "duas garrafas"], captions: cap,
     audioCues: [cue("sizzle", 10), cue("drips", 70)] },
   { id: "s7", voKey: "s7", startFrame: 1530, durationInFrames: 360,
-    narration: "O freio é duro: pede mais de 100 quilos no pedal. E o corpo é jogado pra frente, uns 5 G. O cinto segura, e a barriga ajuda a firmar o tronco.",
+    narration: "O freio é muito duro: pesa mais de 100 quilos no pedal! E o corpo é jogado para a frente, com uns 5 G. O cinto segura, e a barriga ajuda a manter o tronco firme.",
     camera: [{ f: 0, az: 60, el: 10, dist: 2.0, target: [0, 0.2, 0.9] }, { f: 150, az: 90, el: 5, dist: 4, target: [0, 0.9, 0.3] }, { f: 270, az: 40, el: 8, dist: 2.6, target: [0, 0.9, 0.2] }, { f: 360, az: 40, el: 8, dist: 2.6, target: [0, 0.9, 0.2] }],
     objects: ["pedal", "foot", "forceGauge", "brakeDiscs", "arrowForward", "harness", "abdomen", "labelAbs"],
     animations: [
@@ -107,7 +107,7 @@ export const scenes: ScenePlan[] = [
     badges: [{ text: "FREADA: ~5 G", kind: "problem", f0: 175, anchorWord: "5" }], highlights: ["100 quilos", "5 G", "cinto", "barriga"], captions: cap,
     audioCues: [cue("brake-thud", 40), cue("belt-click", 250)] },
   { id: "s8", voKey: "s8", startFrame: 1890, durationInFrames: 270,
-    narration: "E tem a peça mais escondida: o cérebro. Ele decide em frações de segundo, com o corpo cansado e o coração a mil.",
+    narration: "E tem a parte mais escondida: o cérebro! Ele decide em frações de segundo, com o corpo cansado e o coração bem acelerado.",
     camera: [{ f: 0, az: 0, el: 10, dist: 3, target: [0, 1.1, 0] }, { f: 270, az: -15, el: 10, dist: 3, target: [0, 1.1, 0] }],
     objects: ["brain", "brainLights24", "trackRibbons", "heartIcon", "energyBar"],
     animations: [
@@ -119,7 +119,7 @@ export const scenes: ScenePlan[] = [
     badges: [{ text: "DECIDE NA HORA", kind: "neutral", f0: 60, anchorWord: "decide" }], highlights: ["cérebro", "frações de segundo"], captions: cap,
     audioCues: [cue("brain-ticks", 0)] },
   { id: "s9", voKey: "s9", startFrame: 2160, durationInFrames: 270,
-    narration: "Então o treino imita a corrida: cardio longo com o coração lá em cima, pescoço puxando elástico e perna e barriga na academia.",
+    narration: "Por isso o treino imita a corrida: exercício longo para o coração, pescoço puxando elástico, e perna e barriga na academia.",
     camera: [{ f: 0, az: -10, el: 8, dist: 4, target: [0, 1, 0] }, { f: 90, az: 2, el: 8, dist: 4, target: [0, 1, 0] }, { f: 180, az: -6, el: 8, dist: 4.5, target: [0, 1, 0] }, { f: 270, az: 6, el: 8, dist: 4.5, target: [0, 1, 0] }],
     objects: ["trainee", "bench", "elasticBand", "treadmill", "bpmCounter", "barbell", "wipe"],
     animations: [
@@ -132,7 +132,7 @@ export const scenes: ScenePlan[] = [
     badges: [{ text: "TREINA DO TAMANHO DA CORRIDA", kind: "solution", f0: 20, anchorWord: "treino" }], highlights: ["treino", "cardio", "elástico", "academia"], captions: cap,
     audioCues: [cue("whoosh-cut1", 87), cue("whoosh-cut2", 177)] },
   { id: "s10", voKey: "s10", startFrame: 2430, durationInFrames: 240,
-    narration: "Pescoço de mola, coração de maratonista e perna de aço. Sem isso, em poucas voltas o seu pescoço pedia arrego.",
+    narration: "Pescoço forte como uma mola, coração de maratonista e perna de aço. Sem isso, em poucas voltas o pescoço não aguentaria!",
     camera: [{ f: 0, az: 10, el: 8, dist: 4, target: [0, 1, 0] }, { f: 110, az: 10, el: 8, dist: 8, target: [0, 1.2, 0] }, { f: 240, az: 0, el: 6, dist: 4, target: [0, 1, 0] }],
     objects: ["giantSeat", "driverSmall", "neckSpring", "heart", "legsMetal", "sweatDrop"],
     animations: [
@@ -141,10 +141,10 @@ export const scenes: ScenePlan[] = [
       { target: "legs.metalness", unit: "0-1", from: 0, to: 1, f0: 160, f1: 200, fn: "easeInOut" },
       { target: "neckSpring.wobble", unit: "deg", from: -4, to: 4, f0: 0, f1: 240, fn: "sin" },
     ],
-    badges: [{ text: "TUDO PRA NÃO PASSAR MAL", kind: "solution", f0: 130 }], highlights: ["mola", "maratonista", "aço", "arrego"], captions: cap,
+    badges: [{ text: "TUDO PARA NÃO PASSAR MAL", kind: "solution", f0: 130 }], highlights: ["mola", "maratonista", "aço", "não aguentaria"], captions: cap,
     audioCues: [cue("boing", 120), cue("metal-ping", 170)] },
   { id: "s11", voKey: "s11", startFrame: 2670, durationInFrames: 270,
-    narration: "Agora você sabe por que piloto de F1 treina tanto. Teria coragem de treinar assim? Comenta aí e segue o Por Dentro Lab!",
+    narration: "Agora você sabe por que o piloto de Fórmula 1 treina tanto! Você teria coragem de treinar assim? Comenta aqui e segue o Por Dentro Lab!",
     camera: [{ f: 0, az: 0, el: 4, dist: 4, target: [0, 1, 0] }, { f: 270, az: 0, el: 4, dist: 4, target: [0, 1, 0] }],
     objects: ["driver", "wavingArm", "wordmarkPlaceholder", "iconComment", "iconShare"],
     animations: [

@@ -274,7 +274,7 @@ const Counters: React.FC<{id: string}> = ({id}) => {
     );
   }
   if (id === "s6" && f >= 110) return <Chip text={`${L(f, 110, 220, 0, -4, easeOut).toFixed(1).replace(".", ",")} KG`} color="#E53935" />;
-  if (id === "s7" && f >= 20 && f < 150) return <Chip text={`${Math.round(L(f, 20, 70, 0, 110, easeOut))} KG NO PEDAL`} color="#E53935" />;
+  if (id === "s7" && f >= 20 && f < 150) return <Chip text={`${"PESA MAIS DE "}${Math.round(L(f, 20, 70, 0, 100, easeOut))} KG NO PEDAL`} color="#E53935" />;
   if (id === "s9" && f >= 90 && f < 180) return <Chip text="170 BPM" color="#E53935" />;
   return null;
 };
