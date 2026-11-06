@@ -8,12 +8,7 @@ type G = {target: string; g0: number; g1: number; from: number; to: number; fn: 
 
 // Ajustes técnicos de continuidade (não mudam conteúdo): devolvem o estado normal depois de um evento.
 // [cena, alvo, de, para, início e fim como fração da cena]
-const EXTRA: [string, string, number, number, number, number, string][] = [
-  ["s9", "rain.density", 2, 1, 0.3, 0.7, "easeInOut"], // chuva volta ao normal enquanto o piscinão trabalha
-  ["s9", "sky.darkness", 0.7, 0.15, 0.3, 0.8, "easeInOut"],
-  ["s9", "mascot.y", 0.4, 0, 0.6, 0.75, "easeInOut"], // desce do banquinho quando a rua seca
-  ["s11", "rain.density", 1, 1.4, 0, 0.1, "linear"], // "chuva forte" no sistema completo
-];
+const EXTRA: [string, string, number, number, number, number, string][] = [];
 
 const EASE: Record<string, (t: number) => number> = {
   linear: (t) => t,

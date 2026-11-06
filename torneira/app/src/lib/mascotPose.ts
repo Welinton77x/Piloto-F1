@@ -1,10 +1,8 @@
-// Reações e gestos do mascote ao longo do roteiro (tudo derivado do frame global).
+// Vídeo 2 — reações e gestos do mascote na cozinha (tudo derivado do frame global).
 import {VO_OFFSET, S, finalCut, sceneAt, wordLocal} from "../data/scenes";
-import type {MascotPose} from "../components/Mascot";
+import type {MascotLook, MascotPose} from "../components/Mascot";
 import {L, clamp01, easeInOut} from "./anim";
-import {track} from "./track";
 
-/** boca falando acompanhando as palavras da narração */
 const talkAt = (gf: number) => {
   const s = sceneAt(gf);
   if (!s.voWords) return 0;
@@ -16,6 +14,16 @@ const talkAt = (gf: number) => {
   return 0;
 };
 
+export const mascotLook = (gf: number): MascotLook => {
+  const s = sceneAt(gf);
+  const f = gf - s.startFrame;
+  if (s.id === "s11" && gf >= finalCut) {
+    const ci = wordLocal(s, "comente") ?? 0;
+    if (f >= ci - 6 && f < ci + 45) return {capLogo: true, rHand: "point"};
+  }
+  return {capLogo: true};
+};
+
 export const mascotPose = (gf: number): MascotPose => {
   const s = sceneAt(gf);
   const f = gf - s.startFrame;
@@ -24,74 +32,54 @@ export const mascotPose = (gf: number): MascotPose => {
   const pose: MascotPose = {
     emotion: "happy",
     talk: talkAt(gf),
-    lArm: [-62, 16], // segura o guarda-chuva
-    rArm: [4 + sway * 0.5, 10],
-    umbrella: "open",
+    lArm: [4 + sway * 0.3, 12],
+    rArm: [-30 + Math.sin(gf * 0.12) * 8, 22], // gesticula falando
+    umbrella: "none",
     umbrellaTilt: 0,
     jump: 0,
     shiver: 0,
     walking: false,
   };
   switch (s.id) {
-    case "s1":
-      pose.emotion = p < 0.45 ? "surprised" : "worried";
-      pose.umbrellaTilt = track("umbrella.rotZ", gf, 0) * 0.6 + Math.sin(gf * 0.2) * 3;
-      pose.rArm = p < 0.45 ? [-30, 40] : [-70, 25]; // susto, depois "pra onde?" com a mão
-      break;
-    case "s3":
-      pose.emotion = p < 0.3 ? "happy" : "worried";
-      break;
-    case "s6": {
-      const walk0 = 0.77, walk1 = 0.86, throw1 = 0.93;
-      pose.emotion = p < 0.3 ? "surprised" : p < throw1 ? "annoyed" : "happy";
-      pose.walking = p >= walk0 && p < walk1;
-      if (p >= walk1 && p < throw1) pose.rArm = [L(p, walk1, throw1, -20, -140, easeInOut), 15];
-      if (p < 0.3) pose.rArm = [-40, 45];
+    case "s1": {
+      const onde = wordLocal(s, "onde") ?? s.durationInFrames * 0.6;
+      pose.emotion = f < onde - 4 ? "happy" : "surprised";
+      if (p < 0.2) pose.rArm = [L(p, 0, 0.12, -10, -75, easeInOut), 30]; // estica o braço até a torneira
+      if (f >= onde - 4) pose.rArm = [-45, 40];
       break;
     }
-    case "s7":
-      pose.emotion = "scared";
-      pose.shiver = 1;
-      pose.umbrellaTilt = Math.sin(gf * 0.25) * 9;
-      pose.rArm = [-20, 30];
+    case "s2":
+    case "s3":
+      pose.emotion = "surprised";
       break;
-    case "s8":
-      pose.emotion = "worried";
-      pose.shiver = 0.4;
+    case "s7":
+      pose.emotion = p < 0.37 ? "worried" : "relieved";
       break;
     case "s9":
-      pose.emotion = p < 0.45 ? "worried" : "relieved";
-      if (p >= 0.45) pose.rArm = [-25, 20];
+      pose.emotion = "happy";
+      pose.lArm = [-70, 40]; // mostra o hidrômetro, do lado de fora da casa
       break;
     case "s10":
-      pose.emotion = "happy";
-      pose.rArm = [-55 + Math.sin(gf * 0.15) * 8, 30]; // mostra a calçada
+      pose.emotion = p < 0.8 ? "happy" : "relieved";
+      if (p >= 0.8) pose.rArm = [-113.5, -39]; // leva o copo à boca
       break;
     case "s11": {
       if (gf < finalCut) break;
       const c = gf - finalCut;
-      const s11 = S("s11");
-      const ci = wordLocal(s11, "comente") ?? 0;
-      const fw = wordLocal(s11, "Dentro") ?? 0;
-      const lf = f;
-      pose.umbrella = "none";
-      pose.emotion = "happy";
+      const ci = wordLocal(s, "comente") ?? 0;
+      const fw = wordLocal(s, "segue") ?? 0;
       if (c < 80) {
-        // comemoração: braços para cima e pulinhos
         pose.emotion = "joy";
         const up = clamp01(c / 8);
         pose.lArm = [-10, 15 + 140 * up + Math.sin(gf * 0.5) * 8];
         pose.rArm = [-10, 15 + 140 * up - Math.sin(gf * 0.5) * 8];
         pose.jump = Math.abs(Math.sin(c * 0.22)) * 0.18 * (1 - clamp01((c - 60) / 20));
-      } else if (lf >= ci - 6 && lf < ci + 45) {
+      } else if (f >= ci - 6 && f < ci + 45) {
         pose.lArm = [4, 10];
-        pose.rArm = [-88, 8]; // aponta para quem está assistindo ("comente")
-      } else if (lf >= fw - 10) {
+        pose.rArm = [-88, 8]; // aponta para quem assiste
+      } else if (f >= fw - 10) {
         pose.lArm = [4, 10];
         pose.rArm = [-10, 150 + Math.sin(gf * 0.35) * 20]; // acena
-      } else {
-        pose.lArm = [4 + sway * 0.3, 10];
-        pose.rArm = [-35 + Math.sin(gf * 0.12) * 10, 25]; // gesticula falando
       }
       break;
     }

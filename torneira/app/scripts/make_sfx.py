@@ -189,3 +189,17 @@ save("bubble.wav", norm(bu * env(len(tt), 0.02, 0.3), 0.6))
 # gota (infiltração / contagem)
 tt = t(0.25)
 save("drip.wav", norm(np.sin(2 * np.pi * (900 - 500 * tt / 0.25) * tt) * np.exp(-tt * 22), 0.5))
+
+# bomba (zumbido grave com leve batimento)
+tt = t(1.6)
+pm = (np.sin(2 * np.pi * 60 * tt) + 0.5 * np.sin(2 * np.pi * 120 * tt) + 0.2 * lp_fast(rng.standard_normal(len(tt)), 0.05)) * (0.8 + 0.2 * np.sin(2 * np.pi * 7 * tt))
+save("pump.wav", norm(pm * env(len(tt), 0.15, 0.4), 0.55))
+
+# tique do hidrômetro (cliques leves)
+tt = t(1.2)
+tk = np.zeros_like(tt)
+for k in range(8):
+    i = int(k * 0.15 * SR)
+    seg = np.arange(400) / SR
+    tk[i : i + 400] += np.sin(2 * np.pi * 2200 * seg) * np.exp(-seg * 300)
+save("tick.wav", norm(tk, 0.5))

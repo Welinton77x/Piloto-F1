@@ -1,19 +1,15 @@
-import {VO_OFFSET, finalCut, timed} from "../data/scenes";
-import {track} from "./track";
+import {VO_OFFSET, timed} from "../data/scenes";
 import {clamp01} from "./anim";
 
 // efeito sintetizado (public/sfx) para cada pista do plano; null = sem som
 export const SFX = (id: string): string | null => {
-  if (/pop/.test(id)) return "pop.wav";
+  if (/pop|celebrate/.test(id)) return "pop.wav";
   if (/whoosh/.test(id)) return "whoosh.wav";
-  if (/thunder/.test(id)) return "thunder.wav";
-  if (/gurgle|waterfall|trickle|pipe-flow|slow-drain|river-rush|system-flow/.test(id)) return "gurgle.wav";
-  if (/splash|geyser/.test(id)) return "splash.wav";
-  if (/plastic/.test(id)) return "crinkle.wav";
-  if (/thud|bin-drop/.test(id)) return "thud.wav";
-  if (/bubble/.test(id)) return "bubble.wav";
-  if (/drip|soak/.test(id)) return "drip.wav";
-  if (/build/.test(id)) return "pop.wav";
+  if (/pump/.test(id)) return "pump.wav";
+  if (/tick/.test(id)) return "tick.wav";
+  if (/faucet|glass/.test(id)) return "splash.wav";
+  if (/gurgle|swirl|flow/.test(id)) return "gurgle.wav";
+  if (/drip|plop/.test(id)) return "drip.wav";
   return null;
 };
 
@@ -30,8 +26,4 @@ export const musicVolume = (f: number) => {
   return (speaking(f) ? 0.07 : 0.14) * fadeIn * fadeOut;
 };
 
-export const rainVolume = (f: number) => {
-  const d = track("rain.density", f, 1);
-  const end = clamp01((finalCut + 20 - f) / 20);
-  return (speaking(f) ? 0.025 : 0.042) * d * end; // chuva mais baixa (pedidos do usuário)
-};
+export const rainVolume = (_f: number) => 0; // vídeo 2: sem chuva

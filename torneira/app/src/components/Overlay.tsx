@@ -169,11 +169,11 @@ const Card: React.FC<{text: string; color: string; scale?: number; fs?: number}>
 
 type Lab = {id: string; text: string; p: [number, number, number]; f0: number; f1?: number; color: string};
 const LABELS: Lab[] = [
-  {id: "s2", text: "SOLO", p: [-2.0, -1.4, 1.0], f0: 119, color: "#8d6e63"},
-  {id: "s4", text: "CAIMENTO", p: [0, 0.45, 1.0], f0: 26, f1: 142, color: "#4DD0FF"},
-  {id: "s4", text: "MEIO-FIO", p: [2.25, 0.35, -0.6], f0: 120, color: "#9aa4ae"},
-  {id: "s5", text: "RIO", p: [5.5, -1.7, 1.0], f0: 140, color: "#4DD0FF"},
-  {id: "s9", text: "PISCINÃO", p: [3.85, -1.3, 1.0], f0: 120, color: "#2E9E4F"},
+  {id: "s3", text: "BOMBA", p: [-8.4, -0.8, 1.0], f0: 30, color: "#4a7fb8"},
+  {id: "s6", text: "AREIA", p: [-0.35, 0.6, 1.0], f0: 40, color: "#e8cf93"},
+  {id: "s6", text: "CASCALHO", p: [-0.35, 0.22, 1.0], f0: 70, color: "#9aa3ad"},
+  {id: "s7", text: "FLÚOR", p: [1.6, 1.5, 0.6], f0: 230, color: "#4DD0FF"},
+  {id: "s9", text: "REDE", p: [6.5, -0.45, 1.0], f0: 20, color: "#4DD0FF"},
 ];
 
 const Labels: React.FC<{s: TimedScene; f: number}> = ({s, f}) => (
@@ -200,115 +200,68 @@ const Panel: React.FC<{top: number; height: number; children: React.ReactNode; s
   <div style={{position: "absolute", left: (1080 - width) / 2, width, top, height, background: "rgba(16,24,32,0.82)", border: "4px solid rgba(255,255,255,0.15)", borderRadius: 28, transform: `scale(${scale})`, transformOrigin: "50% 50%", fontFamily: FONT, fontWeight: 900, color: "#fff"}}>{children}</div>
 );
 
-/* s3 (c): medidores "1 em 10" × "mais da metade" */
-const Gauges: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
-  const k = s.k;
-  const fa = Math.round(261 * k);
-  if (f < fa) return null;
-  const nat = track("gaugeNatural.drops", s.startFrame + f, 0);
-  const city = track("gaugeCity.drops", s.startFrame + f, 0);
-  const Drop: React.FC<{on: boolean; c: string}> = ({on, c}) => (
-    <svg width={52} height={64} viewBox="0 0 24 30">
-      <path d="M12 2C12 2 4 13 4 19a8 8 0 0 0 16 0C20 13 12 2 12 2z" fill={on ? c : "rgba(255,255,255,0.15)"} stroke={on ? "#fff" : "rgba(255,255,255,0.35)"} strokeWidth="1.6" />
-    </svg>
-  );
-  const Row: React.FC<{title: string; sub: string; n: number; c: string; delay: number}> = ({title, sub, n, c, delay}) => (
-    <div style={{display: "flex", flexDirection: "column", alignItems: "center", gap: 10, opacity: clamp01((f - delay) / 8)}}>
-      <div style={{fontSize: 40, color: c}}>{title}</div>
-      <div style={{display: "grid", gridTemplateColumns: "repeat(5, 52px)", gap: 8}}>
-        {Array.from({length: 10}).map((_, i) => (
-          <Drop key={i} on={i < Math.round(n)} c={c} />
-        ))}
-      </div>
-      <div style={{fontSize: 34}}>{sub}</div>
-    </div>
-  );
-  return (
-    <Panel top={600} height={720} scale={SP(f, fa, 14, 140)}>
-      <div style={{textAlign: "center", fontSize: 34, marginTop: 26, color: "#cfe8ff"}}>DE CADA 10 GOTAS, QUANTAS ESCORREM?</div>
-      <div style={{display: "flex", justifyContent: "space-around", marginTop: 34}}>
-        <Row title="TERRA" sub={`≈ ${Math.round(nat * 10)}%`} n={nat} c="#2E9E4F" delay={fa} />
-        <Row title="CIDADE" sub={`≈ ${Math.round(city * 10)}%`} n={city} c="#E53935" delay={Math.round(352 * k) - 4} />
-      </div>
-      <div style={{textAlign: "center", fontSize: 22, marginTop: 30, color: "rgba(255,255,255,0.6)", fontWeight: 800}}>valores aproximados · Arnold &amp; Gibbons (1996)</div>
-    </Panel>
-  );
-};
-
-/* s7: régua de capacidade da galeria */
-const Capacity: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
-  const k = s.k;
-  const a = Math.round(125 * k), b = Math.round(264 * k);
-  if (f < a || f >= b) return null;
-  const v = track("capacityBar.value", s.startFrame + f, 30);
-  const col = v > 90 ? "#E53935" : v > 70 ? "#FFC400" : "#4DD0FF";
-  return (
-    <div style={{position: "absolute", right: 70, top: 640, width: 150, height: 560, fontFamily: FONT, fontWeight: 900, color: "#fff", textAlign: "center", opacity: clamp01((f - a) / 8)}}>
-      <div style={{fontSize: 26, WebkitTextStroke: "6px #101820", paintOrder: "stroke fill"}}>CAPACIDADE</div>
-      <div style={{position: "relative", margin: "12px auto", width: 74, height: 440, borderRadius: 18, background: "rgba(16,24,32,0.8)", border: "4px solid #fff", overflow: "hidden"}}>
-        <div style={{position: "absolute", left: 0, right: 0, bottom: 0, height: `${v}%`, background: col}} />
-      </div>
-      <div style={{fontSize: 40, WebkitTextStroke: "7px #101820", paintOrder: "stroke fill", color: col}}>{Math.round(v)}%</div>
-    </div>
-  );
-};
-
-/* s9: hidrograma esquemático (vazão × tempo), sem números */
-const Hydrograph: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
-  const k = s.k;
-  const a = Math.round(250 * k);
+/* s2: lupa com micróbios na água bruta */
+const Lens: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
+  const a = Math.round(160 * s.k);
   if (f < a) return null;
-  const without = track("hydrograph.curveWithout", s.startFrame + f, 0);
-  const withR = track("hydrograph.curveWith", s.startFrame + f, 0);
-  const W = 760, H = 250;
-  const curve = (peak: number, spread: number, center: number) => {
-    const pts: string[] = [];
-    for (let i = 0; i <= 60; i++) {
-      const t = i / 60;
-      const y = 0.06 + peak * Math.exp(-((t - center) ** 2) / (2 * spread ** 2));
-      pts.push(`${(t * W).toFixed(1)},${(H - y * H).toFixed(1)}`);
-    }
-    return pts.join(" ");
+  const sc = SP(f, a, 12, 140);
+  const mic = (i: number) => {
+    const ang = i * 1.7 + f * 0.03;
+    const r = 70 + (i % 3) * 45;
+    return {x: 230 + Math.cos(ang) * r, y: 230 + Math.sin(ang * 1.3) * r, c: ["#7ed957", "#b388ff", "#ffb74d"][i % 3]};
   };
-  const len = 1400;
   return (
-    <Panel top={1010} height={340} scale={SP(f, a, 14, 140)}>
-      <div style={{display: "flex", justifyContent: "space-between", padding: "16px 34px 0", fontSize: 26}}>
-        <span>VAZÃO NO RIO ↑</span>
-        <span style={{color: "#E53935"}}>— SEM</span>
-        <span style={{color: "#4DD0FF"}}>— COM PISCINÃO</span>
-      </div>
-      <svg width={W} height={H} style={{position: "absolute", left: 70, top: 64}}>
-        <line x1={0} y1={H} x2={W} y2={H} stroke="rgba(255,255,255,0.5)" strokeWidth={3} />
-        <polyline points={curve(0.88, 0.09, 0.3)} fill="none" stroke="#E53935" strokeWidth={8} strokeDasharray={len} strokeDashoffset={len * (1 - without)} strokeLinecap="round" />
-        <polyline points={curve(0.5, 0.17, 0.42)} fill="none" stroke="#4DD0FF" strokeWidth={8} strokeDasharray={len} strokeDashoffset={len * (1 - withR)} strokeLinecap="round" />
+    <div style={{position: "absolute", left: 310, top: 640, width: 460, height: 460, transform: `scale(${sc})`}}>
+      <svg width={460} height={520} viewBox="0 0 460 520">
+        <defs>
+          <clipPath id="lensClip"><circle cx={230} cy={230} r={200} /></clipPath>
+        </defs>
+        <rect x={300} y={380} width={40} height={140} rx={16} fill="#5b3a1e" transform="rotate(-35 320 450)" />
+        <circle cx={230} cy={230} r={200} fill="#9c8257" />
+        <g clipPath="url(#lensClip)">
+          {Array.from({length: 18}).map((_, i) => (
+            <circle key={i} cx={40 + ((i * 97) % 380)} cy={40 + ((i * 53) % 380)} r={8 + (i % 4) * 3} fill="#6b4a2b" opacity={0.8} />
+          ))}
+          {Array.from({length: 7}).map((_, i) => {
+            const m = mic(i);
+            return (
+              <g key={"m" + i} transform={`translate(${m.x} ${m.y})`}>
+                {Array.from({length: 8}).map((__, k) => (
+                  <line key={k} x1={0} y1={0} x2={Math.cos((k / 8) * 6.28) * 34} y2={Math.sin((k / 8) * 6.28) * 34} stroke={m.c} strokeWidth={6} strokeLinecap="round" />
+                ))}
+                <circle r={24} fill={m.c} stroke="#101820" strokeWidth={4} />
+                <circle cx={-8} cy={-4} r={5} fill="#101820" />
+                <circle cx={8} cy={-4} r={5} fill="#101820" />
+              </g>
+            );
+          })}
+        </g>
+        <circle cx={230} cy={230} r={200} fill="none" stroke="#2a2f38" strokeWidth={22} />
+        <circle cx={230} cy={230} r={200} fill="none" stroke="#c9d1da" strokeWidth={8} />
       </svg>
-      <div style={{position: "absolute", right: 34, bottom: 8, fontSize: 24, color: "rgba(255,255,255,0.75)"}}>TEMPO →</div>
-    </Panel>
-  );
-};
-
-/* s11 (a): balança "chega × sai" */
-const Balance: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
-  const k = s.k;
-  const a = Math.round(70 * k), b = finalCut - s.startFrame;
-  if (f < a || f >= b) return null;
-  const inflow = track("inflowBar.value", s.startFrame + f, 0);
-  const outflow = track("outflowBar.value", s.startFrame + f, 0);
-  const Bar: React.FC<{label: string; v: number; c: string}> = ({label, v, c}) => (
-    <div style={{display: "flex", alignItems: "center", gap: 18, margin: "14px 34px"}}>
-      <div style={{width: 300, fontSize: 30, textAlign: "right"}}>{label}</div>
-      <div style={{flex: 1, height: 44, borderRadius: 14, background: "rgba(255,255,255,0.12)", overflow: "hidden"}}>
-        <div style={{width: `${v * 100}%`, height: "100%", background: c}} />
+      <div style={{position: "absolute", left: 0, right: 0, top: 466, textAlign: "center"}}>
+        <Card text="MICRÓBIOS" color="#E53935" />
       </div>
     </div>
   );
+};
+
+/* s8: manômetro de pressão (a gravidade cria a pressão) */
+const Pressure: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
+  const a = Math.round(170 * s.k);
+  if (f < a) return null;
+  const v = track("pressureGauge.value", s.startFrame + f, 0);
+  const ang = -120 + 240 * v;
   return (
-    <Panel top={1040} height={230} scale={SP(f, a, 14, 140)}>
-      <div style={{height: 18}} />
-      <Bar label="CHUVA QUE CHEGA" v={inflow} c="#E53935" />
-      <Bar label="INFILTRA + ESCOA" v={outflow} c="#2E9E4F" />
-    </Panel>
+    <div style={{position: "absolute", right: 70, top: 640, width: 260, textAlign: "center", fontFamily: FONT, fontWeight: 900, color: "#fff", transform: `scale(${SP(f, a, 12, 140)})`}}>
+      <svg width={260} height={230} viewBox="0 0 260 230">
+        <circle cx={130} cy={130} r={110} fill="#ffffff" stroke="#101820" strokeWidth={10} />
+        <path d="M 52 182 A 95 95 0 1 1 208 182" fill="none" stroke="#2E9E4F" strokeWidth={14} strokeLinecap="round" />
+        <line x1={130} y1={130} x2={130 + Math.sin((ang * Math.PI) / 180) * 80} y2={130 - Math.cos((ang * Math.PI) / 180) * 80} stroke="#E53935" strokeWidth={9} strokeLinecap="round" />
+        <circle cx={130} cy={130} r={13} fill="#101820" />
+      </svg>
+      <div style={{fontSize: 36, WebkitTextStroke: "7px #101820", paintOrder: "stroke fill"}}>PRESSÃO</div>
+    </div>
   );
 };
 
@@ -368,11 +321,8 @@ export const Overlay: React.FC<{s: TimedScene}> = ({s}) => {
   const f = useCurrentFrame();
   return (
     <AbsoluteFill>
-      <Flash s={s} f={f} />
-      {s.id === "s3" && <Gauges s={s} f={f} />}
-      {s.id === "s7" && <Capacity s={s} f={f} />}
-      {s.id === "s9" && <Hydrograph s={s} f={f} />}
-      {s.id === "s11" && <Balance s={s} f={f} />}
+      {s.id === "s2" && <Lens s={s} f={f} />}
+      {s.id === "s8" && <Pressure s={s} f={f} />}
       {s.id === "s11" && <Brand s={s} f={f} />}
       {s.id === "s11" && <Celebration s={s} f={f} />}
       <Labels s={s} f={f} />

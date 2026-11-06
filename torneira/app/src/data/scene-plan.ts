@@ -26,7 +26,7 @@ export const layout = {
 export const scenes: ScenePlan[] = [
   { id: "s1", voKey: "s1", startFrame: 0, durationInFrames: 210,
     narration: "Você abre a torneira e a água sai limpa. Mas de onde ela vem?",
-    camera: [{ f: 0, az: 15, el: 6, dist: 4, target: [10.5, 1.2, 0] }, { f: 210, az: 5, el: 6, dist: 3.4, target: [10.5, 1.2, 0] }],
+    camera: [{ f: 0, az: -4, el: 8, dist: 6.4, target: [10.15, 1.0, -0.9] }, { f: 210, az: -12, el: 8, dist: 5.6, target: [10.15, 1.0, -0.9] }],
     objects: ["house", "sink", "faucet", "glass", "mascot", "wallPipe"],
     animations: [
       { target: "faucet.handle", unit: "deg", from: 0, to: 70, f0: 10, f1: 30, fn: "spring" },
@@ -51,7 +51,7 @@ export const scenes: ScenePlan[] = [
 
   { id: "s3", voKey: "s3", startFrame: 450, durationInFrames: 210,
     narration: "Bombas empurram essa água por canos grandes, as adutoras, até a estação de tratamento.",
-    camera: [{ f: 0, az: 0, el: 10, dist: 12, target: [-7.5, -0.3, 0] }, { f: 60, az: 0, el: 10, dist: 12, target: [-7.5, -0.3, 0] }, { f: 210, az: 8, el: 12, dist: 14, target: [-5, 0, 0] }],
+    camera: [{ f: 0, az: 0, el: 8, dist: 10, target: [-8.0, -0.4, 0.5] }, { f: 60, az: 0, el: 8, dist: 10, target: [-8.0, -0.4, 0.5] }, { f: 210, az: 6, el: 10, dist: 11, target: [-6.0, 0.2, 0.5] }],
     objects: ["intakeGrate", "pump", "adutora", "flowArrows"],
     animations: [
       { target: "pump.rotor", unit: "deg/f", from: 0, to: 12, f0: 20, f1: 40, fn: "easeIn" },
@@ -63,7 +63,7 @@ export const scenes: ScenePlan[] = [
 
   { id: "s4", voKey: "s4", startFrame: 660, durationInFrames: 240,
     narration: "Primeiro entra um produto que junta a sujeira fininha em flocos: é a coagulação e a floculação.",
-    camera: [{ f: 0, az: 20, el: 22, dist: 7, target: [-4.5, 0.2, 0] }, { f: 240, az: 26, el: 22, dist: 6.5, target: [-4.2, 0.2, 0] }],
+    camera: [{ f: 0, az: 12, el: 14, dist: 6.5, target: [-4.5, 0.75, 0.3] }, { f: 240, az: 18, el: 14, dist: 6.0, target: [-4.3, 0.75, 0.3] }],
     objects: ["mixTank", "doser", "particles", "flocculator", "paddles", "flocs"],
     animations: [
       { target: "doser.drip", unit: "0-1", from: 0, to: 1, f0: 0, f1: 60, fn: "linear" },
@@ -75,7 +75,7 @@ export const scenes: ScenePlan[] = [
 
   { id: "s5", voKey: "s5", startFrame: 900, durationInFrames: 180,
     narration: "Os flocos são pesados e afundam no tanque. Isso é a decantação.",
-    camera: [{ f: 0, az: 0, el: 8, dist: 7, target: [-2, -0.3, 0] }, { f: 180, az: 6, el: 8, dist: 6.5, target: [-2, -0.3, 0] }],
+    camera: [{ f: 0, az: 0, el: 8, dist: 5.6, target: [-2.0, 0.7, 0.3] }, { f: 180, az: 6, el: 8, dist: 5.2, target: [-2.0, 0.7, 0.3] }],
     objects: ["decanter", "flocs", "sludge"],
     animations: [
       { target: "flocs.y", unit: "u3d", from: 0, to: -1.2, f0: 0, f1: 140, fn: "easeIn" },
@@ -87,7 +87,7 @@ export const scenes: ScenePlan[] = [
 
   { id: "s6", voKey: "s6", startFrame: 1080, durationInFrames: 165,
     narration: "Depois, a água atravessa camadas de areia e cascalho: a filtração.",
-    camera: [{ f: 0, az: 0, el: 6, dist: 6, target: [-0.35, -0.5, 0] }, { f: 165, az: -6, el: 6, dist: 5.6, target: [-0.35, -0.5, 0] }],
+    camera: [{ f: 0, az: 0, el: 6, dist: 4.8, target: [-0.35, 0.65, 0.4] }, { f: 165, az: -6, el: 6, dist: 4.5, target: [-0.35, 0.65, 0.4] }],
     objects: ["filter", "sandLayer", "gravelLayer", "drops", "trappedDirt"],
     animations: [
       { target: "drops.y", unit: "seeded", from: 0, to: 1, f0: 0, f1: 165, fn: "seeded" },
@@ -98,7 +98,7 @@ export const scenes: ScenePlan[] = [
 
   { id: "s7", voKey: "s7", startFrame: 1245, durationInFrames: 300,
     narration: "Mas micróbios passam pelo filtro. Então entra o cloro, que mata os germes e protege a água até a sua casa.",
-    camera: [{ f: 0, az: 0, el: 6, dist: 5, target: [-0.35, -0.6, 0] }, { f: 110, az: 0, el: 6, dist: 5, target: [-0.35, -0.6, 0] }, { f: 111, az: 10, el: 12, dist: 6, target: [0.9, 0, 0] }, { f: 300, az: 14, el: 12, dist: 8, target: [1.2, 0, 0] }],
+    camera: [{ f: 0, az: 0, el: 6, dist: 4.6, target: [-0.35, 0.7, 0.4] }, { f: 110, az: 0, el: 6, dist: 4.6, target: [-0.35, 0.7, 0.4] }, { f: 111, az: 10, el: 10, dist: 5.6, target: [0.9, 0.8, 0.3] }, { f: 300, az: 14, el: 10, dist: 7.5, target: [1.4, 0.8, 0.3] }],
     objects: ["microbes2D", "chlorineDoser", "contactTank", "residualGlow", "labelFluor"],
     animations: [
       { target: "microbes.y", unit: "u3d", from: 0, to: -1, f0: 0, f1: 100, fn: "linear" },
@@ -111,7 +111,7 @@ export const scenes: ScenePlan[] = [
 
   { id: "s8", voKey: "s8", startFrame: 1545, durationInFrames: 270,
     narration: "Daí ela sobe pra reservatórios no alto, e a gravidade cria a pressão que empurra a água pela rede.",
-    camera: [{ f: 0, az: 5, el: 12, dist: 14, target: [3.5, 2.5, 0] }, { f: 140, az: 5, el: 12, dist: 14, target: [3.5, 2.5, 0] }, { f: 270, az: 8, el: 14, dist: 20, target: [5.5, 1.5, 0] }],
+    camera: [{ f: 0, az: 5, el: 10, dist: 10, target: [2.9, 1.3, 0] }, { f: 140, az: 5, el: 10, dist: 10, target: [2.9, 1.3, 0] }, { f: 270, az: 8, el: 12, dist: 14, target: [4.6, 0.6, 0] }],
     objects: ["hill", "tower", "riserPipe", "downPipe", "upArrows", "downArrows", "pressureGauge2D"],
     animations: [
       { target: "rise.fill", unit: "0-1", from: 0, to: 1, f0: 20, f1: 120, fn: "easeOut" },
@@ -124,7 +124,7 @@ export const scenes: ScenePlan[] = [
 
   { id: "s9", voKey: "s9", startFrame: 1815, durationInFrames: 240,
     narration: "Debaixo da rua, ela passa pelo hidrômetro, o relógio da sua casa, e chega na caixa d'água.",
-    camera: [{ f: 0, az: 0, el: 8, dist: 9, target: [8.5, 0, 0] }, { f: 240, az: 6, el: 8, dist: 7, target: [10, 2.5, 0] }],
+    camera: [{ f: 0, az: 0, el: 8, dist: 9, target: [7.8, 0.2, 0.3] }, { f: 240, az: 6, el: 8, dist: 8, target: [9.8, 1.4, 0] }],
     objects: ["streetMain", "branchPipe", "meter", "riser", "roofTank", "mascot"],
     animations: [
       { target: "mainFlow.offset", unit: "u3d", from: 0, to: 3, f0: 0, f1: 240, fn: "linear" },
@@ -137,7 +137,7 @@ export const scenes: ScenePlan[] = [
 
   { id: "s10", voKey: "s10", startFrame: 2055, durationInFrames: 210,
     narration: "A caixa guarda uma reserva, e a gravidade leva a água até a torneira.",
-    camera: [{ f: 0, az: 10, el: 10, dist: 6, target: [10.5, 2, 0] }, { f: 210, az: 6, el: 8, dist: 4, target: [10.5, 1.2, 0] }],
+    camera: [{ f: 0, az: 10, el: 10, dist: 7, target: [10.5, 1.8, -0.8] }, { f: 210, az: -10, el: 8, dist: 5.6, target: [10.15, 1.0, -0.9] }],
     objects: ["roofTank", "downPipe", "faucet", "glass", "mascot"],
     animations: [
       { target: "houseDown.offset", unit: "u3d", from: 0, to: 2, f0: 20, f1: 150, fn: "linear" },
@@ -149,7 +149,7 @@ export const scenes: ScenePlan[] = [
 
   { id: "s11", voKey: "s11", startFrame: 2265, durationInFrames: 645,
     narration: "Resumindo: represa, tratamento, reservatório, rede, caixa d'água e torneira. Agora você sabe de onde vem a água que sai na sua torneira! Se você já sabia, comente TORNEIRA. Se não sabia, comente REPRESA. E segue o Por Dentro Lab pra descobrir mais coisas por dentro.",
-    camera: [{ f: 0, az: 0, el: 12, dist: 34, target: [-1, 1, 0] }, { f: 199, az: 6, el: 12, dist: 32, target: [-1, 1, 0], atWord: "Agora", wordOffset: -6 }, { f: 200, az: 0, el: 4, dist: 7.6, target: [10.2, 1.3, 0.4], atWord: "Agora", wordOffset: -5 }, { f: 645, az: 5, el: 4, dist: 7.2, target: [10.2, 1.3, 0.4] }],
+    camera: [{ f: 0, az: 4, el: 12, dist: 16, target: [-11.5, 0.2, 0] }, { f: 40, az: 4, el: 12, dist: 16, target: [-7.5, 0.0, 0] }, { f: 80, az: 4, el: 12, dist: 14, target: [-2.5, 0.7, 0] }, { f: 120, az: 4, el: 12, dist: 15, target: [3.5, 1.4, 0] }, { f: 160, az: 4, el: 12, dist: 15, target: [7.5, 0.4, 0] }, { f: 199, az: 4, el: 12, dist: 15, target: [10.3, 1.4, 0], atWord: "Agora", wordOffset: -6 }, { f: 200, az: 0, el: 4, dist: 6.4, target: [9.85, 0.85, -0.6], atWord: "Agora", wordOffset: -5 }, { f: 645, az: 5, el: 4, dist: 6.0, target: [9.85, 0.85, -0.6] }],
     objects: ["world", "flowHighlight", "mascot", "confetti2D", "hearts2D", "wordmark"],
     animations: [
       { target: "flowHighlight.stage", unit: "etapa 0-6", from: 0, to: 6, f0: 10, f1: 190, fn: "linear" },

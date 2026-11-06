@@ -9,11 +9,9 @@ export const FOV = 24;
 
 // O plano usa o layout largo da Fase 1 (x de −7 a 7,8). Para caber em 9:16, o diorama foi
 // comprimido no eixo x; este mapa converte as coordenadas do plano para o diorama real.
-const OX = [-7, -3.5, -2.5, 2.5, 2.6, 3.6, 6.2, 7.8, 9];
-const NX = [-4.6, -3.0, -2.2, 2.2, 2.3, 3.0, 4.8, 6.2, 7.4];
-export const mapX = (x: number) => interpolate(x, OX, NX, {extrapolateLeft: "extend", extrapolateRight: "extend"});
+export const mapX = (x: number) => x; // vídeo 2: coordenadas do plano = diorama
 // Profundidades do plano para o diorama real (rio e piscinão mais fundos para a água descer por gravidade)
-export const mapY = (y: number) => (y < -1.5 ? interpolate(y, [-4, -1.5], [-3.2, -1.5]) : y);
+export const mapY = (y: number) => y;
 
 export type Pose = {pos: THREE.Vector3; target: THREE.Vector3};
 

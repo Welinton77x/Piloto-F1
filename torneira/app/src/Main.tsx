@@ -4,12 +4,12 @@ import * as THREE from "three";
 import {ThreeCanvas} from "@remotion/three";
 import {useThree} from "@react-three/fiber";
 import {VO_OFFSET, config, finalCut, hasVO, timed} from "./data/scenes";
-import {World} from "./components/World";
+import {WaterWorld} from "./components/WaterWorld";
 import {Overlay} from "./components/Overlay";
 import {FOV, poseAt} from "./lib/camera";
 import {track} from "./lib/track";
 import {clamp01, mixHex} from "./lib/anim";
-import {SFX, musicVolume, rainVolume} from "./lib/audio";
+import {SFX, musicVolume} from "./lib/audio";
 
 // fontes locais (Montserrat 800/900), sem depender de rede no render
 const fontHandle = delayRender("fonts");
@@ -60,7 +60,7 @@ export const Scene3D: React.FC<{at?: number; fixed?: FixedPose; sunny?: boolean;
   return (
     <ThreeCanvas width={width} height={height} camera={{fov: FOV, near: 0.1, far: 400, position: [0, 2, 40]}}>
       <CamRig at={at} fixed={fixed} />
-      <World gf={gf} sunny={sunny} hideMascot={hideMascot} />
+      <WaterWorld gf={gf} />
       {children}
     </ThreeCanvas>
   );
@@ -87,7 +87,6 @@ export const Main: React.FC = () => (
           ))}
       </Sequence>
     ))}
-    <Audio src={staticFile("sfx/rain.wav")} loop volume={(f) => rainVolume(f)} />
     <Audio src={staticFile("sfx/music.wav")} loop volume={(f) => musicVolume(f)} />
   </AbsoluteFill>
 );
