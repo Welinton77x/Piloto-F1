@@ -293,8 +293,8 @@ export const Driver: React.FC<DriverProps> = ({
                 <Mat color="#1b2a6b" />
               </mesh>
               {/* faixa em volta da borda */}
-              <mesh position={[0, 0.17, 0]} rotation={[0, 0, 0]}>
-                <torusGeometry args={[0.328, 0.018, 5, 28, Math.PI * 2]} />
+              <mesh position={[0, 0.17, 0]} rotation={[Math.PI / 2, 0, 0]}>
+                <torusGeometry args={[0.33, 0.016, 5, 28, Math.PI * 2]} />
                 <Mat color="#1b2a6b" />
               </mesh>
               {/* óculos levantado na testa */}
