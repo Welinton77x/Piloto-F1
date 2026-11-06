@@ -199,28 +199,66 @@ const Umbrella: React.FC<{state: "open" | "closed"; tilt: number}> = ({state, ti
   </group>
 );
 
-const Arm: React.FC<{side: -1 | 1; rot: [number, number]; children?: React.ReactNode}> = ({side, rot, children}) => (
+export type Hand = "fist" | "open" | "point";
+const Arm: React.FC<{side: -1 | 1; rot: [number, number]; hand?: Hand; children?: React.ReactNode}> = ({side, rot, hand = "fist", children}) => (
   <group position={[side * 0.345, 0.93, 0]} rotation={[rad(rot[0]), 0, rad(side * rot[1])]}>
     <RB w={0.17} h={0.3} d={0.18} r={0.07} c={col.shirt} position={[0, -0.13, 0]} />
     <RB w={0.15} h={0.22} d={0.16} r={0.06} c={col.skin} position={[0, -0.36, 0]} />
-    <mesh position={[0, -0.5, 0]}>
-      <sphereGeometry args={[0.085, 16, 12]} />
-      <Mat c={col.skin} />
-    </mesh>
+    {hand === "open" ? (
+      <group position={[0, -0.53, 0]}>
+        {/* palma achatada, dedos juntos e polegar */}
+        <mesh scale={[1.25, 1.3, 0.55]}>
+          <sphereGeometry args={[0.085, 18, 14]} />
+          <Mat c={col.skin} />
+        </mesh>
+        {[-0.045, -0.015, 0.015, 0.045].map((x, i) => (
+          <mesh key={x} position={[x, -0.1 - (i === 1 || i === 2 ? 0.012 : 0), 0]}>
+            <capsuleGeometry args={[0.022, 0.06, 4, 8]} />
+            <Mat c={col.skin} />
+          </mesh>
+        ))}
+        <mesh position={[side * 0.1, -0.02, 0.01]} rotation={[0, 0, side * rad(-50)]}>
+          <capsuleGeometry args={[0.024, 0.05, 4, 8]} />
+          <Mat c={col.skin} />
+        </mesh>
+      </group>
+    ) : (
+      <mesh position={[0, -0.5, 0]}>
+        <sphereGeometry args={[0.085, 16, 12]} />
+        <Mat c={col.skin} />
+      </mesh>
+    )}
+    {hand === "point" && (
+      <mesh position={[0, -0.62, 0]}>
+        <capsuleGeometry args={[0.026, 0.12, 4, 8]} />
+        <Mat c={col.skin} />
+      </mesh>
+    )}
     {children && <group position={[0, -0.5, 0]}>{children}</group>}
   </group>
 );
 
 /** chave inglesa (segurada pela mão) */
-const Wrench: React.FC = () => (
-  <group rotation={[0, 0, rad(-20)]}>
+const Wrench: React.FC<{tilt?: number}> = ({tilt = -20}) => (
+  <group rotation={[0, 0, rad(tilt)]}>
     <mesh position={[0, 0.17, 0.02]}>
       <boxGeometry args={[0.06, 0.42, 0.035]} />
       <meshStandardMaterial color="#c9d1da" metalness={0.75} roughness={0.3} />
     </mesh>
+    {/* cabeça da chave: corpo + duas garras abertas (boca em U) + rosca de ajuste */}
     <mesh position={[0, 0.42, 0.02]}>
-      <torusGeometry args={[0.075, 0.03, 8, 16, Math.PI * 1.45]} />
+      <boxGeometry args={[0.16, 0.08, 0.04]} />
       <meshStandardMaterial color="#c9d1da" metalness={0.75} roughness={0.3} />
+    </mesh>
+    {[-1, 1].map((sd) => (
+      <mesh key={sd} position={[sd * 0.055, 0.5, 0.02]}>
+        <boxGeometry args={[0.05, 0.11, 0.04]} />
+        <meshStandardMaterial color="#c9d1da" metalness={0.75} roughness={0.3} />
+      </mesh>
+    ))}
+    <mesh position={[0, 0.34, 0.03]} rotation={[0, 0, Math.PI / 2]}>
+      <cylinderGeometry args={[0.025, 0.025, 0.07, 10]} />
+      <meshStandardMaterial color="#8a939e" metalness={0.6} roughness={0.35} />
     </mesh>
     <mesh position={[0, 0.05, 0.02]}>
       <boxGeometry args={[0.07, 0.1, 0.045]} />
@@ -257,7 +295,56 @@ const CurlyHair: React.FC = () => {
   );
 };
 
-export type MascotLook = {hair?: "short" | "curly"; outfit?: "shirt" | "overall"; wrench?: boolean};
+export type MascotLook = {hair?: "short" | "curly"; outfit?: "shirt" | "overall"; wrench?: boolean; wrenchTilt?: number; wrenchLeft?: boolean; capLogo?: boolean; lHand?: Hand; rHand?: Hand};
+
+/** logo do canal estampado na frente do boné (lâmpada + "Por Dentro Lab") */
+const CapLogo: React.FC = () => {
+  const tex = useMemo(() => {
+    const c = document.createElement("canvas");
+    c.width = 512;
+    c.height = 300;
+    const g = c.getContext("2d")!;
+    g.lineJoin = "round";
+    // lâmpada
+    g.strokeStyle = "#FFD400";
+    g.lineWidth = 10;
+    for (const a of [-60, -30, 0, 30, 60]) {
+      const r = (a * Math.PI) / 180;
+      g.beginPath();
+      g.moveTo(256 + Math.sin(r) * 58, 70 - Math.cos(r) * 58);
+      g.lineTo(256 + Math.sin(r) * 80, 70 - Math.cos(r) * 80);
+      g.stroke();
+    }
+    g.fillStyle = "#FFD400";
+    g.beginPath();
+    g.arc(256, 70, 36, 0, Math.PI * 2);
+    g.fill();
+    g.fillStyle = "#c9d1da";
+    g.fillRect(238, 100, 36, 22);
+    // texto
+    g.font = '900 86px "Montserrat"';
+    g.textAlign = "center";
+    g.lineWidth = 16;
+    g.strokeStyle = "#0d2457";
+    g.strokeText("Por Dentro", 256, 200);
+    g.fillStyle = "#ffffff";
+    g.fillText("Por Dentro", 256, 200);
+    g.font = '900 104px "Montserrat"';
+    g.strokeText("Lab", 256, 290);
+    g.fillStyle = "#FFD400";
+    g.fillText("Lab", 256, 290);
+    const t = new THREE.CanvasTexture(c);
+    t.colorSpace = THREE.SRGBColorSpace;
+    t.anisotropy = 4;
+    return t;
+  }, []);
+  return (
+    <mesh position={[0, 0.375, 0.252]}>
+      <planeGeometry args={[0.38, 0.223]} />
+      <meshStandardMaterial map={tex} transparent roughness={0.6} />
+    </mesh>
+  );
+};
 
 export const Mascot: React.FC<{position: [number, number, number]; scale?: number; pose: MascotPose; gf: number; look?: MascotLook}> = ({position, scale = 1, pose, gf, look = {}}) => {
   const curly = look.hair === "curly";
@@ -317,10 +404,11 @@ export const Mascot: React.FC<{position: [number, number, number]; scale?: numbe
         </mesh>
         <RB w={0.62} h={0.07} d={0.38} r={0.03} c={col.pants} position={[0, 0.02, 0]} />
       </group>
-      <Arm side={-1} rot={pose.lArm}>
+      <Arm side={-1} rot={pose.lArm} hand={look.lHand}>
         {umbrella}
+        {look.wrench && look.wrenchLeft ? <group rotation={new THREE.Euler(-rad(pose.lArm[0]), 0, rad(pose.lArm[1]), "ZYX")}><Wrench tilt={look.wrenchTilt} /></group> : null}
       </Arm>
-      <Arm side={1} rot={pose.rArm}>{look.wrench ? <group rotation={new THREE.Euler(-rad(pose.rArm[0]), 0, -rad(pose.rArm[1]), "ZYX")}><Wrench /></group> : null}</Arm>
+      <Arm side={1} rot={pose.rArm} hand={look.rHand}>{look.wrench && !look.wrenchLeft ? <group rotation={new THREE.Euler(-rad(pose.rArm[0]), 0, -rad(pose.rArm[1]), "ZYX")}><Wrench tilt={look.wrenchTilt} /></group> : null}</Arm>
       <group position={[0, 1.3 + breath * 0.5, 0]} rotation={[0, 0, rad(headTilt)]}>
         <RB w={0.54} h={0.5} d={0.48} r={0.14} c={col.skin} />
         {[-1, 1].map((s) => (
@@ -338,8 +426,15 @@ export const Mascot: React.FC<{position: [number, number, number]; scale?: numbe
             <RB w={0.4} h={0.07} d={0.08} r={0.03} c={col.hair} position={[-0.04, 0.2, 0.22]} rotation={[0, 0, rad(-6)]} />
           </>
         )}
-        <RB w={0.6} h={0.17} d={0.52} r={0.08} c={col.cap} position={[0, 0.3, -0.02]} />
+        <RB w={0.6} h={look.capLogo ? 0.3 : 0.17} d={0.52} r={0.08} c={col.cap} position={[0, look.capLogo ? 0.35 : 0.3, -0.02]} />
         <RB w={0.42} h={0.04} d={0.24} r={0.02} c={col.capD} position={[0, 0.23, 0.3]} rotation={[rad(8), 0, 0]} />
+        {look.capLogo && (
+          <>
+            {/* friso amarelo na aba, como na arte do canal */}
+            <RB w={0.44} h={0.018} d={0.03} r={0.008} c="#FFD400" position={[0, 0.236, 0.415]} rotation={[rad(8), 0, 0]} />
+            <CapLogo />
+          </>
+        )}
         {curly && (
           <group position={[0, 0.31, 0.245]}>
             <mesh>
