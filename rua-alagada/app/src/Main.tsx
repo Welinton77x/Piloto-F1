@@ -22,8 +22,9 @@ if (typeof document !== "undefined") {
   Promise.all([document.fonts.load('900 40px "Montserrat"'), document.fonts.load('800 40px "Montserrat"')]).then(() => continueRender(fontHandle), () => continueRender(fontHandle));
 } else continueRender(fontHandle);
 
-const CamRig: React.FC = () => {
-  const gf = useCurrentFrame();
+const CamRig: React.FC<{at?: number}> = ({at}) => {
+  const cur = useCurrentFrame();
+  const gf = at ?? cur;
   const camera = useThree((s) => s.camera);
   const {pos, target} = poseAt(gf);
   camera.position.copy(pos);
@@ -32,8 +33,9 @@ const CamRig: React.FC = () => {
   return null;
 };
 
-const Background: React.FC = () => {
-  const gf = useCurrentFrame();
+export const Background: React.FC<{at?: number}> = ({at}) => {
+  const cur = useCurrentFrame();
+  const gf = at ?? cur;
   const dark = track("sky.darkness", gf, 0);
   const under = track("bgGradient.mix", gf, 0);
   const brand = clamp01((gf - finalCut) / 15);
@@ -47,11 +49,12 @@ const Background: React.FC = () => {
   return <AbsoluteFill style={{background: `linear-gradient(180deg, ${top} 0%, ${bot} 70%)`}} />;
 };
 
-const Scene3D: React.FC = () => {
-  const gf = useCurrentFrame();
+export const Scene3D: React.FC<{at?: number}> = ({at}) => {
+  const cur = useCurrentFrame();
+  const gf = at ?? cur;
   return (
     <ThreeCanvas width={config.width} height={config.height} camera={{fov: FOV, near: 0.1, far: 400, position: [0, 2, 40]}}>
-      <CamRig />
+      <CamRig at={at} />
       <World gf={gf} />
     </ThreeCanvas>
   );
