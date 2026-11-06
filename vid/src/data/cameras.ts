@@ -65,7 +65,7 @@ export const CAMS: Record<string, Cam[]> = {
     {f: 240, az: 5, el: 6, h: 3.9, target: [0, 0.6, 0]},
   ],
   s11: [
-    {f: 0, az: 0, el: 3, h: 4.3, target: [0, 0.2, 0]},
-    {f: 270, az: 0, el: 3, h: 4.3, target: [0, 0.2, 0]},
+    {f: 0, az: 0, el: 3, h: 4.6, target: [0, -0.15, 0]},
+    {f: 270, az: 0, el: 3, h: 4.6, target: [0, -0.15, 0]},
   ],
 };

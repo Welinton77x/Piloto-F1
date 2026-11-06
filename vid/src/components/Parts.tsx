@@ -44,7 +44,7 @@ export type DriverProps = {
 };
 
 const OUT = {
-  racing: {shirt: "#d83a34", pants: "#2b2f3a", head: "#f4f4f4", skin: "#f0bf98", shoe: "#15171c", glove: "#f4f4f4"},
+  racing: {shirt: "#d83a34", pants: "#2b2f3a", head: "#f4f4f4", skin: "#f0bf98", shoe: "#15171c", glove: "#2b2f3a"},
   mechanic: {shirt: "#2f6fb5", pants: "#27598f", head: "#2f6fb5", skin: "#f0bf98", shoe: "#3b2a1f", glove: "#f0bf98"},
   training: {shirt: "#2e9e4f", pants: "#2b2f3a", head: "#2e9e4f", skin: "#f0bf98", shoe: "#f4f4f4", glove: "#f0bf98"},
 } as const;
@@ -189,12 +189,12 @@ export const Driver: React.FC<DriverProps> = ({
               {/* viseira levantada */}
               <mesh rotation={[0, 0, 0]}>
                 <sphereGeometry args={[0.35, 12, 6, Math.PI / 2 - 0.95, 1.9, 0.5, 0.42]} />
-                <Mat color="#2f94b8" emissive="#4dd0ff" ei={0.3} />
+                <Mat color="#1d2b45" emissive="#12203a" ei={0.2} />
               </mesh>
               {/* faixa */}
               <mesh position={[0, 0.33, 0]}>
-                <boxGeometry args={[0.07, 0.04, 0.5]} />
-                <Mat color="#ffd400" />
+                <boxGeometry args={[0.09, 0.04, 0.5]} />
+                <Mat color="#d83a34" />
               </mesh>
             </>
           ) : (

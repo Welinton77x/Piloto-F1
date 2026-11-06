@@ -200,7 +200,7 @@ export const S5: React.FC = () => {
       <Heart color="#2e9e4f" pulse={calm} position={[-0.9, 0.1, 0]} />
       <Heart color={col} pulse={racing} position={[0.9, 0.1, 0]} />
       {f > 170 && (
-        <group position={[0, 0.95, 0]} scale={0.55} rotation={[0, 0, rad(rock)]}>
+        <group position={[0, 0.95, 0]} scale={0.55} rotation={[0, rad(-40), rad(rock)]}>
           <mesh position={[0, 0.2, 0]}>
             <boxGeometry args={[0.7, 0.1, 0.6]} />
             <Mat color="#d83a34" />
@@ -335,8 +335,8 @@ export const S7: React.FC = () => {
       </group>
       {/* discos de freio */}
       {[-0.7, 0.7].map((x) => (
-        <mesh key={x} position={[x, 0.3, 1.2]} rotation={[0, 0, Math.PI / 2]}>
-          <cylinderGeometry args={[0.28, 0.28, 0.05, 12]} />
+        <mesh key={x} position={[x * 0.75, 0.2, 1.05]} rotation={[0, 0, Math.PI / 2]}>
+          <cylinderGeometry args={[0.15, 0.15, 0.04, 12]} />
           <Mat color="#ff7043" emissive="#ff5722" ei={disc * 1.6} />
         </mesh>
       ))}
@@ -395,8 +395,8 @@ export const S8: React.FC = () => {
         })}
       </group>
       {/* ícone de coração e barra de energia */}
-      <Heart color="#e53935" pulse={heart * 0.38} position={[0.85, 0.3, 0]} />
-      <group position={[-0.85, 0.3, 0]}>
+      <Heart color="#e53935" pulse={heart * 0.38} position={[0.7, 0.3, 0]} />
+      <group position={[-0.7, 0.3, 0]}>
         <mesh>
           <boxGeometry args={[0.2, 1, 0.1]} />
           <Mat color="#dfe6ee" opacity={0.4} />
@@ -486,8 +486,8 @@ export const S10: React.FC = () => {
               <boxGeometry args={[0.8, 0.1, 0.8]} />
               <Mat color="#d83a34" />
             </mesh>
-            <mesh position={[0, 0.8, -0.4]}>
-              <boxGeometry args={[0.8, 1.2, 0.1]} />
+            <mesh position={[0, 0.55, -0.4]}>
+              <boxGeometry args={[0.8, 0.7, 0.1]} />
               <Mat color="#d83a34" />
             </mesh>
             {[-0.34, 0.34].map((x) => (

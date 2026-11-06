@@ -300,7 +300,7 @@ const Closing: React.FC = () => {
           position: "absolute",
           left: 90,
           right: 90,
-          top: 1090,
+          top: 1130,
           textAlign: "center",
           fontFamily,
           fontWeight: 900,
