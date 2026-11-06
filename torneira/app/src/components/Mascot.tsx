@@ -427,21 +427,22 @@ export const Mascot: React.FC<{position: [number, number, number]; scale?: numbe
           </>
         )}
         {/* boné encaixado: copa arredondada sobre o topo da cabeça, faixa, aba na testa e botão */}
-        <mesh position={[0, 0.15, -0.01]} scale={[1.0, 0.6, 0.96]}>
+        <mesh position={[0, 0.14, -0.01]} scale={[1.0, 0.8, 0.96]}>
           <sphereGeometry args={[0.345, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2]} />
           <Mat c={col.cap} />
         </mesh>
-        <mesh position={[0, 0.165, -0.01]} scale={[1.0, 1, 0.96]}>
-          <cylinderGeometry args={[0.347, 0.347, 0.05, 32, 1, true]} />
+        <mesh position={[0, 0.155, -0.01]} scale={[1.0, 1, 0.96]}>
+          <cylinderGeometry args={[0.347, 0.347, 0.04, 32, 1, true]} />
           <Mat c={col.capD} side={THREE.DoubleSide} />
         </mesh>
-        <mesh position={[0, 0.358, -0.01]}>
-          <sphereGeometry args={[0.03, 12, 8]} />
+        <mesh position={[0, 0.41, -0.01]}>
+          <sphereGeometry args={[0.032, 12, 8]} />
           <Mat c={col.capD} />
         </mesh>
-        <group position={[0, 0.155, 0.29]} rotation={[rad(10), 0, 0]}>
-          <mesh position={[0, 0, 0.09]} scale={[1, 0.12, 0.62]}>
-            <cylinderGeometry args={[0.22, 0.22, 0.2, 32, 1, false, -Math.PI / 2, Math.PI]} />
+        {/* aba presa na frente da copa, apontando para frente e levemente para baixo */}
+        <group position={[0, 0.15, 0.27]} rotation={[rad(14), 0, 0]}>
+          <mesh scale={[1.05, 1, 0.85]}>
+            <cylinderGeometry args={[0.26, 0.26, 0.035, 32, 1, false, -Math.PI / 2, Math.PI]} />
             <Mat c={col.capD} />
           </mesh>
         </group>

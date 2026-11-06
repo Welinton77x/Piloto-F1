@@ -620,7 +620,7 @@ export const WaterWorld: React.FC<{gf: number}> = ({gf}) => {
       ))}
 
       {/* ---------- MASCOTE (na cozinha) ---------- */}
-      <Mascot position={[9.65, 0.1, -0.75]} scale={0.58} pose={mascotPose(gf)} gf={gf} look={mascotLook(gf)} />
+      <Mascot position={[9.6, 0.1, -0.6]} scale={0.8} pose={mascotPose(gf)} gf={gf} look={mascotLook(gf)} />
 
       <Clouds gf={gf} />
       <fog attach="fog" args={["#d6ecfb", camDist + 10, camDist + 60]} />

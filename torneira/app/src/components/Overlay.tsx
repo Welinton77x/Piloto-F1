@@ -127,35 +127,30 @@ const buildPhrases = (s: TimedScene): Phrase[] => {
   return out;
 };
 
+/** Legendas no estilo da referência do usuário: UMA PALAVRA POR VEZ, grande, branca, contorno escuro,
+ *  um pouco abaixo do centro, escrita como é falada (sem caixa alta, sem pontuação). */
 const Captions: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
-  const phrases = React.useMemo(() => buildPhrases(s), [s]);
-  // cada fala aparece sozinha: some antes da próxima (intervalo mínimo de 4 f)
-  let cur: Phrase | undefined;
-  let endF = 0;
-  for (let i = 0; i < phrases.length; i++) {
-    const p = phrases[i];
-    const next = phrases[i + 1];
-    const show0 = p.start - 2;
-    const show1 = Math.min(p.end + 6, next ? next.start - 6 : Infinity);
-    if (f >= show0 && f < show1) {
-      cur = p;
-      endF = show1;
+  const words = React.useMemo(() => {
+    const ph = buildPhrases(s);
+    return ph.flatMap((p) => p.words);
+  }, [s]);
+  let cur: (typeof words)[number] | undefined;
+  let idx = -1;
+  for (let i = 0; i < words.length; i++) {
+    const w = words[i];
+    const next = words[i + 1];
+    const until = next ? Math.min(next.start - 1, w.end + 10) : w.end + 10;
+    if (f >= w.start - 1 && f < until) {
+      cur = w;
+      idx = i;
     }
   }
   if (!cur) return null;
-  const fadeIn = clamp01((f - (cur.start - 2)) / 4);
-  const fadeOut = clamp01((endF - f) / 4);
+  const text = cur.t.replace(/[.,:;!?…]+$/u, "");
+  const pop = 1 + 0.18 * (1 - clamp01((f - (cur.start - 1)) / 5));
   return (
-    <div style={{position: "absolute", left: 90, right: 90, top: 1418, transform: `translateY(-50%)`, opacity: Math.min(fadeIn, fadeOut), display: "flex", flexWrap: "wrap", justifyContent: "center", columnGap: 18, rowGap: 4, fontFamily: FONT, fontWeight: 900, fontSize: 58, lineHeight: 1.1, textTransform: "uppercase", WebkitTextStroke: "10px #101820", paintOrder: "stroke fill", textAlign: "center"}}>
-      {cur.words.map((w, i) => {
-        const active = f >= w.start - 1 && f < w.end + 1;
-        const color = active ? "#FFD400" : w.key ? "#4DD0FF" : "#FFFFFF";
-        return (
-          <span key={i} style={{color, display: "inline-block"}}>
-            {w.t}
-          </span>
-        );
-      })}
+    <div key={idx} style={{position: "absolute", left: 60, right: 60, top: 1230, transform: `translateY(-50%) scale(${pop})`, textAlign: "center", fontFamily: FONT, fontWeight: 900, fontSize: 104, lineHeight: 1, color: "#FFFFFF", WebkitTextStroke: "14px #101820", paintOrder: "stroke fill", textShadow: "0 8px 0 rgba(16,24,32,0.35)", whiteSpace: "nowrap"}}>
+      {text}
     </div>
   );
 };
