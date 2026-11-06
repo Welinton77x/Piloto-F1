@@ -164,7 +164,7 @@ const Card: React.FC<{text: string; color: string; scale?: number; fs?: number}>
 
 type Lab = {id: string; text: string; p: [number, number, number]; f0: number; f1?: number; color: string};
 const LABELS: Lab[] = [
-  {id: "s3", text: "BOMBA", p: [-8.4, -0.8, 1.0], f0: 30, color: "#4a7fb8"},
+  {id: "s3", text: "BOMBA", p: [-8.4, 0.3, 1.0], f0: 30, color: "#4a7fb8"},
   {id: "s6", text: "AREIA", p: [-0.35, 0.6, 1.0], f0: 40, color: "#e8cf93"},
   {id: "s6", text: "CASCALHO", p: [-0.35, 0.22, 1.0], f0: 70, color: "#9aa3ad"},
   {id: "s7", text: "FLÚOR", p: [1.6, 1.5, 0.6], f0: 230, color: "#4DD0FF"},
@@ -179,7 +179,7 @@ const Labels: React.FC<{s: TimedScene; f: number}> = ({s, f}) => (
       if (f < f0 || (f1 !== undefined && f >= f1)) return null;
       const pt = project(s.startFrame + f, l.p);
       if (!pt) return null;
-      const y = Math.max(560, Math.min(1290, pt.y));
+      const y = Math.max(560, Math.min(1080, pt.y));
       const x = Math.max(200, Math.min(880, pt.x));
       return (
         <div key={l.text} style={{position: "absolute", left: x, top: y, transform: "translate(-50%, -50%)"}}>

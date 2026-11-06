@@ -294,7 +294,7 @@ export const WaterWorld: React.FC<{gf: number}> = ({gf}) => {
         <Microbe key={"mb" + i} p={[-13.4 + random("mx" + i) * 4, -1.9 + random("my" + i) * 1.4 + Math.sin(gf / 30 + i) * 0.05, FACE + 0.03]} s={0.8} c={i % 2 ? "#7ed957" : "#b388ff"} />
       ))}
       <Tree x={-15.5} z={-1.5} s={1.3} />
-      <Tree x={-12} z={-3.5} s={1.1} y={0} />
+      <Tree x={-16.8} z={-4.5} s={1.1} y={0} />
       <Tree x={-8.2} z={-2.6} s={1.0} />
 
       {/* ---------- CAPTAÇÃO E ADUTORA ---------- */}
@@ -317,7 +317,9 @@ export const WaterWorld: React.FC<{gf: number}> = ({gf}) => {
       </group>
       <Pipe a={[-9.1, -1.25, FACE]} b={[-8.7, -1.25, FACE]} r={0.16} fill={adutora > 0 ? 1 : 0} glow={lit(0)} />
       <Pipe a={[-8.1, -1.25, FACE]} b={[-6.4, -1.25, FACE]} r={0.2} fill={clamp01(adutora * 2)} glow={lit(0)} />
-      <Pipe a={[-6.4, -1.25, FACE]} b={[-6.4, 1.35, FACE]} r={0.2} fill={clamp01(adutora * 2 - 1)} glow={lit(0)} />
+      <Pipe a={[-6.4, -1.25, FACE]} b={[-6.4, -1.25, -0.4]} r={0.2} fill={clamp01(adutora * 2 - 1)} glow={lit(0)} />
+      <Pipe a={[-6.4, -1.25, -0.4]} b={[-6.4, 1.7, -0.4]} r={0.2} fill={clamp01(adutora * 3 - 1.5)} glow={lit(0)} />
+      <Pipe a={[-6.4, 1.7, -0.4]} b={[-5.7, 1.7, -0.4]} r={0.2} fill={clamp01(adutora * 3 - 2)} glow={lit(0)} />
       {etaRunning &&
         [0, 1, 2].map((i) => {
           const t = (((flowT + i / 3) % 1) + 1) % 1;
@@ -339,6 +341,8 @@ export const WaterWorld: React.FC<{gf: number}> = ({gf}) => {
       </Tank>
       {/* dosador do produto (coagulante) */}
       <B x={[-5.6, -5.2]} y={[1.7, 2.1]} z={[FACE - 0.6, FACE - 0.2]} c="#f5f6f8" />
+      <B x={[-5.62, -5.56]} y={[1.5, 1.7]} z={[FACE - 0.6, FACE - 0.2]} c="#9aa3ad" />
+      <B x={[-6.05, -5.55]} y={[1.44, 1.52]} z={[FACE - 0.45, FACE - 0.35]} c="#9aa3ad" />
       <B x={[-5.45, -5.35]} y={[1.3, 1.7]} z={[FACE - 0.45, FACE - 0.35]} c="#9aa3ad" />
       {track("doser.drip", gf, 0) > 0.01 &&
         gf < s5.startFrame + 30 &&
@@ -429,6 +433,8 @@ export const WaterWorld: React.FC<{gf: number}> = ({gf}) => {
         <B x={[0.38, 1.42]} y={[0.1, 1.3]} z={[-1.5, FACE - 0.03]} c={C.waterClear} o={0.5} e={C.cyan} ei={residual * 0.5} />
       </Tank>
       <B x={[0.7, 1.1]} y={[1.7, 2.2]} z={[FACE - 0.6, FACE - 0.2]} c="#7ed957" />
+      <B x={[1.08, 1.14]} y={[1.5, 1.7]} z={[FACE - 0.6, FACE - 0.2]} c="#9aa3ad" />
+      <B x={[1.12, 1.55]} y={[1.44, 1.52]} z={[FACE - 0.45, FACE - 0.35]} c="#9aa3ad" />
       <B x={[0.85, 0.95]} y={[1.3, 1.7]} z={[FACE - 0.45, FACE - 0.35]} c="#9aa3ad" />
       {chlorineDrip > 0.01 &&
         gf < s8.startFrame &&
@@ -507,10 +513,10 @@ export const WaterWorld: React.FC<{gf: number}> = ({gf}) => {
       {/* azulejo da cozinha */}
       {Array.from({length: 5}).map((_, i) => <B key={"az" + i} x={[9.9 + i * 0.36, 10.22 + i * 0.36]} y={[1.0, 1.5]} z={[-2.6, -2.58]} c={i % 2 ? "#cfe8f5" : "#e6f4fb"} />)}
       {/* bancada, pia e torneira */}
-      <B x={[9.9, 11.7]} y={[0.1, 0.92]} z={[-1.8, -1.0]} c="#8a5a2b" />
-      <B x={[9.85, 11.75]} y={[0.92, 0.98]} z={[-1.85, -0.95]} c="#e9ecef" />
-      <B x={[10.3, 10.9]} y={[0.86, 0.985]} z={[-1.65, -1.15]} c="#aab3bd" />
-      <group position={[houseX, 0.98, -1.7]}>
+      <B x={[9.9, 11.7]} y={[0.1, 0.92]} z={[-2.6, -1.8]} c="#8a5a2b" />
+      <B x={[9.85, 11.75]} y={[0.92, 0.98]} z={[-2.6, -1.75]} c="#e9ecef" />
+      <B x={[10.25, 10.85]} y={[0.86, 0.985]} z={[-2.3, -1.85]} c="#aab3bd" />
+      <group position={[houseX + 0.05, 0.98, -2.5]}>
         <mesh position={[0, 0.2, 0]}>
           <cylinderGeometry args={[0.03, 0.03, 0.4, 12]} />
           <M c="#c9d1da" metal={0.7} rough={0.3} />
@@ -576,17 +582,17 @@ export const WaterWorld: React.FC<{gf: number}> = ({gf}) => {
         </mesh>
       </group>
       {/* descida da caixa até a torneira */}
-      <Pipe a={[11.0, 2.42, -1.2]} b={[11.0, 1.9, -1.2]} r={0.05} fill={1} glow={lit(6)} />
-      <Pipe a={[11.0, 1.9, -1.2]} b={[houseX, 1.9, -1.7]} r={0.05} fill={1} glow={lit(6)} />
-      <Pipe a={[houseX, 1.9, -1.7]} b={[houseX, 1.4, -1.7]} r={0.05} fill={1} glow={lit(6)} />
+      <Pipe a={[11.0, 2.42, -0.6]} b={[11.0, 2.5, -0.6]} r={0.05} fill={1} glow={lit(6)} />
+      <Pipe a={[11.0, 2.5, -0.6]} b={[houseX + 0.05, 2.5, -2.55]} r={0.05} fill={1} glow={lit(6)} />
+      <Pipe a={[houseX + 0.05, 2.5, -2.55]} b={[houseX + 0.05, 1.38, -2.55]} r={0.05} fill={1} glow={lit(6)} />
       {gf >= S("s10").startFrame &&
         gf < s11.startFrame &&
         [0, 1].map((i) => {
           const t = (((flowT * 1.4 + i / 2) % 1) + 1) % 1;
-          return <Arrow key={"hd" + i} p={[11.0, 2.4 - t * 0.5, -1.0]} dir={-Math.PI / 2} s={0.6} c="#2E9E4F" />;
+          return <Arrow key={"hd" + i} p={[houseX + 0.05, 2.25 - t * 0.7, -2.4]} dir={-Math.PI / 2} s={0.6} c="#2E9E4F" />;
         })}
       {/* brilho na parede no gancho: "de onde vem?" */}
-      {wallGlow > 0.02 && <B x={[houseX - 0.06, houseX + 0.06]} y={[1.4, 1.9]} z={[-1.76, -1.64]} c={C.cyan} e={C.cyan} ei={wallGlow} o={0.8} />}
+      {wallGlow > 0.02 && <B x={[houseX - 0.01, houseX + 0.11]} y={[1.4, 2.3]} z={[-2.6, -2.5]} c={C.cyan} e={C.cyan} ei={wallGlow} o={0.8} />}
 
       {/* ---------- GRAMA, ÁRVORES, BAIRRO ---------- */}
       <GrassBlades

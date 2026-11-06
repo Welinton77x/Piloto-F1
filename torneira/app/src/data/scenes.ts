@@ -78,7 +78,7 @@ export const totalFrames = t;
 /** frame global do corte para o close final (s11): plano geral antes, mascote depois */
 export const finalCut = (() => {
   const s11 = timed[timed.length - 1];
-  const k = s11.camera.find((c) => c.atWord && (c.wordOffset ?? 0) > -6) ?? s11.camera[2];
+  const k = s11.camera.find((c) => c.atWord === "Agora" && (c.wordOffset ?? 0) > -6) ?? s11.camera[2];
   return s11.startFrame + (k ? k.f : Math.round(s11.durationInFrames * 0.5));
 })();
 export const hasVO = (key: string) => Boolean(timing[key]);
