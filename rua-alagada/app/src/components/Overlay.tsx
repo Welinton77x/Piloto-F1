@@ -1,5 +1,5 @@
 import React from "react";
-import {AbsoluteFill, useCurrentFrame} from "remotion";
+import {AbsoluteFill, random, useCurrentFrame} from "remotion";
 import type {Badge, Kind} from "../data/scene-plan";
 import {TAIL, VO_OFFSET, finalCut, norm, wordLocal} from "../data/scenes";
 import type {TimedScene} from "../data/scenes";
@@ -314,14 +314,14 @@ const Balance: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
 
 /* s11 (b): marca + ícones */
 const Brand: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
-  const wf = wordLocal(s, "Dentro") ?? Math.round(318 * s.k);
+  const wf = (wordLocal(s, "segue") ?? Math.round(318 * s.k)) + 2;
   const ci = wordLocal(s, "comente") ?? Math.round(274 * s.k);
   const sh = wordLocal(s, "manda") ?? ci + 60;
   if (f < ci - 4) return null;
   const pulseAt = (f0: number) => 1 + 0.1 * Math.max(0, Math.sin((f - f0) * 0.3)) * (f >= f0 && f < f0 + 40 ? 1 : 0);
   return (
     <>
-      <div style={{position: "absolute", left: 0, right: 0, top: 1060, display: "flex", justifyContent: "center", gap: 560, opacity: clamp01((f - ci) / 6)}}>
+      <div style={{position: "absolute", left: 0, right: 0, top: 1100, display: "flex", justifyContent: "center", gap: 600, opacity: clamp01((f - ci) / 6)}}>
         {[0, 1].map((i) => (
           <svg key={i} width={96} height={96} viewBox="0 0 24 24" style={{transform: `scale(${i === 0 ? pulseAt(ci) : pulseAt(sh)})`, opacity: i === 0 ? 1 : clamp01((f - sh + 6) / 6)}}>
             {i === 0 ? <path d="M4 4h16v12H9l-5 4z" fill="#fff" stroke="#101820" strokeWidth="1.4" strokeLinejoin="round" /> : <path d="M4 12l16-8-6 16-3-7z" fill="#fff" stroke="#101820" strokeWidth="1.4" strokeLinejoin="round" />}
@@ -329,11 +329,44 @@ const Brand: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
         ))}
       </div>
       {f >= wf && (
-        <div style={{position: "absolute", left: 0, right: 0, top: 1180, textAlign: "center", fontFamily: FONT, fontWeight: 900, fontSize: 92, color: "#fff", WebkitTextStroke: "12px #101820", paintOrder: "stroke fill", transform: `scale(${SP(f, wf, 12, 140)})`}}>
+        <div style={{position: "absolute", left: 0, right: 0, top: 290, textAlign: "center", fontFamily: FONT, fontWeight: 900, fontSize: 92, color: "#fff", WebkitTextStroke: "12px #101820", paintOrder: "stroke fill", transform: `scale(${SP(f, wf, 12, 140)})`}}>
           POR DENTRO <span style={{color: "#4DD0FF"}}>LAB</span>
         </div>
       )}
     </>
+  );
+};
+
+/* comemoração (s11): confete caindo e corações subindo a partir do "Parabéns" */
+const Celebration: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
+  const c0 = finalCut - s.startFrame;
+  const t = f - c0;
+  if (t < 0) return null;
+  const COL = ["#E53935", "#FFC400", "#2E9E4F", "#1E88E5", "#4DD0FF", "#ff7aa8"];
+  return (
+    <AbsoluteFill style={{pointerEvents: "none"}}>
+      {t < 110 &&
+        Array.from({length: 90}).map((_, i) => {
+          const x = random("cx" + i) * 1080;
+          const sp = 9 + random("cv" + i) * 9;
+          const y = -60 + (t - random("cd" + i) * 25) * sp;
+          if (y < -60 || y > 1960) return null;
+          const rot = t * (6 + random("cr" + i) * 10);
+          return <div key={i} style={{position: "absolute", left: x + Math.sin(t * 0.15 + i) * 30, top: y, width: 18, height: 30, background: COL[i % COL.length], transform: `rotate(${rot}deg) scaleX(${Math.cos(t * 0.3 + i)})`, borderRadius: 4, opacity: 1 - clamp01((t - 90) / 20)}} />;
+        })}
+      {Array.from({length: 10}).map((_, i) => {
+        const d = random("hd" + i) * 120;
+        const tt = t - d;
+        if (tt < 0 || tt > 150) return null;
+        const x = 120 + random("hx" + i) * 840;
+        const y = 1250 - tt * 6;
+        return (
+          <svg key={i} width={80} height={72} viewBox="0 0 24 22" style={{position: "absolute", left: x, top: y, opacity: Math.min(1, tt / 10) * (1 - clamp01((tt - 110) / 40)), transform: `scale(${0.8 + Math.sin(tt * 0.2) * 0.1})`}}>
+            <path d="M12 21s-9-5.6-9-12a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 6.4-9 12-9 12z" fill="#ff4d6d" stroke="#ffffff" strokeWidth="1.2" />
+          </svg>
+        );
+      })}
+    </AbsoluteFill>
   );
 };
 
@@ -355,6 +388,7 @@ export const Overlay: React.FC<{s: TimedScene}> = ({s}) => {
       {s.id === "s9" && <Hydrograph s={s} f={f} />}
       {s.id === "s11" && <Balance s={s} f={f} />}
       {s.id === "s11" && <Brand s={s} f={f} />}
+      {s.id === "s11" && <Celebration s={s} f={f} />}
       <Labels s={s} f={f} />
       <Badges s={s} f={f} />
       <Captions s={s} f={f} />

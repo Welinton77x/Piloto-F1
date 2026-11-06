@@ -7,6 +7,7 @@ import {track} from "../lib/track";
 import {clamp01, mixHex, rad} from "../lib/anim";
 import {mapX, poseAt} from "../lib/camera";
 import {Mascot} from "./Mascot";
+import {mascotPose} from "../lib/mascotPose";
 
 export const FACE = 1; // face cortada (z) voltada para a câmera
 const ZB = -2.6; // profundidade das peças locais (piscinão, juntas...)
@@ -26,13 +27,13 @@ const CURB = 0.18;
 
 const C = {
   soil1: "#7a5534", soil2: "#6a4a2e", soil3: "#58402a", wet: "#3e2b1c",
-  asphalt: "#3b414d", sidewalk: "#c3c8cf", curb: "#e1e4e8", grass: "#4caf50", grass2: "#3c9442",
+  asphalt: "#3b414d", sidewalk: "#c3c8cf", curb: "#e1e4e8", grass: "#7ccf52", grass2: "#5db443",
   concrete: "#9aa4ae", concreteD: "#7d8791", water: "#3fa9f5", waterD: "#1f6fb5", pipe: "#cfd6de",
-  wall: "#f2e6d0", roof: "#c0563f", trunk: "#6b4a2b", leaf: "#2f8f46", red: "#E53935", cyan: "#4DD0FF",
+  wall: "#f6ecd9", roof: "#c9563c", trunk: "#7a4f2c", leaf: "#3f9b3a", red: "#E53935", cyan: "#4DD0FF",
 };
 
 const M: React.FC<{c: string; o?: number; e?: string; ei?: number; metal?: number; side?: THREE.Side}> = ({c, o = 1, e = "#000000", ei = 0, metal = 0, side}) => (
-  <meshStandardMaterial color={c} flatShading transparent={o < 1} opacity={o} depthWrite={o >= 1} emissive={e} emissiveIntensity={ei} metalness={metal} roughness={0.85} side={side ?? THREE.FrontSide} />
+  <meshStandardMaterial color={c} transparent={o < 1} opacity={o} depthWrite={o >= 1} emissive={e} emissiveIntensity={ei} metalness={metal} roughness={0.85} side={side ?? THREE.FrontSide} />
 );
 
 /** caixa por limites: x0..x1, y0..y1, z0..z1 */
@@ -149,16 +150,106 @@ const StreetGeo = () => {
 };
 
 /* ---------------- árvores / arbustos ---------------- */
+/** árvore de copa redonda e fofa (estilo liso) */
 const Tree: React.FC<{x: number; z: number; s?: number}> = ({x, z, s = 1}) => (
   <group position={[x, 0, z]} scale={s}>
-    <mesh position={[0, 0.45, 0]}>
-      <cylinderGeometry args={[0.07, 0.1, 0.9, 6]} />
+    <mesh position={[0, 0.55, 0]}>
+      <cylinderGeometry args={[0.08, 0.13, 1.1, 12]} />
       <M c={C.trunk} />
     </mesh>
-    <mesh position={[0, 1.15, 0]}>
-      <icosahedronGeometry args={[0.55, 0]} />
+    <mesh position={[0, 1.45, 0]} scale={[1, 0.95, 1]}>
+      <sphereGeometry args={[0.72, 24, 18]} />
       <M c={C.leaf} />
     </mesh>
+    <mesh position={[0.42, 1.2, 0.2]}>
+      <sphereGeometry args={[0.45, 20, 14]} />
+      <M c="#4aaa41" />
+    </mesh>
+    <mesh position={[-0.38, 1.25, -0.15]}>
+      <sphereGeometry args={[0.48, 20, 14]} />
+      <M c="#378f34" />
+    </mesh>
+  </group>
+);
+
+/** pinheiro (fundo) */
+const Pine: React.FC<{x: number; z: number; s?: number}> = ({x, z, s = 1}) => (
+  <group position={[x, 0, z]} scale={s}>
+    <mesh position={[0, 0.25, 0]}>
+      <cylinderGeometry args={[0.06, 0.08, 0.5, 8]} />
+      <M c={C.trunk} />
+    </mesh>
+    {[0, 1, 2].map((i) => (
+      <mesh key={i} position={[0, 0.7 + i * 0.42, 0]}>
+        <coneGeometry args={[0.55 - i * 0.13, 0.75, 14]} />
+        <M c={i % 2 ? "#2f7d3a" : "#2a7034"} />
+      </mesh>
+    ))}
+  </group>
+);
+
+/** grama em folhas (instanciada, balança com o vento) */
+type Area = {x: [number, number]; z: [number, number]; n: number};
+const GrassBlades: React.FC<{areas: Area[]; gf: number; scale?: number; seed: string}> = ({areas, gf, scale = 1, seed}) => {
+  const ref = useRef<THREE.InstancedMesh>(null);
+  const tmp = useMemo(() => new THREE.Object3D(), []);
+  const total = areas.reduce((a, b) => a + b.n, 0);
+  const pts = useMemo(() => {
+    const out: {x: number; z: number; h: number; r: number; c: number; ph: number}[] = [];
+    areas.forEach((a, ai) => {
+      for (let i = 0; i < a.n; i++) {
+        const id = `${seed}${ai}-${i}`;
+        out.push({x: a.x[0] + random(id + "x") * (a.x[1] - a.x[0]), z: a.z[0] + random(id + "z") * (a.z[1] - a.z[0]), h: 0.16 + random(id + "h") * 0.3, r: random(id + "r") * Math.PI, c: random(id + "c"), ph: random(id + "p") * 6.28});
+      }
+    });
+    return out;
+  }, [areas, seed]);
+  const colors = useMemo(() => ["#5fb33c", "#4a9c33", "#78c94f", "#3f8a2e"].map((c) => new THREE.Color(c)), []);
+  useLayoutEffect(() => {
+    const m = ref.current;
+    if (!m) return;
+    pts.forEach((b, i) => {
+      tmp.position.set(b.x, (b.h * scale) / 2 + 0.05, b.z);
+      tmp.rotation.set(Math.sin(gf * 0.06 + b.ph) * 0.12, b.r, Math.sin(gf * 0.05 + b.ph) * 0.1);
+      tmp.scale.set(1, b.h * scale, 1);
+      tmp.updateMatrix();
+      m.setMatrixAt(i, tmp.matrix);
+      m.setColorAt(i, colors[Math.floor(b.c * colors.length)]);
+    });
+    m.instanceMatrix.needsUpdate = true;
+    if (m.instanceColor) m.instanceColor.needsUpdate = true;
+  });
+  if (scale < 0.01) return null;
+  return (
+    <instancedMesh ref={ref} args={[undefined, undefined, total]} frustumCulled={false}>
+      <coneGeometry args={[0.03, 1, 4]} />
+      <meshStandardMaterial roughness={0.8} />
+    </instancedMesh>
+  );
+};
+
+/** flores vermelhas e rosas */
+const Flowers: React.FC<{spots: [number, number][]; scale?: number}> = ({spots, scale = 1}) => (
+  <group>
+    {scale > 0.01 &&
+      spots.map(([x, z], i) => (
+        <group key={i} position={[x, 0.05, z]} scale={scale}>
+          <mesh position={[0, 0.16, 0]}>
+            <cylinderGeometry args={[0.012, 0.012, 0.32, 6]} />
+            <M c="#3f8a2e" />
+          </mesh>
+          {Array.from({length: 5}).map((_, k) => (
+            <mesh key={k} position={[Math.sin((k / 5) * 6.28) * 0.06, 0.34, Math.cos((k / 5) * 6.28) * 0.06]}>
+              <sphereGeometry args={[0.045, 10, 8]} />
+              <M c={i % 3 === 0 ? "#ff7aa8" : "#ef4b4b"} />
+            </mesh>
+          ))}
+          <mesh position={[0, 0.35, 0]}>
+            <sphereGeometry args={[0.03, 8, 6]} />
+            <M c="#ffd84d" />
+          </mesh>
+        </group>
+      ))}
   </group>
 );
 
@@ -242,11 +333,14 @@ const Backdrop: React.FC<{city: number}> = ({city}) => {
       {[[-7, -1.2], [-2.8, -6], [3.8, -5.5], [7.2, -13], [-7.2, -18], [4.2, -12], [10, -8]].map(([x, z], i) => (
         <Tree key={i} x={x} z={z} s={0.9 + (i % 3) * 0.15} />
       ))}
+      {[[-12, -14], [-14, -20], [-10, -24], [14, -16], [16, -22], [12, -26], [-4, -30], [5, -32], [-18, -12], [19, -12]].map(([x, z], i) => (
+        <Pine key={"p" + i} x={x} z={z} s={1.3 + (i % 3) * 0.3} />
+      ))}
       {/* morros distantes */}
       {[[-30, -46, 12], [-8, -50, 15], [16, -48, 13], [36, -44, 10]].map(([x, z, r], i) => (
         <mesh key={i} position={[x, -r * 0.55, z]} scale={[1.6, 1, 1]}>
-          <icosahedronGeometry args={[r, 1]} />
-          <M c={i % 2 ? "#5f8f5a" : "#6f9a63"} />
+          <sphereGeometry args={[r, 32, 16]} />
+          <M c={i % 2 ? "#7fb35a" : "#8cc063"} />
         </mesh>
       ))}
     </group>
@@ -370,9 +464,7 @@ export const World: React.FC<{gf: number}> = ({gf}) => {
   const mx = gf >= S("s7").startFrame ? mapX(-3.0) : mapX(track("mascot.x", gf, -3.0));
   const my = track("mascot.y", gf, 0);
   const s1 = S("s1");
-  const umbrellaTilt = gf < s2.startFrame ? track("umbrella.rotZ", gf, 0) : 0;
-  const umbrellaClose = track("umbrella.close", gf, 0);
-  const wave = gf >= finalCut + 20 ? Math.sin((gf - s11.startFrame) * 0.35) * 25 + 60 : 0;
+
   const mascotVis = gf < s2.startFrame ? 1 : before(s3) ? 0 : sidewalks;
   const waterAtMascot = streetWater > CURB ? streetWater - CURB : 0;
 
@@ -630,45 +722,63 @@ export const World: React.FC<{gf: number}> = ({gf}) => {
         </group>
       )}
 
+      {/* ---------- GRAMA EM FOLHAS E FLORES ---------- */}
+      <GrassBlades
+        gf={gf}
+        seed="lawn"
+        areas={[
+          {x: [-9, X.houseL - 0.05], z: [-7, FACE - 0.05], n: 700},
+          {x: [X.houseR + 0.05, X.swL[0] - 0.05], z: [-7, FACE - 0.05], n: 160},
+          {x: [X.houseL, X.houseR], z: [-0.9 + 1.12, FACE - 0.05], n: 60},
+          {x: [X.green[0] + 0.05, X.river[0] - 0.05], z: [-7, FACE - 0.05], n: 420},
+          {x: [X.river[1] + 0.05, 11], z: [-8, FACE - 0.05], n: 650},
+        ]}
+      />
+      {grassScale > 0.01 && <GrassBlades gf={gf} seed="wild" scale={grassScale * 1.3} areas={[{x: [X.swL[0] - 0.05, X.green[0] + 0.05], z: [-7, FACE - 0.05], n: 900}]} />}
+      <Flowers spots={[[-3.4, 0.6], [-3.6, -0.4], [-6.2, 0.3], [-7.1, -1.6], [-5.6, 0.75], [3.4, 0.4], [4.4, -0.6], [3.7, -2.2], [7.0, 0.5], [8.3, -0.8], [9.6, 0.2]]} />
+      {grassScale > 0.01 && <Flowers scale={grassScale} spots={[[-1.8, 0.4], [-0.6, -0.8], [0.7, 0.5], [1.6, -1.4], [-1.1, -2.5]]} />}
+
       {/* ---------- MASCOTE ---------- */}
       {mascotVis > 0.01 && (
-        <Mascot
-          position={[mx, CURB + my - Math.min(waterAtMascot, 0.1) * 0, FACE - 0.6]}
-          scale={0.62 * mascotVis}
-          umbrellaTilt={umbrellaTilt}
-          umbrellaOpen={1 - umbrellaClose}
-          wave={wave}
-          walking={gf >= s6.startFrame + s6.durationInFrames * 0.77 && gf < s6.startFrame + s6.durationInFrames * 0.86}
-          gf={gf}
-        />
+        <Mascot position={[mx, CURB + my, FACE - 0.6]} scale={0.58 * mascotVis} pose={mascotPose(gf)} gf={gf} />
       )}
 
       {/* ---------- BAIRRO AO FUNDO + NÉVOA DE DISTÂNCIA ---------- */}
       <Backdrop city={before(s3) ? city : house} />
-      <fog attach="fog" args={[mixHex("#8fa8c2", "#3d4a5e", track("sky.darkness", gf, 0)), camDist + 8, camDist + 55]} />
+      <fog attach="fog" args={[mixHex(mixHex("#cfe2f2", "#5a6576", track("sky.darkness", gf, 0)), "#f7c7a0", clamp01((gf - finalCut) / 15)), camDist + 10, camDist + 60]} />
       {/* ---------- NUVENS E CHUVA ---------- */}
       <Clouds gf={gf} />
       {gf < finalCut + 15 && <Rain gf={gf} density={density} opacity={0.55} floorAt={groundAt} />}
-      <ambientLight intensity={0.55} />
-      <hemisphereLight args={["#dbe8ff", "#4a3a2a", 0.55]} />
-      <directionalLight position={[4, 9, 7]} intensity={1.25} />
-      <directionalLight position={[-6, 3, 8]} intensity={0.35} />
+      <ambientLight intensity={0.3} />
+      <hemisphereLight args={["#d6ecff", "#5d7a3a", 0.9]} />
+      <directionalLight position={[5, 10, 8]} intensity={1.7 - track("sky.darkness", gf, 0) * 0.6} color="#fff1d6" />
+      <directionalLight position={[-6, 4, 9]} intensity={0.35} color="#cfe3ff" />
     </group>
   );
 };
 
 const Clouds: React.FC<{gf: number}> = ({gf}) => {
   const dark = track("sky.darkness", gf, 0);
-  const col = mixHex("#e3e8ef", "#4a5466", dark);
-  const drop = dark * 1.2;
+  const col = mixHex("#ffffff", "#5b6577", dark);
+  const colB = mixHex("#dfe6ee", "#454e5e", dark);
+  const drop = dark * 1.0;
   return (
-    <group position={[0, 8.2 - drop, -1.5]}>
-      {Array.from({length: 9}).map((_, i) => (
-        <mesh key={i} position={[-5 + i * 1.45 + Math.sin(gf / 120 + i) * 0.2, random("cy" + i) * 0.6, random("cz" + i) * -1.5]} scale={[1.6, 0.9, 1]}>
-          <icosahedronGeometry args={[0.85 + random("cs" + i) * 0.4, 0]} />
-          <M c={col} />
-        </mesh>
-      ))}
+    <group position={[0, 8.0 - drop, -2]}>
+      {Array.from({length: 7}).map((_, i) => {
+        const x = -6 + i * 2.1 + Math.sin(gf / 140 + i) * 0.25;
+        const z = -random("cz" + i) * 2.5;
+        const sc = 0.8 + random("cs" + i) * 0.5;
+        return (
+          <group key={i} position={[x, random("cy" + i) * 0.7, z]} scale={sc}>
+            {[[0, 0, 0, 0.75], [0.7, -0.15, 0.1, 0.55], [-0.7, -0.15, 0, 0.6], [0.3, 0.35, -0.1, 0.55], [-0.35, 0.3, 0.1, 0.5]].map(([dx, dy, dz, r], k) => (
+              <mesh key={k} position={[dx, dy, dz]}>
+                <sphereGeometry args={[r, 20, 14]} />
+                <M c={k < 3 ? col : colB} />
+              </mesh>
+            ))}
+          </group>
+        );
+      })}
     </group>
   );
 };

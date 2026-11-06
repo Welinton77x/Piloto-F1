@@ -37,13 +37,14 @@ const Background: React.FC = () => {
   const dark = track("sky.darkness", gf, 0);
   const under = track("bgGradient.mix", gf, 0);
   const brand = clamp01((gf - finalCut) / 15);
-  let top = mixHex("#9db7d3", "#3d4a5e", dark);
-  let bot = mixHex("#5f7d9e", "#1d2533", dark);
+  // céu claro de chuva leve → temporal escuro; azul profundo no subsolo; pôr do sol quando a chuva passa
+  let top = mixHex("#86b4e0", "#3d4a5e", dark);
+  let bot = mixHex("#d9e9f5", "#5a6576", dark);
   top = mixHex(top, "#17325c", under);
   bot = mixHex(bot, "#0b1730", under);
-  top = mixHex(top, "#3d8bff", brand);
-  bot = mixHex(bot, "#0b2a66", brand);
-  return <AbsoluteFill style={{background: `linear-gradient(180deg, ${top} 0%, ${bot} 100%)`}} />;
+  top = mixHex(top, "#c97b9a", brand);
+  bot = mixHex(bot, "#ffcf9e", brand);
+  return <AbsoluteFill style={{background: `linear-gradient(180deg, ${top} 0%, ${bot} 70%)`}} />;
 };
 
 const Scene3D: React.FC = () => {

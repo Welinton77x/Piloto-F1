@@ -82,3 +82,10 @@ Texto do usuário: "corrija esse telhado desta casa, corrija o cenário onde se 
 - **Calçada:** placas de concreto com juntas, sobre base e meio-fio contínuo; a versão permeável tem placas com juntas verdes.
 - **Som:** chuva ~50% mais baixa.
 - **Legendas:** falas longas divididas até caberem em 2 linhas, sempre uma por vez.
+
+## v4 — estilo visual a partir de um vídeo de referência do usuário (2026-11-06)
+Pedido: "observe o cenário então quero no mesmo estilo use o personagem dele de base quero que o meu personagem seja da mesma forma do mesmo jeito com as mesmas reações e o jeito que ele é animado".
+- Referência: vídeo de outro canal (132 s, 720×1280). Usado só como referência de **estilo e animação**; o personagem dele (moletom amarelo) **não foi copiado**: o mascote mantém a identidade do Por Dentro Lab (boné e camisa azuis, selo PD).
+- **Cenário:** materiais lisos (sem facetado), cores vivas, grama em folhas que balança, flores, árvores de copa redonda, pinheiros, morros suaves, nuvens fofas, luz de sol quente; pôr do sol quando a chuva passa no fecho.
+- **Mascote:** formato arredondado de blocos, cabeça grande, cabelo, orelhas; rosto com sobrancelhas, olhos com brilho, nariz, bochechas e bocas (sorriso, falando, "O", preocupado, bravo, gargalhada); respira, pisca, mexe a boca junto com a narração.
+- **Reações por cena:** susto/preocupação (s1), preocupado (s3), bravo com o lixo e feliz ao jogar na lixeira (s6), medo e tremor no temporal (s7–s8), alívio (s9), mostra a calçada (s10), comemora com braços para cima, pulos, confete e corações no "Parabéns", aponta para o comentário e acena (s11).
