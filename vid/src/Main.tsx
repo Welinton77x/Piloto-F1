@@ -6,7 +6,7 @@ import {CAMS, FOV} from "./data/cameras";
 import type {Cam} from "./data/cameras";
 import {VO_OFFSET, config, hasVO, timed} from "./data/scenes";
 import type {TimedScene} from "./data/scenes";
-import {Lights} from "./components/Parts";
+import {Lights, TalkContext} from "./components/Parts";
 import {STAGES} from "./components/Stages";
 import {Overlay} from "./components/Overlay";
 import {rad} from "./lib/anim";
@@ -16,13 +16,13 @@ const BG: Record<string, [string, string]> = {
   s1: ["#7cc4ff", "#2b3a55"],
   s2: ["#7cc4ff", "#10305a"],
   s3: ["#4a7fb8", "#14284a"],
-  s4: ["#17325c", "#0b1730"],
-  s5: ["#1b2f5e", "#0b1730"],
-  s6: ["#3a2a4f", "#0b1730"],
-  s7: ["#17325c", "#0b1730"],
-  s8: ["#1b2f5e", "#08102a"],
-  s9: ["#2a6b7a", "#0b2230"],
-  s10: ["#2f6fb5", "#0b1730"],
+  s4: ["#7cc4ff", "#cfe9ff"],
+  s5: ["#7cc4ff", "#cfe9ff"],
+  s6: ["#7cc4ff", "#cfe9ff"],
+  s7: ["#7cc4ff", "#cfe9ff"],
+  s8: ["#7cc4ff", "#cfe9ff"],
+  s9: ["#7cc4ff", "#cfe9ff"],
+  s10: ["#7cc4ff", "#cfe9ff"],
   s11: ["#3d8bff", "#0b2a66"],
 };
 
@@ -74,7 +74,9 @@ const SceneBlock: React.FC<{s: TimedScene}> = ({s}) => {
       <ThreeCanvas width={config.width} height={config.height} camera={{fov: FOV, near: 0.1, far: 200, position: [0, 1, 4]}}>
         <Lights />
         <CamRig keys={CAMS[s.id] ?? ([] as Cam[])} shake={s.id === "s1" ? 0.012 : 0} />
-        <Stage />
+        <TalkContext.Provider value={{words: s.voWords ?? [], offset: VO_OFFSET, fps: config.fps}}>
+          <Stage />
+        </TalkContext.Provider>
       </ThreeCanvas>
       <Overlay s={s} />
     </AbsoluteFill>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, {createContext, useContext} from "react";
 import * as THREE from "three";
 import {random, useCurrentFrame} from "remotion";
 import {rad} from "../lib/anim";
@@ -44,6 +44,7 @@ export type DriverProps = {
   mood?: Mood;
   look?: number; // -1..1 olhar lateral
   waveL?: number; // graus do braço esquerdo (para fora)
+  pedal?: number; // 0-1: perna direita empurra o pedal (sentado)
 };
 
 const OUT = {
@@ -68,16 +69,22 @@ const Cap: React.FC<{r: number; l: number; color: string; opacity?: number; posi
 );
 
 
+export const TalkContext = createContext<{words: {s: number; e: number}[]; offset: number; fps: number} | null>(null);
+
 type Mood = "happy" | "wow" | "shock" | "worry" | "effort" | "joy";
 
 /** Rosto expressivo: olhos com brilho, sobrancelhas e boca mudam conforme o humor. */
 const Face: React.FC<{mood: Mood; f: number; look?: number}> = ({mood, f, look = 0}) => {
   const blink = f % 96 < 4 ? 0.15 : 1;
+  const tc = useContext(TalkContext);
+  const t = tc ? (f - tc.offset) / tc.fps : -1;
+  const speaking = !!tc && tc.words.some((w) => t >= w.s - 0.02 && t <= w.e + 0.04);
+  const open = speaking ? 0.3 + 0.7 * Math.abs(Math.sin(f * 0.95)) : 0;
   const m = {
-    happy: {eye: 1, brow: 0.0, bz: 0, by: 0.0, mouth: "smile"},
+    happy: {eye: 1.05, brow: 0.0, bz: 0, by: 0.0, mouth: "smile"},
     joy: {eye: 0.9, brow: 0.0, bz: 0, by: 0.03, mouth: "grin"},
-    wow: {eye: 1.3, brow: 0.0, bz: 0, by: 0.06, mouth: "o"},
-    shock: {eye: 1.45, brow: 0.0, bz: 0, by: 0.08, mouth: "big"},
+    wow: {eye: 1.25, brow: 0.0, bz: 0, by: 0.06, mouth: "o"},
+    shock: {eye: 1.4, brow: 0.0, bz: 0, by: 0.08, mouth: "big"},
     worry: {eye: 1.1, brow: 0.35, bz: 0, by: 0.03, mouth: "frown"},
     effort: {eye: 0.8, brow: -0.4, bz: 0, by: -0.02, mouth: "grit"},
   }[mood];
@@ -86,21 +93,21 @@ const Face: React.FC<{mood: Mood; f: number; look?: number}> = ({mood, f, look =
     <group position={[shake, 0, 0]}>
       {[-1, 1].map((s) => (
         <group key={s}>
-          <mesh position={[s * 0.125, -0.015, 0.275]} scale={[1, 1.15 * m.eye * blink, 0.55]}>
-            <sphereGeometry args={[0.078, 14, 10]} />
+          <mesh position={[s * 0.115, -0.015, 0.285]} scale={[1, 1.15 * m.eye * blink, 0.55]}>
+            <sphereGeometry args={[0.058, 14, 10]} />
             <Mat color="#ffffff" />
           </mesh>
-          <mesh position={[s * 0.125 + look * 0.025, -0.015, 0.32]} scale={[1, 1.15 * Math.min(1, m.eye) * blink, 0.4]}>
-            <sphereGeometry args={[0.044, 12, 8]} />
+          <mesh position={[s * 0.115 + look * 0.02, -0.015, 0.325]} scale={[1, 1.15 * Math.min(1, m.eye) * blink, 0.4]}>
+            <sphereGeometry args={[0.034, 12, 8]} />
             <Mat color="#1b1b1b" />
           </mesh>
-          <mesh position={[s * 0.125 + look * 0.025 + 0.015, 0.012, 0.337]} scale={[1, 1, 0.3]}>
-            <sphereGeometry args={[0.016, 8, 6]} />
+          <mesh position={[s * 0.115 + look * 0.02 + 0.012, 0.01, 0.34]} scale={[1, 1, 0.3]}>
+            <sphereGeometry args={[0.012, 8, 6]} />
             <Mat color="#ffffff" emissive="#ffffff" ei={0.5} />
           </mesh>
           {/* sobrancelha */}
-          <mesh position={[s * 0.125, 0.105 + m.by, 0.29]} rotation={[0, 0, s * -m.brow]}>
-            <boxGeometry args={[0.1, 0.022, 0.02]} />
+          <mesh position={[s * 0.115, 0.085 + m.by, 0.295]} rotation={[0, 0, s * -m.brow]}>
+            <boxGeometry args={[0.085, 0.02, 0.02]} />
             <Mat color="#4a2f1f" />
           </mesh>
           {/* bochecha */}
@@ -111,19 +118,33 @@ const Face: React.FC<{mood: Mood; f: number; look?: number}> = ({mood, f, look =
         </group>
       ))}
       {/* boca */}
-      {m.mouth === "smile" && (
+      {speaking && (
+        <group position={[0, -0.125, 0.298]}>
+          <mesh scale={[1.25, 0.25 + open * 1.2, 0.4]}>
+            <sphereGeometry args={[0.05, 12, 8]} />
+            <Mat color="#3a1414" />
+          </mesh>
+          {open > 0.5 && (
+            <mesh position={[0, -0.02, 0.012]} scale={[1, 0.45, 0.3]}>
+              <sphereGeometry args={[0.04, 8, 6]} />
+              <Mat color="#ff7a85" />
+            </mesh>
+          )}
+        </group>
+      )}
+      {!speaking && m.mouth === "smile" && (
         <mesh position={[0, -0.115, 0.3]} rotation={[0, 0, Math.PI]}>
           <torusGeometry args={[0.06, 0.014, 5, 12, Math.PI]} />
           <Mat color="#8a3b2a" />
         </mesh>
       )}
-      {m.mouth === "frown" && (
+      {!speaking && m.mouth === "frown" && (
         <mesh position={[0, -0.16, 0.3]}>
           <torusGeometry args={[0.05, 0.013, 5, 12, Math.PI]} />
           <Mat color="#8a3b2a" />
         </mesh>
       )}
-      {(m.mouth === "grin" || m.mouth === "o" || m.mouth === "big") && (
+      {!speaking && (m.mouth === "grin" || m.mouth === "o" || m.mouth === "big") && (
         <group position={[0, m.mouth === "grin" ? -0.11 : -0.13, 0.295]}>
           <mesh scale={m.mouth === "grin" ? [1.5, 0.8, 0.4] : m.mouth === "o" ? [0.9, 1.15, 0.4] : [1.3, 1.7, 0.4]}>
             <sphereGeometry args={[0.055, 12, 8]} />
@@ -135,7 +156,7 @@ const Face: React.FC<{mood: Mood; f: number; look?: number}> = ({mood, f, look =
           </mesh>
         </group>
       )}
-      {m.mouth === "grit" && (
+      {!speaking && m.mouth === "grit" && (
         <mesh position={[0, -0.13, 0.305]}>
           <boxGeometry args={[0.12, 0.045, 0.02]} />
           <Mat color="#ffffff" />
@@ -165,6 +186,7 @@ export const Driver: React.FC<DriverProps> = ({
   mood = "happy",
   look = 0,
   waveL = 0,
+  pedal = 0,
 }) => {
   const fr = useCurrentFrame();
   const sway = Math.sin(fr / 14) * 3;
@@ -180,8 +202,8 @@ export const Driver: React.FC<DriverProps> = ({
         seated ? (
           <group key={x}>
             <Cap r={0.085} l={0.2} color={legColor} opacity={op} position={[x, 0.3, 0.2]} rotation={[Math.PI / 2, 0, 0]} />
-            <Cap r={0.08} l={0.1} color={legColor} opacity={op} position={[x, 0.16, 0.42]} />
-            <mesh position={[x, 0.05, 0.5]} scale={[1, 0.6, 1.5]}>
+            <Cap r={0.08} l={0.1} color={legColor} opacity={op} position={[x, 0.16 - (x > 0 ? pedal * 0.03 : 0), 0.42 + (x > 0 ? pedal * 0.16 : 0)]} />
+            <mesh position={[x, 0.05 - (x > 0 ? pedal * 0.03 : 0), 0.5 + (x > 0 ? pedal * 0.16 : 0)]} scale={[1, 0.6, 1.5]}>
               <icosahedronGeometry args={[0.1, 1]} />
               <Mat color={c.shoe} />
             </mesh>
@@ -335,7 +357,9 @@ export const Driver: React.FC<DriverProps> = ({
 };
 
 /** Carro de F1 genérico fictício (sem equipes ou patrocinadores). Eixo longo = Z, frente = +Z. */
-export const Car: React.FC<{opacity?: number; yaw?: number; position?: [number, number, number]}> = ({
+export const Car: React.FC<{opacity?: number; yaw?: number; position?: [number, number, number]; spin?: number; nose?: number}> = ({
+  spin = 0,
+  nose = 0,
   opacity = 1,
   yaw = 0,
   position = [0, 0, 0],
@@ -344,7 +368,7 @@ export const Car: React.FC<{opacity?: number; yaw?: number; position?: [number, 
   const dark = "#1b2a6b";
   const wheelOp = Math.max(opacity, 0.5);
   return (
-    <group position={position} rotation={[0, rad(yaw), 0]}>
+    <group position={position} rotation={[rad(nose), rad(yaw), 0]}>
       {/* monocoque */}
       <mesh position={[0, 0.28, 0]}>
         <boxGeometry args={[0.56, 0.26, 2.0]} />
@@ -438,6 +462,14 @@ export const Car: React.FC<{opacity?: number; yaw?: number; position?: [number, 
             <cylinderGeometry args={[w[3] * 0.55, w[3] * 0.55, w[4] + 0.02, 10]} />
             <Mat color="#aeb8c4" metal={0.4} opacity={wheelOp} />
           </mesh>
+          <group rotation={[0, spin, 0]}>
+            {[0, 1, 2].map((k) => (
+              <mesh key={k} position={[0, w[4] / 2 + 0.015, 0]} rotation={[0, (k * Math.PI) / 3, 0]}>
+                <boxGeometry args={[w[3] * 1.0, 0.012, w[3] * 0.13]} />
+                <Mat color="#ff7a00" opacity={wheelOp} />
+              </mesh>
+            ))}
+          </group>
         </group>
       ))}
       {/* eixos */}
@@ -583,7 +615,8 @@ const Grass: React.FC = () => {
 };
 
 /** Cenário externo persistente: grama, pista, zebras, árvores, morros, montanhas e nuvens. */
-export const World: React.FC<{frame: number; road?: boolean}> = ({frame, road = true}) => {
+export const World: React.FC<{frame: number; road?: boolean; scroll?: number}> = ({frame, road = true, scroll = 0}) => {
+  const wrap = (x: number, span: number) => ((((x - scroll) % span) + span * 1.5) % span) - span / 2;
   const trees = React.useMemo(
     () =>
       Array.from({length: 26}).map((_, i) => {
@@ -618,21 +651,27 @@ export const World: React.FC<{frame: number; road?: boolean}> = ({frame, road = 
           </mesh>
           {kerbs.map((x) => (
             <React.Fragment key={x}>
-              <mesh position={[x + 0.5, 0.01, 2.75]}>
+              <mesh position={[wrap(x + 0.5, 36), 0.01, 2.75]}>
                 <boxGeometry args={[1, 0.04, 0.3]} />
                 <Mat color={x % 2 === 0 ? "#e53935" : "#f4f4f4"} />
               </mesh>
-              <mesh position={[x + 0.5, 0.01, -2.75]}>
+              <mesh position={[wrap(x + 0.5, 36), 0.01, -2.75]}>
                 <boxGeometry args={[1, 0.04, 0.3]} />
                 <Mat color={x % 2 === 0 ? "#e53935" : "#f4f4f4"} />
               </mesh>
             </React.Fragment>
           ))}
+          {Array.from({length: 18}).map((_, i) => (
+            <mesh key={"d" + i} position={[wrap(-18 + i * 2 + 1, 36), 0.005, 0]}>
+              <boxGeometry args={[0.9, 0.01, 0.1]} />
+              <Mat color="#f4f4f4" />
+            </mesh>
+          ))}
         </>
       )}
       <Grass />
       {trees.map((t, i) => (
-        <group key={i} position={[t.x, 0, t.z]} scale={t.s}>
+        <group key={i} position={[wrap(t.x, 44), 0, t.z]} scale={t.s}>
           <mesh position={[0, 0.3, 0]}>
             <cylinderGeometry args={[0.08, 0.11, 0.6, 5]} />
             <Mat color="#7a4e2d" />
@@ -683,15 +722,25 @@ export const World: React.FC<{frame: number; road?: boolean}> = ({frame, road = 
 };
 
 /** Palco do laboratório: plataforma circular com anel luminoso (cenas internas). */
-export const LabFloor: React.FC<{r?: number; y?: number; color?: string}> = ({r = 2.6, y = 0, color = "#1c3a6e"}) => (
-  <group position={[0, y, 0]}>
-    <mesh position={[0, -0.04, 0]}>
-      <cylinderGeometry args={[r, r, 0.08, 36]} />
-      <Mat color={color} />
-    </mesh>
-    <mesh position={[0, 0.002, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-      <ringGeometry args={[r * 0.92, r * 0.97, 48]} />
-      <meshBasicMaterial color="#4dd0ff" />
-    </mesh>
-  </group>
-);
+export const LabFloor: React.FC<{r?: number; y?: number; color?: string}> = ({r = 2.6, y = 0, color = "#9bdc6e"}) => {
+  const f = useCurrentFrame();
+  return (
+    <group>
+      <World frame={f} road={false} />
+      <group position={[0, y, 0]}>
+        <mesh position={[0, -0.12, 0]}>
+          <cylinderGeometry args={[r * 1.02, r * 0.98, 0.16, 36]} />
+          <Mat color="#8a6a45" />
+        </mesh>
+        <mesh position={[0, -0.02, 0]}>
+          <cylinderGeometry args={[r, r, 0.05, 36]} />
+          <Mat color={color} />
+        </mesh>
+        <mesh position={[0, 0.012, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <ringGeometry args={[r * 0.9, r * 0.95, 48]} />
+          <meshBasicMaterial color="#ffffff" />
+        </mesh>
+      </group>
+    </group>
+  );
+};
