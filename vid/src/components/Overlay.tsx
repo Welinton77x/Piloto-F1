@@ -144,7 +144,7 @@ const buildChunks = (s: TimedScene): Chunk[] => {
   };
   for (const w of ws) {
     const len = cur.map((x) => x.t).join(" ").length + w.t.length + (cur.length ? 1 : 0);
-    if (cur.length && len > 17) flush();
+    if (cur.length && len > 15) flush();
     cur.push(w);
     if (/[.!?:…]$/.test(w.t)) flush();
   }
@@ -163,21 +163,21 @@ const Captions: React.FC<{s: TimedScene}> = ({s}) => {
     <div
       style={{
         position: "absolute",
-        left: 70,
-        right: 70,
-        top: 1470,
+        left: 110,
+        right: 110,
+        top: 1580,
         transform: `translateY(-50%) scale(${0.9 + 0.1 * pop})`,
         display: "flex",
         flexWrap: "wrap",
         justifyContent: "center",
-        columnGap: 30,
+        columnGap: 22,
         rowGap: 6,
         fontFamily,
         fontWeight: 900,
-        fontSize: 68,
-        lineHeight: 1.1,
+        fontSize: 58,
+        lineHeight: 1.08,
         textTransform: "uppercase",
-        WebkitTextStroke: "10px #101820",
+        WebkitTextStroke: "8px #101820",
         paintOrder: "stroke fill",
       }}
     >
@@ -185,7 +185,7 @@ const Captions: React.FC<{s: TimedScene}> = ({s}) => {
         const active = f >= w.start && f < w.end;
         const color = active ? "#FFD400" : w.key ? "#4DD0FF" : "#FFFFFF";
         return (
-          <span key={i} style={{color, display: "inline-block", transform: active ? "scale(1.1)" : "none"}}>
+          <span key={i} style={{color, display: "inline-block", transform: active ? "scale(1.05)" : "none"}}>
             {w.t}
           </span>
         );
