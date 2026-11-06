@@ -1,4 +1,3 @@
-Rendered 1/1
 [34m+                    out/s10_a.png[39m
 Bundling 6%
 Bundling 20%
@@ -21,7 +20,8 @@ Rendered 0/1
 Rendered 1/1
 [34m+                    out/s10_b.png[39m
 Bundling 6%
-Bundling 19%
+Bundling 20%
+Bundling 31%
 Bundling 61%
 Bundling 69%
 Bundling 74%
