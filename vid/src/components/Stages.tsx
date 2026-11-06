@@ -524,7 +524,7 @@ export const S11: React.FC = () => {
   return (
     <group>
       <World frame={f} />
-      <Driver outfit="mechanic" position={[0, 0, 0]} wave={wave} scale={1.15} />
+      <Driver outfit="mechanic" position={[0, 0, 0]} wave={wave} scale={0.95} />
     </group>
   );
 };
