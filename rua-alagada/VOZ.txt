@@ -1,1 +1,2 @@
 gerar voz Liam do roteiro v2 aprovado (rua alagada)
+v3: regenerar s11 (novo fecho pedido pelo usuário)

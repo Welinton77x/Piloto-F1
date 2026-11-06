@@ -17,12 +17,14 @@ jobs:
         env:
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
         run: |
-          if [ -f rua-alagada/app/public/vo/s11.mp3 ]; then echo "voz já existe, nada a fazer"; exit 0; fi
-          python rua-alagada/app/scripts/tts_elevenlabs.py
+          ONLY=""; [ -f rua-alagada/VOZ_ONLY.txt ] && ONLY=$(cat rua-alagada/VOZ_ONLY.txt)
+          if [ -z "$ONLY" ] && [ -f rua-alagada/app/public/vo/s11.mp3 ]; then echo "voz já existe, nada a fazer"; exit 0; fi
+          TTS_ONLY="$ONLY" python rua-alagada/app/scripts/tts_elevenlabs.py
+          rm -f rua-alagada/VOZ_ONLY.txt
       - name: Guardar no branch
         run: |
           git config user.name "claude-bot"; git config user.email "bot@users.noreply.github.com"
-          git add rua-alagada/app/public/vo rua-alagada/app/src/data/timing.json
+          git add -A rua-alagada/app/public/vo rua-alagada/app/src/data/timing.json rua-alagada/VOZ_ONLY.txt
           git commit -m "Voz Liam gerada (rua alagada)" || exit 0
           git pull --rebase origin "${GITHUB_REF_NAME}"
           git push origin "HEAD:${GITHUB_REF_NAME}"

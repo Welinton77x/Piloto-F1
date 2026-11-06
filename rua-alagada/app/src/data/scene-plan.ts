@@ -204,7 +204,7 @@ export const scenes: ScenePlan[] = [
     audioCues: [cue("pop-badge", 43), cue("pop-badge", 102), cue("pop-badge", 151)] },
 
   { id: "s11", voKey: "s11", startFrame: 3030, durationInFrames: 420,
-    narration: "Resumindo: a rua alaga quando chega mais água do que o solo infiltra e a drenagem escoa. Na sua rua, isso acontece? Comenta aí e segue o Por Dentro Lab.",
+    narration: "Resumindo: a rua alaga quando chega mais água do que o solo infiltra e a drenagem escoa. Parabéns, agora você sabe para onde a água da chuva vai. Se você sabia, comente chuva. Se não sabia, comente alagado. E segue o Por Dentro Lab e manda para um amigo que ainda acha que a água da chuva vai pro céu de novo.",
     camera: [{ f: 0, az: 0, el: 8, dist: 48, target: [1.5, -0.8, 0] }, { f: 216, az: 10, el: 8, dist: 44, target: [1.5, -0.8, 0] }, { f: 217, az: 0, el: 4, dist: 10, target: [-3.0, 0.35, 0] }, { f: 420, az: 4, el: 4, dist: 9.5, target: [-3.0, 0.35, 0] }],
     objects: ["world", "flowArrowsAll", "inflowBar", "outflowBar", "mascot", "umbrella", "wordmark", "iconComment", "iconShare", "bgBrand"],
     animations: [
