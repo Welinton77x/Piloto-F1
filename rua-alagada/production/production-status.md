@@ -24,3 +24,8 @@
 - `tsc --noEmit` (strict) sem erros. Stills por cena revisados em 4 rodadas; quadros extraídos do próprio MP4 revisados (`rua-alagada/out/folha-de-contato.png`).
 - NÃO verificado: audição (o agente não ouve áudio); só medições.
 - Renderizar de novo: ver `rua-alagada/app/README.md`.
+
+## Entrega v4 (correções do usuário + estilo da referência)
+- `rua-alagada/out/rua-alagada.mp4` (cópia do repositório recomprimida em CRF 22 para caber no limite de 100 MB do GitHub; o original CRF 17 tem 106,5 MB): H.264 1080×1920, 30 fps, 3657 frames, 122,0 s; AAC 48 kHz; −14,3 LUFS, pico −2,0 dBFS; áudio em todos os segundos.
+- Voz: só a s11 regenerada (novo fecho, 21,3 s). Chuva ~50% mais baixa.
+- Verificado: `tsc --noEmit`, stills revisados, 16 quadros do MP4 revisados. Não verificado por audição.
