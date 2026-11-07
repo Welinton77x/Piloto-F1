@@ -113,43 +113,6 @@ const TitleCard: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
   );
 };
 
-/* ---------- círculo vermelho desenhado em volta do ponto que importa ---------- */
-type Ring = {id: string; word: string; occ?: number; p: [number, number, number]; r: number; dur?: number};
-const RINGS: Ring[] = [
-  {id: "s2", word: "terra", p: [-11.2, -1.1, 1.03], r: 150},
-  {id: "s3", word: "Bombas", p: [-8.4, -1.35, 1.0], r: 120},
-  {id: "s4", word: "turva", p: [-4.4, 0.65, 1.0], r: 140},
-  {id: "s5", word: "flocos", p: [-1.7, 1.0, 0.7], r: 130},
-  {id: "s6", word: "preso", p: [-0.35, 0.35, 1.0], r: 140},
-  {id: "s7", word: "micróbios", p: [-0.35, 1.25, 1.04], r: 130},
-  {id: "s8", word: "reservatórios", p: [3.5, 1.9, -0.5], r: 170},
-  {id: "s9", word: "hidrômetro", p: [8.75, 0.5, 0.75], r: 100},
-  {id: "s9", word: "caixa", p: [11.0, 2.85, -0.6], r: 150},
-];
-const Rings: React.FC<{s: TimedScene; f: number}> = ({s, f}) => (
-  <>
-    {RINGS.filter((r) => r.id === s.id).map((r) => {
-      const a = wordLocal(s, r.word, r.occ ?? 0);
-      if (a === undefined) return null;
-      const dur = r.dur ?? 75;
-      if (f < a - 2 || f > a + dur) return null;
-      const pt = project(s.startFrame + f, r.p);
-      if (!pt) return null;
-      const draw = clamp01((f - a + 2) / 10);
-      const o = 1 - clamp01((f - a - dur + 10) / 10);
-      const R = r.r * (1 + 0.04 * Math.sin(f * 0.3));
-      const C = 2 * Math.PI * R;
-      return (
-        <svg key={r.word} width={R * 2 + 40} height={R * 2 + 40} style={{position: "absolute", left: pt.x - R - 20, top: pt.y - R - 20, opacity: o, overflow: "visible"}}>
-          <circle cx={R + 20} cy={R + 20} r={R} fill="none" stroke="#101820" strokeWidth={18} strokeDasharray={C} strokeDashoffset={C * (1 - draw)} strokeLinecap="round" transform={`rotate(-80 ${R + 20} ${R + 20})`} opacity={0.35} />
-          <circle cx={R + 20} cy={R + 20} r={R} fill="none" stroke="#FF2D2D" strokeWidth={11} strokeDasharray={C} strokeDashoffset={C * (1 - draw)} strokeLinecap="round" transform={`rotate(-80 ${R + 20} ${R + 20})`} />
-          <circle cx={R + 20 + Math.cos(-1.4) * R} cy={R + 20 + Math.sin(-1.4) * R} r={13 * draw} fill="#FF2D2D" stroke="#fff" strokeWidth={4} />
-        </svg>
-      );
-    })}
-  </>
-);
-
 /* ---------- ✓ e ✕ grandes ---------- */
 type Stamp = {id: string; word: string; ok: boolean; x: number; y: number};
 const STAMPS: Stamp[] = [
@@ -527,7 +490,6 @@ export const Overlay: React.FC<{s: TimedScene}> = ({s}) => {
       {s.id === "s1" && <TitleCard s={s} f={f} />}
       {s.id === "s11" && <FinalCTA s={s} f={f} />}
       <Imagine s={s} f={f} />
-      <Rings s={s} f={f} />
       <Labels s={s} f={f} />
       <Stamps s={s} f={f} />
       <Tip s={s} f={f} />

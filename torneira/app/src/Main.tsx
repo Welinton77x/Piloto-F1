@@ -6,6 +6,7 @@ import {useThree} from "@react-three/fiber";
 import {VO_OFFSET, config, finalCut, hasVO, sceneAt, timed, wordLocal} from "./data/scenes";
 import {WaterWorld} from "./components/WaterWorld";
 import {Overlay, imagineAmount} from "./components/Overlay";
+import {Rings3D} from "./components/Rings3D";
 import {FOV, poseAt} from "./lib/camera";
 import {track} from "./lib/track";
 import {clamp01, mixHex} from "./lib/anim";
@@ -61,6 +62,7 @@ export const Scene3D: React.FC<{at?: number; fixed?: FixedPose; sunny?: boolean;
     <ThreeCanvas width={width} height={height} shadows={{type: THREE.PCFSoftShadowMap}} camera={{fov: FOV, near: 0.1, far: 400, position: [0, 2, 40]}}>
       <CamRig at={at} fixed={fixed} />
       <WaterWorld gf={gf} />
+      {!fixed && <Rings3D gf={gf} />}
       {children}
     </ThreeCanvas>
   );
