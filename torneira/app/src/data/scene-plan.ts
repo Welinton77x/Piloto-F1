@@ -26,7 +26,7 @@ export const layout = {
 export const scenes: ScenePlan[] = [
   { id: "s1", voKey: "s1", startFrame: 0, durationInFrames: 210,
     narration: "Você abre a torneira e a água sai limpa. Mas de onde ela vem?",
-    camera: [{ f: 0, az: -4, el: 8, dist: 6.6, target: [9.85, 1.1, -0.8] }, { f: 210, az: -12, el: 8, dist: 6.0, target: [9.85, 1.1, -0.8] }],
+    camera: [{ f: 0, az: -6, el: 6, dist: 4.4, target: [9.75, 1.15, -0.8] }, { f: 210, az: -12, el: 6, dist: 4.0, target: [9.75, 1.15, -0.8] }],
     objects: ["house", "sink", "faucet", "glass", "mascot", "wallPipe"],
     animations: [
       { target: "faucet.handle", unit: "deg", from: 0, to: 70, f0: 10, f1: 30, fn: "spring" },
@@ -39,7 +39,7 @@ export const scenes: ScenePlan[] = [
 
   { id: "s2", voKey: "s2", startFrame: 210, durationInFrames: 240,
     narration: "Ela começa num rio ou numa represa. Só que essa água tem terra, folhas e micróbios invisíveis.",
-    camera: [{ f: 0, az: 5, el: 6, dist: 3.4, target: [10.5, 1.2, 0] }, { f: 60, az: 10, el: 18, dist: 16, target: [-11.5, 0, 0] }, { f: 150, az: 10, el: 18, dist: 16, target: [-11.5, 0, 0] }, { f: 151, az: 0, el: 10, dist: 4, target: [-11, -0.3, 0.5] }, { f: 240, az: 6, el: 10, dist: 4, target: [-11, -0.3, 0.5] }],
+    camera: [{ f: 0, az: 5, el: 6, dist: 3.4, target: [10.5, 1.2, 0] }, { f: 60, az: 10, el: 14, dist: 15, target: [-10.4, 0.4, 0] }, { f: 150, az: 10, el: 14, dist: 15, target: [-10.4, 0.4, 0] }, { f: 151, az: 0, el: 10, dist: 4, target: [-11, -0.3, 0.5] }, { f: 240, az: 6, el: 10, dist: 4, target: [-11, -0.3, 0.5] }],
     objects: ["lake", "shore", "trees", "leaves", "dirtParticles", "lens2D", "microbes2D"],
     animations: [
       { target: "camera.travel", unit: "spring", from: 0, to: 1, f0: 0, f1: 60, fn: "spring" },
@@ -51,7 +51,7 @@ export const scenes: ScenePlan[] = [
 
   { id: "s3", voKey: "s3", startFrame: 450, durationInFrames: 210,
     narration: "Bombas empurram essa água por canos grandes, as adutoras, até a estação de tratamento.",
-    camera: [{ f: 0, az: 0, el: 8, dist: 10, target: [-8.0, -0.4, 0.5] }, { f: 60, az: 0, el: 8, dist: 10, target: [-8.0, -0.4, 0.5] }, { f: 210, az: 6, el: 10, dist: 11, target: [-6.0, 0.2, 0.5] }],
+    camera: [{ f: 0, az: 0, el: 8, dist: 10, target: [-7.9, -0.1, 0.5] }, { f: 60, az: 0, el: 8, dist: 10, target: [-7.9, -0.1, 0.5] }, { f: 210, az: 6, el: 10, dist: 11, target: [-6.3, 0.3, 0.5] }],
     objects: ["intakeGrate", "pump", "adutora", "flowArrows"],
     animations: [
       { target: "pump.rotor", unit: "deg/f", from: 0, to: 12, f0: 20, f1: 40, fn: "easeIn" },
@@ -111,7 +111,7 @@ export const scenes: ScenePlan[] = [
 
   { id: "s8", voKey: "s8", startFrame: 1545, durationInFrames: 270,
     narration: "Daí ela sobe pra reservatórios no alto, e a gravidade cria a pressão que empurra a água pela rede.",
-    camera: [{ f: 0, az: 5, el: 10, dist: 10, target: [2.9, 1.3, 0] }, { f: 140, az: 5, el: 10, dist: 10, target: [2.9, 1.3, 0] }, { f: 270, az: 8, el: 12, dist: 14, target: [4.6, 0.6, 0] }],
+    camera: [{ f: 0, az: 5, el: 10, dist: 10, target: [3.0, 1.3, 0] }, { f: 140, az: 5, el: 10, dist: 10, target: [3.0, 1.3, 0] }, { f: 270, az: 8, el: 12, dist: 13, target: [4.0, 0.9, 0] }],
     objects: ["hill", "tower", "riserPipe", "downPipe", "upArrows", "downArrows", "pressureGauge2D"],
     animations: [
       { target: "rise.fill", unit: "0-1", from: 0, to: 1, f0: 20, f1: 120, fn: "easeOut" },
@@ -124,7 +124,7 @@ export const scenes: ScenePlan[] = [
 
   { id: "s9", voKey: "s9", startFrame: 1815, durationInFrames: 240,
     narration: "Debaixo da rua, ela passa pelo hidrômetro, o relógio da sua casa, e chega na caixa d'água.",
-    camera: [{ f: 0, az: 0, el: 8, dist: 9, target: [7.8, 0.2, 0.3] }, { f: 240, az: 6, el: 8, dist: 8, target: [9.8, 1.4, 0] }],
+    camera: [{ f: 0, az: 0, el: 8, dist: 7, target: [8.4, 0.6, 0.3] }, { f: 240, az: 6, el: 8, dist: 6.5, target: [8.5, 0.8, 0.3] }],
     objects: ["streetMain", "branchPipe", "meter", "riser", "roofTank", "mascot"],
     animations: [
       { target: "mainFlow.offset", unit: "u3d", from: 0, to: 3, f0: 0, f1: 240, fn: "linear" },
@@ -137,7 +137,7 @@ export const scenes: ScenePlan[] = [
 
   { id: "s10", voKey: "s10", startFrame: 2055, durationInFrames: 210,
     narration: "A caixa guarda uma reserva, e a gravidade leva a água até a torneira.",
-    camera: [{ f: 0, az: 10, el: 10, dist: 7, target: [10.5, 1.8, -0.8] }, { f: 210, az: -10, el: 8, dist: 6.0, target: [9.85, 1.1, -0.8] }],
+    camera: [{ f: 0, az: 10, el: 10, dist: 7, target: [10.5, 1.8, -0.8] }, { f: 210, az: -10, el: 6, dist: 4.2, target: [9.75, 1.15, -0.8] }],
     objects: ["roofTank", "downPipe", "faucet", "glass", "mascot"],
     animations: [
       { target: "houseDown.offset", unit: "u3d", from: 0, to: 2, f0: 20, f1: 150, fn: "linear" },
@@ -149,7 +149,7 @@ export const scenes: ScenePlan[] = [
 
   { id: "s11", voKey: "s11", startFrame: 2265, durationInFrames: 645,
     narration: "Resumindo: represa, tratamento, reservatório, rede, caixa d'água e torneira. Agora você sabe de onde vem a água que sai na sua torneira! Se você já sabia, comente TORNEIRA. Se não sabia, comente REPRESA. E segue o Por Dentro Lab pra descobrir mais coisas por dentro.",
-    camera: [{ f: 0, az: 4, el: 12, dist: 15, target: [-11.5, -0.3, 0] }, { f: 10, az: 4, el: 12, dist: 15, target: [-11.5, -0.3, 0], atWord: "represa", wordOffset: -8 }, { f: 11, az: 4, el: 12, dist: 15, target: [-11.5, -0.3, 0], atWord: "represa", wordOffset: 14 }, { f: 40, az: 4, el: 12, dist: 13, target: [-2.5, 0.7, 0], atWord: "tratamento", wordOffset: -8 }, { f: 41, az: 4, el: 12, dist: 13, target: [-2.5, 0.7, 0], atWord: "tratamento", wordOffset: 14 }, { f: 70, az: 4, el: 12, dist: 13, target: [3.4, 1.6, 0], atWord: "reservatório", wordOffset: -8 }, { f: 71, az: 4, el: 12, dist: 13, target: [3.4, 1.6, 0], atWord: "reservatório", wordOffset: 14 }, { f: 100, az: 4, el: 12, dist: 13, target: [7.2, -0.2, 0], atWord: "rede", wordOffset: -8 }, { f: 101, az: 4, el: 12, dist: 13, target: [7.2, -0.2, 0], atWord: "rede", wordOffset: 14 }, { f: 130, az: 4, el: 12, dist: 11, target: [10.6, 2.6, -0.6], atWord: "caixa", wordOffset: -8 }, { f: 131, az: 4, el: 12, dist: 11, target: [10.6, 2.6, -0.6], atWord: "caixa", wordOffset: 14 }, { f: 160, az: 4, el: 12, dist: 9, target: [10.3, 1.4, -1.6], atWord: "torneira", wordOffset: -8 }, { f: 161, az: 4, el: 12, dist: 9, target: [10.3, 1.4, -1.6], atWord: "torneira", wordOffset: 14 }, { f: 199, az: 4, el: 10, dist: 9, target: [10.3, 1.4, -1.6], atWord: "Agora", wordOffset: -6 }, { f: 200, az: 0, el: 4, dist: 6.4, target: [9.85, 1.05, -0.6], atWord: "Agora", wordOffset: -5 }, { f: 645, az: 5, el: 4, dist: 6.0, target: [9.85, 1.05, -0.6] }],
+    camera: [{ f: 0, az: 4, el: 12, dist: 15, target: [-11.5, -0.3, 0] }, { f: 10, az: 4, el: 12, dist: 15, target: [-11.5, -0.3, 0], atWord: "represa", wordOffset: -8 }, { f: 11, az: 4, el: 12, dist: 15, target: [-11.5, -0.3, 0], atWord: "represa", wordOffset: 14 }, { f: 40, az: 4, el: 12, dist: 13, target: [-2.5, 0.7, 0], atWord: "tratamento", wordOffset: -8 }, { f: 41, az: 4, el: 12, dist: 13, target: [-2.5, 0.7, 0], atWord: "tratamento", wordOffset: 14 }, { f: 70, az: 4, el: 12, dist: 13, target: [3.4, 1.6, 0], atWord: "reservatório", wordOffset: -8 }, { f: 71, az: 4, el: 12, dist: 13, target: [3.4, 1.6, 0], atWord: "reservatório", wordOffset: 14 }, { f: 100, az: 4, el: 12, dist: 13, target: [7.2, -0.2, 0], atWord: "rede", wordOffset: -8 }, { f: 101, az: 4, el: 12, dist: 13, target: [7.2, -0.2, 0], atWord: "rede", wordOffset: 14 }, { f: 130, az: 4, el: 12, dist: 11, target: [10.6, 2.6, -0.6], atWord: "caixa", wordOffset: -8 }, { f: 131, az: 4, el: 12, dist: 11, target: [10.6, 2.6, -0.6], atWord: "caixa", wordOffset: 14 }, { f: 160, az: 4, el: 12, dist: 9, target: [10.3, 1.4, -1.6], atWord: "torneira", wordOffset: -8 }, { f: 161, az: 4, el: 12, dist: 9, target: [10.3, 1.4, -1.6], atWord: "torneira", wordOffset: 14 }, { f: 199, az: 4, el: 10, dist: 9, target: [10.3, 1.4, -1.6], atWord: "Agora", wordOffset: -6 }, { f: 200, az: 0, el: 4, dist: 4.8, target: [9.7, 1.15, -0.6], atWord: "Agora", wordOffset: -5 }, { f: 645, az: 5, el: 4, dist: 4.4, target: [9.7, 1.15, -0.6] }],
     objects: ["world", "flowHighlight", "mascot", "confetti2D", "hearts2D", "wordmark"],
     animations: [
       { target: "flowHighlight.stage", unit: "etapa 0-6", from: 0, to: 6, f0: 10, f1: 190, fn: "linear" },

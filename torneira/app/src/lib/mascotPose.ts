@@ -49,15 +49,23 @@ export const mascotPose = (gf: number): MascotPose => {
       break;
     }
     case "s2":
+      pose.emotion = p < 0.5 ? "happy" : "worried";
+      pose.lArm = [-70, 25]; // mostra a represa
+      break;
     case "s3":
       pose.emotion = "surprised";
+      pose.rArm = [-60, 30]; // mostra a bomba
+      break;
+    case "s8":
+      pose.emotion = "happy";
+      pose.rArm = [-100, 20]; // aponta para o reservatório lá em cima
       break;
     case "s7":
       pose.emotion = p < 0.37 ? "worried" : "relieved";
       break;
     case "s9":
       pose.emotion = "happy";
-      pose.lArm = [-60, 12]; // aponta para frente, em direção ao hidrômetro (sem encostar na parede)
+      pose.rArm = [-75, 35]; // aponta para o hidrômetro, ao lado dele na calçada
       break;
     case "s10":
       pose.emotion = p < 0.8 ? "happy" : "relieved";

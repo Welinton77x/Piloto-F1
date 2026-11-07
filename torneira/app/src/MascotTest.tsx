@@ -10,8 +10,8 @@ const pose: MascotPose = {emotion: "happy", talk: 0, lArm: [4, 12], rArm: [4, 12
 const Cam: React.FC<{az: number}> = ({az}) => {
   const camera = useThree((s) => s.camera);
   const r = 3.2, a = (az * Math.PI) / 180;
-  camera.position.set(Math.sin(a) * r, 1.45, Math.cos(a) * r);
-  camera.lookAt(0, 1.35, 0);
+  camera.position.set(Math.sin(a) * r * 1.6, 1.0, Math.cos(a) * r * 1.6);
+  camera.lookAt(0, 0.95, 0);
   camera.updateProjectionMatrix();
   return null;
 };

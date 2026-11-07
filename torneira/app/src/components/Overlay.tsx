@@ -164,7 +164,7 @@ const Card: React.FC<{text: string; color: string; scale?: number; fs?: number}>
 
 type Lab = {id: string; text: string; p: [number, number, number]; f0: number; f1?: number; color: string};
 const LABELS: Lab[] = [
-  {id: "s3", text: "BOMBA", p: [-8.4, 0.3, 1.0], f0: 30, color: "#4a7fb8"},
+  {id: "s3", text: "BOMBA", p: [-8.4, -0.9, 1.0], f0: 30, color: "#4a7fb8"},
   {id: "s6", text: "AREIA", p: [-0.35, 0.6, 1.0], f0: 40, color: "#e8cf93"},
   {id: "s6", text: "CASCALHO", p: [-0.35, 0.22, 1.0], f0: 70, color: "#9aa3ad"},
   {id: "s7", text: "FLÚOR", p: [1.6, 1.5, 0.6], f0: 230, color: "#4DD0FF"},

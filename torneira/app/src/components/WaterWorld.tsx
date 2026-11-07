@@ -3,7 +3,7 @@
 import React, {useLayoutEffect, useMemo, useRef} from "react";
 import * as THREE from "three";
 import {random} from "remotion";
-import {S} from "../data/scenes";
+import {S, sceneAt} from "../data/scenes";
 import {track} from "../lib/track";
 import {clamp01, mixHex} from "../lib/anim";
 import {poseAt} from "../lib/camera";
@@ -626,7 +626,22 @@ export const WaterWorld: React.FC<{gf: number}> = ({gf}) => {
       ))}
 
       {/* ---------- MASCOTE (na cozinha) ---------- */}
-      <Mascot position={[9.6, 0.1, -0.6]} scale={0.8} pose={mascotPose(gf)} gf={gf} look={mascotLook(gf)} />
+      {(() => {
+        // o mascote acompanha a água: aparece ao lado de cada etapa (como o personagem da referência)
+        const id = sceneAt(gf).id;
+        const P: Record<string, [number, number, number] | null> = {
+          s1: [9.6, 0.1, -0.6],
+          s2: [-8.8, 0.06, 0.75],
+          s3: [-6.95, 0.06, 1.0],
+          s4: null, s5: null, s6: null, s7: null, // closes dos tanques
+          s8: [2.3, 0.06, 1.3],
+          s9: [8.05, 0.08, 0.35],
+          s10: [9.6, 0.1, -0.6],
+          s11: [9.6, 0.1, -0.6],
+        };
+        const p = P[id];
+        return p ? <Mascot position={p} scale={0.8} pose={mascotPose(gf)} gf={gf} look={mascotLook(gf)} /> : null;
+      })()}
 
       <Clouds gf={gf} />
       <fog attach="fog" args={["#d6ecfb", camDist + 10, camDist + 60]} />

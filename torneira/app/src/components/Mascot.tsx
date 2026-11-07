@@ -201,11 +201,11 @@ const Umbrella: React.FC<{state: "open" | "closed"; tilt: number}> = ({state, ti
 
 export type Hand = "fist" | "open" | "point";
 const Arm: React.FC<{side: -1 | 1; rot: [number, number]; hand?: Hand; children?: React.ReactNode}> = ({side, rot, hand = "fist", children}) => (
-  <group position={[side * 0.345, 0.93, 0]} rotation={[rad(rot[0]), 0, rad(side * rot[1])]}>
-    <RB w={0.17} h={0.3} d={0.18} r={0.07} c={col.shirt} position={[0, -0.13, 0]} />
-    <RB w={0.15} h={0.22} d={0.16} r={0.06} c={col.skin} position={[0, -0.36, 0]} />
+  <group position={[side * 0.335, 1.18, 0]} rotation={[rad(rot[0]), 0, rad(side * rot[1])]}>
+    <RB w={0.16} h={0.36} d={0.17} r={0.07} c={col.shirt} position={[0, -0.16, 0]} />
+    <RB w={0.14} h={0.3} d={0.15} r={0.06} c={col.skin} position={[0, -0.44, 0]} />
     {hand === "open" ? (
-      <group position={[0, -0.53, 0]}>
+      <group position={[0, -0.65, 0]}>
         {/* palma achatada, dedos juntos e polegar */}
         <mesh scale={[1.25, 1.3, 0.55]}>
           <sphereGeometry args={[0.085, 18, 14]} />
@@ -223,18 +223,18 @@ const Arm: React.FC<{side: -1 | 1; rot: [number, number]; hand?: Hand; children?
         </mesh>
       </group>
     ) : (
-      <mesh position={[0, -0.5, 0]}>
+      <mesh position={[0, -0.62, 0]}>
         <sphereGeometry args={[0.085, 16, 12]} />
         <Mat c={col.skin} />
       </mesh>
     )}
     {hand === "point" && (
-      <mesh position={[0, -0.62, 0]}>
+      <mesh position={[0, -0.74, 0]}>
         <capsuleGeometry args={[0.026, 0.12, 4, 8]} />
         <Mat c={col.skin} />
       </mesh>
     )}
-    {children && <group position={[0, -0.5, 0]}>{children}</group>}
+    {children && <group position={[0, -0.62, 0]}>{children}</group>}
   </group>
 );
 
@@ -372,14 +372,14 @@ export const Mascot: React.FC<{position: [number, number, number]; scale?: numbe
         <meshBasicMaterial color="#000000" transparent opacity={0.22 / (1 + pose.jump * 3)} depthWrite={false} />
       </mesh>
       {[-1, 1].map((s, i) => (
-        <group key={s} position={[s * 0.13, 0.5, 0]} rotation={[rad(i ? step : -step), 0, 0]}>
-          <RB w={0.21} h={0.44} d={0.23} r={0.07} c={overall ? col.shirtD : col.pants} position={[0, -0.22, 0]} />
-          <RB w={0.22} h={0.1} d={0.32} r={0.045} c={col.shoe} position={[0, -0.45, 0.04]} />
-          <RB w={0.23} h={0.035} d={0.33} r={0.015} c={col.sole} position={[0, -0.49, 0.04]} />
+        <group key={s} position={[s * 0.12, 0.66, 0]} rotation={[rad(i ? step : -step), 0, 0]}>
+          <RB w={0.2} h={0.6} d={0.22} r={0.07} c={overall ? col.shirtD : col.pants} position={[0, -0.3, 0]} />
+          <RB w={0.22} h={0.1} d={0.32} r={0.045} c={col.shoe} position={[0, -0.61, 0.04]} />
+          <RB w={0.23} h={0.035} d={0.33} r={0.015} c={col.sole} position={[0, -0.65, 0.04]} />
         </group>
       ))}
-      <group position={[0, 0.5, 0]} scale={[1, 1 + breath, 1 + breath * 0.5]}>
-        <RB w={0.6} h={0.5} d={0.36} r={0.12} c={overall ? col.shirtD : col.shirt} position={[0, 0.25, 0]} />
+      <group position={[0, 0.66, 0]} scale={[1, 1 + breath, 1 + breath * 0.5]}>
+        <RB w={0.58} h={0.6} d={0.34} r={0.12} c={overall ? col.shirtD : col.shirt} position={[0, 0.3, 0]} />
         {overall && (
           <group>
             {/* zíper, bolso com canetas e símbolo de engrenagem */}
@@ -393,12 +393,12 @@ export const Mascot: React.FC<{position: [number, number, number]; scale?: numbe
             </mesh>
           </group>
         )}
-        <RB w={0.3} h={0.06} d={0.3} r={0.03} c={col.shirtD} position={[0, 0.5, 0]} />
-        <mesh position={[0.13, 0.33, overall ? -5 : 0.182]}>
+        <RB w={0.3} h={0.06} d={0.3} r={0.03} c={col.shirtD} position={[0, 0.6, 0]} />
+        <mesh position={[0.13, 0.42, overall ? -5 : 0.172]}>
           <circleGeometry args={[0.065, 20]} />
           <Mat c="#4DD0FF" />
         </mesh>
-        <mesh position={[0.13, 0.33, overall ? -5 : 0.183]}>
+        <mesh position={[0.13, 0.42, overall ? -5 : 0.173]}>
           <ringGeometry args={[0.065, 0.078, 20]} />
           <Mat c="#ffffff" />
         </mesh>
@@ -409,7 +409,7 @@ export const Mascot: React.FC<{position: [number, number, number]; scale?: numbe
         {look.wrench && look.wrenchLeft ? <group rotation={new THREE.Euler(-rad(pose.lArm[0]), 0, rad(pose.lArm[1]), "ZYX")}><Wrench tilt={look.wrenchTilt} /></group> : null}
       </Arm>
       <Arm side={1} rot={pose.rArm} hand={look.rHand}>{look.wrench && !look.wrenchLeft ? <group rotation={new THREE.Euler(-rad(pose.rArm[0]), 0, -rad(pose.rArm[1]), "ZYX")}><Wrench tilt={look.wrenchTilt} /></group> : null}</Arm>
-      <group position={[0, 1.3 + breath * 0.5, 0]} rotation={[0, 0, rad(headTilt)]}>
+      <group position={[0, 1.5 + breath * 0.5, 0]} rotation={[0, 0, rad(headTilt)]} scale={0.86}>
         <RB w={0.54} h={0.5} d={0.48} r={0.14} c={col.skin} />
         {[-1, 1].map((s) => (
           <mesh key={s} position={[s * 0.275, -0.02, 0]} scale={[0.5, 1, 0.8]}>
