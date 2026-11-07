@@ -35,8 +35,9 @@ const work = {outfit: "swim" as const}; // pedido do usuário: roupa de banho o 
 
 const PIT_FLOOR = -1.5;
 // caminhos pela escada (sem atravessar terra nem parede): da grama, passa por cima da beirada e desce
-const LADDER3: V3[] = [[-1.75, 0.06, 0.35], [-1.35, 0.3, 0.35], [-0.8, PIT_FLOOR, 0.35]]; // escada de obra dentro do buraco
-const LADDER5: V3[] = [[-1.85, 0.1, 0.35], [-1.6, 0.18, 0.35], [-1.05, 0.12, 0.35], [-1.05, -1.22, 0.35]]; // escada da piscina
+// o mascote fica de frente para a escada, com os pés nos degraus e o corpo entre os corrimões (sem atravessar)
+const LADDER3: V3[] = [[-1.75, 0.06, 0.35], [-1.25, 0.3, 0.35], [-0.6, PIT_FLOOR, 0.35]]; // escada de obra dentro do buraco
+const LADDER5: V3[] = [[-1.85, 0.1, 0.35], [-1.55, 0.2, 0.35], [-0.96, 0.12, 0.35], [-0.96, -1.22, 0.35]]; // escada da piscina
 const LADDER3_BOT = LADDER3[LADDER3.length - 1], LADDER5_BOT = LADDER5[LADDER5.length - 1];
 const lerp3 = (a: V3, b: V3, k: number): V3 => [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k];
 /** posição ao longo de uma lista de pontos (k de 0 a 1, velocidade constante por trecho) */

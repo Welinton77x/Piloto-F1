@@ -879,7 +879,7 @@ export const PoolWorld: React.FC<{gf: number}> = ({gf}) => {
       {inS("s3") && pitD > 0.8 && (
         // escada de obra: apoiada no fundo do buraco e encostada na beirada (não entra na terra)
         <group>
-          {[0.2, 0.5].map((z) => (
+          {[0.04, 0.66].map((z) => (
             <group key={"lw" + z} position={[-1.42, 0.45, z]} rotation={[0, 0, 0.35]}>
               <B x={[-0.03, 0.03]} y={[-2.08, 0]} z={[-0.03, 0.03]} c="#a0643c" />
             </group>
@@ -887,20 +887,20 @@ export const PoolWorld: React.FC<{gf: number}> = ({gf}) => {
           {Array.from({length: 7}).map((_, i) => {
             const k = (i + 0.5) / 7;
             const x = -1.42 + 0.71 * k, y = 0.45 - 1.95 * k;
-            return <B key={"lr" + i} x={[x - 0.03, x + 0.03]} y={[y - 0.02, y + 0.02]} z={[0.2, 0.5]} c="#8a5a2b" />;
+            return <B key={"lr" + i} x={[x - 0.03, x + 0.03]} y={[y - 0.02, y + 0.02]} z={[0.04, 0.66]} c="#8a5a2b" />;
           })}
         </group>
       )}
       {(after("s6") || (inS("s5") && t >= s5Work().r0 - 30)) && (
         <group>
-          {[0.2, 0.5].map((z) => (
+          {[0.04, 0.66].map((z) => (
             <group key={"pl" + z}>
               <B x={[-1.18, -1.14]} y={[-1.18, 0.38]} z={[z - 0.02, z + 0.02]} c="#cfd8dc" />
               <B x={[-1.62, -1.14]} y={[0.36, 0.4]} z={[z - 0.02, z + 0.02]} c="#cfd8dc" />
               <B x={[-1.64, -1.6]} y={[0.09, 0.4]} z={[z - 0.02, z + 0.02]} c="#cfd8dc" />
             </group>
           ))}
-          {[-0.95, -0.65, -0.35, -0.05].map((y) => <B key={"ps" + y} x={[-1.26, -1.12]} y={[y - 0.015, y + 0.015]} z={[0.2, 0.5]} c="#eceff1" />)}
+          {[-0.95, -0.65, -0.35, -0.05].map((y) => <B key={"ps" + y} x={[-1.26, -1.0]} y={[y - 0.015, y + 0.015]} z={[0.06, 0.64]} c="#eceff1" />)}
         </group>
       )}
 
