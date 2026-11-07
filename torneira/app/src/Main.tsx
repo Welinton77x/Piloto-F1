@@ -3,7 +3,7 @@ import {AbsoluteFill, Audio, Sequence, continueRender, delayRender, staticFile, 
 import * as THREE from "three";
 import {ThreeCanvas} from "@remotion/three";
 import {useThree} from "@react-three/fiber";
-import {VO_OFFSET, config, finalCut, hasVO, sceneAt, timed} from "./data/scenes";
+import {VO_OFFSET, config, finalCut, hasVO, sceneAt, timed, wordLocal} from "./data/scenes";
 import {WaterWorld} from "./components/WaterWorld";
 import {Overlay, imagineAmount} from "./components/Overlay";
 import {FOV, poseAt} from "./lib/camera";
@@ -89,6 +89,16 @@ export const Main: React.FC = () => (
         {hasVO(s.voKey) && (
           <Sequence from={VO_OFFSET} name={`vo-${s.id}`}>
             <Audio src={staticFile(`vo/${s.voKey}.mp3`)} />
+          </Sequence>
+        )}
+        {s.id === "s2" && wordLocal(s, "Por") !== undefined && (
+          <Sequence from={wordLocal(s, "Por")!} durationInFrames={40} name="rewind">
+            <Audio src={staticFile("sfx/rewind.wav")} volume={0.45} />
+          </Sequence>
+        )}
+        {s.id === "s2" && wordLocal(s, "imagina") !== undefined && (
+          <Sequence from={wordLocal(s, "imagina")! - 8} durationInFrames={30} name="pause">
+            <Audio src={staticFile("sfx/tick.wav")} volume={0.5} />
           </Sequence>
         )}
         {s.audioCues
