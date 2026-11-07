@@ -1,4 +1,4 @@
-// Capa do Short (1080×1920) no padrão das capas de referência: cena clara, título branco com
+// Capa do vídeo 3 (piscina) no padrão das capas de referência: cena clara, título branco com
 // palavras-chave em amarelo e vermelho, mascote reagindo e círculo vermelho no objeto principal.
 import React from "react";
 import * as THREE from "three";
@@ -38,13 +38,13 @@ export const Cover: React.FC<P> = ({at, dy = 0, fixed, ring, ringR = 150}) => {
           <circle cx={rp.x} cy={rp.y + dy} r={ringR} fill="none" stroke="#E0201B" strokeWidth={13} />
         </svg>
       )}
-      <div style={{position: "absolute", top: 210, left: 40, right: 40, textAlign: "center", fontFamily: FONT, fontWeight: 900, fontSize: 112, lineHeight: 1.0, color: "#fff", WebkitTextStroke: "16px #101820", paintOrder: "stroke fill", textShadow: "0 8px 0 rgba(0,0,0,0.3)"}}>
-        <div>DE ONDE VEM</div>
+      <div style={{position: "absolute", top: 200, left: 30, right: 30, textAlign: "center", fontFamily: FONT, fontWeight: 900, fontSize: 112, lineHeight: 1.0, color: "#fff", WebkitTextStroke: "16px #101820", paintOrder: "stroke fill", textShadow: "0 8px 0 rgba(0,0,0,0.3)"}}>
         <div>
-          A <W c="#FFD400">ÁGUA</W> DA
+          COMO UM <W c="#FF2B2B">BURACO</W>
         </div>
-        <div>
-          SUA <W c="#FF2B2B">TORNEIRA</W>?
+        <div>VIRA UMA</div>
+        <div style={{fontSize: 150}}>
+          <W c="#FFD400">PISCINA</W>?
         </div>
       </div>
     </AbsoluteFill>
