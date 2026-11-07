@@ -65,3 +65,18 @@ Série: "A água da cidade por dentro" (episódio 2, depois de "Por que a rua al
 - Etapas de uma ETA convencional (coagulação, floculação, decantação, filtração, desinfecção, fluoretação, correção de pH): [InfoEscola](https://www.infoescola.com/geografia/tratamento-de-agua/exercicios/), [Sienge — tratamento de água](https://sienge.com.br/blog/tratamento-de-agua-2/), [artigo técnico com autores da Sabesp (USP)](https://repositorio.usp.br/bitstreams/bc8261d4-59f4-423e-9eba-5adb0bb133f0).
 - Cloro residual obrigatório em toda a rede e nos pontos de consumo (Portaria GM/MS 888/2021): [UFPR — cloro residual livre](https://revistas.ufpr.br/academica/article/view/94046).
 - Conhecimento geral (não verificado em fonte nesta sessão): bombas/adutoras, reservatórios elevados dando pressão por gravidade, hidrômetro antes da caixa d'água e caixa d'água alimentando as torneiras por gravidade.
+
+## v3 — narração mais completa e no ritmo da referência (aprovada pelo usuário em 2026-11-07: "Eu aprovo")
+Pedido: "Ficou muito rápido as falas, diminuía a fala melhore a explicação use o vídeo que eu mandei e se basei nas velocidade das falas dele". Referência medida: ~185–200 palavras/min (≈430 palavras em 132 s). Roteiro v3: 317 palavras; voz Matheus – Energic Young Voice desacelerada ~12% com pausas curtas entre frases (~180 palavras/min, ~105 s). O mascote passa a participar de cada etapa (pedido do usuário na aprovação).
+
+- s1: "Você abre a torneira e sai água limpinha. Mas você já parou pra pensar de onde ela vem? E como ela chega limpa até aqui?"
+- s2: "Tudo começa num rio ou numa represa. Só que essa água não dá pra beber: ela tem terra, folhas e micróbios tão pequenos que você nem enxerga."
+- s3: "Então bombas gigantes puxam essa água e empurram por canos enormes, as adutoras, até a estação de tratamento. É lá que a limpeza acontece."
+- s4: "A sujeira mais fininha não afunda sozinha. Por isso entra um produto que faz essas partículas grudarem umas nas outras, formando bolinhas maiores: os flocos. Isso é a coagulação e a floculação."
+- s5: "Os flocos ficam pesados e vão afundando devagar até o fundo do tanque. A água de cima fica bem mais clara. Isso é a decantação."
+- s6: "Depois, a água passa por camadas de areia e cascalho, como uma peneira gigante. A sujeira que sobrou fica presa ali: é a filtração."
+- s7: "Mas tem um problema: alguns micróbios são tão pequenos que passam até pelo filtro. Aí entra o cloro, que mata esses germes e continua protegendo a água por todo o caminho até a sua casa."
+- s8: "Agora a água limpa é bombeada pra reservatórios no alto. Lá de cima, a gravidade faz o trabalho: a água desce com pressão e corre pelos canos da cidade."
+- s9: "Debaixo da rua, ela entra no cano da sua casa, passa pelo hidrômetro, que é o relógio que mede quanto você gasta, e sobe até a caixa d'água."
+- s10: "A caixa guarda uma reserva pra quando falta água na rua. E, de novo, a gravidade leva a água até a sua torneira."
+- s11: "Resumindo: represa, tratamento, reservatório, rede, caixa d'água e torneira. Agora você sabe de onde vem a água que sai na sua torneira! Se você já sabia, comente TORNEIRA. Se não sabia, comente REPRESA. E segue o Por Dentro Lab pra descobrir mais coisas por dentro."

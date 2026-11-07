@@ -25,7 +25,7 @@ export const layout = {
 
 export const scenes: ScenePlan[] = [
   { id: "s1", voKey: "s1", startFrame: 0, durationInFrames: 210,
-    narration: "Você abre a torneira e a água sai limpa. Mas de onde ela vem?",
+    narration: "Você abre a torneira e sai água limpinha. Mas você já parou pra pensar de onde ela vem? E como ela chega limpa até aqui?",
     camera: [{ f: 0, az: -6, el: 6, dist: 4.4, target: [9.75, 1.15, -0.8] }, { f: 210, az: -12, el: 6, dist: 4.0, target: [9.75, 1.15, -0.8] }],
     objects: ["house", "sink", "faucet", "glass", "mascot", "wallPipe"],
     animations: [
@@ -38,7 +38,7 @@ export const scenes: ScenePlan[] = [
     audioCues: [cue("music-in", 0, "music"), cue("faucet-open", 10), cue("water-glass", 30), cue("pop-badge", 150)] },
 
   { id: "s2", voKey: "s2", startFrame: 210, durationInFrames: 240,
-    narration: "Ela começa num rio ou numa represa. Só que essa água tem terra, folhas e micróbios invisíveis.",
+    narration: "Tudo começa num rio ou numa represa. Só que essa água não dá pra beber: ela tem terra, folhas e micróbios tão pequenos que você nem enxerga.",
     camera: [{ f: 0, az: 5, el: 6, dist: 3.4, target: [10.5, 1.2, 0] }, { f: 60, az: 10, el: 14, dist: 15, target: [-10.4, 0.4, 0] }, { f: 150, az: 10, el: 14, dist: 15, target: [-10.4, 0.4, 0] }, { f: 151, az: 0, el: 10, dist: 4, target: [-11, -0.3, 0.5] }, { f: 240, az: 6, el: 10, dist: 4, target: [-11, -0.3, 0.5] }],
     objects: ["lake", "shore", "trees", "leaves", "dirtParticles", "lens2D", "microbes2D"],
     animations: [
@@ -50,7 +50,7 @@ export const scenes: ScenePlan[] = [
     audioCues: [cue("whoosh-pipe", 0), cue("water-ambience", 60)] },
 
   { id: "s3", voKey: "s3", startFrame: 450, durationInFrames: 210,
-    narration: "Bombas empurram essa água por canos grandes, as adutoras, até a estação de tratamento.",
+    narration: "Então bombas gigantes puxam essa água e empurram por canos enormes, as adutoras, até a estação de tratamento. É lá que a limpeza acontece.",
     camera: [{ f: 0, az: 0, el: 8, dist: 10, target: [-7.9, -0.1, 0.5] }, { f: 60, az: 0, el: 8, dist: 10, target: [-7.9, -0.1, 0.5] }, { f: 210, az: 6, el: 10, dist: 11, target: [-6.3, 0.3, 0.5] }],
     objects: ["intakeGrate", "pump", "adutora", "flowArrows"],
     animations: [
@@ -62,7 +62,7 @@ export const scenes: ScenePlan[] = [
     audioCues: [cue("pump-hum", 20), cue("gurgle", 40)] },
 
   { id: "s4", voKey: "s4", startFrame: 660, durationInFrames: 240,
-    narration: "Primeiro entra um produto que junta a sujeira fininha em flocos: é a coagulação e a floculação.",
+    narration: "A sujeira mais fininha não afunda sozinha. Por isso entra um produto que faz essas partículas grudarem umas nas outras, formando bolinhas maiores: os flocos. Isso é a coagulação e a floculação.",
     camera: [{ f: 0, az: 12, el: 14, dist: 6.5, target: [-4.5, 0.75, 0.3] }, { f: 240, az: 18, el: 14, dist: 6.0, target: [-4.3, 0.75, 0.3] }],
     objects: ["mixTank", "doser", "particles", "flocculator", "paddles", "flocs"],
     animations: [
@@ -74,7 +74,7 @@ export const scenes: ScenePlan[] = [
     audioCues: [cue("drip", 10), cue("swirl", 60)] },
 
   { id: "s5", voKey: "s5", startFrame: 900, durationInFrames: 180,
-    narration: "Os flocos são pesados e afundam no tanque. Isso é a decantação.",
+    narration: "Os flocos ficam pesados e vão afundando devagar até o fundo do tanque. A água de cima fica bem mais clara. Isso é a decantação.",
     camera: [{ f: 0, az: 0, el: 8, dist: 5.6, target: [-2.0, 0.7, 0.3] }, { f: 180, az: 6, el: 8, dist: 5.2, target: [-2.0, 0.7, 0.3] }],
     objects: ["decanter", "flocs", "sludge"],
     animations: [
@@ -86,7 +86,7 @@ export const scenes: ScenePlan[] = [
     audioCues: [cue("plop", 30)] },
 
   { id: "s6", voKey: "s6", startFrame: 1080, durationInFrames: 165,
-    narration: "Depois, a água atravessa camadas de areia e cascalho: a filtração.",
+    narration: "Depois, a água passa por camadas de areia e cascalho, como uma peneira gigante. A sujeira que sobrou fica presa ali: é a filtração.",
     camera: [{ f: 0, az: 0, el: 6, dist: 4.8, target: [-0.35, 0.65, 0.4] }, { f: 165, az: -6, el: 6, dist: 4.5, target: [-0.35, 0.65, 0.4] }],
     objects: ["filter", "sandLayer", "gravelLayer", "drops", "trappedDirt"],
     animations: [
@@ -97,7 +97,7 @@ export const scenes: ScenePlan[] = [
     audioCues: [cue("drip", 20)] },
 
   { id: "s7", voKey: "s7", startFrame: 1245, durationInFrames: 300,
-    narration: "Mas micróbios passam pelo filtro. Então entra o cloro, que mata os germes e protege a água até a sua casa.",
+    narration: "Mas tem um problema: alguns micróbios são tão pequenos que passam até pelo filtro. Aí entra o cloro, que mata esses germes e continua protegendo a água por todo o caminho até a sua casa.",
     camera: [{ f: 0, az: 0, el: 6, dist: 4.6, target: [-0.35, 0.7, 0.4] }, { f: 110, az: 0, el: 6, dist: 4.6, target: [-0.35, 0.7, 0.4] }, { f: 111, az: 10, el: 10, dist: 5.6, target: [0.9, 0.8, 0.3] }, { f: 300, az: 14, el: 10, dist: 7.5, target: [1.4, 0.8, 0.3] }],
     objects: ["microbes2D", "chlorineDoser", "contactTank", "residualGlow", "labelFluor"],
     animations: [
@@ -110,7 +110,7 @@ export const scenes: ScenePlan[] = [
     audioCues: [cue("drip", 120), cue("pop-microbe", 160)] },
 
   { id: "s8", voKey: "s8", startFrame: 1545, durationInFrames: 270,
-    narration: "Daí ela sobe pra reservatórios no alto, e a gravidade cria a pressão que empurra a água pela rede.",
+    narration: "Agora a água limpa é bombeada pra reservatórios no alto. Lá de cima, a gravidade faz o trabalho: a água desce com pressão e corre pelos canos da cidade.",
     camera: [{ f: 0, az: 5, el: 10, dist: 10, target: [3.0, 1.3, 0] }, { f: 140, az: 5, el: 10, dist: 10, target: [3.0, 1.3, 0] }, { f: 270, az: 8, el: 12, dist: 13, target: [4.0, 0.9, 0] }],
     objects: ["hill", "tower", "riserPipe", "downPipe", "upArrows", "downArrows", "pressureGauge2D"],
     animations: [
@@ -123,7 +123,7 @@ export const scenes: ScenePlan[] = [
     audioCues: [cue("pump-hum", 10), cue("gurgle", 150)] },
 
   { id: "s9", voKey: "s9", startFrame: 1815, durationInFrames: 240,
-    narration: "Debaixo da rua, ela passa pelo hidrômetro, o relógio da sua casa, e chega na caixa d'água.",
+    narration: "Debaixo da rua, ela entra no cano da sua casa, passa pelo hidrômetro, que é o relógio que mede quanto você gasta, e sobe até a caixa d'água.",
     camera: [{ f: 0, az: 0, el: 8, dist: 7, target: [8.4, 0.6, 0.3] }, { f: 240, az: 6, el: 8, dist: 6.5, target: [8.5, 0.8, 0.3] }],
     objects: ["streetMain", "branchPipe", "meter", "riser", "roofTank", "mascot"],
     animations: [
@@ -136,7 +136,7 @@ export const scenes: ScenePlan[] = [
     audioCues: [cue("meter-tick", 60)] },
 
   { id: "s10", voKey: "s10", startFrame: 2055, durationInFrames: 210,
-    narration: "A caixa guarda uma reserva, e a gravidade leva a água até a torneira.",
+    narration: "A caixa guarda uma reserva pra quando falta água na rua. E, de novo, a gravidade leva a água até a sua torneira.",
     camera: [{ f: 0, az: 10, el: 10, dist: 7, target: [10.5, 1.8, -0.8] }, { f: 210, az: -6, el: 6, dist: 4.4, target: [9.95, 1.15, -0.8] }],
     objects: ["roofTank", "downPipe", "faucet", "glass", "mascot"],
     animations: [
