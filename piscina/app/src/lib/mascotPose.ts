@@ -30,7 +30,7 @@ const POOL_FLOAT: V3 = [1.2, -0.82, 0.7];
 const FL = -1.5 + 0.08;
 const IN_Y0 = FL + 0.2;
 const swim = {outfit: "swim" as const};
-const work = {outfit: "shirt" as const};
+const work = {outfit: "swim" as const}; // pedido do usuário: roupa de banho o vídeo todo, inclusive explicando
 
 /** posição do compactador / rolo (mesmas contas do PoolWorld) */
 const compX = (t: number) => L(t, W("s3", "socado") - 6, W("s3", "magro"), -1.0, 4.0);
