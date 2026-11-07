@@ -43,23 +43,10 @@ export const Rings3D: React.FC<{gf: number}> = ({gf}) => {
         const len = Math.max(0.001, Math.PI * 2 * draw);
         const start = Math.PI / 2;
         const mat = (c: string, op = 1) => <meshBasicMaterial color={c} transparent opacity={op * o} toneMapped={false} side={THREE.DoubleSide} depthWrite={false} />;
-        const dot = new THREE.Vector3(Math.cos(start + len), Math.sin(start + len), 0).multiplyScalar(R);
         return (
           <group key={r.word} position={p} quaternion={q}>
-            <mesh renderOrder={10}>
-              <ringGeometry args={[R - 15 * px, R + 15 * px, 96, 1, start, len]} />
-              {mat("#ffffff")}
-            </mesh>
-            <mesh renderOrder={11} position={[0, 0, 0.002]}>
-              <ringGeometry args={[R - 9 * px, R + 9 * px, 96, 1, start, len]} />
-              {mat(RED)}
-            </mesh>
-            <mesh renderOrder={12} position={[dot.x, dot.y, 0.004]}>
-              <circleGeometry args={[17 * px * draw, 32]} />
-              {mat("#ffffff")}
-            </mesh>
-            <mesh renderOrder={13} position={[dot.x, dot.y, 0.006]}>
-              <circleGeometry args={[12 * px * draw, 32]} />
+            <mesh renderOrder={11}>
+              <ringGeometry args={[R - 11 * px, R + 11 * px, 96, 1, start, len]} />
               {mat(RED)}
             </mesh>
           </group>
