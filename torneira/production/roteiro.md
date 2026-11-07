@@ -82,3 +82,20 @@ Pedido: "Ficou muito rápido as falas, diminuía a fala melhore a explicação u
 - s11: "Resumindo: represa, tratamento, reservatório, rede, caixa d'água e torneira. Agora você sabe de onde vem a água que sai na sua torneira! Se você já sabia, comente TORNEIRA. Se não sabia, comente REPRESA. E segue o Por Dentro Lab pra descobrir mais coisas por dentro."
 
 Ajuste por crédito (faltavam 11 créditos na conta): removidos "Então" (s3) e ", de novo," (s10); sentido inalterado.
+
+## v5 — PROPOSTA no estilo do vídeo de exemplo do usuário (AGUARDANDO APROVAÇÃO)
+Pedido (2026-11-07): mudar a abertura para "Você abre a sua torneira e sai água, mas você já se perguntou de onde vem a água que sai da sua torneira?" e seguir o vídeo de exemplo (explicação detalhada, "bolinha vermelha" mostrando o que acontece, uso do boneco, jeito de narrar). Voz: Liam.
+Recursos visuais a aplicar: cartão-título da pergunta no gancho; círculo vermelho em volta do que importa; etiquetas brancas com bolinha colorida (vermelha = problema, amarela = atenção, verde = solução, azul = info); nome técnico grande em amarelo quando o termo aparece; ✓ verde / ✕ vermelho; efeito de "rebobinar" (preto e branco) e "pausa" nas cenas de "imagina…"; cenário da DICA; final com confete e pergunta grande "COMENTA AÍ".
+Narração (372 palavras, ~2 min com a voz Liam):
+- s1: "Você abre a sua torneira e sai água. Mas você já se perguntou de onde vem a água que sai da sua torneira?"
+- s2: "Tudo começa num rio ou numa represa. Agora imagina beber essa água direto de lá. Ela tem terra, folhas e micróbios que você nem enxerga. Resultado: dor de barriga, diarreia e vômito. Por isso ela não pode ir direto pra sua casa."
+- s3: "Primeiro, bombas gigantes puxam essa água e mandam por canos enormes, as adutoras, até um lugar especial: a estação de tratamento."
+- s4: "Só que tem um problema: a sujeira mais fininha não afunda sozinha. Ela fica boiando e deixa a água turva. Aí entra um produto que faz essas partículas grudarem umas nas outras, virando bolinhas maiores. Isso se chama coagulação e floculação."
+- s5: "Essas bolinhas, os flocos, ficam pesadas e afundam devagar até o fundo do tanque. A água de cima fica muito mais clara. Isso é a decantação."
+- s6: "Mas ainda sobra sujeira. Então a água passa por camadas de areia e cascalho, tipo uma peneira gigante. O que sobrou fica preso ali. Isso é a filtração."
+- s7: "Parece limpa, né? Só que alguns micróbios são tão pequenos que passam até pelo filtro. Aí entra o cloro. Ele mata esses germes e continua protegendo a água pelo caminho todo até a sua casa. É por isso que às vezes a água tem aquele cheirinho de piscina."
+- s8: "Agora a água limpa é bombeada pra reservatórios no alto. E aqui vem o truque: lá de cima, a própria gravidade empurra a água com força pelos canos da cidade."
+- s9: "Debaixo da rua, ela entra no cano da sua casa e passa pelo hidrômetro, aquele relógio que mede quanto você gasta. É ele que define a sua conta de água. Depois, ela sobe até a caixa d'água."
+- s10: "A caixa guarda uma reserva pra quando falta água na rua. E fica a dica: limpe a sua caixa d'água a cada seis meses. Se ela ficar suja, todo aquele tratamento vai pro ralo."
+- s11: "Resumindo: represa, tratamento, reservatório, rede, caixa d'água e torneira. Parabéns, agora você sabe de onde vem a água da sua torneira! Você já limpou a sua caixa d'água? Comenta aí e segue o Por Dentro Lab pra descobrir mais coisas por dentro."
+Fontes novas: limpeza da caixa a cada 6 meses — Sanepar e nota técnica da Saúde/RS citando cartilha do Ministério da Saúde (https://saude.rs.gov.br/upload/arquivos/carga20180750/25125051-notatecnica-limpeza-de-reservatorios-agua.pdf); cheiro de cloro = cloro residual exigido na rede (Portaria GM/MS 888/2021).
