@@ -1,0 +1,30 @@
+name: Gerar voz Liam (piscina)
+on:
+  push:
+    paths: ["piscina/VOZ.txt"]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency: voz-piscina
+jobs:
+  voz:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Instalar ffmpeg
+        run: sudo apt-get update -y >/dev/null && sudo apt-get install -y ffmpeg >/dev/null
+      - name: Gerar narração (uma vez; pula se já existe)
+        env:
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+        run: |
+          ONLY=""; [ -f piscina/VOZ_ONLY.txt ] && ONLY=$(cat piscina/VOZ_ONLY.txt)
+          if [ -z "$ONLY" ] && [ -f piscina/app/public/vo/s9.mp3 ]; then echo "voz já existe, nada a fazer"; exit 0; fi
+          TTS_ONLY="$ONLY" python piscina/app/scripts/tts_elevenlabs.py
+          rm -f piscina/VOZ_ONLY.txt
+      - name: Guardar no branch
+        run: |
+          git config user.name "claude-bot"; git config user.email "bot@users.noreply.github.com"
+          git add -A piscina/
+          git commit -m "Voz Liam gerada (piscina)" || exit 0
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
