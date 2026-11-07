@@ -18,7 +18,7 @@ export type Rewind = {id: string; P: number; R: number; back: number};
 export const REWINDS: Rewind[] = [
   {id: "s2", P: W("s2", "Imagina") - 8, R: W("s2", "Volta"), back: start("s1")},
   {id: "s3", P: W("s3", "se") - 6, R: W("s3", "Volta"), back: W("s3", "se") - 6},
-  {id: "s4", P: W("s4", "Se") - 6, R: W("s4", "Por", 1), back: W("s4", "Se") - 6},
+  {id: "s4", P: W("s4", "Se") - 6, R: W("s4", "Por", 2), back: W("s4", "Se") - 6},
   {id: "s5", P: W("s5", "Sem") - 6, R: W("s5", "Por"), back: W("s5", "Sem") - 6},
   {id: "s8", P: W("s8", "Imagina") - 8, R: W("s8", "Por"), back: W("s8", "Imagina") - 8},
 ];

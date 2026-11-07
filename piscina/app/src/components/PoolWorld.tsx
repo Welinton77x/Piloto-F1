@@ -7,7 +7,7 @@ import {sceneAt} from "../data/scenes";
 import {clamp01, mixHex} from "../lib/anim";
 import {poseAt} from "../lib/camera";
 import {Mascot} from "./Mascot";
-import {mascotLook, mascotPose} from "../lib/mascotPose";
+import {mascotLook, mascotPose, neighborLand, neighborLook, neighborPose} from "../lib/mascotPose";
 
 export const FACE = 1.5;
 const FAR = -40;
@@ -223,6 +223,14 @@ const FL = -PD + LEAN; // topo do concreto magro
 const IN = {x0: PX0 + CT, x1: PX1 - CT, z0: PZ0 + CT, y0: FL + CT}; // interior da casca de concreto
 export const WATER_TOP = -0.2;
 const HOLE = {x0: 0, x1: 3, z0: -0.6}; // buraco "na pá" do começo
+// rachaduras do fundo (x, z), em zigue-zague, saindo da emenda do meio
+const CRACKS: [number, number][][] = [
+  [[1.5, -1.4], [1.35, -0.9], [1.6, -0.4], [1.42, 0.1], [1.62, 0.6], [1.45, 1.1], [1.55, 1.5]],
+  [[1.45, -0.3], [0.9, -0.55], [0.5, -0.35], [0.0, -0.7], [-0.6, -0.5]],
+  [[1.6, 0.6], [2.2, 0.85], [2.7, 0.55], [3.3, 0.95], [3.9, 0.7]],
+  [[1.4, 1.1], [0.8, 1.3], [0.2, 1.05]],
+  [[1.55, -0.9], [2.3, -1.2], [3.0, -0.95]],
+];
 const MR = {x0: 6, x1: 7.6, z0: -0.5, y0: -1.2}; // casa de máquinas enterrada
 
 const P = {
@@ -340,13 +348,6 @@ const Mixer: React.FC<{x: number; z: number; t: number; o: number}> = ({x, z, t,
     </group>
   );
 
-/** pá "cavando sozinha" */
-const Shovel: React.FC<{x: number; y: number; z: number; t: number}> = ({x, y, z, t}) => (
-  <group position={[x, y + Math.abs(Math.sin(t * 0.25)) * 0.35, z]} rotation={[0, 0, 0.35 + Math.sin(t * 0.25) * 0.25]}>
-    <B x={[-0.035, 0.035]} y={[0.25, 1.35]} z={[-0.035, 0.035]} c="#a0643c" />
-    <B x={[-0.16, 0.16]} y={[0, 0.3]} z={[-0.02, 0.02]} c="#9aa3ad" />
-  </group>
-);
 
 /** água em caixa (corte) com superfície brilhante */
 const WaterBox: React.FC<{x: [number, number]; y0: number; top: number; z: [number, number]; color?: string; o?: number}> = ({x, y0, top, z, color = P.water, o = 0.62}) =>
@@ -469,11 +470,11 @@ export const PoolWorld: React.FC<{gf: number}> = ({gf}) => {
   const lid = inS("s7") ? L(t, W("s7", "máquinas") - 10, W("s7", "máquinas") + 10, 0, 1.15, easeOut) : 0;
 
   /* ---- s8: cloro (gotas) e kit de pH ---- */
-  const bottle = inS("s8") ? L(t, W("s8", "cloro") - 14, W("s8", "cloro") - 4, 0, 1) * (1 - L(t, W("s8", "cloro") + 40, W("s8", "cloro") + 50, 0, 1)) : 0;
+  const bottle = inS("s8") && t >= W("s8", "cloro") && t < W("s8", "cloro") + 45 ? 1 : 0; // gotas do frasco que o mascote segura
   const kit = after("s8") && t < start("s9") ? L(t, W("s8", "pH") - 10, W("s8", "pH"), 0, 1, easeOut) : 0;
 
   /* ---- s9: vista explodida e mergulho ---- */
-  const explode = inS("s9") ? L(t, start("s9"), start("s9") + 20, 0, 1, easeOut) * (1 - L(t, W("s9", "pular") - 2, W("s9", "pular") + 16, 0, 1, easeInOut)) : 0;
+  const explode = 0; // vista explodida removida a pedido do usuário
   const splashT = inS("s9") ? t - (W("s9", "pular") + 30) : -1;
 
   // água da piscina (s5 vazamento / teste, s7+ cheia)
@@ -523,7 +524,6 @@ export const PoolWorld: React.FC<{gf: number}> = ({gf}) => {
           <M c={P.soilTop} />
         </mesh>
       )}
-      {holeD > 0.05 && inS("s1") && <Shovel x={1.5} y={-holeD * 0.6} z={0.6} t={t} />}
       {/* mangueira enchendo o buraco */}
       {hose && (
         <group>
@@ -574,12 +574,36 @@ export const PoolWorld: React.FC<{gf: number}> = ({gf}) => {
           <B x={[-0.03, 0.03]} y={[0.25, 0.9]} z={[-0.03, 0.03]} c="#37474f" />
         </group>
       )}
-      {/* concreto magro (afunda e racha no "E se?") */}
+      {/* concreto magro (no "E se?" o fundo se parte: metade afunda e aparecem rachaduras grandes) */}
       {lean > 0.001 && (
-        <group position={[0, -sink * 0.18, 0]} rotation={[0, 0, sink * 0.05]}>
-          <B x={[PX0, PX0 + (PX1 - PX0) * lean]} y={[-PD, FL]} z={[PZ0, FACE]} c={P.lean} />
-          {sink > 0.05 && <B x={[1.2, 1.2 + 0.06]} y={[FL - 0.001, FL + 0.004]} z={[PZ0, PZ0 + (FACE - PZ0) * sink]} c="#3a3a3a" />}
-          {sink > 0.05 && <B x={[1.0, 1.45]} y={[-PD - 0.01, FL + 0.003]} z={[FACE - 0.001, FACE + 0.01]} c="#3a3a3a" o={sink} />}
+        <group>
+          <B x={[PX0, Math.min(1.5, PX0 + (PX1 - PX0) * lean)]} y={[-PD, FL]} z={[PZ0, FACE]} c={P.lean} />
+          {lean > 0.5 && (
+            <group position={[1.5, -sink * 0.32, 0]} rotation={[0, 0, sink * 0.09]}>
+              <B x={[0, PX0 + (PX1 - PX0) * lean - 1.5]} y={[-PD, FL]} z={[PZ0, FACE]} c={P.lean} />
+            </group>
+          )}
+          {sink > 0.02 &&
+            CRACKS.map((cr, i) => {
+              const k = clamp01(sink * 1.6 - i * 0.12);
+              return k <= 0 ? null : (
+                <group key={"cr" + i}>
+                  {cr.slice(1).map((q, j) => {
+                    const p0 = cr[j];
+                    if (j / (cr.length - 1) > k) return null;
+                    const dx = q[0] - p0[0], dz = q[1] - p0[1];
+                    const len = Math.hypot(dx, dz);
+                    return (
+                      <mesh key={j} position={[(p0[0] + q[0]) / 2, FL + 0.006 - (p0[0] > 1.5 ? sink * 0.3 : 0), (p0[1] + q[1]) / 2]} rotation={[0, -Math.atan2(dz, dx), 0]}>
+                        <boxGeometry args={[len + 0.03, 0.012, 0.035 + 0.04 * sink]} />
+                        <meshBasicMaterial color="#1b1b1b" />
+                      </mesh>
+                    );
+                  })}
+                </group>
+              );
+            })}
+          {sink > 0.05 && <B x={[1.47, 1.53]} y={[-PD - 0.2, FL]} z={[FACE - 0.001, FACE + 0.012]} c="#1b1b1b" o={sink} />}
         </group>
       )}
 
@@ -781,17 +805,11 @@ export const PoolWorld: React.FC<{gf: number}> = ({gf}) => {
       )}
 
       {/* ---------- s8: cloro e kit de pH ---------- */}
-      {bottle > 0.01 && (
-        <group position={[0.6, 0.9, 0.9]} rotation={[0, 0, -1.9 * bottle]} scale={bottle}>
-          <B x={[-0.13, 0.13]} y={[-0.25, 0.2]} z={[-0.1, 0.1]} c="#f5f7fa" />
-          <B x={[-0.05, 0.05]} y={[0.2, 0.32]} z={[-0.05, 0.05]} c="#1e88e5" />
-        </group>
-      )}
       {bottle > 0.6 &&
         Array.from({length: 10}).map((_, i) => {
           const k = ((t * 0.05 + random("cd" + i)) % 1);
           return (
-            <mesh key={"cd" + i} position={[0.95 + random("cx" + i) * 0.15, 0.95 - k * 1.15, 0.9]}>
+            <mesh key={"cd" + i} position={[-1.12 + random("cx" + i) * 0.12, 0.75 - k * 0.95, 0.9]}>
               <sphereGeometry args={[0.035, 8, 6]} />
               <M c="#e9fbff" e="#bff3ff" ei={0.6} />
             </mesh>
@@ -825,6 +843,19 @@ export const PoolWorld: React.FC<{gf: number}> = ({gf}) => {
 
       {/* ---------- cenário ---------- */}
       <House />
+      {/* casas da vizinhança (pedido do usuário) */}
+      {[[-3.2, -8.2, "#f5d9b8", "#b24a36"], [2.2, -8.6, "#dfe9f2", "#4f6d8f"], [7.4, -8.2, "#fff3c4", "#c9563c"], [12.6, -7.0, "#e3f1df", "#6d4c41"], [-12.5, -6.5, "#f8e1e7", "#4f6d8f"]].map(([x, z, wc, rc], i) => (
+        <group key={"vh" + i} position={[x as number, 0.06, z as number]} scale={0.9 + (i % 2) * 0.15}>
+          <B x={[-1.6, 1.6]} y={[0, 1.9]} z={[-1.3, 1.3]} c={wc as string} />
+          <mesh position={[0, 1.9 + 0.6, 0]} rotation={[0, Math.PI / 4, 0]}>
+            <coneGeometry args={[2.45, 1.2, 4]} />
+            <M c={rc as string} />
+          </mesh>
+          <B x={[-0.3, 0.3]} y={[0, 1.1]} z={[1.3, 1.34]} c="#8a5a2b" />
+          <B x={[-1.25, -0.6]} y={[0.9, 1.45]} z={[1.3, 1.34]} c="#9fd3f2" />
+          <B x={[0.6, 1.25]} y={[0.9, 1.45]} z={[1.3, 1.34]} c="#9fd3f2" />
+        </group>
+      ))}
       <B x={[-12, 12]} y={[0.06, 1.0]} z={[-4.6, -4.4]} c="#ece3d3" />
       <Tree x={-3.6} z={-3.4} s={1.1} />
       <Tree x={9.2} z={-3.0} s={1.2} />
@@ -845,7 +876,28 @@ export const PoolWorld: React.FC<{gf: number}> = ({gf}) => {
         </mesh>
       ))}
 
-      {/* ---------- MASCOTE (só nos momentos importantes, de roupa de banho) ---------- */}
+      {/* ---------- VIZINHO ENGRAÇADO: pula do muro no lamaçal ---------- */}
+      {(() => {
+        const nl = neighborLook(t);
+        if (!nl.at) return null;
+        return <Mascot position={nl.at} scale={0.8} pose={neighborPose(t)} gf={gf} look={nl} />;
+      })()}
+      {(() => {
+        const st = t - neighborLand();
+        if (st < 0 || st > 32 || undoneS2(gf) || !inS("s2")) return null;
+        return Array.from({length: 24}).map((_, i) => {
+          const a = random("ms" + i) * Math.PI * 2, v = 0.04 + random("mv" + i) * 0.05;
+          const y = -0.7 + (0.14 + random("my" + i) * 0.08) * st - 0.011 * st * st;
+          return y < -0.8 ? null : (
+            <mesh key={"ms" + i} position={[2.1 + Math.cos(a) * v * st, y, 0.35 + Math.sin(a) * v * st * 0.6]}>
+              <sphereGeometry args={[0.07, 8, 6]} />
+              <M c={P.mud} />
+            </mesh>
+          );
+        });
+      })()}
+
+      {/* ---------- MASCOTE ---------- */}
       {(() => {
         const mp = mascotPose(t);
         const ml = mascotLook(t);

@@ -7,6 +7,7 @@ import {VO_OFFSET, config, finalCut, hasVO, sceneAt, timed, wordLocal} from "./d
 import {PoolWorld} from "./components/PoolWorld";
 import {Overlay} from "./components/Overlay";
 import {REWINDS, W, imagineAmount, rew, skyDark, start} from "./lib/story";
+import {neighborLand} from "./lib/mascotPose";
 import {Rings3D} from "./components/Rings3D";
 import {FOV, poseAt} from "./lib/camera";
 import {track} from "./lib/track";
@@ -90,6 +91,7 @@ const SFX_AT: [number, string, number][] = [
   [start("s2"), "gurgle.wav", 0.3],
   [W("s2", "desmoronam") - 4, "thud.wav", 0.45],
   [rew("s2").P + 32, "splash.wav", 0.4],
+  [neighborLand(), "splash.wav", 0.5],
   [W("s3", "máquina") - 10, "pump.wav", 0.25],
   [W("s3", "socado"), "thud.wav", 0.3],
   [W("s3", "racha"), "crinkle.wav", 0.4],
