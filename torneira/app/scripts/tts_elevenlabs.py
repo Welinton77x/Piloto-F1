@@ -8,9 +8,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 KEY = os.environ["ELEVENLABS_API_KEY"]
-VOICE = os.environ.get("ELEVENLABS_VOICE_ID", "NQmLEqxcRTkWYIYZSYod")  # Matheus - Energetic and Dynamic (escolhida pelo usuário)
+VOICE = os.environ.get("ELEVENLABS_VOICE_ID", "TX3LPaxmHKxFdv7VOQHJ")  # Liam (escolha do usuário no roteiro v5)
 MODEL = os.environ.get("ELEVENLABS_MODEL", "eleven_multilingual_v2")
-SETTINGS = {"stability": 0.5, "similarity_boost": 0.8, "style": 0.3, "use_speaker_boost": True, "speed": 1.0}
+SETTINGS = {"stability": 0.45, "similarity_boost": 0.8, "style": 0.4, "use_speaker_boost": True, "speed": 1.05}
 
 src = (ROOT / "src/data/scene-plan.ts").read_text(encoding="utf-8")
 items = re.findall(r'voKey: "(s\d+)".*?narration: "((?:[^"\\]|\\.)*)"', src, flags=re.S)

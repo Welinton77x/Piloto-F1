@@ -83,7 +83,7 @@ Pedido: "Ficou muito rápido as falas, diminuía a fala melhore a explicação u
 
 Ajuste por crédito (faltavam 11 créditos na conta): removidos "Então" (s3) e ", de novo," (s10); sentido inalterado.
 
-## v5 — PROPOSTA no estilo do vídeo de exemplo do usuário (AGUARDANDO APROVAÇÃO)
+## v5 — no estilo do vídeo de exemplo do usuário (APROVADO em 2026-11-07: "Eu aprovo pode fazer")
 Pedido (2026-11-07): mudar a abertura para "Você abre a sua torneira e sai água, mas você já se perguntou de onde vem a água que sai da sua torneira?" e seguir o vídeo de exemplo (explicação detalhada, "bolinha vermelha" mostrando o que acontece, uso do boneco, jeito de narrar). Voz: Liam.
 Recursos visuais a aplicar: cartão-título da pergunta no gancho; círculo vermelho em volta do que importa; etiquetas brancas com bolinha colorida (vermelha = problema, amarela = atenção, verde = solução, azul = info); nome técnico grande em amarelo quando o termo aparece; ✓ verde / ✕ vermelho; efeito de "rebobinar" (preto e branco) e "pausa" nas cenas de "imagina…"; cenário da DICA; final com confete e pergunta grande "COMENTA AÍ".
 Narração (372 palavras, ~2 min com a voz Liam):
