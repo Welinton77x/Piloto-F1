@@ -18,3 +18,8 @@
 - **Fase 2 CONCLUÍDA.** `torneira/out/torneira.mp4`: H.264 1080×1920, 30 fps, 2912 frames, 97,1 s; AAC 48 kHz; −15,4 LUFS, pico −2,3 dBFS; áudio em todos os segundos (51 MB).
 - Mudanças pedidas pelo usuário durante a Fase 2: boné encaixado sem nome/lâmpada e com aba para frente; legendas uma palavra por vez (estilo da referência); mascote maior.
 - Verificado: `tsc --noEmit`, stills revisados em 6 rodadas, 18 quadros do MP4 revisados (`torneira/out/folha-de-contato.png`). Não verificado por audição.
+
+## Entrega v2 (correções do usuário)
+- Voz trocada para "Matheus – Energic Young Voice" (`36rVQA1AOIPwpA3Hg1tC`), escolhida pelo usuário; gerada pelo conector da ElevenLabs (1.104 créditos), transcrita para tempos por palavra.
+- Corrigidos: árvore na represa, pia/torneira presa na parede (água não flutua), braço atravessando a parede, adutora na frente da câmera, dosadores flutuando, rótulo da bomba, câmera do resumo; mascote com proporção de adolescente, closes da cintura pra cima e presença na represa, bomba, reservatório e hidrômetro.
+- MP4: 1080×1920, 30 fps, 1798 frames, 60,0 s; −14,9 LUFS, pico −2,9 dBFS; áudio em todos os segundos. Não verificado por audição.
