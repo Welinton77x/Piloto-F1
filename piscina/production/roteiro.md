@@ -47,7 +47,7 @@ Convenção: MM:SS:FF (FF de 00 a 29), intervalos semiabertos [início, fim). Te
 | 02:11:06 - 02:20:25 | 3936 - 4225 (s8) | Só que o cloro depende do pH. Imagina nadar com ele fora do ponto: o cloro perde força e a água arde no olho. | Kit de teste de pH com tubos de cor e um ponteiro com faixa verde. ⏸ em "Imagina": o mascote de roupa de banho mergulha, sai com os olhos vermelhos ardendo e esfrega os olhos. | phKit, phGauge, mascot (roupa de banho, olhos vermelhos) | phGauge.needle sai da faixa verde; mascot.emotion sick (olhos ardendo) | Círculo vermelho no kit de pH (3 de 3); ✕ ARDE NO OLHO em "arde" |
 | 02:20:25 - 02:22:25 | 4225 - 4285 (s8) | Por isso se mede sempre. | ⏪ em "Por isso": volta ao ponteiro na faixa verde; o kit marca a cor certa. | phGauge | rewind; phGauge.needle → faixa verde | ✓ pH EQUILIBRADO |
 | 02:22:25 - 02:24:17 | 4285 - 4337 (s9) | Agora sim: pode pular! | Vista explodida final: as camadas da piscina se separam no ar (terra, concreto magro, ferro, concreto, impermeabilização, pastilha, canos, água) e cada uma acende na sua palavra; depois se juntam de novo. | piscina explodida (camadas) | layers.explode 0→1→0 (atWord por camada) | Etiqueta i BURACO → PISCINA |
-| 02:24:17 - 02:29:22 | 4337 - 4492 (s9) | Parabéns, agora você sabe como um buraco no quintal vira uma piscina! | O mascote de roupa de banho corre e dá um mergulho "bomba"; respingo grande e confete. | mascot (roupa de banho), splash, confetti | mascot.jump arco; splash (spring); confetti (seeded) | AGORA VOCÊ SABE! em "Parabéns" |
+| 02:24:17 - 02:29:22 | 4337 - 4492 (s9) | Parabéns, agora você sabe como construir uma piscina, para se divertir no calor! | O mascote de roupa de banho corre e dá um mergulho "bomba"; respingo grande e confete. | mascot (roupa de banho), splash, confetti | mascot.jump arco; splash (spring); confetti (seeded) | AGORA VOCÊ SABE! em "Parabéns" |
 | 02:29:22 - 02:43:29 | 4492 - 4919 (s9) | E aí, teria coragem de fazer uma na sua casa? Comenta aí e segue o Por Dentro Lab pra ver como funciona por dentro tudo o que você usa no dia a dia. | O mascote boia na boia e acena; aponta para quem assiste em "Comenta". | mascot, floaty | mascot.rArm aponta (Comenta), acena (segue) | Pergunta grande VOCÊ TERIA CORAGEM? COMENTA AÍ! com confete; POR DENTRO LAB em "segue" |
 
 Soma: 4919 frames contíguos (0 a 4918).
@@ -70,7 +70,7 @@ Soma: 4919 frames contíguos (0 a 4918).
 
 **s8.** E olha que curioso: o filtro segura a sujeira, mas não mata micróbios. Isso é trabalho do cloro. Só que o cloro depende do pH. Imagina nadar com ele fora do ponto: o cloro perde força e a água arde no olho. Por isso se mede sempre.
 
-**s9.** Agora sim: pode pular! Parabéns, agora você sabe como um buraco no quintal vira uma piscina! E aí, teria coragem de fazer uma na sua casa? Comenta aí e segue o Por Dentro Lab pra ver como funciona por dentro tudo o que você usa no dia a dia.
+**s9.** Agora sim: pode pular! Parabéns, agora você sabe como construir uma piscina, para se divertir no calor! E aí, teria coragem de fazer uma na sua casa? Comenta aí e segue o Por Dentro Lab pra ver como funciona por dentro tudo o que você usa no dia a dia.
 
 **Contagem:** 404 palavras → ~154 s de fala + pausas ≈ 164 s.
 
