@@ -6,7 +6,7 @@ import {L, clamp01, easeInOut, easeOut} from "./anim";
 import {W, end, rew, start, undoneS2} from "./story";
 
 export const REWIND_FRAMES = 26;
-export type Look = MascotLook & {at?: [number, number, number]; ry?: number; rx?: number};
+export type Look = MascotLook & {at?: [number, number, number]; ry?: number; rx?: number; pivotHip?: boolean};
 type V3 = [number, number, number];
 
 const base = (t: number): MascotPose => ({
@@ -24,7 +24,7 @@ const inS = (id: string, t: number) => t >= start(id) && t < end(id);
 const between = (t: number, a: number, b: number) => t >= a && t < b;
 const DIG: V3 = [-0.55, 0.06, 0.9]; // na beira do buraco, cavando
 export const CHAIR: V3 = [-3.0, 0.06, 0.6]; // espreguiçadeira no gramado
-const LYING: V3 = [CHAIR[0], 0.4, CHAIR[2] + 1.3];
+const LYING: V3 = [CHAIR[0], 0.47, CHAIR[2] + 0.45]; // quadril no encontro do assento com o encosto
 const SIDE: V3 = [-2.4, 0.06, 1.0]; // na grama, à esquerda da piscina, explicando
 const POOL_FLOAT: V3 = [1.2, -0.82, 0.7];
 const FL = -1.5 + 0.08;
@@ -41,7 +41,7 @@ export const mascotLook = (t: number): Look => {
     const idea = W("s1", "ideia");
     const hot = clamp01(1 - (t - idea) / 40);
     // deitado na espreguiçadeira, se abanando no calor
-    if (t < idea - 4) return {...swim, hot: 1, at: LYING, rx: -1.2, prop: "fan", propHand: "r", propTilt: Math.sin(t * 0.6) * 25};
+    if (t < idea - 4) return {...swim, hot: 1, at: LYING, rx: -0.8, pivotHip: true, prop: "fan", propHand: "r", propTilt: Math.sin(t * 0.6) * 25};
     // pula da cadeira com a ideia
     if (t < W("s1", "abrir") - 4) return {...swim, hot, floaty: "arm", at: [CHAIR[0] + 0.9, 0.06 + Math.abs(Math.sin(((t - idea + 4) / 14) * Math.PI)) * 0.25, CHAIR[2] + 0.4], rHand: "point"};
     const digging = between(t, W("s1", "abrir") - 4, W("s1", "encher") - 4);
@@ -53,7 +53,7 @@ export const mascotLook = (t: number): Look => {
     if (undoneS2(t) || t < r.P + 6) return {...swim, floaty: "arm", at: DIG};
     // pula no lamaçal: arco da beira até o buraco
     const k = clamp01((t - r.P - 6) / 26);
-    const x = DIG[0] + (0.9 - DIG[0]) * easeInOut(k);
+    const x = DIG[0] + (0.55 - DIG[0]) * easeInOut(k);
     const y = DIG[1] + Math.sin(k * Math.PI) * 1.2 + (-0.75 - DIG[1]) * k;
     return {...swim, floaty: "arm", at: [x, y, 0.6], muddy: clamp01((t - r.P - 30) / 12)};
   }
@@ -114,6 +114,7 @@ export const mascotPose = (t: number): MascotPose => {
     if (t < idea - 4) {
       pose.emotion = t < W("s1", "derretendo") ? "annoyed" : "sick"; // sofrendo com o calor
       pose.sick = 0.15;
+      pose.hip = 44; // costas no encosto, pernas esticadas no assento
       pose.rArm = [-70 + Math.sin(t * 0.6) * 18, 38]; // abana o leque ao lado do rosto
       pose.lArm = [-15, 18];
     } else if (t < W("s1", "abrir") - 4) {
@@ -264,18 +265,18 @@ export const mascotPose = (t: number): MascotPose => {
 };
 
 /* ---------- vizinho engraçado: pula do muro, do nada, no lamaçal (s2) ---------- */
-const NB_FROM: V3 = [2.2, 1.02, -4.5];
-const NB_TO: V3 = [2.1, -1.05, 0.35];
+const NB_FROM: V3 = [2.2, 1.02, -7.4]; // em cima do muro do fundo (quintal maior)
+const NB_TO: V3 = [1.75, -1.05, 0.35];
 export const neighborJump = () => W("s2", "desmoronam") + 4;
 export const neighborLand = () => neighborJump() + 30;
 export const neighborLook = (t: number): Look => {
   if (!inS("s2", t) || undoneS2(t)) return {};
   const j0 = neighborJump();
   if (t < j0 - 18) return {};
-  if (t < j0) return {...swim, neighbor: true, at: NB_FROM}; // aparece em cima do muro
+  if (t < j0) return {...swim, neighbor: true, at: [NB_FROM[0], NB_FROM[1] - 1.2 * (1 - clamp01((t - j0 + 18) / 8)), NB_FROM[2]]}; // surge do nada atrás do muro
   if (t < neighborLand()) {
     const k = clamp01((t - j0) / 30);
-    const at: V3 = [NB_FROM[0] + (NB_TO[0] - NB_FROM[0]) * k, NB_FROM[1] + Math.sin(k * Math.PI) * 1.6 + (NB_TO[1] - NB_FROM[1]) * k, NB_FROM[2] + (NB_TO[2] - NB_FROM[2]) * k];
+    const at: V3 = [NB_FROM[0] + (NB_TO[0] - NB_FROM[0]) * k, NB_FROM[1] + Math.sin(k * Math.PI) * 1.3 + (NB_TO[1] - NB_FROM[1]) * k, NB_FROM[2] + (NB_TO[2] - NB_FROM[2]) * k];
     return {...swim, neighbor: true, at};
   }
   return {...swim, neighbor: true, at: [NB_TO[0], NB_TO[1] - clamp01((t - neighborLand()) / 30) * 0.2, NB_TO[2]], muddy: clamp01((t - neighborLand()) / 6)};

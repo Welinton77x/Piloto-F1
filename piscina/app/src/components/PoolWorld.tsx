@@ -401,7 +401,7 @@ const Tiles: React.FC<{reveal: number; dy: number}> = ({reveal, dy}) => {
 
 /** casa simples ao fundo, à esquerda */
 const House: React.FC = () => (
-  <group position={[-7.2, 0.06, -2.2]}>
+  <group position={[-9.6, 0.06, -3.6]}>
     <B x={[-1.8, 1.8]} y={[0, 2.2]} z={[-1.6, 1.6]} c="#f6ecd9" />
     <mesh position={[0, 2.2 + 0.7, 0]} rotation={[0, Math.PI / 4, 0]}>
       <coneGeometry args={[2.85, 1.4, 4]} />
@@ -460,7 +460,7 @@ export const PoolWorld: React.FC<{gf: number}> = ({gf}) => {
   /* ---- s7: piscina cheia, fica verde, canos + casa de máquinas, volta azul ---- */
   const fill = after("s7") ? (inS("s7") ? L(t, start("s7"), start("s7") + 25, 0, 1, easeOut) : 1) : 0;
   const greenK = inS("s7") ? L(t, W("s7", "dias"), W("s7", "verde") + 8, 0, 1) * (1 - L(t, W("s7", "volta"), W("s7", "volta") + 60, 0, 1)) : 0;
-  const leaves = inS("s7") && t > W("s7", "caem") - 10 ? 1 - L(t, W("s7", "volta"), W("s7", "volta") + 50, 0, 1) : 0;
+  const leaves = inS("s7") && t > W("s7", "caem") - 10 ? 1 : 0;
   // canalização: os canos até a casa de máquinas são instalados na obra, junto com a ferragem (s4)
   const pipeBuild = after("s4") ? (inS("s4") ? L(t, W("s4", "gaiola") - 10, W("s4", "envolve") + 10, 0, 1) : 1) : 0;
   const pDrain = clamp01(pipeBuild * 3);
@@ -742,8 +742,11 @@ export const PoolWorld: React.FC<{gf: number}> = ({gf}) => {
           const d0 = W("s7", "caem") - 10 + random("lf" + i) * 40;
           const y = Math.max(WATER_TOP + 0.01, 2.5 - (t - d0) * 0.06);
           if (t < d0) return null;
+          const sk = L(t, W("s7", "skimmer") + i * 2, W("s7", "skimmer") + 40 + i * 2, 0, 1, easeIn); // o skimmer puxa as folhas
+          if (sk >= 0.98) return null;
+          const lx = IN.x0 + 0.3 + random("lx" + i) * 4.9 + Math.sin(t * 0.05 + i) * 0.1, lz = IN.z0 + 0.3 + random("lz" + i) * 2.4;
           return (
-            <mesh key={"lf" + i} position={[IN.x0 + 0.3 + random("lx" + i) * 4.9 + Math.sin(t * 0.05 + i) * 0.1, y, IN.z0 + 0.3 + random("lz" + i) * 2.4]} rotation={[-Math.PI / 2 + Math.sin(t * 0.1 + i) * 0.4, 0, random("lr" + i) * 6]} scale={leaves}>
+            <mesh key={"lf" + i} position={[lx + (IN.x1 - 0.2 - lx) * sk, y, lz + (1.05 - lz) * sk]} rotation={[-Math.PI / 2 + Math.sin(t * 0.1 + i) * 0.4, 0, random("lr" + i) * 6]} scale={leaves}>
               <circleGeometry args={[0.09, 6]} />
               <M c={i % 3 ? "#7a9a2e" : "#a0642c"} side={THREE.DoubleSide} />
             </mesh>
@@ -752,7 +755,20 @@ export const PoolWorld: React.FC<{gf: number}> = ({gf}) => {
 
       {/* ---------- s7: hidráulica em corte e casa de máquinas ---------- */}
       {pDrain > 0 && <B x={[1.25, 1.75]} y={[IN.y0 + 0.04, IN.y0 + 0.06]} z={[0.35, 0.85]} c="#eceff1" />}
-      {pSkim > 0 && <B x={[IN.x1 - 0.05, IN.x1 + 0.02]} y={[WATER_TOP - 0.18, WATER_TOP + 0.08]} z={[0.9, 1.35]} c="#eceff1" />}
+      {/* skimmer: caixa na parede, boca na linha d'água com a "portinha" que balança, tampa redonda na borda */}
+      {pSkim > 0 && (
+        <group>
+          <B x={[IN.x1 - 0.2, IN.x1 + 0.05]} y={[WATER_TOP - 0.3, WATER_TOP + 0.16]} z={[0.7, 1.4]} c="#f5f7fa" />
+          <B x={[IN.x1 - 0.215, IN.x1 - 0.2]} y={[WATER_TOP - 0.13, WATER_TOP + 0.08]} z={[0.8, 1.3]} c="#263238" />
+          <group position={[IN.x1 - 0.22, WATER_TOP + 0.08, 1.05]} rotation={[0, 0, flow ? 0.25 + Math.sin(gf * 0.2) * 0.12 : 0]}>
+            <B x={[-0.01, 0.0]} y={[-0.2, 0]} z={[-0.24, 0.24]} c="#b0bec5" />
+          </group>
+          <mesh position={[IN.x1 + 0.1, 0.11, 1.05]}>
+            <cylinderGeometry args={[0.2, 0.2, 0.04, 24]} />
+            <M c="#ffffff" />
+          </mesh>
+        </group>
+      )}
       {pRet > 0 && <B x={[IN.x0 - 0.01, IN.x0 + 0.06]} y={[-0.55, -0.45]} z={[1.05, 1.25]} c="#eceff1" />}
       <PipePath gf={gf} show={pDrain} flow={flow} pts={[[1.5, IN.y0, FACE + 0.03], [1.5, -1.75, FACE + 0.03], [6.35, -1.75, FACE + 0.03], [6.35, -0.95, FACE + 0.03]]} />
       <PipePath gf={gf} show={pSkim} flow={flow} pts={[[IN.x1, -0.3, FACE + 0.03], [5.6, -0.3, FACE + 0.03], [5.6, -0.95, FACE + 0.03], [6.15, -0.95, FACE + 0.03]]} />
@@ -851,7 +867,7 @@ export const PoolWorld: React.FC<{gf: number}> = ({gf}) => {
           {Array.from({length: 6}).map((_, i) => (
             <B key={"cs" + i} x={[-0.36, 0.36]} y={[0.3, 0.34]} z={[0.35 + i * 0.19, 0.5 + i * 0.19]} c={i % 2 ? "#1e88e5" : "#ffffff"} />
           ))}
-          <group position={[0, 0.32, 0.38]} rotation={[-1.05, 0, 0]}>
+          <group position={[0, 0.32, 0.38]} rotation={[0.8, 0, 0]}>
             {Array.from({length: 5}).map((_, i) => (
               <B key={"cb" + i} x={[-0.36, 0.36]} y={[0, 0.04]} z={[-0.18 - i * 0.19, -0.03 - i * 0.19]} c={i % 2 ? "#1e88e5" : "#ffffff"} />
             ))}
@@ -868,7 +884,7 @@ export const PoolWorld: React.FC<{gf: number}> = ({gf}) => {
       {/* ---------- cenário ---------- */}
       <House />
       {/* casas da vizinhança (pedido do usuário) */}
-      {[[-3.2, -8.2, "#f5d9b8", "#b24a36"], [2.2, -8.6, "#dfe9f2", "#4f6d8f"], [7.4, -8.2, "#fff3c4", "#c9563c"], [12.6, -7.0, "#e3f1df", "#6d4c41"], [-12.5, -6.5, "#f8e1e7", "#4f6d8f"]].map(([x, z, wc, rc], i) => (
+      {[[-3.2, -10.6, "#f5d9b8", "#b24a36"], [2.2, -11.2, "#dfe9f2", "#4f6d8f"], [7.4, -10.6, "#fff3c4", "#c9563c"], [13.5, -9.8, "#e3f1df", "#6d4c41"], [-13.5, -9.6, "#f8e1e7", "#4f6d8f"]].map(([x, z, wc, rc], i) => (
         <group key={"vh" + i} position={[x as number, 0.06, z as number]} scale={0.9 + (i % 2) * 0.15}>
           <B x={[-1.6, 1.6]} y={[0, 1.9]} z={[-1.3, 1.3]} c={wc as string} />
           <mesh position={[0, 1.9 + 0.6, 0]} rotation={[0, Math.PI / 4, 0]}>
@@ -880,17 +896,17 @@ export const PoolWorld: React.FC<{gf: number}> = ({gf}) => {
           <B x={[0.6, 1.25]} y={[0.9, 1.45]} z={[1.3, 1.34]} c="#9fd3f2" />
         </group>
       ))}
-      <B x={[-12, 12]} y={[0.06, 1.0]} z={[-4.6, -4.4]} c="#ece3d3" />
-      <Tree x={-3.6} z={-3.4} s={1.1} />
-      <Tree x={9.2} z={-3.0} s={1.2} />
-      <Pine x={11} z={-6} s={1.3} />
+      <B x={[-14, 14]} y={[0.06, 1.0]} z={[-7.6, -7.4]} c="#ece3d3" />
+      <Tree x={-4.2} z={-5.6} s={1.1} />
+      <Tree x={9.6} z={-5.2} s={1.2} />
+      <Pine x={12} z={-6.6} s={1.3} />
       <GrassBlades
         gf={gf}
         seed="p"
         areas={[
-          {x: [-12, -2.2], z: [-4.2, FACE - 0.05], n: 420},
-          {x: [8.0, 14], z: [-4.2, FACE - 0.05], n: 300},
-          {x: [-1.8, 5.5], z: [-4.2, -2.0], n: 160},
+          {x: [-12, -2.2], z: [-7.2, FACE - 0.05], n: 520},
+          {x: [8.0, 14], z: [-7.2, FACE - 0.05], n: 360},
+          {x: [-1.8, 5.5], z: [-7.2, -2.0], n: 260},
         ]}
       />
       {[[-9, -30, 10], [4, -34, 13], [22, -32, 11]].map(([x, z, r], i) => (
@@ -913,7 +929,7 @@ export const PoolWorld: React.FC<{gf: number}> = ({gf}) => {
           const a = random("ms" + i) * Math.PI * 2, v = 0.04 + random("mv" + i) * 0.05;
           const y = -0.7 + (0.14 + random("my" + i) * 0.08) * st - 0.011 * st * st;
           return y < -0.8 ? null : (
-            <mesh key={"ms" + i} position={[2.1 + Math.cos(a) * v * st, y, 0.35 + Math.sin(a) * v * st * 0.6]}>
+            <mesh key={"ms" + i} position={[1.75 + Math.cos(a) * v * st, y, 0.35 + Math.sin(a) * v * st * 0.6]}>
               <sphereGeometry args={[0.07, 8, 6]} />
               <M c={P.mud} />
             </mesh>
@@ -928,7 +944,7 @@ export const PoolWorld: React.FC<{gf: number}> = ({gf}) => {
         if (!ml.at) return null;
         return (
           <group position={ml.at} rotation={[ml.rx ?? 0, ml.ry ?? 0, 0]}>
-            <Mascot position={[0, 0, 0]} scale={0.8} pose={mp} gf={gf} look={ml} />
+            <Mascot position={ml.pivotHip ? [0, -0.66 * 0.8, 0] : [0, 0, 0]} scale={0.8} pose={mp} gf={gf} look={ml} />
           </group>
         );
       })()}

@@ -18,6 +18,7 @@ export type MascotPose = {
   shiver: number; // 0-1
   walking: boolean;
   sick?: number; // 0-1: rosto esverdeado (passou mal)
+  hip?: number; // graus: pernas dobradas para frente no quadril (deitado/sentado)
 };
 
 const col = {
@@ -536,7 +537,7 @@ export const Mascot: React.FC<{position: [number, number, number]; scale?: numbe
         <meshBasicMaterial color="#000000" transparent opacity={0.22 / (1 + pose.jump * 3)} depthWrite={false} />
       </mesh>
       {[-1, 1].map((s, i) => (
-        <group key={s} position={[s * 0.12, 0.66, 0]} rotation={[rad(i ? step : -step), 0, 0]}>
+        <group key={s} position={[s * 0.12, 0.66, 0]} rotation={[rad(i ? step : -step) - rad(pose.hip ?? 0), 0, 0]}>
           {swim ? (
             <>
               {/* bermuda de praia (com faixa amarela), perna à mostra e chinelo */}

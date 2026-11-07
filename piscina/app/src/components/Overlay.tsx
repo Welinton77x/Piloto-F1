@@ -7,6 +7,7 @@ import {L, SP, clamp01, easeOut, mixHex} from "../lib/anim";
 import {project} from "../lib/camera";
 import {track} from "../lib/track";
 import {REWINDS, RW, heat, imagineAmount, te} from "../lib/story";
+import {neighborJump, neighborLand, neighborLook} from "../lib/mascotPose";
 
 export const FONT = "Montserrat";
 const KIND: Record<Kind, {bg: string; fg: string}> = {
@@ -144,6 +145,24 @@ const Heat: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
         {temp}°C
       </div>
     </AbsoluteFill>
+  );
+};
+
+/* ---------- s2: o vizinho grita ao pular no lamaçal ---------- */
+const Shout: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
+  const gf = s.startFrame + f;
+  const t = te(gf);
+  const a = neighborJump() - 14, b = neighborLand() + 12;
+  if (t < a || t > b) return null;
+  const nl = neighborLook(t);
+  if (!nl.at) return null;
+  const pt = project(gf, [nl.at[0], nl.at[1] + 1.95, nl.at[2]]);
+  if (!pt) return null;
+  const x = Math.max(220, Math.min(860, pt.x)), y = Math.max(560, Math.min(1080, pt.y - 40));
+  return (
+    <div style={{position: "absolute", left: x, top: y, transform: `translate(-50%, -100%) scale(${SP(t, a, 9, 170)}) rotate(-6deg)`, fontFamily: FONT, fontWeight: 900, fontSize: 64, color: "#101820", background: "#FFD60A", border: "6px solid #101820", borderRadius: 40, padding: "6px 28px", boxShadow: "0 6px 0 rgba(0,0,0,0.3)", whiteSpace: "nowrap"}}>
+      UHUUU!
+    </div>
   );
 };
 
@@ -519,6 +538,7 @@ export const Overlay: React.FC<{s: TimedScene}> = ({s}) => {
       {s.id === "s9" && <Brand s={s} f={f} />}
       {s.id === "s9" && <Celebration s={s} f={f} />}
       {s.id === "s1" && <Heat s={s} f={f} />}
+      {s.id === "s2" && <Shout s={s} f={f} />}
       {s.id === "s1" && <TitleCard s={s} f={f} />}
       {s.id === "s9" && <FinalCTA s={s} f={f} />}
       <Imagine s={s} f={f} />
