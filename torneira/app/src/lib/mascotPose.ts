@@ -9,7 +9,7 @@ export const s2Rewind = (s: ReturnType<typeof sceneAt>, f: number): number | nul
   const im = wordLocal(s, "Agora");
   if (p === undefined || im === undefined || f < p) return null;
   const R = REWIND_FRAMES;
-  if (f < p + R) return Math.round(p - ((f - p) / R) * (p - im));
+  if (f < p + R) return Math.min(p - 1, Math.round(p - ((f - p) / R) * (p - im)));
   return -1;
 };
 export const REWIND_FRAMES = 26;
