@@ -25,7 +25,7 @@ const between = (t: number, a: number, b: number) => t >= a && t < b;
 const DIG: V3 = [-0.55, 0.06, 0.9]; // na beira do buraco, cavando
 export const CHAIR: V3 = [-3.0, 0.06, 0.6]; // espreguiçadeira no gramado
 const LYING: V3 = [CHAIR[0], 0.47, CHAIR[2] + 0.45]; // quadril no encontro do assento com o encosto
-const SIDE: V3 = [-2.4, 0.06, 1.0]; // na grama, à esquerda da piscina, explicando
+const SIDE: V3 = [-2.0, 0.06, 1.2]; // na grama, colado na borda esquerda da piscina, explicando (sempre no quadro)
 const POOL_FLOAT: V3 = [1.2, -0.82, 0.7];
 const FL = -1.5 + 0.08;
 const IN_Y0 = FL + 0.2;
@@ -75,7 +75,7 @@ export const mascotLook = (t: number): Look => {
   }
   if (inS("s7", t)) {
     if (t > W("s7", "máquinas") - 20) return {...work, at: [5.35, 0.06, 1.0], lHand: "point"};
-    return {...work, at: SIDE, rHand: t > W("s7", "parte") - 6 ? "point" : undefined};
+    return {...work, at: [-1.62, 0.15, 1.2], rHand: t > W("s7", "parte") - 6 ? "point" : undefined}; // na borda, dentro do quadro
   }
   if (inS("s8", t)) {
     const r = rew("s8");

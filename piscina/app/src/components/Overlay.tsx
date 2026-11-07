@@ -247,7 +247,7 @@ const Bill: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
   if (gf < a || gf >= r.R) return null;
   const v = Math.round(L(gf, a, r.R - 6, 95, 780));
   return (
-    <div style={{position: "absolute", left: 70, top: 600, width: 330, transform: `scale(${SP(gf, a, 10, 150)}) rotate(-4deg)`, fontFamily: FONT, fontWeight: 900}}>
+    <div style={{position: "absolute", left: 680, top: 600, width: 330, transform: `scale(${SP(gf, a, 10, 150)}) rotate(4deg)`, fontFamily: FONT, fontWeight: 900}}>
       <div style={{background: "#ffffff", borderRadius: 18, padding: "18px 22px", boxShadow: "0 8px 0 rgba(0,0,0,0.3)", border: "5px solid #101820", textAlign: "center"}}>
         <div style={{fontSize: 30, color: "#101820"}}>CONTA DE ÁGUA</div>
         <div style={{height: 4, background: "#cfd8dc", margin: "10px 0"}} />
