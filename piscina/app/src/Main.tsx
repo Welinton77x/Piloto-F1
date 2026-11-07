@@ -8,7 +8,6 @@ import {PoolWorld} from "./components/PoolWorld";
 import {Overlay} from "./components/Overlay";
 import {REWINDS, W, heat, imagineAmount, rew, skyDark, start} from "./lib/story";
 import {neighborLand} from "./lib/mascotPose";
-import {Rings3D} from "./components/Rings3D";
 import {FOV, poseAt} from "./lib/camera";
 import {track} from "./lib/track";
 import {clamp01, mixHex} from "./lib/anim";
@@ -65,7 +64,7 @@ export const Scene3D: React.FC<{at?: number; fixed?: FixedPose; sunny?: boolean;
     <ThreeCanvas width={width} height={height} shadows={{type: THREE.PCFSoftShadowMap}} camera={{fov: FOV, near: 0.1, far: 400, position: [0, 2, 40]}}>
       <CamRig at={at} fixed={fixed} />
       <PoolWorld gf={gf} />
-      {!fixed && <Rings3D gf={gf} />}
+      {/* círculos vermelhos removidos a pedido do usuário */}
       {children}
     </ThreeCanvas>
   );

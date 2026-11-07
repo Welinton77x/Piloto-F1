@@ -11,5 +11,5 @@
 - Mundo: `src/components/PoolWorld.tsx` (quintal em corte; buraco → projeto → escavação → concreto magro → concreto armado → impermeabilização → pastilhas/borda → água, canos, casa de máquinas → cloro/pH).
 - "E se fizer errado?": `src/lib/story.ts` (5 janelas com pausa, imaginação em sépia e rebobinar; o mundo e o mascote voltam no tempo).
 - Mascote só em s1, s2 (pulo na lama), s8 (olho ardendo) e s9 (mergulho), de roupa de banho (bermuda, lycra, chinelo, óculos, boia).
-- Círculo vermelho 3D só em 3 pontos: trinca da parede, filtro de areia, kit de pH.
+- Círculos vermelhos REMOVIDOS a pedido do usuário.
 - Ajustes técnicos sem mudar conteúdo: câmeras amarradas às palavras e afastadas para caber a piscina inteira.
