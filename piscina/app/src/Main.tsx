@@ -4,8 +4,9 @@ import * as THREE from "three";
 import {ThreeCanvas} from "@remotion/three";
 import {useThree} from "@react-three/fiber";
 import {VO_OFFSET, config, finalCut, hasVO, sceneAt, timed, wordLocal} from "./data/scenes";
-import {WaterWorld} from "./components/WaterWorld";
-import {Overlay, imagineAmount} from "./components/Overlay";
+import {PoolWorld} from "./components/PoolWorld";
+import {Overlay} from "./components/Overlay";
+import {REWINDS, W, imagineAmount, rew, skyDark, start} from "./lib/story";
 import {Rings3D} from "./components/Rings3D";
 import {FOV, poseAt} from "./lib/camera";
 import {track} from "./lib/track";
@@ -41,12 +42,12 @@ const CamRig: React.FC<{at?: number; fixed?: FixedPose}> = ({at, fixed}) => {
 export const Background: React.FC<{at?: number}> = ({at}) => {
   const cur = useCurrentFrame();
   const gf = at ?? cur;
-  const dark = track("sky.darkness", gf, 0);
-  const under = track("bgGradient.mix", gf, 0);
+  const dark = skyDark(gf);
+  const under = 0;
   const brand = clamp01((gf - finalCut) / 15);
   // céu claro de chuva leve → temporal escuro; azul profundo no subsolo; pôr do sol quando a chuva passa
-  let top = mixHex("#86b4e0", "#3d4a5e", dark);
-  let bot = mixHex("#d9e9f5", "#5a6576", dark);
+  let top = mixHex("#86c4f0", "#14213f", dark);
+  let bot = mixHex("#dff0fb", "#2c3d66", dark);
   top = mixHex(top, "#17325c", under);
   bot = mixHex(bot, "#0b1730", under);
   top = mixHex(top, "#c97b9a", brand);
@@ -61,7 +62,7 @@ export const Scene3D: React.FC<{at?: number; fixed?: FixedPose; sunny?: boolean;
   return (
     <ThreeCanvas width={width} height={height} shadows={{type: THREE.PCFSoftShadowMap}} camera={{fov: FOV, near: 0.1, far: 400, position: [0, 2, 40]}}>
       <CamRig at={at} fixed={fixed} />
-      <WaterWorld gf={gf} />
+      <PoolWorld gf={gf} />
       {!fixed && <Rings3D gf={gf} />}
       {children}
     </ThreeCanvas>
@@ -71,8 +72,7 @@ export const Scene3D: React.FC<{at?: number; fixed?: FixedPose; sunny?: boolean;
 /** s2 "imagina beber...": a cena fica com cor de lembrança/imaginação até o rebobinar */
 const World: React.FC = () => {
   const gf = useCurrentFrame();
-  const s = sceneAt(gf);
-  const k = imagineAmount(s, gf - s.startFrame);
+  const k = imagineAmount(gf);
   const filter = k > 0.01 ? `saturate(${1 - 0.7 * k}) sepia(${0.45 * k}) contrast(${1 + 0.06 * k})` : undefined;
   return (
     <AbsoluteFill style={{filter}}>
@@ -81,6 +81,29 @@ const World: React.FC = () => {
     </AbsoluteFill>
   );
 };
+
+// efeitos pontuais amarrados às palavras (frames globais)
+const SFX_AT: [number, string, number][] = [
+  [W("s1", "cava"), "thud.wav", 0.3],
+  [W("s1", "cava") + 18, "thud.wav", 0.3],
+  [W("s1", "cava") + 36, "thud.wav", 0.3],
+  [start("s2"), "gurgle.wav", 0.3],
+  [W("s2", "desmoronam") - 4, "thud.wav", 0.45],
+  [rew("s2").P + 32, "splash.wav", 0.4],
+  [W("s3", "máquina") - 10, "pump.wav", 0.25],
+  [W("s3", "socado"), "thud.wav", 0.3],
+  [W("s3", "racha"), "crinkle.wav", 0.4],
+  [W("s4", "trincava"), "crinkle.wav", 0.4],
+  [W("s4", "envolve") - 10, "pump.wav", 0.25],
+  [W("s5", "enche"), "gurgle.wav", 0.3],
+  [start("s7"), "gurgle.wav", 0.3],
+  [W("s7", "bomba"), "pump.wav", 0.3],
+  [W("s7", "bocais"), "bubble.wav", 0.3],
+  [W("s8", "cloro"), "drip.wav", 0.35],
+  [rew("s8").P + 22, "splash.wav", 0.3],
+  [W("s9", "pular") + 30, "splash.wav", 0.5],
+  [W("s9", "Parabéns"), "pop.wav", 0.35],
+];
 
 export const Main: React.FC = () => (
   <AbsoluteFill style={{backgroundColor: "#101820"}}>
@@ -93,16 +116,6 @@ export const Main: React.FC = () => (
             <Audio src={staticFile(`vo/${s.voKey}.mp3`)} />
           </Sequence>
         )}
-        {s.id === "s2" && wordLocal(s, "Por") !== undefined && (
-          <Sequence from={wordLocal(s, "Por")!} durationInFrames={40} name="rewind">
-            <Audio src={staticFile("sfx/rewind.wav")} volume={0.45} />
-          </Sequence>
-        )}
-        {s.id === "s2" && wordLocal(s, "imagina") !== undefined && (
-          <Sequence from={wordLocal(s, "imagina")! - 8} durationInFrames={30} name="pause">
-            <Audio src={staticFile("sfx/tick.wav")} volume={0.5} />
-          </Sequence>
-        )}
         {s.audioCues
           .filter((c) => c.kind === "sfx" && SFX(c.id))
           .map((c, i) => (
@@ -111,6 +124,21 @@ export const Main: React.FC = () => (
             </Sequence>
           ))}
       </Sequence>
+    ))}
+    {SFX_AT.map(([f, file, v], i) => (
+      <Sequence key={"fx" + i} from={f} durationInFrames={90} name={file}>
+        <Audio src={staticFile(`sfx/${file}`)} volume={v} />
+      </Sequence>
+    ))}
+    {REWINDS.map((r) => (
+      <React.Fragment key={r.id}>
+        <Sequence from={r.P} durationInFrames={30} name={`pausa-${r.id}`}>
+          <Audio src={staticFile("sfx/tick.wav")} volume={0.5} />
+        </Sequence>
+        <Sequence from={r.R} durationInFrames={40} name={`rebobinar-${r.id}`}>
+          <Audio src={staticFile("sfx/rewind.wav")} volume={0.45} />
+        </Sequence>
+      </React.Fragment>
     ))}
     <Audio src={staticFile("sfx/music.wav")} loop volume={(f) => musicVolume(f)} />
   </AbsoluteFill>

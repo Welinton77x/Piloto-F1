@@ -58,7 +58,7 @@ const Arc: React.FC<{r: number; t: number; up: boolean; position: [number, numbe
   </mesh>
 );
 
-const Face: React.FC<{emotion: Emotion; talk: number; blink: number}> = ({emotion, talk, blink}) => {
+const Face: React.FC<{emotion: Emotion; talk: number; blink: number; redEyes?: number}> = ({emotion, talk, blink, redEyes = 0}) => {
   const zf = 0.248; // frente da cabeça
   // sobrancelhas: [altura, inclinação em graus (+ = ponta interna para cima)]
   const brow: Record<Emotion, [number, number]> = {
@@ -152,6 +152,13 @@ const Face: React.FC<{emotion: Emotion; talk: number; blink: number}> = ({emotio
     <group>
       {[-1, 1].map((s) => (
         <group key={s} position={[s * 0.105, 0.035, zf]}>
+          {redEyes > 0.02 && (
+            // olhos ardendo (cloro/pH errado): borda vermelha inchada em volta do olho
+            <mesh position={[0, 0, -0.004]} scale={[0.068, 0.072, 0.016]}>
+              <sphereGeometry args={[1, 16, 12]} />
+              <meshStandardMaterial color="#e2342f" roughness={0.6} transparent opacity={redEyes} />
+            </mesh>
+          )}
           {eyesClosedHappy ? (
             <Arc r={0.035} t={0.011} up position={[0, -0.015, 0.004]} />
           ) : (
@@ -221,10 +228,16 @@ const Umbrella: React.FC<{state: "open" | "closed"; tilt: number}> = ({state, ti
 );
 
 export type Hand = "fist" | "open" | "point";
-const Arm: React.FC<{side: -1 | 1; rot: [number, number]; hand?: Hand; children?: React.ReactNode}> = ({side, rot, hand = "fist", children}) => (
+const Arm: React.FC<{side: -1 | 1; rot: [number, number]; hand?: Hand; sleeve?: string; skin?: string; ring?: boolean; children?: React.ReactNode}> = ({side, rot, hand = "fist", sleeve = col.shirt, skin = col.skin, ring, children}) => (
   <group position={[side * 0.335, 1.18, 0]} rotation={[rad(rot[0]), 0, rad(side * rot[1])]}>
-    <RB w={0.16} h={0.36} d={0.17} r={0.07} c={col.shirt} position={[0, -0.16, 0]} />
-    <RB w={0.14} h={0.3} d={0.15} r={0.06} c={col.skin} position={[0, -0.44, 0]} />
+    <RB w={0.16} h={0.2} d={0.17} r={0.07} c={sleeve} position={[0, -0.08, 0]} />
+    <RB w={0.14} h={0.5} d={0.15} r={0.06} c={skin} position={[0, -0.36, 0]} />
+    {ring && (
+      <mesh position={[0, -0.2, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[0.13, 0.055, 12, 24]} />
+        <Mat c="#ff7a1a" r={0.35} />
+      </mesh>
+    )}
     {hand === "open" ? (
       <group position={[0, -0.65, 0]}>
         {/* palma achatada, dedos juntos e polegar */}
@@ -317,7 +330,7 @@ const CurlyHair: React.FC = () => {
 };
 
 export type Prop = "jug" | "bottle" | "glassDirty" | "glass";
-export type MascotLook = {hair?: "short" | "curly"; outfit?: "shirt" | "overall"; wrench?: boolean; wrenchTilt?: number; wrenchLeft?: boolean; capLogo?: boolean; lHand?: Hand; rHand?: Hand; prop?: Prop; propHand?: "l" | "r"; propTilt?: number; pouring?: number};
+export type MascotLook = {muddy?: number; redEyes?: number; floaty?: "arm" | "waist"; hair?: "short" | "curly"; outfit?: "shirt" | "overall" | "swim"; wrench?: boolean; wrenchTilt?: number; wrenchLeft?: boolean; capLogo?: boolean; lHand?: Hand; rHand?: Hand; prop?: Prop; propHand?: "l" | "r"; propTilt?: number; pouring?: number};
 
 /** objetos que o mascote segura para demonstrar cada etapa (sempre na vertical; inclinam para despejar) */
 const PropMesh: React.FC<{prop: Prop; tilt: number; pouring: number; side: -1 | 1}> = ({prop, tilt, pouring, side}) => {
@@ -454,7 +467,14 @@ const CapLogo: React.FC = () => {
 export const Mascot: React.FC<{position: [number, number, number]; scale?: number; pose: MascotPose; gf: number; look?: MascotLook}> = ({position, scale = 1, pose, gf, look = {}}) => {
   const curly = look.hair === "curly";
   const overall = look.outfit === "overall";
-  const headSkin = mixHex(col.skin, "#a8d08d", pose.sick ?? 0);
+  const swim = look.outfit === "swim";
+  const mud = look.muddy ?? 0;
+  const dirt = (c: string) => (mud > 0 ? mixHex(c, "#6b4a2b", mud * 0.85) : c);
+  // roupa de banho de clube aquático: camiseta de lycra turquesa, bermuda de praia laranja com faixa, chinelo
+  const lycra = dirt(swim ? "#18b6c9" : col.shirt), lycraD = dirt(swim ? "#0f8fa1" : col.shirtD);
+  const shorts = dirt(swim ? "#ff7a1a" : col.pants), shortsD = dirt("#ffd23f");
+  const bodySkin = dirt(col.skin);
+  const headSkin = mixHex(dirt(col.skin), "#a8d08d", pose.sick ?? 0);
   const period = 95;
   const ph = (gf + Math.floor(random("blink") * period)) % period;
   const blink = ph < 4 ? 1 - Math.abs(ph - 2) / 2 : 0;
@@ -479,13 +499,27 @@ export const Mascot: React.FC<{position: [number, number, number]; scale?: numbe
       </mesh>
       {[-1, 1].map((s, i) => (
         <group key={s} position={[s * 0.12, 0.66, 0]} rotation={[rad(i ? step : -step), 0, 0]}>
-          <RB w={0.2} h={0.6} d={0.22} r={0.07} c={overall ? col.shirtD : col.pants} position={[0, -0.3, 0]} />
-          <RB w={0.22} h={0.1} d={0.32} r={0.045} c={col.shoe} position={[0, -0.61, 0.04]} />
-          <RB w={0.23} h={0.035} d={0.33} r={0.015} c={col.sole} position={[0, -0.65, 0.04]} />
+          {swim ? (
+            <>
+              {/* bermuda de praia (com faixa amarela), perna à mostra e chinelo */}
+              <RB w={0.24} h={0.3} d={0.25} r={0.07} c={shorts} position={[0, -0.13, 0]} />
+              <RB w={0.245} h={0.05} d={0.255} r={0.02} c={shortsD} position={[0, -0.22, 0]} />
+              <RB w={0.15} h={0.36} d={0.16} r={0.06} c={bodySkin} position={[0, -0.44, 0]} />
+              <RB w={0.2} h={0.04} d={0.32} r={0.015} c="#1e88e5" position={[0, -0.64, 0.04]} />
+              <RB w={0.17} h={0.05} d={0.04} r={0.015} c="#ffffff" position={[0, -0.6, 0.1]} />
+            </>
+          ) : (
+            <>
+              <RB w={0.2} h={0.6} d={0.22} r={0.07} c={overall ? col.shirtD : col.pants} position={[0, -0.3, 0]} />
+              <RB w={0.22} h={0.1} d={0.32} r={0.045} c={col.shoe} position={[0, -0.61, 0.04]} />
+              <RB w={0.23} h={0.035} d={0.33} r={0.015} c={col.sole} position={[0, -0.65, 0.04]} />
+            </>
+          )}
         </group>
       ))}
       <group position={[0, 0.66, 0]} scale={[1, 1 + breath, 1 + breath * 0.5]}>
-        <RB w={0.58} h={0.6} d={0.34} r={0.12} c={overall ? col.shirtD : col.shirt} position={[0, 0.3, 0]} />
+        <RB w={0.58} h={0.6} d={0.34} r={0.12} c={overall ? col.shirtD : lycra} position={[0, 0.3, 0]} />
+        {swim && <RB w={0.6} h={0.07} d={0.36} r={0.03} c="#ffffff" position={[0, 0.36, 0]} />}
         {overall && (
           <group>
             {/* zíper, bolso com canetas e símbolo de engrenagem */}
@@ -499,7 +533,7 @@ export const Mascot: React.FC<{position: [number, number, number]; scale?: numbe
             </mesh>
           </group>
         )}
-        <RB w={0.3} h={0.06} d={0.3} r={0.03} c={col.shirtD} position={[0, 0.6, 0]} />
+        <RB w={0.3} h={0.06} d={0.3} r={0.03} c={lycraD} position={[0, 0.6, 0]} />
         <mesh position={[0.13, 0.42, overall ? -5 : 0.172]}>
           <circleGeometry args={[0.065, 20]} />
           <Mat c="#4DD0FF" />
@@ -508,14 +542,20 @@ export const Mascot: React.FC<{position: [number, number, number]; scale?: numbe
           <ringGeometry args={[0.065, 0.078, 20]} />
           <Mat c="#ffffff" />
         </mesh>
-        <RB w={0.62} h={0.07} d={0.38} r={0.03} c={col.pants} position={[0, 0.02, 0]} />
+        <RB w={0.62} h={0.07} d={0.38} r={0.03} c={shorts} position={[0, 0.02, 0]} />
+        {look.floaty === "waist" && (
+          <mesh position={[0, 0.12, 0]} rotation={[Math.PI / 2, 0, 0]}>
+            <torusGeometry args={[0.42, 0.13, 16, 32]} />
+            <Mat c="#ff4f6d" r={0.35} />
+          </mesh>
+        )}
       </group>
-      <Arm side={-1} rot={pose.lArm} hand={look.lHand}>
+      <Arm side={-1} rot={pose.lArm} hand={look.lHand} sleeve={lycra} skin={bodySkin} ring={look.floaty === "arm"}>
         {umbrella}
         {look.prop && look.propHand === "l" ? <group rotation={new THREE.Euler(-rad(pose.lArm[0]), 0, rad(pose.lArm[1]), "ZYX")}><PropMesh prop={look.prop} tilt={look.propTilt ?? 0} pouring={look.pouring ?? 0} side={-1} /></group> : null}
         {look.wrench && look.wrenchLeft ? <group rotation={new THREE.Euler(-rad(pose.lArm[0]), 0, rad(pose.lArm[1]), "ZYX")}><Wrench tilt={look.wrenchTilt} /></group> : null}
       </Arm>
-      <Arm side={1} rot={pose.rArm} hand={look.rHand}>{look.prop && look.propHand !== "l" ? <group rotation={new THREE.Euler(-rad(pose.rArm[0]), 0, -rad(pose.rArm[1]), "ZYX")}><PropMesh prop={look.prop} tilt={look.propTilt ?? 0} pouring={look.pouring ?? 0} side={1} /></group> : null}{look.wrench && !look.wrenchLeft ? <group rotation={new THREE.Euler(-rad(pose.rArm[0]), 0, -rad(pose.rArm[1]), "ZYX")}><Wrench tilt={look.wrenchTilt} /></group> : null}</Arm>
+      <Arm side={1} rot={pose.rArm} hand={look.rHand} sleeve={lycra} skin={bodySkin} ring={look.floaty === "arm"}>{look.prop && look.propHand !== "l" ? <group rotation={new THREE.Euler(-rad(pose.rArm[0]), 0, -rad(pose.rArm[1]), "ZYX")}><PropMesh prop={look.prop} tilt={look.propTilt ?? 0} pouring={look.pouring ?? 0} side={1} /></group> : null}{look.wrench && !look.wrenchLeft ? <group rotation={new THREE.Euler(-rad(pose.rArm[0]), 0, -rad(pose.rArm[1]), "ZYX")}><Wrench tilt={look.wrenchTilt} /></group> : null}</Arm>
       <group position={[0, 1.5 + breath * 0.5, 0]} rotation={[0, 0, rad(headTilt)]} scale={0.86}>
         <RB w={0.54} h={0.5} d={0.48} r={0.14} c={headSkin} />
         {[-1, 1].map((s) => (
@@ -533,6 +573,32 @@ export const Mascot: React.FC<{position: [number, number, number]; scale?: numbe
             <RB w={0.57} h={0.3} d={0.12} r={0.06} c={col.hair} position={[0, 0.02, -0.2]} />
           </>
         )}
+        {swim ? (
+          <group>
+            {/* sem boné: cabelo curto por cima e óculos de natação na testa */}
+            <mesh position={[0, 0.12, -0.01]} scale={[1.0, 0.72, 0.96]}>
+              <sphereGeometry args={[0.33, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2]} />
+              <Mat c={dirt(col.hair)} />
+            </mesh>
+            <mesh position={[0, 0.19, -0.01]} rotation={[Math.PI / 2, 0, 0]} scale={[1, 0.92, 1]}>
+              <torusGeometry args={[0.31, 0.018, 8, 40]} />
+              <Mat c="#1b1b1b" />
+            </mesh>
+            {[-1, 1].map((k) => (
+              <group key={k} position={[k * 0.1, 0.2, 0.27]}>
+                <mesh rotation={[Math.PI / 2, 0, 0]}>
+                  <cylinderGeometry args={[0.07, 0.07, 0.04, 20]} />
+                  <Mat c="#ff4f6d" />
+                </mesh>
+                <mesh position={[0, 0, 0.022]}>
+                  <circleGeometry args={[0.055, 20]} />
+                  <meshStandardMaterial color="#7fd6ff" roughness={0.1} metalness={0.3} emissive="#7fd6ff" emissiveIntensity={0.25} />
+                </mesh>
+              </group>
+            ))}
+          </group>
+        ) : (
+          <>
         {/* boné encaixado: copa arredondada sobre o topo da cabeça, faixa, aba na testa e botão */}
         <mesh position={[0, 0.14, -0.01]} scale={[1.0, 0.8, 0.96]}>
           <sphereGeometry args={[0.345, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2]} />
@@ -553,6 +619,8 @@ export const Mascot: React.FC<{position: [number, number, number]; scale?: numbe
             <Mat c={col.capD} />
           </mesh>
         </group>
+          </>
+        )}
         {curly && (
           <group position={[0, 0.31, 0.245]}>
             <mesh>
@@ -565,7 +633,7 @@ export const Mascot: React.FC<{position: [number, number, number]; scale?: numbe
             </mesh>
           </group>
         )}
-        <Face emotion={pose.emotion} talk={pose.talk} blink={blink} />
+        <Face emotion={pose.emotion} talk={pose.talk} blink={blink} redEyes={look.redEyes} />
         {/* passando mal: estrelinhas/bolhas verdes girando em volta da cabeça */}
         {(pose.sick ?? 0) > 0.4 &&
           [0, 1, 2].map((i) => {

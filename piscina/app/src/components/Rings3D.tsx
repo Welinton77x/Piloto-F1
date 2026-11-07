@@ -1,4 +1,4 @@
-// Círculo vermelho DENTRO da cena 3D (como no vídeo de exemplo): fica atrás do mascote quando ele está na frente.
+// Círculo vermelho DENTRO da cena 3D (como no vídeo de exemplo): todo vermelho e atrás do mascote quando ele está na frente.
 // O anel sempre encara a câmera e tem tamanho constante na tela (raio em px), com borda branca para aparecer bem.
 import React from "react";
 import * as THREE from "three";
@@ -8,14 +8,11 @@ import {clamp01} from "../lib/anim";
 
 type Ring = {id: string; word: string; p: [number, number, number]; r: number; dur?: number; fwd?: number};
 export const RINGS: Ring[] = [
-  {id: "s3", word: "Bombas", p: [-8.4, -1.35, 1.0], r: 130},
-  {id: "s4", word: "turva", p: [-5.2, 0.6, 1.0], r: 160},
-  {id: "s5", word: "flocos", p: [-1.7, 1.0, 0.7], r: 140},
-  {id: "s6", word: "preso", p: [-0.2, 0.4, 1.0], r: 130},
-  {id: "s7", word: "micróbios", p: [-0.35, 0.5, 1.04], r: 160},
-  {id: "s8", word: "reservatórios", p: [3.5, 1.9, -0.5], r: 180},
-  {id: "s9", word: "hidrômetro", p: [8.75, 0.5, 0.75], r: 115},
-];
+  // pedido do usuário: círculo vermelho só em 3 pontos importantes
+  {id: "s4", word: "trincava", p: [4.3, -0.55, 1.5], r: 150, dur: 40},
+  {id: "s7", word: "areia", p: [7.2, -0.62, 1.2], r: 130, dur: 75},
+  {id: "s8", word: "pH", p: [-2.35, 0.25, 1.1], r: 110, dur: 75},
+]
 
 const F = 960 / Math.tan(((FOV / 2) * Math.PI) / 180); // distância focal em px (altura 1920)
 const RED = "#FF1E1E";

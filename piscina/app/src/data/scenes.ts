@@ -1,4 +1,4 @@
-// Cenas com tempos DERIVADOS DA VOZ (roteiro v2 aprovado). Sem timing.json => frames do plano.
+// Vídeo 3 (piscina): cenas com tempos DERIVADOS DA VOZ (roteiro v5 aprovado). Sem timing.json => frames do plano.
 // Cada fala começa VO_OFFSET após o corte; a cena termina TAIL após o fim da fala.
 // Os frames locais do plano (câmera, animações, badges, sons) são reescalados para a nova duração,
 // e badges com anchorWord passam a entrar no frame real da palavra.
@@ -75,11 +75,10 @@ export const timed: TimedScene[] = planned.map((s, i) => {
 });
 
 export const totalFrames = t;
-/** frame global do corte para o close final (s11): plano geral antes, mascote depois */
+/** frame global do "Parabéns" (s9): comemoração, gradiente final e marca */
 export const finalCut = (() => {
-  const s11 = timed[timed.length - 1];
-  const k = s11.camera.find((c) => c.atWord === "Agora" && (c.wordOffset ?? 0) > -6) ?? s11.camera[2];
-  return s11.startFrame + (k ? k.f : Math.round(s11.durationInFrames * 0.5));
+  const s9 = timed[timed.length - 1];
+  return s9.startFrame + (wordLocal(s9, "Parabéns") ?? Math.round(s9.durationInFrames * 0.35));
 })();
 export const hasVO = (key: string) => Boolean(timing[key]);
 export const sceneAt = (gf: number) => timed.find((s) => gf >= s.startFrame && gf < s.startFrame + s.durationInFrames) ?? timed[timed.length - 1];

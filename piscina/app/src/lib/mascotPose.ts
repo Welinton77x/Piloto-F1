@@ -1,177 +1,131 @@
-// Vídeo 2 — o mascote participa de cada etapa (como o personagem da referência): reações, gestos e objetos.
-import {VO_OFFSET, finalCut, sceneAt, wordLocal} from "../data/scenes";
+// Vídeo 3 — o mascote aparece só nos momentos importantes, sempre de roupa de banho:
+// abertura (quer piscina), pulo no lamaçal (imaginação), pH errado ardendo o olho (imaginação) e o mergulho final.
+// Recebe o tempo efetivo t (que volta no rebobinar).
 import type {MascotLook, MascotPose} from "../components/Mascot";
-import {L, clamp01, easeInOut} from "./anim";
+import {L, clamp01, easeInOut, easeOut} from "./anim";
+import {W, end, rew, start, undoneS2} from "./story";
 
-/** s2: janela do "rebobinar" a partir do "Por isso". null = fora; >=0 = frame local a mostrar; -1 = depois */
-export const s2Rewind = (s: ReturnType<typeof sceneAt>, f: number): number | null => {
-  const p = wordLocal(s, "Por");
-  const im = wordLocal(s, "Agora");
-  if (p === undefined || im === undefined || f < p) return null;
-  const R = REWIND_FRAMES;
-  if (f < p + R) return Math.min(p - 1, Math.round(p - ((f - p) / R) * (p - im)));
-  return -1;
-};
 export const REWIND_FRAMES = 26;
+type Look = MascotLook & {at?: [number, number, number]; ry?: number};
 
-const talkAt = (gf: number) => {
-  const s = sceneAt(gf);
-  if (!s.voWords) return 0;
-  const f = gf - s.startFrame;
-  for (const w of s.voWords) {
-    const a = VO_OFFSET + w.s * 30, b = VO_OFFSET + w.e * 30;
-    if (f >= a && f < b) return 0.3 + 0.7 * Math.abs(Math.sin((f - a) * 0.75));
+const base = (t: number): MascotPose => ({
+  emotion: "happy",
+  talk: 0, // sem sincronia labial (pedido do usuário): só reações no rosto
+  lArm: [4 + Math.sin(t * 0.07) * 1.2, 12],
+  rArm: [4, 12],
+  umbrella: "none",
+  umbrellaTilt: 0,
+  jump: 0,
+  shiver: 0,
+  walking: false,
+});
+const inS = (id: string, t: number) => t >= start(id) && t < end(id);
+const STAND: [number, number, number] = [-2.7, 0.06, 0.9];
+const POOL_FLOAT: [number, number, number] = [1.2, -0.82, 0.7];
+
+export const mascotLook = (t: number): Look => {
+  const swim = {outfit: "swim" as const};
+  if (inS("s1", t)) return {...swim, floaty: "arm", at: STAND, rHand: t > W("s1", "testar") - 6 ? "point" : undefined};
+  if (inS("s2", t)) {
+    const r = rew("s2");
+    if (undoneS2(t)) return {...swim, floaty: "arm", at: STAND};
+    if (t < r.P + 6) return {...swim, floaty: "arm", at: STAND};
+    // pula no lamaçal: arco do gramado até o meio do buraco
+    const k = clamp01((t - r.P - 6) / 26);
+    const x = STAND[0] + (1.5 - STAND[0]) * easeInOut(k);
+    const y = STAND[1] + Math.sin(k * Math.PI) * 1.3 + (-0.75 - STAND[1]) * k;
+    return {...swim, floaty: "arm", at: [x, y, 0.6], muddy: clamp01((t - r.P - 30) / 12)};
   }
-  return 0;
-};
-
-export const mascotLook = (gf: number): MascotLook => {
-  const s = sceneAt(gf);
-  const f = gf - s.startFrame;
-  const W = (w: string, fb: number) => wordLocal(s, w) ?? Math.round(fb * s.durationInFrames);
-  switch (s.id) {
-    case "s2": {
-      // pega o copo, imagina beber, bebe, larga o copo e passa mal; no "Por isso" tudo rebobina
-      const r = s2Rewind(s, f);
-      if (r !== null) return r < 0 ? {} : mascotLook(s.startFrame + r);
-      const b = W("beber", 0.22), res = W("Resultado", 0.6);
-      if (f < s.durationInFrames * 0.07 || f >= res) return {};
-      return {prop: "glassDirty", propHand: "r", propTilt: f > b && f < b + 40 ? 35 : 0};
+  if (inS("s8", t)) {
+    const r = rew("s8");
+    if (t < r.P || t >= r.R) return {};
+    const dunk = t > r.P + 22 && t < r.P + 40 ? Math.sin(((t - r.P - 22) / 18) * Math.PI) * 0.55 : 0;
+    return {...swim, at: [POOL_FLOAT[0], -1.05 - dunk + Math.sin(t * 0.15) * 0.03, POOL_FLOAT[2]], redEyes: clamp01((t - r.P - 40) / 10)};
+  }
+  if (inS("s9", t)) {
+    const j = W("s9", "pular");
+    if (t < j - 26) return {};
+    if (t < j + 2) {
+      // corre pela grama até a borda
+      const k = clamp01((t - (j - 26)) / 28);
+      return {...swim, floaty: "waist", at: [-3.6 + 1.7 * k, 0.06, 0.7], ry: Math.PI / 2 * (1 - clamp01((t - j + 4) / 6))};
     }
-    case "s4": {
-      const a = W("produto", 0.3), b = W("maiores", 0.7);
-      const tilt = f < b + 10 ? L(f, a - 6, a + 8, 0, 80, easeInOut) : L(f, b + 10, b + 22, 80, 0, easeInOut);
-      return {prop: "jug", propHand: "r", propTilt: tilt, pouring: f > a + 4 && f < b + 10 ? 1 : 0};
+    if (t < j + 30) {
+      const k = clamp01((t - j - 2) / 28);
+      const x = -1.9 + (POOL_FLOAT[0] + 1.9) * k;
+      const y = 0.06 + Math.sin(k * Math.PI) * 0.95 + (POOL_FLOAT[1] - 0.06) * easeOut(k);
+      return {...swim, floaty: "waist", at: [x, y, POOL_FLOAT[2]]};
     }
-    case "s7": {
-      const a = W("cloro", 0.45), b = W("germes", 0.6);
-      return {prop: "bottle", propHand: "l", propTilt: L(f, a - 6, a + 6, 0, 75, easeInOut), pouring: f > a + 3 && f < b + 25 ? 1 : 0};
-    }
-    case "s10":
-      return {prop: "glass", propHand: "r"};
-    case "s11": {
-      if (gf < finalCut) return {};
-      const ci = wordLocal(s, "Comenta") ?? 0;
-      return f >= ci - 6 && f < ci + 45 ? {rHand: "point"} : {};
-    }
+    const ci = W("s9", "Comenta");
+    return {...swim, floaty: "waist", at: [POOL_FLOAT[0], POOL_FLOAT[1] + Math.sin(t * 0.12) * 0.03, POOL_FLOAT[2]], rHand: t >= ci - 6 && t < ci + 40 ? "point" : undefined};
   }
   return {};
 };
 
-export const mascotPose = (gf: number): MascotPose => {
-  const s = sceneAt(gf);
-  const f = gf - s.startFrame;
-  const p = f / s.durationInFrames;
-  const sway = Math.sin(gf * 0.07) * 4;
-  const pose: MascotPose = {
-    emotion: "happy",
-    talk: 0, // sem sincronia labial: só reações no rosto (pedido do usuário)
-    lArm: [4 + sway * 0.3, 12],
-    rArm: [-30 + Math.sin(gf * 0.12) * 8, 22], // gesticula falando
-    umbrella: "none",
-    umbrellaTilt: 0,
-    jump: 0,
-    shiver: 0,
-    walking: false,
-  };
-  switch (s.id) {
-    case "s1": {
-      const onde = wordLocal(s, "onde") ?? s.durationInFrames * 0.6;
-      pose.emotion = f < onde - 4 ? "happy" : "surprised";
-      if (p < 0.2) pose.rArm = [L(p, 0, 0.12, -10, -75, easeInOut), 30]; // estica o braço até a torneira
-      if (f >= onde - 4) pose.rArm = [-45, 40];
-      break;
+export const mascotPose = (t: number): MascotPose => {
+  const pose = base(t);
+  if (inS("s1", t)) {
+    pose.emotion = t < W("s1", "Parece") ? "happy" : "grin";
+    pose.rArm = t > W("s1", "testar") - 6 ? [-80, 25] : [-20 + Math.sin(t * 0.12) * 6, 20];
+    pose.lArm = [-10, 30]; // braço com a boia
+  } else if (inS("s2", t)) {
+    const r = rew("s2");
+    if (undoneS2(t) || t < r.P) {
+      pose.emotion = undoneS2(t) ? "relieved" : t < W("s2", "desmoronam") ? "surprised" : "worried";
+      pose.lArm = [-10, 30];
+      pose.rArm = [-45, 40];
+    } else if (t < r.P + 32) {
+      pose.emotion = "joy"; // pula achando que vai ser legal
+      pose.lArm = [-10, 150];
+      pose.rArm = [-10, 150];
+    } else {
+      const k = clamp01((t - r.P - 32) / 12);
+      pose.emotion = k > 0.4 ? "sick" : "surprised";
+      pose.sick = k * 0.8;
+      pose.lArm = [-30, 20];
+      pose.rArm = [-30, 20];
+      pose.shiver = 0.5 * k;
     }
-    case "s2": {
-      // o boneco testa: imagina beber a água da represa, bebe e passa mal... e a cena rebobina
-      const r = s2Rewind(s, f);
-      if (r !== null) {
-        if (r >= 0) return mascotPose(s.startFrame + r);
-        pose.emotion = "worried"; // de volta ao começo: "melhor não!"
-        pose.rArm = [-55, 48 + Math.sin(gf * 0.4) * 10];
-        break;
-      }
-      const im = wordLocal(s, "imagina") ?? s.durationInFrames * 0.2;
-      const b = wordLocal(s, "beber") ?? s.durationInFrames * 0.22;
-      const t = wordLocal(s, "terra") ?? s.durationInFrames * 0.38;
-      const res = wordLocal(s, "Resultado") ?? s.durationInFrames * 0.6;
-      if (f < s.durationInFrames * 0.07) {
-        pose.emotion = "curious";
-      } else if (f < b) {
-        pose.emotion = f < im - 6 ? "happy" : "curious";
-        pose.rArm = [-75, 12]; // olha a água no copo
-      } else if (f < b + 40) {
-        pose.emotion = "happy";
-        pose.rArm = [-113.5, -39]; // bebe
-      } else if (f < res) {
-        pose.emotion = f < t ? "curious" : "surprised"; // percebe a sujeira no copo
-        pose.rArm = [-75, 12];
-      } else {
-        const k = clamp01((f - res) / 20);
-        pose.sick = k;
-        pose.emotion = k > 0.3 ? "sick" : "surprised";
-        pose.lArm = [-35, -28]; // mãos na barriga
-        pose.rArm = [-35, -28];
-        pose.shiver = 0.5 * k;
-      }
-      break;
+  } else if (inS("s8", t)) {
+    const r = rew("s8");
+    const k = clamp01((t - r.P - 40) / 10);
+    if (k <= 0) {
+      pose.emotion = "joy";
+      pose.lArm = [-10, 120 + Math.sin(t * 0.4) * 15];
+      pose.rArm = [-10, 120 - Math.sin(t * 0.4) * 15];
+    } else {
+      // olhos ardendo: esfrega os olhos com as duas mãos
+      pose.emotion = "sick";
+      pose.lArm = [-150 + Math.sin(t * 0.8) * 8, -28];
+      pose.rArm = [-150 - Math.sin(t * 0.8) * 8, -28];
+      pose.shiver = 0.3;
     }
-    case "s3": {
-      const b = wordLocal(s, "Bombas") ?? 10;
-      pose.emotion = f < b ? "happy" : "surprised";
-      pose.lArm = f < b - 4 ? [-30, 20] : [-55, 52]; // aperta o botão da bomba
-      break;
-    }
-    case "s4":
-      pose.emotion = "happy";
-      pose.rArm = [-105, 22]; // segura a jarra sobre o tanque
-      break;
-    case "s5":
-      pose.emotion = p < 0.3 ? "curious" : "surprised";
-      pose.rArm = [-40, 35]; // aponta os flocos afundando
-      break;
-    case "s6":
-      pose.emotion = p < 0.35 ? "curious" : "happy";
-      pose.rArm = [-50, 38]; // mostra as camadas
-      break;
-    case "s7": {
-      const c = wordLocal(s, "cloro") ?? s.durationInFrames * 0.45;
-      pose.emotion = f < c ? "worried" : "happy";
-      pose.lArm = [-105, 22]; // frasco de cloro sobre o tanque
-      break;
-    }
-    case "s8":
-      pose.emotion = p < 0.4 ? "surprised" : "happy";
-      pose.rArm = [-100, 20]; // aponta para o reservatório lá em cima
-      break;
-    case "s9":
-      pose.emotion = p < 0.4 ? "curious" : "happy";
-      pose.rArm = [-75, 35]; // aponta para o hidrômetro, ao lado dele na calçada
-      break;
-    case "s10":
-      pose.emotion = p < 0.75 ? "happy" : "relieved";
-      pose.rArm = p < 0.75 ? [-60, 18] : [-113.5, -39]; // segura o copo e bebe
-      break;
-    case "s11": {
-      if (gf < finalCut) break;
-      const c = gf - finalCut;
-      const ci = wordLocal(s, "Comenta") ?? 0;
-      const fw = wordLocal(s, "segue") ?? 0;
-      if (c < 80) {
-        pose.emotion = "joy";
-        const up = clamp01(c / 8);
-        pose.lArm = [-10, 15 + 140 * up + Math.sin(gf * 0.5) * 8];
-        pose.rArm = [-10, 15 + 140 * up - Math.sin(gf * 0.5) * 8];
-        pose.jump = Math.abs(Math.sin(c * 0.22)) * 0.18 * (1 - clamp01((c - 60) / 20));
-      } else if (f >= ci - 6 && f < ci + 45) {
-        pose.lArm = [4, 10];
-        pose.rArm = [-88, 8]; // aponta para quem assiste
-      } else if (f >= fw - 10) {
-        pose.lArm = [4, 10];
-        pose.rArm = [-10, 150 + Math.sin(gf * 0.35) * 20]; // acena
-      }
-      break;
+  } else if (inS("s9", t)) {
+    const j = W("s9", "pular");
+    const ci = W("s9", "Comenta"), fw = W("s9", "segue");
+    if (t < j + 2) {
+      pose.walking = true;
+      pose.emotion = "grin";
+      pose.lArm = [Math.sin(t * 0.45) * 30, 15];
+      pose.rArm = [-Math.sin(t * 0.45) * 30, 15];
+    } else if (t < j + 30) {
+      pose.emotion = "joy";
+      pose.lArm = [-10, 165];
+      pose.rArm = [-10, 165];
+    } else if (t >= ci - 6 && t < ci + 40) {
+      pose.emotion = "grin";
+      pose.rArm = [-88, 8]; // aponta para quem assiste
+      pose.lArm = [-10, 40];
+    } else if (t >= fw - 10) {
+      pose.emotion = "grin";
+      pose.rArm = [-10, 150 + Math.sin(t * 0.35) * 20]; // acena
+      pose.lArm = [-10, 40];
+    } else {
+      pose.emotion = "joy";
+      pose.lArm = [-10, 60 + Math.sin(t * 0.3) * 10];
+      pose.rArm = [-10, 60 - Math.sin(t * 0.3) * 10];
     }
   }
   return pose;
 };
+export const unused = [L, easeOut];
