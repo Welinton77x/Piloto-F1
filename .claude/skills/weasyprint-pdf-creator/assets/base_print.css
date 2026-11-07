@@ -1,0 +1,98 @@
+/* base_print.css — boilerplate CSS Paged Media para WeasyPrint (A4) */
+
+@page {
+    size: A4;
+    margin: 25mm 15mm 20mm 15mm;
+
+    @top-center {
+        content: element(doc-header);
+        width: 100%;
+    }
+
+    @bottom-right {
+        content: "Página " counter(page) " de " counter(pages);
+        font-family: "Inter", "DejaVu Sans", sans-serif;
+        font-size: 8pt;
+        color: #718096;
+    }
+}
+
+/* Capa sem cabeçalho nem número de página */
+@page:first {
+    margin: 0;
+    @top-center { content: none; }
+    @bottom-right { content: none; }
+}
+
+html {
+    font-family: "Inter", "DejaVu Sans", sans-serif;
+    font-size: 10.5pt;
+    line-height: 1.5;
+    color: #2d3748;
+}
+
+body { margin: 0; }
+
+/* Cabeçalho repetido (running element) */
+header.doc-header {
+    position: running(doc-header);
+    width: 100%;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 5px;
+}
+
+.header-inner {
+    display: flex;
+    justify-content: space-between;
+    font-size: 8pt;
+    color: #718096;
+}
+
+/* Capa */
+.cover-page {
+    width: 210mm;
+    height: 297mm;
+    background-color: #1a202c;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 40mm 20mm;
+    box-sizing: border-box;
+}
+.cover-page h1 { font-size: 32pt; margin-bottom: 10px; }
+.cover-page .subtitle { font-size: 18pt; color: #a0aec0; margin-bottom: 30px; }
+
+/* Quebras de página */
+.page-break, h2.section-title {
+    break-before: page;
+    page-break-before: always;
+}
+h1, h2, h3, h4, h5, h6 {
+    break-after: avoid;
+    page-break-after: avoid;
+}
+.card, .stat-box, figure, tr {
+    break-inside: avoid;
+    page-break-inside: avoid;
+}
+p, li { orphans: 3; widows: 3; overflow-wrap: break-word; }
+
+/* Tabelas */
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+th, td { padding: 6px 8px; border-bottom: 1px solid #e2e8f0; text-align: left; }
+thead th { background: #edf2f7; font-weight: 600; }
+
+img { max-width: 100%; }
+
+/* Sumário — sem flex: no WeasyPrint, target-counter() dentro de item flex retorna 0 */
+.toc-list { list-style: none; padding: 0; }
+.toc-item { margin-bottom: 10px; }
+.toc-item a { display: block; text-decoration: none; color: #2d3748; }
+.toc-leader { display: none; }
+.toc-item a::after {
+    content: leader(dotted) target-counter(attr(href), page);
+    font-weight: bold;
+}

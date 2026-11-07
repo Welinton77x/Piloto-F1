@@ -1,0 +1,24 @@
+name: Transcrever narração (torneira)
+on:
+  push:
+    paths: ["torneira/stt/PEDIDO.txt"]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency: stt-torneira
+jobs:
+  stt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Transcrever
+        env:
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+        run: python torneira/stt/transcrever.py
+      - name: Guardar no branch
+        run: |
+          git config user.name "claude-bot"; git config user.email "bot@users.noreply.github.com"
+          git add torneira/stt/words.json
+          git commit -m "Transcrição da narração v3 (torneira)" || exit 0
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
