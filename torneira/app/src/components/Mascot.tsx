@@ -295,7 +295,91 @@ const CurlyHair: React.FC = () => {
   );
 };
 
-export type MascotLook = {hair?: "short" | "curly"; outfit?: "shirt" | "overall"; wrench?: boolean; wrenchTilt?: number; wrenchLeft?: boolean; capLogo?: boolean; lHand?: Hand; rHand?: Hand};
+export type Prop = "jug" | "bottle" | "glassDirty" | "glass";
+export type MascotLook = {hair?: "short" | "curly"; outfit?: "shirt" | "overall"; wrench?: boolean; wrenchTilt?: number; wrenchLeft?: boolean; capLogo?: boolean; lHand?: Hand; rHand?: Hand; prop?: Prop; propHand?: "l" | "r"; propTilt?: number; pouring?: number};
+
+/** objetos que o mascote segura para demonstrar cada etapa (sempre na vertical; inclinam para despejar) */
+const PropMesh: React.FC<{prop: Prop; tilt: number; pouring: number; side: -1 | 1}> = ({prop, tilt, pouring, side}) => {
+  const M2: React.FC<{c: string; o?: number; e?: number}> = ({c, o = 1, e = 0}) => <meshStandardMaterial color={c} roughness={0.45} transparent={o < 1} opacity={o} emissive={c} emissiveIntensity={e} />;
+  const spout: [number, number, number] = prop === "jug" ? [side * 0.12, 0.22, 0] : prop === "bottle" ? [0, 0.24, 0] : [0, 0.16, 0];
+  return (
+    <group rotation={[0, 0, (side * -tilt * Math.PI) / 180]}>
+      {prop === "jug" && (
+        <group position={[0, 0.06, 0]}>
+          <mesh>
+            <cylinderGeometry args={[0.09, 0.11, 0.26, 20]} />
+            <M2 c="#f5f6f8" />
+          </mesh>
+          <mesh position={[0, -0.03, 0]}>
+            <cylinderGeometry args={[0.092, 0.112, 0.14, 20]} />
+            <M2 c="#d9b45a" o={0.85} />
+          </mesh>
+          <mesh position={[side * 0.1, 0.11, 0]} rotation={[0, 0, side * -0.9]}>
+            <coneGeometry args={[0.04, 0.09, 12]} />
+            <M2 c="#f5f6f8" />
+          </mesh>
+          <mesh position={[-side * 0.12, 0.02, 0]} rotation={[0, 0, Math.PI / 2]}>
+            <torusGeometry args={[0.05, 0.015, 8, 12, Math.PI]} />
+            <M2 c="#f5f6f8" />
+          </mesh>
+        </group>
+      )}
+      {prop === "bottle" && (
+        <group position={[0, 0.06, 0]}>
+          <mesh>
+            <cylinderGeometry args={[0.06, 0.06, 0.24, 16]} />
+            <M2 c="#7ed957" />
+          </mesh>
+          <mesh position={[0, 0.15, 0]}>
+            <cylinderGeometry args={[0.025, 0.05, 0.08, 12]} />
+            <M2 c="#ffffff" />
+          </mesh>
+          <mesh position={[0, 0.0, 0.061]}>
+            <planeGeometry args={[0.08, 0.06]} />
+            <M2 c="#ffffff" />
+          </mesh>
+        </group>
+      )}
+      {(prop === "glassDirty" || prop === "glass") && (
+        <group position={[0, 0.05, 0]}>
+          <mesh>
+            <cylinderGeometry args={[0.075, 0.06, 0.2, 20, 1, true]} />
+            <meshStandardMaterial color="#e6f4ff" transparent opacity={0.4} side={THREE.DoubleSide} />
+          </mesh>
+          <mesh position={[0, -0.02, 0]}>
+            <cylinderGeometry args={[0.07, 0.057, 0.15, 20]} />
+            <M2 c={prop === "glassDirty" ? "#8c6b3f" : "#5ec4ff"} o={0.85} />
+          </mesh>
+          {prop === "glassDirty" &&
+            [0, 1, 2].map((i) => (
+              <mesh key={i} position={[(i - 1) * 0.03, -0.02 + i * 0.03, 0.06]}>
+                <sphereGeometry args={[0.012, 8, 6]} />
+                <M2 c={i % 2 ? "#7ed957" : "#b388ff"} e={0.4} />
+              </mesh>
+            ))}
+        </group>
+      )}
+      {/* jato/gotas saindo pelo bico enquanto despeja */}
+      {pouring > 0.02 && (
+        <group position={spout} rotation={[0, 0, (side * tilt * Math.PI) / 180]}>
+          {prop === "jug" ? (
+            <mesh position={[0, -0.28, 0]}>
+              <cylinderGeometry args={[0.02, 0.012, 0.56, 8]} />
+              <M2 c="#e8d08a" o={0.85 * pouring} />
+            </mesh>
+          ) : (
+            [0, 1, 2].map((i) => (
+              <mesh key={i} position={[0, -0.1 - i * 0.15, 0]} scale={[1, 1.4, 1]}>
+                <sphereGeometry args={[0.022, 10, 8]} />
+                <M2 c="#b6f28c" o={pouring} e={0.6} />
+              </mesh>
+            ))
+          )}
+        </group>
+      )}
+    </group>
+  );
+};
 
 /** logo do canal estampado na frente do boné (lâmpada + "Por Dentro Lab") */
 const CapLogo: React.FC = () => {
@@ -406,9 +490,10 @@ export const Mascot: React.FC<{position: [number, number, number]; scale?: numbe
       </group>
       <Arm side={-1} rot={pose.lArm} hand={look.lHand}>
         {umbrella}
+        {look.prop && look.propHand === "l" ? <group rotation={new THREE.Euler(-rad(pose.lArm[0]), 0, rad(pose.lArm[1]), "ZYX")}><PropMesh prop={look.prop} tilt={look.propTilt ?? 0} pouring={look.pouring ?? 0} side={-1} /></group> : null}
         {look.wrench && look.wrenchLeft ? <group rotation={new THREE.Euler(-rad(pose.lArm[0]), 0, rad(pose.lArm[1]), "ZYX")}><Wrench tilt={look.wrenchTilt} /></group> : null}
       </Arm>
-      <Arm side={1} rot={pose.rArm} hand={look.rHand}>{look.wrench && !look.wrenchLeft ? <group rotation={new THREE.Euler(-rad(pose.rArm[0]), 0, -rad(pose.rArm[1]), "ZYX")}><Wrench tilt={look.wrenchTilt} /></group> : null}</Arm>
+      <Arm side={1} rot={pose.rArm} hand={look.rHand}>{look.prop && look.propHand !== "l" ? <group rotation={new THREE.Euler(-rad(pose.rArm[0]), 0, -rad(pose.rArm[1]), "ZYX")}><PropMesh prop={look.prop} tilt={look.propTilt ?? 0} pouring={look.pouring ?? 0} side={1} /></group> : null}{look.wrench && !look.wrenchLeft ? <group rotation={new THREE.Euler(-rad(pose.rArm[0]), 0, -rad(pose.rArm[1]), "ZYX")}><Wrench tilt={look.wrenchTilt} /></group> : null}</Arm>
       <group position={[0, 1.5 + breath * 0.5, 0]} rotation={[0, 0, rad(headTilt)]} scale={0.86}>
         <RB w={0.54} h={0.5} d={0.48} r={0.14} c={col.skin} />
         {[-1, 1].map((s) => (

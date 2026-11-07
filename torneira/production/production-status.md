@@ -23,3 +23,7 @@
 - Voz trocada para "Matheus – Energic Young Voice" (`36rVQA1AOIPwpA3Hg1tC`), escolhida pelo usuário; gerada pelo conector da ElevenLabs (1.104 créditos), transcrita para tempos por palavra.
 - Corrigidos: árvore na represa, pia/torneira presa na parede (água não flutua), braço atravessando a parede, adutora na frente da câmera, dosadores flutuando, rótulo da bomba, câmera do resumo; mascote com proporção de adolescente, closes da cintura pra cima e presença na represa, bomba, reservatório e hidrômetro.
 - MP4: 1080×1920, 30 fps, 1798 frames, 60,0 s; −14,9 LUFS, pico −2,9 dBFS; áudio em todos os segundos. Não verificado por audição.
+
+## v3 (roteiro aprovado em 2026-11-07)
+- Narração v3 (314 palavras) na voz Matheus – Energic Young Voice: 1.699 créditos (a conta ficou com ~5 créditos). Transcrição do conector estava ocupada; frases alinhadas pelas pausas do áudio e palavras distribuídas dentro de cada frase. Voz desacelerada 12% (atempo 0,88) com pausas de 0,22 s entre frases → ~180 pal/min (referência medida: 185–200).
+- Mascote participa de cada etapa: copo de água suja na represa, aperta o botão da bomba, despeja o coagulante com jarra (banquinho), aponta flocos e camadas, pinga o cloro (banquinho), aponta reservatório e hidrômetro, bebe a água, comemora.

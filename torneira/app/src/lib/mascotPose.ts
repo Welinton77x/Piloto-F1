@@ -1,5 +1,5 @@
-// Vídeo 2 — reações e gestos do mascote na cozinha (tudo derivado do frame global).
-import {VO_OFFSET, S, finalCut, sceneAt, wordLocal} from "../data/scenes";
+// Vídeo 2 — o mascote participa de cada etapa (como o personagem da referência): reações, gestos e objetos.
+import {VO_OFFSET, finalCut, sceneAt, wordLocal} from "../data/scenes";
 import type {MascotLook, MascotPose} from "../components/Mascot";
 import {L, clamp01, easeInOut} from "./anim";
 
@@ -17,9 +17,26 @@ const talkAt = (gf: number) => {
 export const mascotLook = (gf: number): MascotLook => {
   const s = sceneAt(gf);
   const f = gf - s.startFrame;
-  if (s.id === "s11" && gf >= finalCut) {
-    const ci = wordLocal(s, "comente") ?? 0;
-    if (f >= ci - 6 && f < ci + 45) return {rHand: "point"};
+  const W = (w: string, fb: number) => wordLocal(s, w) ?? Math.round(fb * s.durationInFrames);
+  switch (s.id) {
+    case "s2":
+      return f > s.durationInFrames * 0.3 ? {prop: "glassDirty", propHand: "r"} : {};
+    case "s4": {
+      const a = W("produto", 0.3), b = W("maiores", 0.7);
+      const tilt = f < b + 10 ? L(f, a - 6, a + 8, 0, 80, easeInOut) : L(f, b + 10, b + 22, 80, 0, easeInOut);
+      return {prop: "jug", propHand: "r", propTilt: tilt, pouring: f > a + 4 && f < b + 10 ? 1 : 0};
+    }
+    case "s7": {
+      const a = W("cloro", 0.45), b = W("germes", 0.6);
+      return {prop: "bottle", propHand: "l", propTilt: L(f, a - 6, a + 6, 0, 75, easeInOut), pouring: f > a + 3 && f < b + 25 ? 1 : 0};
+    }
+    case "s10":
+      return {prop: "glass", propHand: "r"};
+    case "s11": {
+      if (gf < finalCut) return {};
+      const ci = wordLocal(s, "comente") ?? 0;
+      return f >= ci - 6 && f < ci + 45 ? {rHand: "point"} : {};
+    }
   }
   return {};
 };
@@ -48,28 +65,47 @@ export const mascotPose = (gf: number): MascotPose => {
       if (f >= onde - 4) pose.rArm = [-45, 40];
       break;
     }
-    case "s2":
-      pose.emotion = p < 0.5 ? "happy" : "worried";
-      pose.lArm = [-70, 25]; // mostra a represa
+    case "s2": {
+      const b = wordLocal(s, "beber") ?? s.durationInFrames * 0.5;
+      pose.emotion = f < b ? "happy" : "annoyed"; // cara de nojo com a água suja
+      if (f > s.durationInFrames * 0.3) pose.rArm = [-95, 8]; // levanta o copo de água da represa
       break;
-    case "s3":
+    }
+    case "s3": {
+      const b = wordLocal(s, "Bombas") ?? 10;
+      pose.emotion = f < b ? "happy" : "surprised";
+      pose.lArm = f < b - 4 ? [-30, 20] : [-55, 52]; // aperta o botão da bomba
+      break;
+    }
+    case "s4":
+      pose.emotion = "happy";
+      pose.rArm = [-105, 22]; // segura a jarra sobre o tanque
+      break;
+    case "s5":
       pose.emotion = "surprised";
-      pose.rArm = [-60, 30]; // mostra a bomba
+      pose.rArm = [-40, 35]; // aponta os flocos afundando
       break;
+    case "s6":
+      pose.emotion = "happy";
+      pose.rArm = [-50, 38]; // mostra as camadas
+      break;
+    case "s7": {
+      const c = wordLocal(s, "cloro") ?? s.durationInFrames * 0.45;
+      pose.emotion = f < c ? "worried" : "happy";
+      pose.lArm = [-105, 22]; // frasco de cloro sobre o tanque
+      break;
+    }
     case "s8":
       pose.emotion = "happy";
       pose.rArm = [-100, 20]; // aponta para o reservatório lá em cima
-      break;
-    case "s7":
-      pose.emotion = p < 0.37 ? "worried" : "relieved";
       break;
     case "s9":
       pose.emotion = "happy";
       pose.rArm = [-75, 35]; // aponta para o hidrômetro, ao lado dele na calçada
       break;
     case "s10":
-      pose.emotion = p < 0.8 ? "happy" : "relieved";
-      if (p >= 0.8) pose.rArm = [-113.5, -39]; // leva o copo à boca
+      pose.emotion = p < 0.75 ? "happy" : "relieved";
+      pose.rArm = p < 0.75 ? [-60, 18] : [-113.5, -39]; // segura o copo e bebe
       break;
     case "s11": {
       if (gf < finalCut) break;

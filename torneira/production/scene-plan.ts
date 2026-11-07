@@ -50,7 +50,7 @@ export const scenes: ScenePlan[] = [
     audioCues: [cue("whoosh-pipe", 0), cue("water-ambience", 60)] },
 
   { id: "s3", voKey: "s3", startFrame: 450, durationInFrames: 210,
-    narration: "Então bombas gigantes puxam essa água e empurram por canos enormes, as adutoras, até a estação de tratamento. É lá que a limpeza acontece.",
+    narration: "Bombas gigantes puxam essa água e empurram por canos enormes, as adutoras, até a estação de tratamento. É lá que a limpeza acontece.",
     camera: [{ f: 0, az: 0, el: 10, dist: 12, target: [-7.5, -0.3, 0] }, { f: 60, az: 0, el: 10, dist: 12, target: [-7.5, -0.3, 0] }, { f: 210, az: 8, el: 12, dist: 14, target: [-5, 0, 0] }],
     objects: ["intakeGrate", "pump", "adutora", "flowArrows"],
     animations: [
@@ -136,7 +136,7 @@ export const scenes: ScenePlan[] = [
     audioCues: [cue("meter-tick", 60)] },
 
   { id: "s10", voKey: "s10", startFrame: 2055, durationInFrames: 210,
-    narration: "A caixa guarda uma reserva pra quando falta água na rua. E, de novo, a gravidade leva a água até a sua torneira.",
+    narration: "A caixa guarda uma reserva pra quando falta água na rua. E a gravidade leva a água até a sua torneira.",
     camera: [{ f: 0, az: 10, el: 10, dist: 6, target: [10.5, 2, 0] }, { f: 210, az: 6, el: 8, dist: 4, target: [10.5, 1.2, 0] }],
     objects: ["roofTank", "downPipe", "faucet", "glass", "mascot"],
     animations: [

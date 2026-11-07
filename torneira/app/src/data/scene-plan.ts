@@ -39,7 +39,7 @@ export const scenes: ScenePlan[] = [
 
   { id: "s2", voKey: "s2", startFrame: 210, durationInFrames: 240,
     narration: "Tudo começa num rio ou numa represa. Só que essa água não dá pra beber: ela tem terra, folhas e micróbios tão pequenos que você nem enxerga.",
-    camera: [{ f: 0, az: 5, el: 6, dist: 3.4, target: [10.5, 1.2, 0] }, { f: 60, az: 10, el: 14, dist: 15, target: [-10.4, 0.4, 0] }, { f: 150, az: 10, el: 14, dist: 15, target: [-10.4, 0.4, 0] }, { f: 151, az: 0, el: 10, dist: 4, target: [-11, -0.3, 0.5] }, { f: 240, az: 6, el: 10, dist: 4, target: [-11, -0.3, 0.5] }],
+    camera: [{ f: 0, az: 5, el: 6, dist: 3.4, target: [10.5, 1.2, 0] }, { f: 60, az: 10, el: 12, dist: 12, target: [-9.9, 0.5, 0.3] }, { f: 150, az: 12, el: 12, dist: 11, target: [-9.7, 0.6, 0.3] }, { f: 151, az: 0, el: 10, dist: 4, target: [-11, -0.3, 0.5] }, { f: 240, az: 6, el: 10, dist: 4, target: [-11, -0.3, 0.5] }],
     objects: ["lake", "shore", "trees", "leaves", "dirtParticles", "lens2D", "microbes2D"],
     animations: [
       { target: "camera.travel", unit: "spring", from: 0, to: 1, f0: 0, f1: 60, fn: "spring" },
@@ -50,7 +50,7 @@ export const scenes: ScenePlan[] = [
     audioCues: [cue("whoosh-pipe", 0), cue("water-ambience", 60)] },
 
   { id: "s3", voKey: "s3", startFrame: 450, durationInFrames: 210,
-    narration: "Então bombas gigantes puxam essa água e empurram por canos enormes, as adutoras, até a estação de tratamento. É lá que a limpeza acontece.",
+    narration: "Bombas gigantes puxam essa água e empurram por canos enormes, as adutoras, até a estação de tratamento. É lá que a limpeza acontece.",
     camera: [{ f: 0, az: 0, el: 8, dist: 10, target: [-7.9, -0.1, 0.5] }, { f: 60, az: 0, el: 8, dist: 10, target: [-7.9, -0.1, 0.5] }, { f: 210, az: 6, el: 10, dist: 11, target: [-6.3, 0.3, 0.5] }],
     objects: ["intakeGrate", "pump", "adutora", "flowArrows"],
     animations: [
@@ -63,7 +63,7 @@ export const scenes: ScenePlan[] = [
 
   { id: "s4", voKey: "s4", startFrame: 660, durationInFrames: 240,
     narration: "A sujeira mais fininha não afunda sozinha. Por isso entra um produto que faz essas partículas grudarem umas nas outras, formando bolinhas maiores: os flocos. Isso é a coagulação e a floculação.",
-    camera: [{ f: 0, az: 12, el: 14, dist: 6.5, target: [-4.5, 0.75, 0.3] }, { f: 240, az: 18, el: 14, dist: 6.0, target: [-4.3, 0.75, 0.3] }],
+    camera: [{ f: 0, az: 8, el: 10, dist: 9.0, target: [-5.65, 1.0, 0.4] }, { f: 240, az: 12, el: 10, dist: 8.6, target: [-5.55, 1.0, 0.4] }],
     objects: ["mixTank", "doser", "particles", "flocculator", "paddles", "flocs"],
     animations: [
       { target: "doser.drip", unit: "0-1", from: 0, to: 1, f0: 0, f1: 60, fn: "linear" },
@@ -75,7 +75,7 @@ export const scenes: ScenePlan[] = [
 
   { id: "s5", voKey: "s5", startFrame: 900, durationInFrames: 180,
     narration: "Os flocos ficam pesados e vão afundando devagar até o fundo do tanque. A água de cima fica bem mais clara. Isso é a decantação.",
-    camera: [{ f: 0, az: 0, el: 8, dist: 5.6, target: [-2.0, 0.7, 0.3] }, { f: 180, az: 6, el: 8, dist: 5.2, target: [-2.0, 0.7, 0.3] }],
+    camera: [{ f: 0, az: 0, el: 8, dist: 7.5, target: [-2.3, 0.85, 0.4] }, { f: 180, az: 6, el: 8, dist: 7.0, target: [-2.2, 0.85, 0.4] }],
     objects: ["decanter", "flocs", "sludge"],
     animations: [
       { target: "flocs.y", unit: "u3d", from: 0, to: -1.2, f0: 0, f1: 140, fn: "easeIn" },
@@ -87,7 +87,7 @@ export const scenes: ScenePlan[] = [
 
   { id: "s6", voKey: "s6", startFrame: 1080, durationInFrames: 165,
     narration: "Depois, a água passa por camadas de areia e cascalho, como uma peneira gigante. A sujeira que sobrou fica presa ali: é a filtração.",
-    camera: [{ f: 0, az: 0, el: 6, dist: 4.8, target: [-0.35, 0.65, 0.4] }, { f: 165, az: -6, el: 6, dist: 4.5, target: [-0.35, 0.65, 0.4] }],
+    camera: [{ f: 0, az: 0, el: 6, dist: 7.0, target: [-0.45, 0.8, 0.4] }, { f: 165, az: -6, el: 6, dist: 6.6, target: [-0.45, 0.8, 0.4] }],
     objects: ["filter", "sandLayer", "gravelLayer", "drops", "trappedDirt"],
     animations: [
       { target: "drops.y", unit: "seeded", from: 0, to: 1, f0: 0, f1: 165, fn: "seeded" },
@@ -98,7 +98,7 @@ export const scenes: ScenePlan[] = [
 
   { id: "s7", voKey: "s7", startFrame: 1245, durationInFrames: 300,
     narration: "Mas tem um problema: alguns micróbios são tão pequenos que passam até pelo filtro. Aí entra o cloro, que mata esses germes e continua protegendo a água por todo o caminho até a sua casa.",
-    camera: [{ f: 0, az: 0, el: 6, dist: 4.6, target: [-0.35, 0.7, 0.4] }, { f: 110, az: 0, el: 6, dist: 4.6, target: [-0.35, 0.7, 0.4] }, { f: 111, az: 10, el: 10, dist: 5.6, target: [0.9, 0.8, 0.3] }, { f: 300, az: 14, el: 10, dist: 7.5, target: [1.4, 0.8, 0.3] }],
+    camera: [{ f: 0, az: 0, el: 6, dist: 4.6, target: [-0.35, 0.7, 0.4] }, { f: 110, az: 0, el: 6, dist: 4.6, target: [-0.35, 0.7, 0.4] }, { f: 111, az: 8, el: 8, dist: 8.2, target: [1.2, 1.0, 0.3] }, { f: 300, az: 12, el: 8, dist: 8.8, target: [1.3, 1.0, 0.3] }],
     objects: ["microbes2D", "chlorineDoser", "contactTank", "residualGlow", "labelFluor"],
     animations: [
       { target: "microbes.y", unit: "u3d", from: 0, to: -1, f0: 0, f1: 100, fn: "linear" },
@@ -136,8 +136,8 @@ export const scenes: ScenePlan[] = [
     audioCues: [cue("meter-tick", 60)] },
 
   { id: "s10", voKey: "s10", startFrame: 2055, durationInFrames: 210,
-    narration: "A caixa guarda uma reserva pra quando falta água na rua. E, de novo, a gravidade leva a água até a sua torneira.",
-    camera: [{ f: 0, az: 10, el: 10, dist: 7, target: [10.5, 1.8, -0.8] }, { f: 210, az: -6, el: 6, dist: 4.4, target: [9.95, 1.15, -0.8] }],
+    narration: "A caixa guarda uma reserva pra quando falta água na rua. E a gravidade leva a água até a sua torneira.",
+    camera: [{ f: 0, az: 10, el: 10, dist: 7, target: [10.5, 1.8, -0.8] }, { f: 210, az: -4, el: 6, dist: 4.6, target: [9.85, 1.15, -0.7] }],
     objects: ["roofTank", "downPipe", "faucet", "glass", "mascot"],
     animations: [
       { target: "houseDown.offset", unit: "u3d", from: 0, to: 2, f0: 20, f1: 150, fn: "linear" },

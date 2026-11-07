@@ -71,12 +71,14 @@ Pedido: "Ficou muito rápido as falas, diminuía a fala melhore a explicação u
 
 - s1: "Você abre a torneira e sai água limpinha. Mas você já parou pra pensar de onde ela vem? E como ela chega limpa até aqui?"
 - s2: "Tudo começa num rio ou numa represa. Só que essa água não dá pra beber: ela tem terra, folhas e micróbios tão pequenos que você nem enxerga."
-- s3: "Então bombas gigantes puxam essa água e empurram por canos enormes, as adutoras, até a estação de tratamento. É lá que a limpeza acontece."
+- s3: "Bombas gigantes puxam essa água e empurram por canos enormes, as adutoras, até a estação de tratamento. É lá que a limpeza acontece."
 - s4: "A sujeira mais fininha não afunda sozinha. Por isso entra um produto que faz essas partículas grudarem umas nas outras, formando bolinhas maiores: os flocos. Isso é a coagulação e a floculação."
 - s5: "Os flocos ficam pesados e vão afundando devagar até o fundo do tanque. A água de cima fica bem mais clara. Isso é a decantação."
 - s6: "Depois, a água passa por camadas de areia e cascalho, como uma peneira gigante. A sujeira que sobrou fica presa ali: é a filtração."
 - s7: "Mas tem um problema: alguns micróbios são tão pequenos que passam até pelo filtro. Aí entra o cloro, que mata esses germes e continua protegendo a água por todo o caminho até a sua casa."
 - s8: "Agora a água limpa é bombeada pra reservatórios no alto. Lá de cima, a gravidade faz o trabalho: a água desce com pressão e corre pelos canos da cidade."
 - s9: "Debaixo da rua, ela entra no cano da sua casa, passa pelo hidrômetro, que é o relógio que mede quanto você gasta, e sobe até a caixa d'água."
-- s10: "A caixa guarda uma reserva pra quando falta água na rua. E, de novo, a gravidade leva a água até a sua torneira."
+- s10: "A caixa guarda uma reserva pra quando falta água na rua. E a gravidade leva a água até a sua torneira."
 - s11: "Resumindo: represa, tratamento, reservatório, rede, caixa d'água e torneira. Agora você sabe de onde vem a água que sai na sua torneira! Se você já sabia, comente TORNEIRA. Se não sabia, comente REPRESA. E segue o Por Dentro Lab pra descobrir mais coisas por dentro."
+
+Ajuste por crédito (faltavam 11 créditos na conta): removidos "Então" (s3) e ", de novo," (s10); sentido inalterado.

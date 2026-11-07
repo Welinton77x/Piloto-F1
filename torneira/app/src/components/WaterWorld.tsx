@@ -303,6 +303,11 @@ export const WaterWorld: React.FC<{gf: number}> = ({gf}) => {
       {/* casa de bombas */}
       <B x={[-8.9, -7.9]} y={[0, 0.9]} z={[-0.6, 0.6]} c="#e6dccb" />
       <B x={[-9.0, -7.8]} y={[0.9, 1.0]} z={[-0.7, 0.7]} c={C.roof} />
+      <B x={[-8.1, -7.9]} y={[0.42, 0.62]} z={[0.6, 0.66]} c="#3b4250" />
+      <mesh position={[-8.0, 0.52, 0.68]} rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.055, 0.055, 0.04 - (pumpSpeed > 0.5 ? 0.02 : 0), 16]} />
+        <M c="#E53935" e="#E53935" ei={pumpSpeed > 0.5 ? 0.6 : 0.1} />
+      </mesh>
       <group position={[-8.4, -1.25, FACE + 0.05]} rotation={[0, 0, gf * pumpSpeed * 0.02]}>
         <mesh rotation={[Math.PI / 2, 0, 0]}>
           <cylinderGeometry args={[0.28, 0.28, 0.2, 20]} />
@@ -632,15 +637,30 @@ export const WaterWorld: React.FC<{gf: number}> = ({gf}) => {
         const P: Record<string, [number, number, number] | null> = {
           s1: [9.6, 0.1, -0.6],
           s2: [-8.8, 0.06, 0.75],
-          s3: [-6.95, 0.06, 1.0],
-          s4: null, s5: null, s6: null, s7: null, // closes dos tanques
+          s3: [-7.5, 0.06, 1.0],
+          s4: [-6.1, 0.6, 1.35], // no banquinho, despejando o produto
+          s5: [-2.6, 0.06, 1.5], // na frente do decantador
+          s6: [-0.75, 0.06, 1.5], // na frente do filtro
+          s7: [1.95, 0.6, 1.0], // no banquinho, pingando o cloro
           s8: [2.3, 0.06, 1.3],
           s9: [8.05, 0.08, 0.35],
           s10: [9.6, 0.1, -0.6],
           s11: [9.6, 0.1, -0.6],
         };
         const p = P[id];
-        return p ? <Mascot position={p} scale={0.8} pose={mascotPose(gf)} gf={gf} look={mascotLook(gf)} /> : null;
+        if (!p) return null;
+        return (
+          <group>
+            {p[1] > 0.3 && (
+              // banquinho de madeira para alcançar o topo do tanque
+              <group position={[p[0], 0, p[2]]}>
+                <B x={[-0.32, 0.32]} y={[p[1] - 0.08, p[1]]} z={[-0.28, 0.28]} c="#a0643c" />
+                {[-0.26, 0.26].map((dx) => <B key={dx} x={[dx - 0.04, dx + 0.04]} y={[0.06, p[1] - 0.08]} z={[-0.24, 0.24]} c="#8a5a2b" />)}
+              </group>
+            )}
+            <Mascot position={p} scale={0.8} pose={mascotPose(gf)} gf={gf} look={mascotLook(gf)} />
+          </group>
+        );
       })()}
 
       <Clouds gf={gf} />
