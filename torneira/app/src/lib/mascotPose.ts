@@ -3,6 +3,17 @@ import {VO_OFFSET, finalCut, sceneAt, wordLocal} from "../data/scenes";
 import type {MascotLook, MascotPose} from "../components/Mascot";
 import {L, clamp01, easeInOut} from "./anim";
 
+/** s2: janela do "rebobinar" a partir do "Por isso". null = fora; >=0 = frame local a mostrar; -1 = depois */
+export const s2Rewind = (s: ReturnType<typeof sceneAt>, f: number): number | null => {
+  const p = wordLocal(s, "Por");
+  const im = wordLocal(s, "Agora");
+  if (p === undefined || im === undefined || f < p) return null;
+  const R = REWIND_FRAMES;
+  if (f < p + R) return Math.round(p - ((f - p) / R) * (p - im));
+  return -1;
+};
+export const REWIND_FRAMES = 26;
+
 const talkAt = (gf: number) => {
   const s = sceneAt(gf);
   if (!s.voWords) return 0;
@@ -20,9 +31,12 @@ export const mascotLook = (gf: number): MascotLook => {
   const W = (w: string, fb: number) => wordLocal(s, w) ?? Math.round(fb * s.durationInFrames);
   switch (s.id) {
     case "s2": {
-      // pega o copo, bebe e depois deixa cair (passou mal)
-      const b = W("beber", 0.45);
-      return f > s.durationInFrames * 0.12 && f < b + 12 ? {prop: "glassDirty", propHand: "r", propTilt: f > b - 18 ? 35 : 0} : {};
+      // pega o copo, imagina beber, bebe, larga o copo e passa mal; no "Por isso" tudo rebobina
+      const r = s2Rewind(s, f);
+      if (r !== null) return r < 0 ? {} : mascotLook(s.startFrame + r);
+      const b = W("beber", 0.22), res = W("Resultado", 0.6);
+      if (f < s.durationInFrames * 0.07 || f >= res) return {};
+      return {prop: "glassDirty", propHand: "r", propTilt: f > b && f < b + 40 ? 35 : 0};
     }
     case "s4": {
       const a = W("produto", 0.3), b = W("maiores", 0.7);
@@ -37,7 +51,7 @@ export const mascotLook = (gf: number): MascotLook => {
       return {prop: "glass", propHand: "r"};
     case "s11": {
       if (gf < finalCut) return {};
-      const ci = wordLocal(s, "comente") ?? 0;
+      const ci = wordLocal(s, "Comenta") ?? 0;
       return f >= ci - 6 && f < ci + 45 ? {rHand: "point"} : {};
     }
   }
@@ -69,19 +83,31 @@ export const mascotPose = (gf: number): MascotPose => {
       break;
     }
     case "s2": {
-      // o boneco testa: bebe a água da represa e passa mal
-      const so = wordLocal(s, "Só") ?? s.durationInFrames * 0.35;
-      const b = wordLocal(s, "beber") ?? s.durationInFrames * 0.45;
-      if (f < s.durationInFrames * 0.12) {
+      // o boneco testa: imagina beber a água da represa, bebe e passa mal... e a cena rebobina
+      const r = s2Rewind(s, f);
+      if (r !== null) {
+        if (r >= 0) return mascotPose(s.startFrame + r);
+        pose.emotion = "worried"; // de volta ao começo: "melhor não!"
+        pose.rArm = [-55, 48 + Math.sin(gf * 0.4) * 10];
+        break;
+      }
+      const im = wordLocal(s, "imagina") ?? s.durationInFrames * 0.2;
+      const b = wordLocal(s, "beber") ?? s.durationInFrames * 0.22;
+      const t = wordLocal(s, "terra") ?? s.durationInFrames * 0.38;
+      const res = wordLocal(s, "Resultado") ?? s.durationInFrames * 0.6;
+      if (f < s.durationInFrames * 0.07) {
         pose.emotion = "curious";
-      } else if (f < so - 6) {
-        pose.emotion = "curious";
+      } else if (f < b) {
+        pose.emotion = f < im - 6 ? "happy" : "curious";
         pose.rArm = [-75, 12]; // olha a água no copo
-      } else if (f < b + 12) {
+      } else if (f < b + 40) {
         pose.emotion = "happy";
         pose.rArm = [-113.5, -39]; // bebe
+      } else if (f < res) {
+        pose.emotion = f < t ? "curious" : "surprised"; // percebe a sujeira no copo
+        pose.rArm = [-75, 12];
       } else {
-        const k = clamp01((f - b - 12) / 20);
+        const k = clamp01((f - res) / 20);
         pose.sick = k;
         pose.emotion = k > 0.3 ? "sick" : "surprised";
         pose.lArm = [-35, -28]; // mãos na barriga
@@ -129,7 +155,7 @@ export const mascotPose = (gf: number): MascotPose => {
     case "s11": {
       if (gf < finalCut) break;
       const c = gf - finalCut;
-      const ci = wordLocal(s, "comente") ?? 0;
+      const ci = wordLocal(s, "Comenta") ?? 0;
       const fw = wordLocal(s, "segue") ?? 0;
       if (c < 80) {
         pose.emotion = "joy";

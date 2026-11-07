@@ -35,3 +35,7 @@
 - Mascote testa a água da represa: bebe, fica verde, mãos na barriga; aviso "DÁ DOR DE BARRIGA, DIARREIA E VÔMITO" (conteúdo novo na tela, coerente com a narração "essa água não dá pra beber").
 - Câmera sempre em movimento (órbita contínua, respiração de zoom, leve flutuação).
 - Gráficos: sombras suaves, água brilhante com ondinhas, pedras.
+
+## v5 (roteiro no estilo do vídeo de exemplo, aprovado em 2026-11-07)
+- Voz Liam (`TX3LPaxmHKxFdv7VOQHJ`) gerada pelo workflow `voz-torneira` com tempos por palavra (372 palavras, 145,6 s de fala); as palavras batem 1:1 com o roteiro.
+- Recursos visuais novos: pergunta grande no início; etiquetas brancas com bolinha colorida; termos técnicos em título grande amarelo antes de virarem etiqueta; círculo vermelho desenhado em volta do ponto 3D que importa; ✓/✕ grandes; "imagina beber" com pausa, tela em tom de imaginação e REBOBINAR no "Por isso" (o mascote volta no tempo); cartão DICA (a cada 6 meses); pergunta final "Você já limpou sua caixa d'água? COMENTA AÍ!" com confete.

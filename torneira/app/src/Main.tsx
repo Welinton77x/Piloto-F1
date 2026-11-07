@@ -3,9 +3,9 @@ import {AbsoluteFill, Audio, Sequence, continueRender, delayRender, staticFile, 
 import * as THREE from "three";
 import {ThreeCanvas} from "@remotion/three";
 import {useThree} from "@react-three/fiber";
-import {VO_OFFSET, config, finalCut, hasVO, timed} from "./data/scenes";
+import {VO_OFFSET, config, finalCut, hasVO, sceneAt, timed} from "./data/scenes";
 import {WaterWorld} from "./components/WaterWorld";
-import {Overlay} from "./components/Overlay";
+import {Overlay, imagineAmount} from "./components/Overlay";
 import {FOV, poseAt} from "./lib/camera";
 import {track} from "./lib/track";
 import {clamp01, mixHex} from "./lib/anim";
@@ -66,10 +66,23 @@ export const Scene3D: React.FC<{at?: number; fixed?: FixedPose; sunny?: boolean;
   );
 };
 
+/** s2 "imagina beber...": a cena fica com cor de lembrança/imaginação até o rebobinar */
+const World: React.FC = () => {
+  const gf = useCurrentFrame();
+  const s = sceneAt(gf);
+  const k = imagineAmount(s, gf - s.startFrame);
+  const filter = k > 0.01 ? `saturate(${1 - 0.7 * k}) sepia(${0.45 * k}) contrast(${1 + 0.06 * k})` : undefined;
+  return (
+    <AbsoluteFill style={{filter}}>
+      <Background />
+      <Scene3D />
+    </AbsoluteFill>
+  );
+};
+
 export const Main: React.FC = () => (
   <AbsoluteFill style={{backgroundColor: "#101820"}}>
-    <Background />
-    <Scene3D />
+    <World />
     {timed.map((s) => (
       <Sequence key={s.id} from={s.startFrame} durationInFrames={s.durationInFrames} name={s.id}>
         <Overlay s={s} />

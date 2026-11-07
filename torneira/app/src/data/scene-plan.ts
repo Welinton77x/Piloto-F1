@@ -34,7 +34,7 @@ export const scenes: ScenePlan[] = [
       { target: "glass.fill", unit: "0-1", from: 0, to: 0.8, f0: 35, f1: 120, fn: "easeOut" },
       { target: "wallPipe.glow", unit: "0-1", from: 0, to: 1, f0: 140, f1: 210, fn: "sin" },
     ],
-    badges: [{ text: "DE ONDE VEM?", kind: "attention", f0: 60, anchorWord: "perguntou" }], highlights: ["torneira", "onde"], captions: cap,
+    badges: [] /* pergunta grande (TitleCard) */, highlights: ["torneira", "onde"], captions: cap,
     audioCues: [cue("music-in", 0, "music"), cue("faucet-open", 10), cue("water-glass", 30), cue("pop-badge", 150)] },
 
   { id: "s2", voKey: "s2", startFrame: 210, durationInFrames: 240,
@@ -144,7 +144,7 @@ export const scenes: ScenePlan[] = [
       { target: "tapStream.opacity", unit: "0-1", from: 0, to: 1, f0: 140, f1: 160, fn: "linear" },
       { target: "glass.fill", unit: "0-1", from: 0, to: 0.8, f0: 150, f1: 200, fn: "easeOut" },
     ],
-    badges: [{ text: "RESERVA EM CASA", kind: "solution", f0: 40, anchorWord: "reserva" }, { text: "DICA: LIMPE A CADA 6 MESES", kind: "attention", f0: 100, anchorWord: "dica" }], highlights: ["reserva", "gravidade", "torneira"], captions: cap,
+    badges: [{ text: "RESERVA EM CASA", kind: "solution", f0: 40, anchorWord: "reserva", untilWord: "dica" }] /* + cartão DICA */, highlights: ["reserva", "gravidade", "torneira"], captions: cap,
     audioCues: [cue("water-glass", 150)] },
 
   { id: "s11", voKey: "s11", startFrame: 2265, durationInFrames: 645,
