@@ -137,7 +137,7 @@ export const scenes: ScenePlan[] = [
 
   { id: "s10", voKey: "s10", startFrame: 2055, durationInFrames: 210,
     narration: "A caixa guarda uma reserva, e a gravidade leva a água até a torneira.",
-    camera: [{ f: 0, az: 10, el: 10, dist: 7, target: [10.5, 1.8, -0.8] }, { f: 210, az: -10, el: 6, dist: 4.2, target: [9.75, 1.15, -0.8] }],
+    camera: [{ f: 0, az: 10, el: 10, dist: 7, target: [10.5, 1.8, -0.8] }, { f: 210, az: -6, el: 6, dist: 4.4, target: [9.95, 1.15, -0.8] }],
     objects: ["roofTank", "downPipe", "faucet", "glass", "mascot"],
     animations: [
       { target: "houseDown.offset", unit: "u3d", from: 0, to: 2, f0: 20, f1: 150, fn: "linear" },
