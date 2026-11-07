@@ -4,9 +4,9 @@ import React, {useMemo} from "react";
 import * as THREE from "three";
 import {RoundedBoxGeometry} from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 import {random} from "remotion";
-import {rad} from "../lib/anim";
+import {mixHex, rad} from "../lib/anim";
 
-export type Emotion = "happy" | "surprised" | "worried" | "annoyed" | "scared" | "relieved" | "joy" | "grin";
+export type Emotion = "happy" | "surprised" | "worried" | "annoyed" | "scared" | "relieved" | "joy" | "grin" | "sick" | "curious";
 export type MascotPose = {
   emotion: Emotion;
   talk: number; // 0-1 abertura da boca falando
@@ -17,6 +17,7 @@ export type MascotPose = {
   jump: number; // u (antes da escala)
   shiver: number; // 0-1
   walking: boolean;
+  sick?: number; // 0-1: rosto esverdeado (passou mal)
 };
 
 const col = {
@@ -69,10 +70,12 @@ const Face: React.FC<{emotion: Emotion; talk: number; blink: number}> = ({emotio
     annoyed: [-0.01, -18],
     joy: [0.05, 0],
     grin: [0.045, 4],
+    sick: [0.03, 14],
+    curious: [0.06, -6],
   };
   const [by, bt] = brow[emotion];
   const eyesClosedHappy = emotion === "joy";
-  const eyeScaleY = (emotion === "surprised" || emotion === "scared" ? 1.25 : 1) * (1 - blink * 0.9);
+  const eyeScaleY = (emotion === "surprised" || emotion === "scared" ? 1.25 : emotion === "sick" ? 0.5 : 1) * (1 - blink * 0.9);
   const open = Math.max(talk, emotion === "surprised" ? 0.55 : emotion === "scared" ? 0.75 : emotion === "joy" ? 0.85 : 0);
   let mouth: React.ReactNode;
   if (emotion === "grin") {
@@ -114,6 +117,24 @@ const Face: React.FC<{emotion: Emotion; talk: number; blink: number}> = ({emotio
           </mesh>
         )}
       </group>
+    );
+  } else if (emotion === "sick") {
+    mouth = (
+      <group position={[0, -0.14, zf + 0.004]}>
+        {[-1, 1].map((sd) => (
+          <mesh key={sd} position={[sd * 0.028, 0, 0]} rotation={[0, 0, sd > 0 ? 0 : Math.PI]}>
+            <torusGeometry args={[0.028, 0.01, 6, 12, Math.PI]} />
+            <Mat c={col.dark} />
+          </mesh>
+        ))}
+      </group>
+    );
+  } else if (emotion === "curious") {
+    mouth = (
+      <mesh position={[0, -0.13, zf + 0.004]} scale={[0.025, 0.03, 0.012]}>
+        <sphereGeometry args={[1, 12, 8]} />
+        <Mat c={col.mouth} />
+      </mesh>
     );
   } else if (emotion === "annoyed") {
     mouth = (
@@ -433,6 +454,7 @@ const CapLogo: React.FC = () => {
 export const Mascot: React.FC<{position: [number, number, number]; scale?: number; pose: MascotPose; gf: number; look?: MascotLook}> = ({position, scale = 1, pose, gf, look = {}}) => {
   const curly = look.hair === "curly";
   const overall = look.outfit === "overall";
+  const headSkin = mixHex(col.skin, "#a8d08d", pose.sick ?? 0);
   const period = 95;
   const ph = (gf + Math.floor(random("blink") * period)) % period;
   const blink = ph < 4 ? 1 - Math.abs(ph - 2) / 2 : 0;
@@ -495,11 +517,11 @@ export const Mascot: React.FC<{position: [number, number, number]; scale?: numbe
       </Arm>
       <Arm side={1} rot={pose.rArm} hand={look.rHand}>{look.prop && look.propHand !== "l" ? <group rotation={new THREE.Euler(-rad(pose.rArm[0]), 0, -rad(pose.rArm[1]), "ZYX")}><PropMesh prop={look.prop} tilt={look.propTilt ?? 0} pouring={look.pouring ?? 0} side={1} /></group> : null}{look.wrench && !look.wrenchLeft ? <group rotation={new THREE.Euler(-rad(pose.rArm[0]), 0, -rad(pose.rArm[1]), "ZYX")}><Wrench tilt={look.wrenchTilt} /></group> : null}</Arm>
       <group position={[0, 1.5 + breath * 0.5, 0]} rotation={[0, 0, rad(headTilt)]} scale={0.86}>
-        <RB w={0.54} h={0.5} d={0.48} r={0.14} c={col.skin} />
+        <RB w={0.54} h={0.5} d={0.48} r={0.14} c={headSkin} />
         {[-1, 1].map((s) => (
           <mesh key={s} position={[s * 0.275, -0.02, 0]} scale={[0.5, 1, 0.8]}>
             <sphereGeometry args={[0.07, 12, 10]} />
-            <Mat c={col.skin} />
+            <Mat c={headSkin} />
           </mesh>
         ))}
         {curly ? (
@@ -544,6 +566,17 @@ export const Mascot: React.FC<{position: [number, number, number]; scale?: numbe
           </group>
         )}
         <Face emotion={pose.emotion} talk={pose.talk} blink={blink} />
+        {/* passando mal: estrelinhas/bolhas verdes girando em volta da cabeça */}
+        {(pose.sick ?? 0) > 0.4 &&
+          [0, 1, 2].map((i) => {
+            const a = gf * 0.12 + (i * Math.PI * 2) / 3;
+            return (
+              <mesh key={i} position={[Math.cos(a) * 0.36, 0.42 + Math.sin(gf * 0.2 + i) * 0.03, Math.sin(a) * 0.36]}>
+                <icosahedronGeometry args={[0.04, 0]} />
+                <meshStandardMaterial color="#9be15d" emissive="#7ed957" emissiveIntensity={0.6} />
+              </mesh>
+            );
+          })}
       </group>
     </group>
   );

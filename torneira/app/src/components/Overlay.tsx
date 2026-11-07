@@ -197,7 +197,7 @@ const Panel: React.FC<{top: number; height: number; children: React.ReactNode; s
 
 /* s2: lupa com micróbios na água bruta */
 const Lens: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
-  const a = Math.round(160 * s.k);
+  const a = wordLocal(s, "micróbios") ?? Math.round(160 * s.k);
   if (f < a) return null;
   const sc = SP(f, a, 12, 140);
   const mic = (i: number) => {
@@ -206,7 +206,7 @@ const Lens: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
     return {x: 230 + Math.cos(ang) * r, y: 230 + Math.sin(ang * 1.3) * r, c: ["#7ed957", "#b388ff", "#ffb74d"][i % 3]};
   };
   return (
-    <div style={{position: "absolute", left: 310, top: 640, width: 460, height: 460, transform: `scale(${sc})`}}>
+    <div style={{position: "absolute", left: 600, top: 520, width: 460, height: 460, transform: `scale(${sc * 0.72})`, transformOrigin: "100% 0%"}}>
       <svg width={460} height={520} viewBox="0 0 460 520">
         <defs>
           <clipPath id="lensClip"><circle cx={230} cy={230} r={200} /></clipPath>

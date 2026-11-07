@@ -23,12 +23,16 @@ export const poseAt = (gf: number): Pose => {
     keys.length === 1
       ? fn(keys[0])
       : interpolate(f, keys.map((k) => k.f), keys.map(fn), {extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.inOut(Easing.cubic)});
-  const drift = Math.sin(gf / 85) * 1.2; // deriva lenta: nunca parada
-  const az = rad(g((k) => k.az) + drift);
-  const el = rad(g((k) => k.el));
-  const d = g((k) => k.dist);
+  // câmera sempre em movimento (pedido do usuário): órbita lenta contínua + respiração de zoom + leve flutuação.
+  // Em cada cena a órbita avança num sentido, então nunca há um quadro parado.
+  const sceneIdx = Number(s.id.slice(1)) || 0;
+  const dir = sceneIdx % 2 ? 1 : -1;
+  const orbit = dir * (f / Math.max(1, s.durationInFrames)) * 7 + Math.sin(gf / 55) * 2.2;
+  const az = rad(g((k) => k.az) + orbit);
+  const el = rad(g((k) => k.el) + Math.sin(gf / 70) * 1.5);
+  const d = g((k) => k.dist) * (1 - 0.05 * (f / Math.max(1, s.durationInFrames)) + 0.015 * Math.sin(gf / 40));
   const tx = mapX(g((k) => k.target[0]));
-  const ty = mapY(g((k) => k.target[1]));
+  const ty = mapY(g((k) => k.target[1])) + Math.sin(gf / 47) * 0.03;
   const tz = g((k) => k.target[2]);
   const pos = new THREE.Vector3(tx + d * Math.sin(az) * Math.cos(el), ty + d * Math.sin(el), tz + d * Math.cos(az) * Math.cos(el));
   return {pos, target: new THREE.Vector3(tx, ty, tz)};

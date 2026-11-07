@@ -28,3 +28,10 @@
 - Narração v3 (314 palavras) na voz Matheus – Energic Young Voice: 1.699 créditos (a conta ficou com ~5 créditos). Transcrição do conector estava ocupada; frases alinhadas pelas pausas do áudio e palavras distribuídas dentro de cada frase. Voz desacelerada 12% (atempo 0,88) com pausas de 0,22 s entre frases → ~180 pal/min (referência medida: 185–200).
 - Mascote participa de cada etapa: copo de água suja na represa, aperta o botão da bomba, despeja o coagulante com jarra (banquinho), aponta flocos e camadas, pinga o cloro (banquinho), aponta reservatório e hidrômetro, bebe a água, comemora.
 - Entrega v3: 1080×1920, 30 fps, 3036 frames, 101,3 s; −15,1 LUFS, pico −3,3 dBFS; áudio em todos os segundos. Cópia do repositório recomprimida (CRF 21) para caber no limite do GitHub. Não verificado por audição.
+
+## v4 (pedidos do usuário, 2026-11-07)
+- Legendas sincronizadas com a transcrição real (ElevenLabs STT via GitHub Actions, chave do repositório).
+- Sem sincronia labial: só reações no rosto (curioso, surpreso, enjoado, feliz…).
+- Mascote testa a água da represa: bebe, fica verde, mãos na barriga; aviso "DÁ DOR DE BARRIGA, DIARREIA E VÔMITO" (conteúdo novo na tela, coerente com a narração "essa água não dá pra beber").
+- Câmera sempre em movimento (órbita contínua, respiração de zoom, leve flutuação).
+- Gráficos: sombras suaves, água brilhante com ondinhas, pedras.

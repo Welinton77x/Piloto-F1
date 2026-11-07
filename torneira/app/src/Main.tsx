@@ -58,7 +58,7 @@ export const Scene3D: React.FC<{at?: number; fixed?: FixedPose; sunny?: boolean;
   const gf = at ?? cur;
   const {width, height} = useVideoConfig();
   return (
-    <ThreeCanvas width={width} height={height} camera={{fov: FOV, near: 0.1, far: 400, position: [0, 2, 40]}}>
+    <ThreeCanvas width={width} height={height} shadows={{type: THREE.PCFSoftShadowMap}} camera={{fov: FOV, near: 0.1, far: 400, position: [0, 2, 40]}}>
       <CamRig at={at} fixed={fixed} />
       <WaterWorld gf={gf} />
       {children}

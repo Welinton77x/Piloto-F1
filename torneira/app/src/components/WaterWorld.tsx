@@ -209,8 +209,67 @@ const Tank: React.FC<{x: [number, number]; h?: number; children?: React.ReactNod
   </group>
 );
 
+/** sol com sombras suaves; a área de sombra acompanha o ponto para onde a câmera olha */
+const SunLight: React.FC<{gf: number}> = ({gf}) => {
+  const ref = useRef<THREE.DirectionalLight>(null);
+  const {target} = poseAt(gf);
+  useLayoutEffect(() => {
+    const l = ref.current;
+    if (!l) return;
+    l.position.set(target.x + 5, target.y + 10, target.z + 8);
+    l.target.position.copy(target);
+    l.target.updateMatrixWorld();
+    const c = l.shadow.camera as THREE.OrthographicCamera;
+    c.left = -8; c.right = 8; c.top = 8; c.bottom = -8; c.near = 0.5; c.far = 40;
+    c.updateProjectionMatrix();
+  });
+  return <directionalLight ref={ref} intensity={1.75} color="#fff1d6" castShadow shadow-mapSize-width={2048} shadow-mapSize-height={2048} shadow-bias={-0.0004} shadow-normalBias={0.02} />;
+};
+
+/** liga sombras em tudo (menos grama instanciada e coisas transparentes) */
+const useShadows = (ref: React.RefObject<THREE.Group | null>) =>
+  useLayoutEffect(() => {
+    ref.current?.traverse((o) => {
+      const m = o as THREE.Mesh;
+      if (!m.isMesh) return;
+      const mat = m.material as THREE.Material;
+      const transparent = Array.isArray(mat) ? false : mat?.transparent;
+      m.receiveShadow = true;
+      m.castShadow = !(o as THREE.InstancedMesh).isInstancedMesh && !transparent;
+    });
+  });
+
+/** pedras arredondadas */
+const Rocks: React.FC<{spots: [number, number, number][]}> = ({spots}) => (
+  <group>
+    {spots.map(([x, z, s], i) => (
+      <mesh key={i} position={[x, 0.04, z]} scale={[s * 1.3, s * 0.7, s]} rotation={[0, i * 1.7, 0]}>
+        <dodecahedronGeometry args={[0.22, 1]} />
+        <M c={i % 3 ? "#9aa3ad" : "#b8c0c8"} />
+      </mesh>
+    ))}
+  </group>
+);
+
+/** ondinhas na superfície da água */
+const Ripples: React.FC<{gf: number; x: [number, number]; y: number}> = ({gf, x, y}) => (
+  <group>
+    {Array.from({length: 7}).map((_, i) => {
+      const t = ((gf * 0.012 + random("rp" + i)) % 1);
+      return (
+        <mesh key={i} position={[x[0] + 0.4 + random("rx" + i) * (x[1] - x[0] - 0.8), y + 0.012, FACE - 0.4 - random("rz" + i) * 3]} rotation={[-Math.PI / 2, 0, 0]} scale={0.15 + t * 0.6}>
+          <ringGeometry args={[0.9, 1, 32]} />
+          <meshBasicMaterial color="#ffffff" transparent opacity={0.45 * (1 - t)} depthWrite={false} />
+        </mesh>
+      );
+    })}
+  </group>
+);
+
 /* ================= MUNDO ================= */
 export const WaterWorld: React.FC<{gf: number}> = ({gf}) => {
+  const rootRef = useRef<THREE.Group>(null);
+  useShadows(rootRef);
   const s2 = S("s2"), s3 = S("s3"), s4 = S("s4"), s5 = S("s5"), s7 = S("s7"), s8 = S("s8"), s11 = S("s11");
   const camDist = poseAt(gf).pos.distanceTo(poseAt(gf).target);
 
@@ -261,7 +320,7 @@ export const WaterWorld: React.FC<{gf: number}> = ({gf}) => {
   const houseX = 10.5;
 
   return (
-    <group>
+    <group ref={rootRef}>
       {/* ---------- SOLO EM CORTE E CHÃO ---------- */}
       {/* solo, com a bacia da represa recortada */}
       <B x={[-40, -14]} y={[-12, -0.5]} c={C.soil2} />
@@ -277,6 +336,12 @@ export const WaterWorld: React.FC<{gf: number}> = ({gf}) => {
 
       {/* ---------- REPRESA ---------- */}
       <B x={[-14, -9]} y={[-2.2, -0.35]} c={mixHex(C.water, C.turbid, 0.35)} o={0.85} />
+      <mesh position={[-11.5, -0.349, (FACE + FAR) / 2]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[5, FACE - FAR]} />
+        <meshStandardMaterial color="#5a9fc4" roughness={0.12} metalness={0.25} transparent opacity={0.55} />
+      </mesh>
+      <Ripples gf={gf} x={[-14, -9]} y={-0.35} />
+      <Rocks spots={[[-14.3, 0.6, 1.1], [-14.6, -0.4, 0.8], [-8.7, -1.5, 0.9], [-14.2, -2.2, 1.2], [-8.75, 0.9, 0.6], [-6.6, 0.5, 0.7], [2.0, 0.7, 0.8], [4.6, 0.6, 0.9], [12.9, 0.4, 1.0], [5.3, -2.2, 0.8]]} />
       {/* folhas boiando e terra na água */}
       {Array.from({length: 10}).map((_, i) => (
         <mesh key={"lf" + i} position={[-13.6 + random("lx" + i) * 4.2 + Math.sin(gf / 90 + i) * 0.15, -0.33, FACE - 0.2 - random("lz" + i) * 3]} rotation={[-Math.PI / 2, 0, random("lr" + i) * 6]} scale={[1, 0.6, 1]}>
@@ -667,7 +732,7 @@ export const WaterWorld: React.FC<{gf: number}> = ({gf}) => {
       <fog attach="fog" args={["#d6ecfb", camDist + 10, camDist + 60]} />
       <ambientLight intensity={0.3} />
       <hemisphereLight args={["#d6ecff", "#5d7a3a", 0.9]} />
-      <directionalLight position={[5, 10, 8]} intensity={1.7} color="#fff1d6" />
+      <SunLight gf={gf} />
       <directionalLight position={[-6, 4, 9]} intensity={0.35} color="#cfe3ff" />
     </group>
   );

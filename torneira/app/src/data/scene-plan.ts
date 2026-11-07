@@ -39,14 +39,14 @@ export const scenes: ScenePlan[] = [
 
   { id: "s2", voKey: "s2", startFrame: 210, durationInFrames: 240,
     narration: "Tudo começa num rio ou numa represa. Só que essa água não dá pra beber: ela tem terra, folhas e micróbios tão pequenos que você nem enxerga.",
-    camera: [{ f: 0, az: 5, el: 6, dist: 3.4, target: [10.5, 1.2, 0] }, { f: 60, az: 10, el: 12, dist: 12, target: [-9.9, 0.5, 0.3] }, { f: 150, az: 12, el: 12, dist: 11, target: [-9.7, 0.6, 0.3] }, { f: 151, az: 0, el: 10, dist: 4, target: [-11, -0.3, 0.5] }, { f: 240, az: 6, el: 10, dist: 4, target: [-11, -0.3, 0.5] }],
+    camera: [{ f: 0, az: 5, el: 6, dist: 3.4, target: [10.5, 1.2, 0] }, { f: 45, az: -12, el: 8, dist: 6.0, target: [-9.05, 1.0, 0.75] }, { f: 240, az: -2, el: 6, dist: 5.2, target: [-8.85, 1.05, 0.75] }],
     objects: ["lake", "shore", "trees", "leaves", "dirtParticles", "lens2D", "microbes2D"],
     animations: [
       { target: "camera.travel", unit: "spring", from: 0, to: 1, f0: 0, f1: 60, fn: "spring" },
       { target: "dirt.particles", unit: "seeded", from: 0, to: 1, f0: 60, f1: 240, fn: "seeded" },
       { target: "lens.scale", unit: "x", from: 0, to: 1, f0: 160, f1: 175, fn: "spring" },
     ],
-    badges: [{ text: "ÁGUA BRUTA", kind: "problem", f0: 120, anchorWord: "terra" }], highlights: ["rio", "represa", "micróbios"], captions: cap,
+    badges: [{ text: "ÁGUA BRUTA", kind: "problem", f0: 120, anchorWord: "terra" }, { text: "DÁ DOR DE BARRIGA, DIARREIA E VÔMITO", kind: "problem", f0: 170, anchorWord: "folhas" }], highlights: ["rio", "represa", "micróbios"], captions: cap,
     audioCues: [cue("whoosh-pipe", 0), cue("water-ambience", 60)] },
 
   { id: "s3", voKey: "s3", startFrame: 450, durationInFrames: 210,

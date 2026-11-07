@@ -19,8 +19,11 @@ export const mascotLook = (gf: number): MascotLook => {
   const f = gf - s.startFrame;
   const W = (w: string, fb: number) => wordLocal(s, w) ?? Math.round(fb * s.durationInFrames);
   switch (s.id) {
-    case "s2":
-      return f > s.durationInFrames * 0.3 ? {prop: "glassDirty", propHand: "r"} : {};
+    case "s2": {
+      // pega o copo, bebe e depois deixa cair (passou mal)
+      const b = W("beber", 0.45);
+      return f > s.durationInFrames * 0.12 && f < b + 12 ? {prop: "glassDirty", propHand: "r", propTilt: f > b - 18 ? 35 : 0} : {};
+    }
     case "s4": {
       const a = W("produto", 0.3), b = W("maiores", 0.7);
       const tilt = f < b + 10 ? L(f, a - 6, a + 8, 0, 80, easeInOut) : L(f, b + 10, b + 22, 80, 0, easeInOut);
@@ -48,7 +51,7 @@ export const mascotPose = (gf: number): MascotPose => {
   const sway = Math.sin(gf * 0.07) * 4;
   const pose: MascotPose = {
     emotion: "happy",
-    talk: talkAt(gf),
+    talk: 0, // sem sincronia labial: só reações no rosto (pedido do usuário)
     lArm: [4 + sway * 0.3, 12],
     rArm: [-30 + Math.sin(gf * 0.12) * 8, 22], // gesticula falando
     umbrella: "none",
@@ -66,9 +69,25 @@ export const mascotPose = (gf: number): MascotPose => {
       break;
     }
     case "s2": {
-      const b = wordLocal(s, "beber") ?? s.durationInFrames * 0.5;
-      pose.emotion = f < b ? "happy" : "annoyed"; // cara de nojo com a água suja
-      if (f > s.durationInFrames * 0.3) pose.rArm = [-95, 8]; // levanta o copo de água da represa
+      // o boneco testa: bebe a água da represa e passa mal
+      const so = wordLocal(s, "Só") ?? s.durationInFrames * 0.35;
+      const b = wordLocal(s, "beber") ?? s.durationInFrames * 0.45;
+      if (f < s.durationInFrames * 0.12) {
+        pose.emotion = "curious";
+      } else if (f < so - 6) {
+        pose.emotion = "curious";
+        pose.rArm = [-75, 12]; // olha a água no copo
+      } else if (f < b + 12) {
+        pose.emotion = "happy";
+        pose.rArm = [-113.5, -39]; // bebe
+      } else {
+        const k = clamp01((f - b - 12) / 20);
+        pose.sick = k;
+        pose.emotion = k > 0.3 ? "sick" : "surprised";
+        pose.lArm = [-35, -28]; // mãos na barriga
+        pose.rArm = [-35, -28];
+        pose.shiver = 0.5 * k;
+      }
       break;
     }
     case "s3": {
@@ -82,11 +101,11 @@ export const mascotPose = (gf: number): MascotPose => {
       pose.rArm = [-105, 22]; // segura a jarra sobre o tanque
       break;
     case "s5":
-      pose.emotion = "surprised";
+      pose.emotion = p < 0.3 ? "curious" : "surprised";
       pose.rArm = [-40, 35]; // aponta os flocos afundando
       break;
     case "s6":
-      pose.emotion = "happy";
+      pose.emotion = p < 0.35 ? "curious" : "happy";
       pose.rArm = [-50, 38]; // mostra as camadas
       break;
     case "s7": {
@@ -96,11 +115,11 @@ export const mascotPose = (gf: number): MascotPose => {
       break;
     }
     case "s8":
-      pose.emotion = "happy";
+      pose.emotion = p < 0.4 ? "surprised" : "happy";
       pose.rArm = [-100, 20]; // aponta para o reservatório lá em cima
       break;
     case "s9":
-      pose.emotion = "happy";
+      pose.emotion = p < 0.4 ? "curious" : "happy";
       pose.rArm = [-75, 35]; // aponta para o hidrômetro, ao lado dele na calçada
       break;
     case "s10":
