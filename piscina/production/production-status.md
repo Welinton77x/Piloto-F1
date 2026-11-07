@@ -1,6 +1,6 @@
 # Status de produção — Vídeo 3: Como um buraco no quintal de casa vira uma piscina?
 
-- **Fase:** 1 — roteiro v1 entregue. **AGUARDANDO APROVAÇÃO — implementação e renderização não iniciadas.**
+- **Fase:** 1 — roteiro v2 entregue (v1 revisado a pedido: desconstrução, mascote só em partes importantes de roupa de banho, pausa/rebobinar em cada erro, círculo vermelho só em 3 pontos). **AGUARDANDO APROVAÇÃO — implementação e renderização não iniciadas.**
 - **Tema escolhido pelo usuário** em 2026-11-07.
 - **Arquivos:** `piscina/production/roteiro.md`, `piscina/production/scene-plan.ts`.
 - **Plano técnico:** reaproveitar o projeto do vídeo 2 (`torneira/app`) como base: mascote, legendas, etiquetas, títulos amarelos, círculo vermelho 3D, ✓/✕, pausa/imaginação/rebobinar, pergunta final com confete, voz Liam via workflow do GitHub.
