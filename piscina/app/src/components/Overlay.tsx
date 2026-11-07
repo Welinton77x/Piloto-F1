@@ -6,7 +6,7 @@ import type {TimedScene} from "../data/scenes";
 import {L, SP, clamp01, easeOut, mixHex} from "../lib/anim";
 import {project} from "../lib/camera";
 import {track} from "../lib/track";
-import {REWINDS, RW, imagineAmount, te} from "../lib/story";
+import {REWINDS, RW, heat, imagineAmount, te} from "../lib/story";
 
 export const FONT = "Montserrat";
 const KIND: Record<Kind, {bg: string; fg: string}> = {
@@ -98,9 +98,10 @@ const Badges: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
 
 /* ---------- s1: a pergunta grande ---------- */
 const TitleCard: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
-  const a = wordLocal(s, "vontade") ?? 10;
-  if (f < a - 4) return null;
-  const sc = SP(f, a - 4, 10, 140);
+  const a = (wordLocal(s, "Dia") ?? 10) + 4;
+  const out = (wordLocal(s, "ideia") ?? 1e9) - 8; // some quando o mascote levanta com a ideia
+  if (f < a - 4 || f >= out + 8) return null;
+  const sc = SP(f, a - 4, 10, 140) * (1 - clamp01((f - out) / 8));
   const line = (t: string, c: string, fs: number, d: number) => (
     <div style={{fontSize: fs, color: c, transform: `scale(${SP(f, a - 4 + d, 10, 160)})`}}>{t}</div>
   );
@@ -110,6 +111,39 @@ const TitleCard: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
       {line("VIRA UMA", "#FFFFFF", 92, 4)}
       {line("PISCINA?", "#FFD60A", 140, 8)}
     </div>
+  );
+};
+
+/* ---------- s1: calor — sol forte, termômetro e ondas de calor ---------- */
+const Heat: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
+  const k = heat(s.startFrame + f);
+  if (k <= 0.01) return null;
+  const temp = Math.round(L(f, 0, (wordLocal(s, "derretendo") ?? 60) + 10, 32, 41));
+  return (
+    <AbsoluteFill style={{pointerEvents: "none", opacity: k}}>
+      {/* ondas de calor */}
+      {Array.from({length: 6}).map((_, i) => (
+        <svg key={i} width={1080} height={60} style={{position: "absolute", left: 0, top: 1500 - ((f * 3 + i * 230) % 1300), opacity: 0.22}}>
+          <path d={`M0 30 ${Array.from({length: 12}).map((__, j) => `Q ${j * 90 + 45} ${30 + (j % 2 ? -18 : 18) * Math.sin(f * 0.1 + i)} ${(j + 1) * 90} 30`).join(" ")}`} stroke="#ffffff" strokeWidth={6} fill="none" />
+        </svg>
+      ))}
+      {/* sol */}
+      <svg width={300} height={300} viewBox="-150 -150 300 300" style={{position: "absolute", right: -40, top: 560, transform: `rotate(${f * 0.8}deg) scale(${1 + 0.05 * Math.sin(f * 0.2)})`}}>
+        {Array.from({length: 12}).map((_, i) => (
+          <rect key={i} x={-10} y={-140} width={20} height={44} rx={10} fill="#ffb300" transform={`rotate(${i * 30})`} />
+        ))}
+        <circle r={78} fill="#ffd54f" stroke="#ff8f00" strokeWidth={8} />
+      </svg>
+      {/* termômetro */}
+      <div style={{position: "absolute", left: 60, top: 600, display: "flex", alignItems: "center", gap: 12, background: "#ffffff", borderRadius: 60, padding: "10px 26px 10px 14px", boxShadow: "0 6px 0 rgba(0,0,0,0.28)", fontFamily: FONT, fontWeight: 900, fontSize: 54, color: "#E53935", transform: `scale(${SP(f, 6, 10, 150)})`}}>
+        <svg width={44} height={70} viewBox="0 0 24 40">
+          <rect x="8" y="2" width="8" height="26" rx="4" fill="#ffffff" stroke="#101820" strokeWidth="2" />
+          <rect x="10.5" y={26 - 20 * clamp01((temp - 30) / 12)} width="3" height={20 * clamp01((temp - 30) / 12) + 4} fill="#E53935" />
+          <circle cx="12" cy="32" r="6" fill="#E53935" stroke="#101820" strokeWidth="2" />
+        </svg>
+        {temp}°C
+      </div>
+    </AbsoluteFill>
   );
 };
 
@@ -484,6 +518,7 @@ export const Overlay: React.FC<{s: TimedScene}> = ({s}) => {
       {s.id === "s8" && <PhGauge s={s} f={f} />}
       {s.id === "s9" && <Brand s={s} f={f} />}
       {s.id === "s9" && <Celebration s={s} f={f} />}
+      {s.id === "s1" && <Heat s={s} f={f} />}
       {s.id === "s1" && <TitleCard s={s} f={f} />}
       {s.id === "s9" && <FinalCTA s={s} f={f} />}
       <Imagine s={s} f={f} />

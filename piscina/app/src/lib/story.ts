@@ -46,17 +46,21 @@ export const undoneS2 = (gf: number) => gf >= rew("s2").R + RW && gf < start("s3
 
 /** céu: dias passando rápido (teste de estanqueidade e água parada) — 0 = dia, 1 = noite */
 export const skyDark = (gf: number) => {
-  const spans: [number, number][] = [
-    [W("s5", "espera"), W("s5", "teste") + 5],
-    [W("s7", "dias") - 5, W("s7", "verde") + 5],
+  const spans: [number, number, number][] = [
+    [start("s2"), W("s2", "cadê") - 4, 1], // "No outro dia": uma noite passando rápido
+    [W("s5", "espera"), W("s5", "teste") + 5, 3],
+    [W("s7", "dias") - 5, W("s7", "verde") + 5, 3],
   ];
-  for (const [a, b] of spans) {
+  for (const [a, b, n] of spans) {
     if (gf >= a && gf < b) {
       const k = (gf - a) / Math.max(1, b - a);
-      return 0.75 * Math.pow(Math.sin(k * Math.PI * 3), 2);
+      return 0.8 * Math.pow(Math.sin(k * Math.PI * n), 2);
     }
   }
   return 0;
 };
 export const lastScene = timed[timed.length - 1];
 export {clamp01};
+
+/** calor do começo (s1): céu alaranjado, sol forte — some depois da "ideia" */
+export const heat = (gf: number) => (gf < end("s1") ? 1 - L(gf, W("s1", "ideia") + 10, W("s1", "abrir") + 10, 0, 1) : 0);

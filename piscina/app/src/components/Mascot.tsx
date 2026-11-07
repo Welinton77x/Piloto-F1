@@ -329,8 +329,8 @@ const CurlyHair: React.FC = () => {
   );
 };
 
-export type Prop = "jug" | "bottle" | "glassDirty" | "glass" | "shovel";
-export type MascotLook = {neighbor?: boolean; muddy?: number; redEyes?: number; floaty?: "arm" | "waist"; hair?: "short" | "curly"; outfit?: "shirt" | "overall" | "swim"; wrench?: boolean; wrenchTilt?: number; wrenchLeft?: boolean; capLogo?: boolean; lHand?: Hand; rHand?: Hand; prop?: Prop; propHand?: "l" | "r"; propTilt?: number; pouring?: number};
+export type Prop = "jug" | "bottle" | "glassDirty" | "glass" | "shovel" | "fan";
+export type MascotLook = {hot?: number; neighbor?: boolean; muddy?: number; redEyes?: number; floaty?: "arm" | "waist"; hair?: "short" | "curly"; outfit?: "shirt" | "overall" | "swim"; wrench?: boolean; wrenchTilt?: number; wrenchLeft?: boolean; capLogo?: boolean; lHand?: Hand; rHand?: Hand; prop?: Prop; propHand?: "l" | "r"; propTilt?: number; pouring?: number};
 
 /** objetos que o mascote segura para demonstrar cada etapa (sempre na vertical; inclinam para despejar) */
 const PropMesh: React.FC<{prop: Prop; tilt: number; pouring: number; side: -1 | 1}> = ({prop, tilt, pouring, side}) => {
@@ -338,6 +338,23 @@ const PropMesh: React.FC<{prop: Prop; tilt: number; pouring: number; side: -1 | 
   const spout: [number, number, number] = prop === "jug" ? [side * 0.12, 0.22, 0] : prop === "bottle" ? [0, 0.24, 0] : [0, 0.16, 0];
   return (
     <group rotation={[0, 0, (side * -tilt * Math.PI) / 180]}>
+      {prop === "fan" && (
+        // leque vermelho para se abanar no calor
+        <group position={[0, 0.12, 0.04]}>
+          <mesh>
+            <circleGeometry args={[0.2, 20, 0, Math.PI]} />
+            <meshStandardMaterial color="#e53935" roughness={0.5} side={THREE.DoubleSide} />
+          </mesh>
+          <mesh position={[0, 0.002, 0.003]}>
+            <ringGeometry args={[0.14, 0.16, 20, 1, 0, Math.PI]} />
+            <meshStandardMaterial color="#ffd23f" roughness={0.5} side={THREE.DoubleSide} />
+          </mesh>
+          <mesh position={[0, -0.06, 0]}>
+            <boxGeometry args={[0.03, 0.14, 0.02]} />
+            <M2 c="#6d4c41" />
+          </mesh>
+        </group>
+      )}
       {prop === "shovel" && (
         // pá: cabo de madeira passando pela mão, lâmina de metal embaixo
         <group>
@@ -494,7 +511,8 @@ export const Mascot: React.FC<{position: [number, number, number]; scale?: numbe
   const shorts = dirt(nb ? "#e53935" : swim ? "#ff7a1a" : col.pants), shortsD = dirt(nb ? "#ffffff" : "#ffd23f");
   const hairC = dirt(nb ? "#9e9e9e" : col.hair);
   const bodySkin = dirt(col.skin);
-  const headSkin = mixHex(dirt(col.skin), "#a8d08d", pose.sick ?? 0);
+  const hot = look.hot ?? 0;
+  const headSkin = mixHex(mixHex(dirt(col.skin), "#ff8f7a", hot * 0.55), "#a8d08d", pose.sick ?? 0);
   const period = 95;
   const ph = (gf + Math.floor(random("blink") * period)) % period;
   const blink = ph < 4 ? 1 - Math.abs(ph - 2) / 2 : 0;
@@ -663,6 +681,18 @@ export const Mascot: React.FC<{position: [number, number, number]; scale?: numbe
           </group>
         )}
         <Face emotion={pose.emotion} talk={pose.talk} blink={blink} redEyes={look.redEyes} />
+        {/* calor: gotas de suor escorrendo da testa */}
+        {hot > 0.05 &&
+          [0, 1, 2, 3].map((i) => {
+            const k = ((gf * 0.03 + i * 0.27) % 1);
+            const sx = [-0.24, 0.22, -0.17, 0.26][i];
+            return (
+              <mesh key={"sw" + i} position={[sx, 0.12 - k * 0.35, 0.2]} scale={[0.6, 1, 0.6]}>
+                <sphereGeometry args={[0.035 * hot, 10, 8]} />
+                <meshStandardMaterial color="#9fe3ff" roughness={0.1} transparent opacity={0.9 * (1 - k * 0.6)} emissive="#9fe3ff" emissiveIntensity={0.3} />
+              </mesh>
+            );
+          })}
         {/* passando mal: estrelinhas/bolhas verdes girando em volta da cabeça */}
         {(pose.sick ?? 0) > 0.4 &&
           [0, 1, 2].map((i) => {

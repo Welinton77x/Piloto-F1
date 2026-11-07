@@ -6,7 +6,7 @@ import {L, clamp01, easeInOut, easeOut} from "./anim";
 import {W, end, rew, start, undoneS2} from "./story";
 
 export const REWIND_FRAMES = 26;
-export type Look = MascotLook & {at?: [number, number, number]; ry?: number};
+export type Look = MascotLook & {at?: [number, number, number]; ry?: number; rx?: number};
 type V3 = [number, number, number];
 
 const base = (t: number): MascotPose => ({
@@ -23,6 +23,8 @@ const base = (t: number): MascotPose => ({
 const inS = (id: string, t: number) => t >= start(id) && t < end(id);
 const between = (t: number, a: number, b: number) => t >= a && t < b;
 const DIG: V3 = [-0.55, 0.06, 0.9]; // na beira do buraco, cavando
+export const CHAIR: V3 = [-3.0, 0.06, 0.6]; // espreguiçadeira no gramado
+const LYING: V3 = [CHAIR[0], 0.4, CHAIR[2] + 1.3];
 const SIDE: V3 = [-2.4, 0.06, 1.0]; // na grama, à esquerda da piscina, explicando
 const POOL_FLOAT: V3 = [1.2, -0.82, 0.7];
 const FL = -1.5 + 0.08;
@@ -36,8 +38,15 @@ const rollX = (t: number) => -1.3 + 5.6 * L(t, W("s5", "impermeabilização") - 
 
 export const mascotLook = (t: number): Look => {
   if (inS("s1", t)) {
-    const digging = between(t, W("s1", "cava") - 6, W("s1", "Bora"));
-    return {...swim, floaty: "arm", at: DIG, prop: digging || t < W("s1", "cava") ? "shovel" : undefined, propHand: "r", propTilt: digging ? -25 + Math.sin(t * 0.25) * 18 : -10, rHand: t > W("s1", "testar") - 6 ? "point" : undefined};
+    const idea = W("s1", "ideia");
+    const hot = clamp01(1 - (t - idea) / 40);
+    // deitado na espreguiçadeira, se abanando no calor
+    if (t < idea - 4) return {...swim, hot: 1, at: LYING, rx: -1.2, prop: "fan", propHand: "r", propTilt: Math.sin(t * 0.6) * 25};
+    // pula da cadeira com a ideia
+    if (t < W("s1", "abrir") - 4) return {...swim, hot, floaty: "arm", at: [CHAIR[0] + 0.9, 0.06 + Math.abs(Math.sin(((t - idea + 4) / 14) * Math.PI)) * 0.25, CHAIR[2] + 0.4], rHand: "point"};
+    const digging = between(t, W("s1", "abrir") - 4, W("s1", "encher") - 4);
+    if (digging) return {...swim, hot, floaty: "arm", at: DIG, prop: "shovel", propHand: "r", propTilt: -25 + Math.sin(t * 0.25) * 18};
+    return {...swim, hot, floaty: "arm", at: DIG};
   }
   if (inS("s2", t)) {
     const r = rew("s2");
@@ -101,22 +110,40 @@ export const mascotPose = (t: number): MascotPose => {
   const pose = base(t);
   const talkArm = (): [number, number] => [-30 + Math.sin(t * 0.12) * 8, 22];
   if (inS("s1", t)) {
-    const digging = between(t, W("s1", "cava") - 6, W("s1", "Bora"));
-    pose.emotion = t < W("s1", "Parece") ? "happy" : "grin";
-    if (digging) {
+    const idea = W("s1", "ideia");
+    if (t < idea - 4) {
+      pose.emotion = t < W("s1", "derretendo") ? "annoyed" : "sick"; // sofrendo com o calor
+      pose.sick = 0.15;
+      pose.rArm = [-70 + Math.sin(t * 0.6) * 18, 38]; // abana o leque ao lado do rosto
+      pose.lArm = [-15, 18];
+    } else if (t < W("s1", "abrir") - 4) {
+      pose.emotion = "surprised";
+      pose.rArm = [-150, 10]; // dedo para cima: ideia!
+    } else if (between(t, W("s1", "abrir") - 4, W("s1", "encher") - 4)) {
       const k = Math.sin(t * 0.25);
+      pose.emotion = "grin";
       pose.rArm = [-35 + k * 25, 8];
-      pose.lArm = [-45 + k * 25, -18]; // as duas mãos no cabo
+      pose.lArm = [-45 + k * 25, -18];
       pose.jump = Math.max(0, -k) * 0.03;
-    } else if (t > W("s1", "testar") - 6) pose.rArm = [-80, 25];
-    else pose.rArm = [-20, 14];
-    if (!digging) pose.lArm = [-10, 30];
+    } else if (t < W("s1", "Pronto") - 2) {
+      pose.emotion = "happy";
+      pose.rArm = [-60, 30]; // segura a mangueira
+    } else if (t < W("s1", "Será") - 2) {
+      pose.emotion = "joy";
+      pose.lArm = [-10, 160 + Math.sin(t * 0.5) * 10];
+      pose.rArm = [-10, 160 - Math.sin(t * 0.5) * 10];
+      pose.jump = Math.abs(Math.sin(t * 0.3)) * 0.12;
+    } else {
+      pose.emotion = "curious";
+      pose.rArm = [-140, -30]; // coça a cabeça: será?
+    }
   } else if (inS("s2", t)) {
     const r = rew("s2");
     if (undoneS2(t) || t < r.P) {
       pose.emotion = undoneS2(t) ? "relieved" : t < W("s2", "desmoronam") ? "surprised" : t < W("s2", "lamaçal") + 8 ? "scared" : "worried";
-      pose.lArm = [-10, 30];
-      pose.rArm = t > W("s2", "lamaçal") - 4 && t < r.P ? [-150, -10] : [-45, 40]; // mão na cabeça quando o vizinho pula
+      const cade = between(t, W("s2", "cadê") - 6, W("s2", "terra"));
+      pose.lArm = cade ? [-20, 70] : [-10, 30]; // braços abertos: cadê a água?
+      pose.rArm = cade ? [-20, 70] : t > W("s2", "lamaçal") - 4 && t < r.P ? [-150, -10] : [-45, 40]; // mão na cabeça quando o vizinho pula
     } else if (t < r.P + 32) {
       pose.emotion = "joy";
       pose.lArm = [-10, 150];

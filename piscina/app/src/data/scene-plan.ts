@@ -21,7 +21,7 @@ export const layout = { house: [-9, -4], pool: { x: [-1.5, 4.5], z: [-1.5, 1.5],
 export const scenes: ScenePlan[] = [
   { id: "s1", voKey: "s1", startFrame: 0, durationInFrames: 337,
     narration: "Dia quente, sol rachando, e você ali derretendo. Do nada, bate a ideia: abrir um buraco no quintal e encher de água. Pronto, você fez uma piscina! Será?",
-    camera: [{ f: 0, az: 15, el: 20, dist: 35.1, target: [0.3, -0.3, 0] }, { f: 0, az: 8, el: 14, dist: 15, target: [0.5, -0.1, 0.9], atWord: "Parece", wordOffset: -4 }, { f: 337, az: 4, el: 12, dist: 23.0, target: [0.4, -0.4, 0.8] }],
+    camera: [{ f: 0, az: 12, el: 18, dist: 10, target: [-2.9, 0.55, 1.1] }, { f: 0, az: 6, el: 14, dist: 10.5, target: [-2.6, 0.6, 1.0], atWord: "ideia", wordOffset: -2 }, { f: 0, az: 4, el: 14, dist: 15, target: [0.2, -0.1, 0.8], atWord: "abrir", wordOffset: 4 }, { f: 0, az: 4, el: 14, dist: 15, target: [0.5, -0.2, 0.8], atWord: "Pronto" }, { f: 337, az: 4, el: 12, dist: 17, target: [0.6, -0.3, 0.8] }],
     objects: ["dirtPile", "floaty", "grass", "hole", "hose", "house", "mascot", "shovel", "wall", "yard"],
     animations: [{ target: "camera", unit: "ver roteiro", from: 0, to: 1, f0: 0, f1: 112, fn: "easeInOut" }, { target: "mascot.emotion", unit: "ver roteiro", from: 0, to: 1, f0: 0, f1: 112, fn: "easeInOut" }, { target: "hole.depth", unit: "ver roteiro", from: 0, to: 1, f0: 112, f1: 337, fn: "easeInOut" }, { target: "dirtPile.scale", unit: "ver roteiro", from: 0, to: 1, f0: 112, f1: 337, fn: "easeInOut" }, { target: "hose.flow", unit: "ver roteiro", from: 0, to: 1, f0: 112, f1: 337, fn: "easeInOut" }],
     badges: [] /* pergunta grande (TitleCard) */, highlights: ["vontade"], captions: cap,

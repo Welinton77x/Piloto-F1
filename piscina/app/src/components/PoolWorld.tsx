@@ -7,7 +7,7 @@ import {sceneAt} from "../data/scenes";
 import {clamp01, mixHex} from "../lib/anim";
 import {poseAt} from "../lib/camera";
 import {Mascot} from "./Mascot";
-import {mascotLook, mascotPose, neighborLand, neighborLook, neighborPose} from "../lib/mascotPose";
+import {CHAIR, mascotLook, mascotPose, neighborLand, neighborLook, neighborPose} from "../lib/mascotPose";
 
 export const FACE = 1.5;
 const FAR = -40;
@@ -255,7 +255,7 @@ const Soil: React.FC<{x: [number, number]; y?: [number, number]; z?: [number, nu
 };
 
 /** cano opaco por uma lista de pontos; show (0-1) desenha do começo ao fim; setas de fluxo quando flow */
-const PipePath: React.FC<{pts: [number, number, number][]; r?: number; show: number; flow?: number; gf: number; c?: string}> = ({pts, r = 0.07, show, flow = 0, gf, c = P.pipe}) => {
+const PipePath: React.FC<{pts: [number, number, number][]; r?: number; show: number; flow?: number; gf: number; c?: string}> = ({pts, r = 0.09, show, flow = 0, gf, c = P.pipe}) => {
   if (show <= 0.001) return null;
   const segs = pts.slice(1).map((b, i) => {
     const a = pts[i];
@@ -423,10 +423,11 @@ export const PoolWorld: React.FC<{gf: number}> = ({gf}) => {
 
   /* ---- s1/s2: buraco na pá, água sumindo, barranco desmoronando ---- */
   const clean2 = undoneS2(gf);
-  const holeD = clean2 ? 0 : inS("s1") ? L(t, W("s1", "cava") - 6, W("s1", "Bora"), 0, 1.0, easeInOut) : inS("s2") ? 1.0 : 0;
-  const s2water = !inS("s2") || clean2 ? 0 : t < W("s2", "some") ? L(t, start("s2"), W("s2", "some"), 0.25, 0.7) : L(t, W("s2", "some"), W("s2", "paredes"), 0.7, 0.05, easeIn);
-  const collapse = !inS("s2") || clean2 ? 0 : L(t, W("s2", "desmoronam") - 6, W("s2", "desmoronam") + 18, 0, 1, easeIn);
-  const hose = (inS("s1") && t > W("s1", "Bora") - 10) || (inS("s2") && !clean2 && t < W("s2", "some") + 10);
+  const holeD = clean2 ? 0 : inS("s1") ? L(t, W("s1", "abrir") - 4, W("s1", "encher") - 4, 0, 1.0, easeInOut) : inS("s2") ? 1.0 : 0;
+  // s1: enche de água ("Pronto, você fez uma piscina!"); s2: no outro dia a água sumiu na terra
+  const s2water = clean2 ? 0 : inS("s1") ? L(t, W("s1", "encher") - 4, W("s1", "Pronto"), 0, 0.7, easeOut) : inS("s2") ? L(t, start("s2") + 4, W("s2", "cadê"), 0.7, 0.04, easeIn) : 0;
+  const collapse = !inS("s2") || clean2 ? 0 : L(t, W("s2", "desmoronaram") - 6, W("s2", "desmoronaram") + 18, 0, 1, easeIn);
+  const hose = inS("s1") && t > W("s1", "encher") - 10 && t < W("s1", "Pronto") + 6;
 
   /* ---- s3: projeto, escavação, compactação, concreto magro; "E se?" fundo afunda ---- */
   const blue = inS("s3") ? L(t, W("s3", "projeto") - 4, W("s3", "canos") + 10, 0, 1) * (1 - L(t, W("s3", "cava") - 5, W("s3", "cava") + 10, 0, 1)) : 0;
@@ -460,12 +461,14 @@ export const PoolWorld: React.FC<{gf: number}> = ({gf}) => {
   const fill = after("s7") ? (inS("s7") ? L(t, start("s7"), start("s7") + 25, 0, 1, easeOut) : 1) : 0;
   const greenK = inS("s7") ? L(t, W("s7", "dias"), W("s7", "verde") + 8, 0, 1) * (1 - L(t, W("s7", "volta"), W("s7", "volta") + 60, 0, 1)) : 0;
   const leaves = inS("s7") && t > W("s7", "caem") - 10 ? 1 - L(t, W("s7", "volta"), W("s7", "volta") + 50, 0, 1) : 0;
-  const pDrain = after("s7") ? (inS("s7") ? L(t, W("s7", "ralo") - 4, W("s7", "ralo") + 20, 0, 1) : 1) : 0;
-  const pSkim = after("s7") ? (inS("s7") ? L(t, W("s7", "skimmer") - 4, W("s7", "skimmer") + 20, 0, 1) : 1) : 0;
-  const room = after("s7") ? (inS("s7") ? L(t, W("s7", "ralo") - 8, W("s7", "ralo") + 8, 0, 1) : 1) : 0;
+  // canalização: os canos até a casa de máquinas são instalados na obra, junto com a ferragem (s4)
+  const pipeBuild = after("s4") ? (inS("s4") ? L(t, W("s4", "gaiola") - 10, W("s4", "envolve") + 10, 0, 1) : 1) : 0;
+  const pDrain = clamp01(pipeBuild * 3);
+  const pSkim = clamp01(pipeBuild * 3 - 1);
+  const room = after("s4") ? (inS("s4") ? L(t, W("s4", "envolve"), W("s4", "envolve") + 12, 0, 1) : 1) : 0;
   const pump = after("s7") ? (inS("s7") ? L(t, W("s7", "bomba") - 4, W("s7", "bomba") + 10, 0, 1, easeOut) : 1) : 0;
   const filt = after("s7") ? (inS("s7") ? L(t, W("s7", "filtro") - 4, W("s7", "filtro") + 10, 0, 1, easeOut) : 1) : 0;
-  const pRet = after("s7") ? (inS("s7") ? L(t, W("s7", "filtro") + 6, W("s7", "bocais") + 6, 0, 1) : 1) : 0;
+  const pRet = clamp01(pipeBuild * 3 - 2);
   const flow = after("s7") && t > W("s7", "bomba") ? 1 : 0;
   const lid = inS("s7") ? L(t, W("s7", "máquinas") - 10, W("s7", "máquinas") + 10, 0, 1.15, easeOut) : 0;
 
@@ -528,14 +531,14 @@ export const PoolWorld: React.FC<{gf: number}> = ({gf}) => {
       {hose && (
         <group>
           <PipePath pts={[[-3.6, 0.08, 0.2], [-1.0, 0.08, 0.5], [0.3, 0.35, 0.7]]} r={0.045} show={1} gf={gf} c="#43a047" />
-          {inS("s2") && <B x={[0.33, 0.39]} y={[-holeD + s2water, 0.35]} z={[0.67, 0.73]} c={P.water} o={0.8} />}
+          <B x={[0.33, 0.39]} y={[-holeD + s2water, 0.35]} z={[0.67, 0.73]} c={P.water} o={0.8} />
         </group>
       )}
       {/* água no buraco de terra: some no chão (gotas descendo) */}
       {s2water > 0.01 && <WaterBox x={[HOLE.x0 + 0.02, HOLE.x1 - 0.02]} y0={-holeD} top={-holeD + s2water} z={[HOLE.z0 + 0.02, FACE]} color={mixHex(P.water, P.mud, collapse * 0.8)} />}
-      {inS("s2") && !clean2 && t > W("s2", "some") - 10 &&
+      {inS("s2") && !clean2 && t < W("s2", "paredes") &&
         Array.from({length: 18}).map((_, i) => {
-          const k = ((t - W("s2", "some") + 10) * 0.012 + random("sd" + i)) % 1;
+          const k = ((t - start("s2")) * 0.012 + random("sd" + i)) % 1;
           return (
             <mesh key={"sd" + i} position={[HOLE.x0 + 0.2 + random("sx" + i) * 2.6, -holeD - k * 2.2, FACE + 0.01]}>
               <sphereGeometry args={[0.05, 8, 6]} />
@@ -841,6 +844,27 @@ export const PoolWorld: React.FC<{gf: number}> = ({gf}) => {
           );
         })}
 
+      {/* ---------- espreguiçadeira (dia quente) ---------- */}
+      {(inS("s1") || (inS("s2") && t < rew("s2").P)) && (
+        <group position={[CHAIR[0], 0.06, CHAIR[2]]}>
+          {[-0.32, 0.32].map((dx) => <B key={"cl" + dx} x={[dx - 0.03, dx + 0.03]} y={[0, 0.3]} z={[-0.05, 1.45]} c="#eceff1" />)}
+          {Array.from({length: 6}).map((_, i) => (
+            <B key={"cs" + i} x={[-0.36, 0.36]} y={[0.3, 0.34]} z={[0.35 + i * 0.19, 0.5 + i * 0.19]} c={i % 2 ? "#1e88e5" : "#ffffff"} />
+          ))}
+          <group position={[0, 0.32, 0.38]} rotation={[-1.05, 0, 0]}>
+            {Array.from({length: 5}).map((_, i) => (
+              <B key={"cb" + i} x={[-0.36, 0.36]} y={[0, 0.04]} z={[-0.18 - i * 0.19, -0.03 - i * 0.19]} c={i % 2 ? "#1e88e5" : "#ffffff"} />
+            ))}
+          </group>
+          {/* guarda-sol */}
+          <B x={[0.55, 0.6]} y={[0, 2.1]} z={[-0.3, -0.25]} c="#eceff1" />
+          <mesh position={[0.58, 2.15, -0.28]}>
+            <coneGeometry args={[1.1, 0.45, 12]} />
+            <M c="#ff7043" />
+          </mesh>
+        </group>
+      )}
+
       {/* ---------- cenário ---------- */}
       <House />
       {/* casas da vizinhança (pedido do usuário) */}
@@ -903,7 +927,7 @@ export const PoolWorld: React.FC<{gf: number}> = ({gf}) => {
         const ml = mascotLook(t);
         if (!ml.at) return null;
         return (
-          <group position={ml.at} rotation={[0, ml.ry ?? 0, 0]}>
+          <group position={ml.at} rotation={[ml.rx ?? 0, ml.ry ?? 0, 0]}>
             <Mascot position={[0, 0, 0]} scale={0.8} pose={mp} gf={gf} look={ml} />
           </group>
         );

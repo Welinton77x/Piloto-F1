@@ -6,7 +6,7 @@ import {useThree} from "@react-three/fiber";
 import {VO_OFFSET, config, finalCut, hasVO, sceneAt, timed, wordLocal} from "./data/scenes";
 import {PoolWorld} from "./components/PoolWorld";
 import {Overlay} from "./components/Overlay";
-import {REWINDS, W, imagineAmount, rew, skyDark, start} from "./lib/story";
+import {REWINDS, W, heat, imagineAmount, rew, skyDark, start} from "./lib/story";
 import {neighborLand} from "./lib/mascotPose";
 import {Rings3D} from "./components/Rings3D";
 import {FOV, poseAt} from "./lib/camera";
@@ -47,8 +47,9 @@ export const Background: React.FC<{at?: number}> = ({at}) => {
   const under = 0;
   const brand = clamp01((gf - finalCut) / 15);
   // céu claro de chuva leve → temporal escuro; azul profundo no subsolo; pôr do sol quando a chuva passa
-  let top = mixHex("#86c4f0", "#14213f", dark);
-  let bot = mixHex("#dff0fb", "#2c3d66", dark);
+  const h = heat(gf);
+  let top = mixHex(mixHex("#86c4f0", "#ffb347", h * 0.7), "#14213f", dark);
+  let bot = mixHex(mixHex("#dff0fb", "#ffe0a3", h * 0.8), "#2c3d66", dark);
   top = mixHex(top, "#17325c", under);
   bot = mixHex(bot, "#0b1730", under);
   top = mixHex(top, "#c97b9a", brand);
@@ -85,10 +86,12 @@ const World: React.FC = () => {
 
 // efeitos pontuais amarrados às palavras (frames globais)
 const SFX_AT: [number, string, number][] = [
-  [W("s1", "cava"), "thud.wav", 0.3],
-  [W("s1", "cava") + 18, "thud.wav", 0.3],
-  [W("s1", "cava") + 36, "thud.wav", 0.3],
-  [start("s2"), "gurgle.wav", 0.3],
+  [W("s1", "ideia") - 4, "pop.wav", 0.35],
+  [W("s1", "abrir"), "thud.wav", 0.3],
+  [W("s1", "abrir") + 18, "thud.wav", 0.3],
+  [W("s1", "abrir") + 36, "thud.wav", 0.3],
+  [W("s1", "encher") - 4, "gurgle.wav", 0.3],
+  [start("s2"), "whoosh.wav", 0.3],
   [W("s2", "desmoronam") - 4, "thud.wav", 0.45],
   [rew("s2").P + 32, "splash.wav", 0.4],
   [neighborLand(), "splash.wav", 0.5],
