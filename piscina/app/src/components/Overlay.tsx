@@ -152,7 +152,7 @@ const Heat: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
 const Shout: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
   const gf = s.startFrame + f;
   const t = te(gf);
-  const a = neighborJump() - 14, b = neighborLand() + 12;
+  const a = neighborJump(s.id) - 14, b = neighborLand(s.id) + 12;
   if (t < a || t > b) return null;
   const nl = neighborLook(t);
   if (!nl.at) return null;
@@ -538,7 +538,7 @@ export const Overlay: React.FC<{s: TimedScene}> = ({s}) => {
       {s.id === "s9" && <Brand s={s} f={f} />}
       {s.id === "s9" && <Celebration s={s} f={f} />}
       {s.id === "s1" && <Heat s={s} f={f} />}
-      {s.id === "s2" && <Shout s={s} f={f} />}
+      {(s.id === "s2" || s.id === "s9") && <Shout s={s} f={f} />}
       {s.id === "s1" && <TitleCard s={s} f={f} />}
       {s.id === "s9" && <FinalCTA s={s} f={f} />}
       <Imagine s={s} f={f} />

@@ -94,6 +94,7 @@ const SFX_AT: [number, string, number][] = [
   [W("s2", "desmoronam") - 4, "thud.wav", 0.45],
   [rew("s2").P + 32, "splash.wav", 0.4],
   [neighborLand(), "splash.wav", 0.5],
+  [neighborLand("s9"), "splash.wav", 0.5],
   [W("s3", "máquina") - 10, "pump.wav", 0.25],
   [W("s3", "socado"), "thud.wav", 0.3],
   [W("s3", "racha"), "crinkle.wav", 0.4],

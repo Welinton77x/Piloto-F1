@@ -64,3 +64,29 @@ export {clamp01};
 
 /** calor do começo (s1): céu alaranjado, sol forte — some depois da "ideia" */
 export const heat = (gf: number) => (gf < end("s1") ? 1 - L(gf, W("s1", "ideia") + 10, W("s1", "abrir") + 10, 0, 1) : 0);
+
+/* ---------- trabalho do mascote dentro da piscina (desce e sobe pela escada) ---------- */
+/** s3: desce a escada de obra, passa o compactador da esquerda para a direita, volta para o lado firme */
+export const s3Work = () => {
+  const d0 = W("s3", "socado");
+  return {d0, d1: d0 + 20, c1: W("s3", "magro") + 6};
+};
+export const compX = (t: number) => {
+  const w = s3Work();
+  return L(t, w.d1, w.c1, -0.5, 3.6);
+};
+/** s5: depois do rebobinar desce a escada da piscina, vai até a parede da direita e puxa o rolo até a escada */
+export const s5Work = () => {
+  const r0 = rew("s5").R + RW;
+  const v = W("s5", "veda") + 20;
+  return {r0, d1: r0 + 18, w1: r0 + 34, v, back: v + 12, up: v + 36};
+};
+export const IN_X0 = -1.3, IN_X1 = 4.3;
+export const rollX = (t: number) => {
+  const w = s5Work();
+  return L(t, w.w1, w.v, IN_X1, IN_X0 + 0.6);
+};
+export const proofK = (t: number) => {
+  const w = s5Work();
+  return L(t, w.w1, w.v, 0, 1);
+};

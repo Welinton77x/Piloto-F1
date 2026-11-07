@@ -4,6 +4,7 @@ import React, {useLayoutEffect, useMemo, useRef} from "react";
 import * as THREE from "three";
 import {random} from "remotion";
 import {sceneAt} from "../data/scenes";
+import {compX, proofK, rollX, s3Work, s5Work} from "../lib/story";
 import {clamp01, mixHex} from "../lib/anim";
 import {poseAt} from "../lib/camera";
 import {Mascot} from "./Mascot";
@@ -309,8 +310,8 @@ const PipePath: React.FC<{pts: [number, number, number][]; r?: number; show: num
 /** miniescavadeira amarela (braço anima) */
 const Excavator: React.FC<{x: number; z: number; t: number; o: number}> = ({x, z, t, o}) => {
   if (o <= 0.01) return null;
-  const boom = -0.5 + Math.sin(t * 0.09) * 0.25;
-  const stick = 1.0 + Math.sin(t * 0.09 + 1) * 0.35;
+  const boom = 2.45 + Math.sin(t * 0.09) * 0.12; // lança inclinada para o buraco (para a esquerda)
+  const stick = 1.75 + Math.sin(t * 0.09 + 1) * 0.25; // braço descendo para dentro do buraco
   return (
     <group position={[x, 0.06, z]} scale={0.95 * o}>
       <B x={[-0.65, 0.65]} y={[0, 0.28]} z={[-0.45, 0.45]} c="#2f3338" />
@@ -318,11 +319,11 @@ const Excavator: React.FC<{x: number; z: number; t: number; o: number}> = ({x, z
       <B x={[-0.5, 0.55]} y={[0.28, 0.75]} z={[-0.4, 0.4]} c={P.yellow} />
       <B x={[0.0, 0.52]} y={[0.75, 1.25]} z={[-0.32, 0.32]} c={P.yellow} />
       <B x={[0.05, 0.47]} y={[0.82, 1.18]} z={[0.321, 0.33]} c="#9fd3f2" />
-      <group position={[-0.5, 0.65, 0]} rotation={[0, 0, Math.PI - 0.9 + boom]}>
-        <B x={[0, 1.5]} y={[-0.09, 0.09]} z={[-0.09, 0.09]} c={P.yellow} />
-        <group position={[1.5, 0, 0]} rotation={[0, 0, -stick]}>
-          <B x={[0, 1.1]} y={[-0.07, 0.07]} z={[-0.08, 0.08]} c="#e0a800" />
-          <group position={[1.1, 0, 0]} rotation={[0, 0, -0.8]}>
+      <group position={[-0.5, 0.65, 0]} rotation={[0, 0, boom]}>
+        <B x={[0, 1.8]} y={[-0.09, 0.09]} z={[-0.09, 0.09]} c={P.yellow} />
+        <group position={[1.8, 0, 0]} rotation={[0, 0, stick]}>
+          <B x={[0, 1.6]} y={[-0.07, 0.07]} z={[-0.08, 0.08]} c="#e0a800" />
+          <group position={[1.6, 0, 0]} rotation={[0, 0, 0.7]}>
             <B x={[0, 0.35]} y={[-0.16, 0.16]} z={[-0.18, 0.18]} c="#3a3f45" />
           </group>
         </group>
@@ -433,7 +434,7 @@ export const PoolWorld: React.FC<{gf: number}> = ({gf}) => {
   const blue = inS("s3") ? L(t, W("s3", "projeto") - 4, W("s3", "canos") + 10, 0, 1) * (1 - L(t, W("s3", "cava") - 5, W("s3", "cava") + 10, 0, 1)) : 0;
   const pitD = after("s3") ? (inS("s3") ? L(t, W("s3", "cava") - 4, W("s3", "socado"), 0, PD, easeInOut) : PD) : 0;
   const excav = inS("s3") ? L(t, W("s3", "máquina") - 20, W("s3", "máquina") - 4, 0, 1) * (1 - L(t, W("s3", "magro") + 10, W("s3", "magro") + 25, 0, 1)) : 0;
-  const compactor = inS("s3") && t > W("s3", "socado") - 6 && t < W("s3", "magro") + 6;
+  const compactor = inS("s3") && t > s3Work().d0 - 10 && t < s3Work().c1 + 2;
   const lean = after("s3") ? (inS("s3") ? L(t, W("s3", "magro") - 6, W("s3", "magro") + 18, 0, 1) : 1) : 0;
   const sink = failing("s3", t) ? L(t, rew("s3").P + 12, rew("s3").P + 45, 0, 1, easeIn) : 0;
 
@@ -450,7 +451,8 @@ export const PoolWorld: React.FC<{gf: number}> = ({gf}) => {
   /* ---- s5: poros, "E se?" vaza e esvazia, impermeabilização, teste de estanqueidade ---- */
   const leakWater = failing("s5", t) ? L(t, rew("s5").P + 4, rew("s5").P + 16, 0, 1) : 0;
   const leakLevel = L(t, rew("s5").P + 16, rew("s5").R - 4, WATER_TOP - 0.05, -0.85);
-  const wproof = after("s5") ? (inS("s5") ? L(t, W("s5", "impermeabilização") - 4, W("s5", "veda") + 20, 0, 1) : 1) : 0;
+  const wproof = after("s5") ? (inS("s5") ? proofK(t) : 1) : 0;
+  const rx0 = wproof >= 0.999 ? IN.x0 : rollX(t); // a camada vai da parede da direita até onde o rolo passou
   const testLvl = inS("s5") ? L(t, W("s5", "enche") - 4, W("s5", "enche") + 30, 0, 1) : inS("s6") ? L(t, start("s6"), start("s6") + 20, 1, 0) : 0;
 
   /* ---- s6: pastilhas e borda ---- */
@@ -572,9 +574,13 @@ export const PoolWorld: React.FC<{gf: number}> = ({gf}) => {
       )}
       <Excavator x={6.4} z={0.4} t={t} o={excav} />
       {compactor && (
-        <group position={[L(t, W("s3", "socado") - 6, W("s3", "magro"), PX0 + 0.5, PX1 - 0.5), -PD + Math.abs(Math.sin(t * 0.9)) * 0.06, 0.6]}>
+        <group position={[compX(t), -PD + Math.abs(Math.sin(t * 0.9)) * 0.06, 0.6]}>
           <B x={[-0.2, 0.2]} y={[0, 0.25]} z={[-0.2, 0.2]} c="#e65100" />
-          <B x={[-0.03, 0.03]} y={[0.25, 0.9]} z={[-0.03, 0.03]} c="#37474f" />
+          {/* cabo inclinado até as mãos do mascote */}
+          <group position={[0, 0.25, 0]} rotation={[0, 0, 0.32]}>
+            <B x={[-0.03, 0.03]} y={[0, 0.62]} z={[-0.03, 0.03]} c="#37474f" />
+            <B x={[-0.03, 0.03]} y={[0.58, 0.64]} z={[-0.2, 0.2]} c="#37474f" />
+          </group>
         </group>
       )}
       {/* concreto magro (no "E se?" o fundo se parte: metade afunda e aparecem rachaduras grandes) */}
@@ -684,19 +690,26 @@ export const PoolWorld: React.FC<{gf: number}> = ({gf}) => {
       {/* ---------- s5: impermeabilização (rolo) e vazamento ---------- */}
       {wproof > 0.001 && (
         <group position={[0, ex(0.45), 0]}>
-          <B x={[IN.x0, IN.x0 + (IN.x1 - IN.x0) * wproof]} y={[IN.y0, IN.y0 + 0.02]} z={[IN.z0, FACE]} c={P.waterproof} />
-          <B x={[IN.x0, IN.x0 + (IN.x1 - IN.x0) * wproof]} y={[IN.y0, 0]} z={[IN.z0, IN.z0 + 0.02]} c={P.waterproof} />
-          {wproof > 0.05 && <B x={[IN.x0, IN.x0 + 0.02]} y={[IN.y0, 0]} z={[IN.z0, FACE]} c={P.waterproof} />}
-          {wproof > 0.95 && <B x={[IN.x1 - 0.02, IN.x1]} y={[IN.y0, 0]} z={[IN.z0, FACE]} c={P.waterproof} />}
-          {wproof < 0.999 && inS("s5") && (
-            <group position={[IN.x0 + (IN.x1 - IN.x0) * wproof, IN.y0 + 0.1, 0.6]}>
-              <mesh rotation={[Math.PI / 2, 0, 0]}>
-                <cylinderGeometry args={[0.1, 0.1, 0.6, 16]} />
-                <M c="#5d8ea6" />
-              </mesh>
-              <B x={[-0.02, 0.02]} y={[0, 0.9]} z={[-0.02, 0.02]} c="#455a64" />
-            </group>
-          )}
+          <B x={[rx0, IN.x1]} y={[IN.y0, IN.y0 + 0.02]} z={[IN.z0, FACE]} c={P.waterproof} />
+          <B x={[rx0, IN.x1]} y={[IN.y0, 0]} z={[IN.z0, IN.z0 + 0.02]} c={P.waterproof} />
+          {wproof > 0.05 && <B x={[IN.x1 - 0.02, IN.x1]} y={[IN.y0, 0]} z={[IN.z0, FACE]} c={P.waterproof} />}
+          {wproof > 0.95 && <B x={[IN.x0, IN.x0 + 0.02]} y={[IN.y0, 0]} z={[IN.z0, FACE]} c={P.waterproof} />}
+        </group>
+      )}
+      {/* rolo de impermeabilizar: parado na parede da direita até o mascote pegar, depois puxado por ele */}
+      {inS("s5") && t >= s5Work().r0 && t < s5Work().v + 4 && (
+        <group position={[rollX(t), IN.y0 + 0.1, 0.6]}>
+          <mesh rotation={[Math.PI / 2, 0, 0]}>
+            <cylinderGeometry args={[0.1, 0.1, 0.6, 16]} />
+            <M c="#5d8ea6" />
+          </mesh>
+          <group rotation={[0, 0, 0.55]}>
+            <B x={[-0.02, 0.02]} y={[0, 0.72]} z={[-0.02, 0.02]} c="#455a64" />
+          </group>
+        </group>
+      )}
+      {false && (
+        <group>
         </group>
       )}
       {leakWater > 0.01 &&
@@ -847,18 +860,47 @@ export const PoolWorld: React.FC<{gf: number}> = ({gf}) => {
       )}
 
       {/* ---------- s9: respingo do mergulho ---------- */}
-      {splashT >= 0 && splashT < 30 &&
-        Array.from({length: 26}).map((_, i) => {
-          const a = random("sa" + i) * Math.PI * 2, v = 0.05 + random("sv" + i) * 0.06;
-          const x = 1.2 + Math.cos(a) * v * splashT, z = 0.7 + Math.sin(a) * v * splashT * 0.6;
+      {[[splashT, 1.2, 0.7, 40], [inS("s9") ? t - neighborLand("s9") : -1, 3.0, 0.45, 26]].map(([st, sx, sz, n]) =>
+        st >= 0 && st < 30 &&
+        Array.from({length: n}).map((_, i) => {
+          const a = random("sa" + i) * Math.PI * 2, v = 0.05 + random("sv" + i) * 0.07;
+          const splashT = st;
+          const x = sx + Math.cos(a) * v * splashT, z = sz + Math.sin(a) * v * splashT * 0.6;
           const y = WATER_TOP + (0.16 + random("sy" + i) * 0.1) * splashT - 0.012 * splashT * splashT;
           return y < WATER_TOP - 0.05 ? null : (
             <mesh key={"sp" + i} position={[x, y, z]}>
-              <sphereGeometry args={[0.06, 8, 6]} />
+              <sphereGeometry args={[0.075, 8, 6]} />
               <M c="#e3f7ff" e="#bfefff" ei={0.4} />
             </mesh>
           );
-        })}
+        }))}
+
+      {/* ---------- escadas: de obra (barranco, s3) e da piscina (a partir do s5) ---------- */}
+      {inS("s3") && pitD > 0.8 && (
+        <group>
+          {[0.2, 0.5].map((z) => (
+            <group key={"lw" + z} position={[-1.95, 0.3, z]} rotation={[0, 0, 0.395]}>
+              <B x={[-0.03, 0.03]} y={[-1.95, 0]} z={[-0.03, 0.03]} c="#a0643c" />
+            </group>
+          ))}
+          {Array.from({length: 6}).map((_, i) => {
+            const k = (i + 0.5) / 6;
+            return <B key={"lr" + i} x={[-1.95 + 0.75 * k - 0.03, -1.95 + 0.75 * k + 0.03]} y={[0.3 - 1.8 * k - 0.02, 0.3 - 1.8 * k + 0.02]} z={[0.2, 0.5]} c="#8a5a2b" />;
+          })}
+        </group>
+      )}
+      {(after("s6") || (inS("s5") && t >= s5Work().r0 - 30)) && (
+        <group>
+          {[0.2, 0.5].map((z) => (
+            <group key={"pl" + z}>
+              <B x={[-1.24, -1.2]} y={[-1.0, 0.32]} z={[z - 0.02, z + 0.02]} c="#cfd8dc" />
+              <B x={[-1.75, -1.2]} y={[0.3, 0.34]} z={[z - 0.02, z + 0.02]} c="#cfd8dc" />
+              <B x={[-1.77, -1.73]} y={[0.06, 0.34]} z={[z - 0.02, z + 0.02]} c="#cfd8dc" />
+            </group>
+          ))}
+          {[-0.85, -0.5, -0.15].map((y) => <B key={"ps" + y} x={[-1.24, -1.08]} y={[y - 0.015, y + 0.015]} z={[0.2, 0.5]} c="#eceff1" />)}
+        </group>
+      )}
 
       {/* ---------- espreguiçadeira (dia quente) ---------- */}
       {(inS("s1") || (inS("s2") && t < rew("s2").P)) && (
