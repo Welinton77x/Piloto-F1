@@ -34,9 +34,18 @@ const swim = {outfit: "swim" as const};
 const work = {outfit: "swim" as const}; // pedido do usuário: roupa de banho o vídeo todo, inclusive explicando
 
 const PIT_FLOOR = -1.5;
-const LADDER3_TOP: V3 = [-1.95, 0.06, 0.35], LADDER3_BOT: V3 = [-1.15, PIT_FLOOR, 0.35]; // escada de obra encostada no barranco
-const LADDER5_TOP: V3 = [-1.9, 0.15, 0.35], LADDER5_BOT: V3 = [-1.05, -1.22, 0.35]; // escada da piscina
+// caminhos pela escada (sem atravessar terra nem parede): da grama, passa por cima da beirada e desce
+const LADDER3: V3[] = [[-1.75, 0.06, 0.35], [-1.35, 0.3, 0.35], [-0.8, PIT_FLOOR, 0.35]]; // escada de obra dentro do buraco
+const LADDER5: V3[] = [[-1.85, 0.1, 0.35], [-1.6, 0.18, 0.35], [-1.05, 0.12, 0.35], [-1.05, -1.22, 0.35]]; // escada da piscina
+const LADDER3_BOT = LADDER3[LADDER3.length - 1], LADDER5_BOT = LADDER5[LADDER5.length - 1];
 const lerp3 = (a: V3, b: V3, k: number): V3 => [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k];
+/** posição ao longo de uma lista de pontos (k de 0 a 1, velocidade constante por trecho) */
+const path = (pts: V3[], k: number): V3 => {
+  const n = pts.length - 1;
+  const x = clamp01(k) * n;
+  const i = Math.min(n - 1, Math.floor(x));
+  return lerp3(pts[i], pts[i + 1], x - i);
+};
 /** subindo/descendo escada: virado para a escada, braços alternando nos degraus */
 const climbing = (t: number) => {
   const st = Math.sin(t * 0.5);
@@ -67,7 +76,7 @@ export const mascotLook = (t: number): Look => {
   if (inS("s3", t)) {
     const w = s3Work();
     if (t < w.d0) return {...work, at: SIDE, rHand: t < W("s3", "cava") ? "point" : undefined};
-    if (t < w.d1) return {...work, at: lerp3(LADDER3_TOP, LADDER3_BOT, (t - w.d0) / (w.d1 - w.d0)), ry: -Math.PI / 2};
+    if (t < w.d1) return {...work, at: path(LADDER3, (t - w.d0) / (w.d1 - w.d0)), ry: -Math.PI / 2};
     if (t < w.c1) return {...work, at: [compX(t) - 0.55, PIT_FLOOR, 0.6], ry: Math.PI / 2, lHand: "open", rHand: "open"};
     const floorY = t > W("s3", "magro") ? PIT_FLOOR + 0.08 : PIT_FLOOR;
     const k = clamp01((t - w.c1) / 20);
@@ -79,11 +88,11 @@ export const mascotLook = (t: number): Look => {
   }
   if (inS("s5", t)) {
     const w = s5Work();
-    if (between(t, w.r0, w.d1)) return {...work, at: lerp3(LADDER5_TOP, LADDER5_BOT, (t - w.r0) / (w.d1 - w.r0)), ry: -Math.PI / 2};
+    if (between(t, w.r0, w.d1)) return {...work, at: path(LADDER5, (t - w.r0) / (w.d1 - w.r0)), ry: -Math.PI / 2};
     if (between(t, w.d1, w.w1)) return {...work, at: lerp3(LADDER5_BOT, [IN_X1_M - 0.55, IN_Y0, 0.6], (t - w.d1) / (w.w1 - w.d1)), ry: Math.PI / 2};
     if (between(t, w.w1, w.v)) return {...work, at: [rollX(t) - 0.55, IN_Y0, 0.6], ry: Math.PI / 2, lHand: "open", rHand: "open"};
     if (between(t, w.v, w.back)) return {...work, at: lerp3([rollX(w.v) - 0.55, IN_Y0, 0.6], LADDER5_BOT, (t - w.v) / (w.back - w.v)), ry: -Math.PI / 2};
-    if (between(t, w.back, w.up)) return {...work, at: lerp3(LADDER5_BOT, LADDER5_TOP, (t - w.back) / (w.up - w.back)), ry: -Math.PI / 2};
+    if (between(t, w.back, w.up)) return {...work, at: path([...LADDER5].reverse(), (t - w.back) / (w.up - w.back)), ry: -Math.PI / 2};
     return {...work, at: SIDE, rHand: t < rew("s5").P ? "point" : undefined};
   }
   if (inS("s6", t)) {
