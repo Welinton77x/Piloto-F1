@@ -6,8 +6,8 @@ import type {TimedScene} from "../data/scenes";
 import {L, SP, clamp01, easeOut, mixHex} from "../lib/anim";
 import {project} from "../lib/camera";
 import {track} from "../lib/track";
-import {REWINDS, RW, heat, imagineAmount, te} from "../lib/story";
-import {neighborJump, neighborLand, neighborLook} from "../lib/mascotPose";
+import {REWINDS, RW, W, carSpeed, carX, failing, imagineAmount, rew, te} from "../lib/story";
+import {mascotLook} from "../lib/mascotPose";
 
 export const FONT = "Montserrat";
 const KIND: Record<Kind, {bg: string; fg: string}> = {
@@ -42,7 +42,7 @@ const Icon: React.FC<{kind: Kind; size: number}> = ({kind, size}) => {
 
 /* ---------- Etiquetas (pílulas brancas com bolinha colorida, como no vídeo de exemplo) ---------- */
 // termos técnicos aparecem primeiro como TÍTULO GRANDE AMARELO e depois viram etiqueta
-const TERMS = new Set(["CONCRETO MAGRO", "≈ 25 TONELADAS", "CONCRETO ARMADO", "IMPERMEABILIZAÇÃO", "TESTE DE ESTANQUEIDADE", "SKIMMER", "FILTRO DE AREIA", "CASA DE MÁQUINAS", "CLORO"]);
+const TERMS = new Set(["PISTÃO", "VIRABREQUIM", "MOTOR", "RADIADOR", "EMBREAGEM", "CÂMBIO", "DIFERENCIAL", "DIREÇÃO", "SUSPENSÃO", "PNEU", "FREIO", "CARRO PRONTO!"]);
 const BIG = 46;
 
 const BadgeView: React.FC<{b: Badge; top: number; f: number; from: number}> = ({b, top, f, from}) => {
@@ -99,8 +99,8 @@ const Badges: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
 
 /* ---------- s1: a pergunta grande ---------- */
 const TitleCard: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
-  const a = (wordLocal(s, "Dia") ?? 10) + 4;
-  const out = (wordLocal(s, "ideia") ?? 1e9) - 8; // some quando o mascote levanta com a ideia
+  const a = (wordLocal(s, "viajar") ?? 10) - 2;
+  const out = (wordLocal(s, "fôlego") ?? 1e9) - 10;
   if (f < a - 4 || f >= out + 8) return null;
   const sc = SP(f, a - 4, 10, 140) * (1 - clamp01((f - out) / 8));
   const line = (t: string, c: string, fs: number, d: number) => (
@@ -108,73 +108,155 @@ const TitleCard: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
   );
   return (
     <div style={{position: "absolute", top: 250, left: 40, right: 40, textAlign: "center", fontFamily: FONT, fontWeight: 900, lineHeight: 1.02, WebkitTextStroke: "14px #101820", paintOrder: "stroke fill", textShadow: "0 9px 0 rgba(16,24,32,0.4)", transform: `scale(${sc}) rotate(${Math.sin(f * 0.1) * 1.2}deg)`}}>
-      {line("COMO UM BURACO", "#FFFFFF", 92, 0)}
-      {line("VIRA UMA", "#FFFFFF", 92, 4)}
-      {line("PISCINA?", "#FFD60A", 140, 8)}
+      {line("VOCÊ CONSTRUIU", "#FFFFFF", 92, 0)}
+      {line("UM CARRO", "#FFD60A", 140, 4)}
+      {line("DO ZERO?", "#FFFFFF", 100, 8)}
     </div>
   );
 };
 
-/* ---------- s1: calor — sol forte, termômetro e ondas de calor ---------- */
-const Heat: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
-  const k = heat(s.startFrame + f);
-  if (k <= 0.01) return null;
-  const temp = Math.round(L(f, 0, (wordLocal(s, "derretendo") ?? 60) + 10, 32, 41));
+/* ---------- balões de reação do mascote (como na referência: EITA!, UHUL!) ---------- */
+const BALLOONS: [string, string, string][] = [
+  ["s1", "fôlego", "UFA!"], ["s2", "explode", "BUM!"], ["s3", "trancos", "EITA!"], ["s4", "travar", "AI!"],
+  ["s5", "semáforo", "SOCORRO!"], ["s6", "chia", "IIIH!"], ["s7", "tombar", "OPA!"], ["s8", "coluna", "AI!"],
+  ["s9", "demais", "SOCORRO!"], ["s10", "Parabéns", "VRUM!"],
+];
+const Balloon: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
+  const gf = s.startFrame + f;
+  const b = BALLOONS.find((x) => x[0] === s.id);
+  if (!b) return null;
+  const a = (wordLocal(s, b[1]) ?? -999) - 4;
+  if (f < a || f > a + 45) return null;
+  const t = te(gf);
+  const ml = mascotLook(t);
+  if (!ml.at) return null;
+  const pt = project(gf, [carX(t) + ml.at[0], ml.at[1] + (ml.pivotHip ? 1.05 : 1.55), ml.at[2]]);
+  if (!pt) return null;
+  const x = Math.max(200, Math.min(880, pt.x + 120)), y = Math.max(540, Math.min(1080, pt.y - 60));
+  const o = 1 - clamp01((f - a - 38) / 7);
   return (
-    <AbsoluteFill style={{pointerEvents: "none", opacity: k}}>
-      {/* ondas de calor */}
-      {Array.from({length: 6}).map((_, i) => (
-        <svg key={i} width={1080} height={60} style={{position: "absolute", left: 0, top: 1500 - ((f * 3 + i * 230) % 1300), opacity: 0.22}}>
-          <path d={`M0 30 ${Array.from({length: 12}).map((__, j) => `Q ${j * 90 + 45} ${30 + (j % 2 ? -18 : 18) * Math.sin(f * 0.1 + i)} ${(j + 1) * 90} 30`).join(" ")}`} stroke="#ffffff" strokeWidth={6} fill="none" />
-        </svg>
-      ))}
-      {/* sol */}
-      <svg width={300} height={300} viewBox="-150 -150 300 300" style={{position: "absolute", right: -40, top: 560, transform: `rotate(${f * 0.8}deg) scale(${1 + 0.05 * Math.sin(f * 0.2)})`}}>
-        {Array.from({length: 12}).map((_, i) => (
-          <rect key={i} x={-10} y={-140} width={20} height={44} rx={10} fill="#ffb300" transform={`rotate(${i * 30})`} />
-        ))}
-        <circle r={78} fill="#ffd54f" stroke="#ff8f00" strokeWidth={8} />
-      </svg>
-      {/* termômetro */}
-      <div style={{position: "absolute", left: 60, top: 600, display: "flex", alignItems: "center", gap: 12, background: "#ffffff", borderRadius: 60, padding: "10px 26px 10px 14px", boxShadow: "0 6px 0 rgba(0,0,0,0.28)", fontFamily: FONT, fontWeight: 900, fontSize: 54, color: "#E53935", transform: `scale(${SP(f, 6, 10, 150)})`}}>
-        <svg width={44} height={70} viewBox="0 0 24 40">
-          <rect x="8" y="2" width="8" height="26" rx="4" fill="#ffffff" stroke="#101820" strokeWidth="2" />
-          <rect x="10.5" y={26 - 20 * clamp01((temp - 30) / 12)} width="3" height={20 * clamp01((temp - 30) / 12) + 4} fill="#E53935" />
-          <circle cx="12" cy="32" r="6" fill="#E53935" stroke="#101820" strokeWidth="2" />
-        </svg>
-        {temp}°C
-      </div>
-    </AbsoluteFill>
+    <div style={{position: "absolute", left: x, top: y, transform: `translate(-50%, -100%) scale(${SP(f, a, 9, 170)}) rotate(-6deg)`, opacity: o, fontFamily: FONT, fontWeight: 900, fontSize: 60, color: "#101820", background: "#FFD60A", border: "6px solid #101820", borderRadius: 40, padding: "6px 26px", boxShadow: "0 6px 0 rgba(0,0,0,0.3)", whiteSpace: "nowrap"}}>
+      {b[2]}
+    </div>
   );
 };
 
-/* ---------- s2: o vizinho grita ao pular no lamaçal ---------- */
-const Shout: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
+/* ---------- s2: cartão histórico (como o "chacoalha-ossos" da referência) ---------- */
+const HistoryCard: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
+  const a = (wordLocal(s, "motor") ?? 1e9) + 4;
+  if (f < a || f > a + 75) return null;
+  const o = 1 - clamp01((f - a - 68) / 7);
+  return (
+    <div style={{position: "absolute", left: 140, right: 140, top: 1300, opacity: o, transform: `scale(${SP(f, a, 10, 150) * 0.85}) rotate(-2deg)`, fontFamily: FONT, fontWeight: 900, textAlign: "center"}}>
+      <div style={{background: "#fff8e1", border: "6px solid #101820", borderRadius: 26, padding: "18px 22px", boxShadow: "0 8px 0 rgba(0,0,0,0.3)"}}>
+        <div style={{fontSize: 46, color: "#e65100"}}>PRIMEIRO CARRO</div>
+        <div style={{fontSize: 30, color: "#101820", marginTop: 4}}>1886 · 3 RODAS · ~16 km/h</div>
+        <svg width={360} height={130} viewBox="0 0 360 130" style={{marginTop: 8}}>
+          <circle cx={80} cy={95} r={30} fill="none" stroke="#101820" strokeWidth={8} />
+          <circle cx={280} cy={95} r={30} fill="none" stroke="#101820" strokeWidth={8} />
+          <path d="M80 95 L150 60 L250 60 L280 95 M150 60 L170 25 L210 25" stroke="#101820" strokeWidth={8} fill="none" strokeLinecap="round" />
+          <rect x={185} y={62} width={50} height={26} fill="#8d6e63" stroke="#101820" strokeWidth={5} />
+        </svg>
+      </div>
+    </div>
+  );
+};
+
+/* ---------- s4: termômetro do motor ---------- */
+const TempGauge: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
   const gf = s.startFrame + f;
   const t = te(gf);
-  const a = neighborJump(s.id) - 14, b = neighborLand(s.id) + 12;
-  if (t < a || t > b) return null;
-  const nl = neighborLook(t);
-  if (!nl.at) return null;
-  const pt = project(gf, [nl.at[0], nl.at[1] + 1.95, nl.at[2]]);
-  if (!pt) return null;
-  const x = Math.max(220, Math.min(860, pt.x)), y = Math.max(560, Math.min(1080, pt.y - 40));
+  const r = rew("s4");
+  const a = r.P - s.startFrame - 6, e = (wordLocal(s, "radiador") ?? 200) + 50;
+  if (f < a || f > e) return null;
+  const hot = failing("s4", t) ? L(t, r.P, r.P + 30, 0.4, 1) : t >= r.R ? L(gf, W("s4", "água"), W("s4", "radiador"), 1, 0.45) : 0.4;
+  const ang = -110 + 220 * hot;
   return (
-    <div style={{position: "absolute", left: x, top: y, transform: `translate(-50%, -100%) scale(${SP(t, a, 9, 170)}) rotate(-6deg)`, fontFamily: FONT, fontWeight: 900, fontSize: 64, color: "#101820", background: "#FFD60A", border: "6px solid #101820", borderRadius: 40, padding: "6px 28px", boxShadow: "0 6px 0 rgba(0,0,0,0.3)", whiteSpace: "nowrap"}}>
-      UHUUU!
+    <div style={{position: "absolute", right: 60, top: 600, width: 250, textAlign: "center", fontFamily: FONT, fontWeight: 900, transform: `scale(${SP(f, a, 12, 140)})`}}>
+      <svg width={250} height={220} viewBox="0 0 260 230">
+        <circle cx={130} cy={130} r={110} fill="#ffffff" stroke="#101820" strokeWidth={10} />
+        <path d="M 52 182 A 95 95 0 0 1 130 35" fill="none" stroke="#1e88e5" strokeWidth={14} strokeLinecap="round" />
+        <path d="M 130 35 A 95 95 0 0 1 208 182" fill="none" stroke="#E53935" strokeWidth={14} strokeLinecap="round" />
+        <line x1={130} y1={130} x2={130 + Math.sin((ang * Math.PI) / 180) * 80} y2={130 - Math.cos((ang * Math.PI) / 180) * 80} stroke="#101820" strokeWidth={9} strokeLinecap="round" />
+        <circle cx={130} cy={130} r={13} fill="#101820" />
+      </svg>
+      <div style={{fontSize: 36, color: "#fff", WebkitTextStroke: "7px #101820", paintOrder: "stroke fill"}}>MOTOR</div>
     </div>
+  );
+};
+
+/* ---------- s5/s9: velocímetro ---------- */
+const Speedo: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
+  const gf = s.startFrame + f;
+  const t = te(gf);
+  let a: number, e: number;
+  if (s.id === "s5") {
+    a = (wordLocal(s, "Primeira") ?? 0) - 6;
+    e = (wordLocal(s, "câmbio") ?? 0) + 40;
+  } else {
+    a = 0;
+    e = (wordLocal(s, "calor") ?? 0) + 30;
+  }
+  if (f < a || f > e) return null;
+  const kmh = Math.round(carSpeed(t) * 700);
+  const ang = -120 + 240 * clamp01(kmh / 120);
+  return (
+    <div style={{position: "absolute", left: 60, top: 600, width: 250, textAlign: "center", fontFamily: FONT, fontWeight: 900, transform: `scale(${SP(f, a, 12, 140)})`}}>
+      <svg width={250} height={220} viewBox="0 0 260 230">
+        <circle cx={130} cy={130} r={110} fill="#101820" stroke="#ffffff" strokeWidth={8} />
+        <path d="M 52 182 A 95 95 0 1 1 208 182" fill="none" stroke="#2E9E4F" strokeWidth={12} strokeLinecap="round" />
+        <path d="M 180 50 A 95 95 0 0 1 208 182" fill="none" stroke="#E53935" strokeWidth={12} strokeLinecap="round" />
+        <line x1={130} y1={130} x2={130 + Math.sin((ang * Math.PI) / 180) * 82} y2={130 - Math.cos((ang * Math.PI) / 180) * 82} stroke="#ff7a1a" strokeWidth={8} strokeLinecap="round" />
+        <text x={130} y={190} textAnchor="middle" fontSize={38} fontFamily={FONT} fontWeight={900} fill="#ffffff">{kmh}</text>
+      </svg>
+      <div style={{fontSize: 32, color: "#fff", WebkitTextStroke: "7px #101820", paintOrder: "stroke fill"}}>km/h</div>
+    </div>
+  );
+};
+
+/* ---------- s6: na curva, a roda de fora anda mais (diagrama visto de cima) ---------- */
+const CurveDiagram: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
+  const a = (wordLocal(s, "curioso") ?? 1e9) - 4, e = (wordLocal(s, "Então") ?? 1e9) + 10;
+  if (f < a || f > e) return null;
+  const k = clamp01((f - a) / 30);
+  const arc = (r: number) => `M ${90 + r} 520 A ${r} ${r} 0 0 0 90 ${520 - r}`;
+  const o = 1 - clamp01((f - e + 8) / 8);
+  return (
+    <div style={{position: "absolute", left: 140, top: 520, opacity: o, transform: `scale(${SP(f, a, 11, 150)})`, transformOrigin: "0% 0%"}}>
+      <svg width={800} height={560} viewBox="0 0 800 560">
+        <rect x={0} y={0} width={800} height={560} rx={36} fill="rgba(16,24,32,0.78)" />
+        <path d={arc(420)} stroke="#E53935" strokeWidth={22} fill="none" strokeLinecap="round" strokeDasharray={700} strokeDashoffset={700 * (1 - k)} />
+        <path d={arc(270)} stroke="#4DD0FF" strokeWidth={22} fill="none" strokeLinecap="round" strokeDasharray={460} strokeDashoffset={460 * (1 - k)} />
+        <text x={480} y={150} fontSize={44} fontFamily={FONT} fontWeight={900} fill="#ff6b6b">FORA: MAIS</text>
+        <text x={350} y={330} fontSize={44} fontFamily={FONT} fontWeight={900} fill="#4DD0FF">DENTRO: MENOS</text>
+      </svg>
+    </div>
+  );
+};
+
+/* ---------- s9: linhas de velocidade (como na referência) ---------- */
+const SpeedLines: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
+  const t = te(s.startFrame + f);
+  if (carSpeed(t) < 0.12) return null;
+  return (
+    <AbsoluteFill style={{pointerEvents: "none"}}>
+      <svg width={1080} height={1920}>
+        {Array.from({length: 26}).map((_, i) => {
+          const ang = (i / 26) * Math.PI * 2 + random("sl" + i);
+          const r0 = 520 + ((f * 37 + i * 91) % 300), r1 = r0 + 220;
+          return <line key={i} x1={540 + Math.cos(ang) * r0} y1={960 + Math.sin(ang) * r0} x2={540 + Math.cos(ang) * r1} y2={960 + Math.sin(ang) * r1} stroke="#ffffff" strokeWidth={6} opacity={0.7} strokeLinecap="round" />;
+        })}
+      </svg>
+    </AbsoluteFill>
   );
 };
 
 /* ---------- ✓ e ✕ grandes ---------- */
 type Stamp = {id: string; word: string; ok: boolean; x: number; y: number};
 const STAMPS: Stamp[] = [
-  {id: "s2", word: "Nem", ok: false, x: 840, y: 760},
-  {id: "s4", word: "armado", ok: true, x: 860, y: 760},
-  {id: "s5", word: "estanqueidade", ok: true, x: 860, y: 760},
-  {id: "s6", word: "antiderrapante", ok: true, x: 860, y: 760},
-  {id: "s8", word: "não", ok: false, x: 860, y: 1000},
-  {id: "s8", word: "sempre", ok: true, x: 860, y: 760},
+  {id: "s3", word: "lisinho", ok: true, x: 860, y: 760},
+  {id: "s6", word: "diferencial", ok: true, x: 860, y: 760},
+  {id: "s9", word: "freio", ok: true, x: 860, y: 760},
 ];
 const Stamps: React.FC<{s: TimedScene; f: number}> = ({s, f}) => (
   <>
@@ -193,17 +275,16 @@ const Stamps: React.FC<{s: TimedScene; f: number}> = ({s, f}) => (
   </>
 );
 
-/* ---------- "E se fizer errado?": pausa + tela de imaginação + REBOBINAR (todas as janelas) ---------- */
+/* ---------- pausar e rebobinar: ⏸ e ⏪ GRANDES NO MEIO DA TELA (pedido do usuário) ---------- */
 const Imagine: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
   const gf = s.startFrame + f;
   const r = REWINDS.find((x) => x.id === s.id);
   if (!r) return null;
   const k = imagineAmount(gf);
   const rewOn = gf >= r.R && gf < r.R + RW;
-  const pauseOn = gf >= r.P && gf < r.P + 34;
-  const txt = s.id === "s2" || s.id === "s8" ? "IMAGINA…" : "E SE…?";
+  const pauseOn = gf >= r.P && gf < r.P + 30;
   const icon = (kind: "pause" | "rew", sc: number, o: number) => (
-    <svg width={200} height={200} viewBox="0 0 24 24" style={{position: "absolute", left: 60, top: 900, transform: `scale(${sc})`, opacity: o}}>
+    <svg width={300} height={300} viewBox="0 0 24 24" style={{position: "absolute", left: 540 - 150, top: 960 - 150, transform: `scale(${sc})`, opacity: o}}>
       <circle cx="12" cy="12" r="11.5" fill="rgba(16,24,32,0.55)" />
       {kind === "pause" ? (
         <>
@@ -218,58 +299,39 @@ const Imagine: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
       )}
     </svg>
   );
-  const po = 1 - clamp01((gf - r.P - 26) / 8);
+  const po = 1 - clamp01((gf - r.P - 22) / 8);
   return (
     <AbsoluteFill style={{pointerEvents: "none"}}>
-      {k > 0.01 && <AbsoluteFill style={{boxShadow: `inset 0 0 ${260 * k}px ${80 * k}px rgba(30,20,10,0.75)`}} />}
+      {k > 0.01 && <AbsoluteFill style={{boxShadow: `inset 0 0 ${260 * k}px ${80 * k}px rgba(30,20,10,0.7)`}} />}
       {pauseOn && icon("pause", SP(gf, r.P, 10, 160), po)}
-      {pauseOn && (
-        <div style={{position: "absolute", top: 1110, left: 50, fontFamily: FONT, fontWeight: 900, fontSize: 58, color: "#FFD60A", WebkitTextStroke: "10px #101820", paintOrder: "stroke fill", opacity: po, transform: `scale(${SP(gf, r.P + 3, 10, 160)})`, transformOrigin: "0% 50%"}}>{txt}</div>
-      )}
       {rewOn && (
         <>
           {icon("rew", 1 + 0.08 * Math.sin(f * 0.9), 1)}
           {Array.from({length: 7}).map((_, i) => (
             <div key={i} style={{position: "absolute", left: 0, right: 0, top: ((i * 293 + f * 97) % 1920), height: 6 + (i % 3) * 5, background: "rgba(255,255,255,0.35)"}} />
           ))}
-          <div style={{position: "absolute", top: 1110, left: 50, fontFamily: FONT, fontWeight: 900, fontSize: 54, color: "#fff", WebkitTextStroke: "9px #101820", paintOrder: "stroke fill", opacity: Math.floor(f / 6) % 2 ? 1 : 0.6}}>VOLTANDO...</div>
+          <div style={{position: "absolute", top: 740, left: 0, right: 0, textAlign: "center", fontFamily: FONT, fontWeight: 900, fontSize: 58, color: "#fff", WebkitTextStroke: "10px #101820", paintOrder: "stroke fill", opacity: Math.floor(f / 6) % 2 ? 1 : 0.6}}>VOLTANDO...</div>
         </>
       )}
     </AbsoluteFill>
   );
 };
 
-/* ---------- s5 (E se?): conta de água disparando ---------- */
-const Bill: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
-  const gf = s.startFrame + f;
-  const r = REWINDS.find((x) => x.id === "s5")!;
-  const a = r.P + 30;
-  if (gf < a || gf >= r.R) return null;
-  const v = Math.round(L(gf, a, r.R - 6, 95, 780));
-  return (
-    <div style={{position: "absolute", left: 680, top: 600, width: 330, transform: `scale(${SP(gf, a, 10, 150)}) rotate(4deg)`, fontFamily: FONT, fontWeight: 900}}>
-      <div style={{background: "#ffffff", borderRadius: 18, padding: "18px 22px", boxShadow: "0 8px 0 rgba(0,0,0,0.3)", border: "5px solid #101820", textAlign: "center"}}>
-        <div style={{fontSize: 30, color: "#101820"}}>CONTA DE ÁGUA</div>
-        <div style={{height: 4, background: "#cfd8dc", margin: "10px 0"}} />
-        <div style={{fontSize: 70, color: "#E53935"}}>R$ {v}</div>
-      </div>
-    </div>
-  );
-};
-
-/* ---------- s9: pergunta final grande ---------- */
+/* ---------- s10: pergunta final grande ---------- */
 const FinalCTA: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
-  const a = (wordLocal(s, "teria") ?? Math.round(s.durationInFrames * 0.6)) - 10;
-  const c = wordLocal(s, "Comenta") ?? a + 70;
-  const e = (wordLocal(s, "segue") ?? c + 30) - 2;
-  if (f < a || f >= e + 6) return null;
-  const o = 1 - clamp01((f - e) / 6);
+  const a = (wordLocal(s, "Comente") ?? Math.round(s.durationInFrames * 0.6)) - 6;
+  const c = (wordLocal(s, "próximo") ?? a + 70) - 30;
+  if (f < a) return null;
   return (
-    <div style={{position: "absolute", top: 270, left: 40, right: 40, textAlign: "center", fontFamily: FONT, fontWeight: 900, lineHeight: 1.02, WebkitTextStroke: "13px #101820", paintOrder: "stroke fill", textShadow: "0 9px 0 rgba(16,24,32,0.4)", opacity: o, transform: `scale(${SP(f, a, 10, 140)})`}}>
-      <div style={{fontSize: 80, color: "#fff"}}>VOCÊ TERIA CORAGEM</div>
-      <div style={{fontSize: 80, color: "#fff"}}>DE FAZER UMA?</div>
-      {f >= c - 2 && (
-        <div style={{fontSize: 120, color: "#FFD60A", marginTop: 10, transform: `scale(${SP(f, c - 2, 8, 180)}) rotate(${Math.sin(f * 0.25) * 3}deg)`}}>COMENTA AÍ!</div>
+    <div style={{position: "absolute", top: 260, left: 40, right: 40, textAlign: "center", fontFamily: FONT, fontWeight: 900, lineHeight: 1.02, WebkitTextStroke: "13px #101820", paintOrder: "stroke fill", textShadow: "0 9px 0 rgba(16,24,32,0.4)", transform: `scale(${SP(f, a, 10, 140)})`}}>
+      <div style={{fontSize: 100, color: "#fff"}}>COMENTE</div>
+      <div style={{fontSize: 140, color: "#FFD60A", transform: `rotate(${Math.sin(f * 0.25) * 3}deg)`}}>"VRUM"</div>
+      {f >= c && (
+        <div style={{fontSize: 62, color: "#fff", marginTop: 14, transform: `scale(${SP(f, c, 9, 170)})`}}>
+          O QUE VOCÊ QUER VER
+          <br />
+          NO <span style={{color: "#4DD0FF"}}>PRÓXIMO VÍDEO?</span>
+        </div>
       )}
     </div>
   );
@@ -362,139 +424,6 @@ const Captions: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
   );
 };
 
-/* ---------- Rótulos ancorados em pontos 3D ---------- */
-const Card: React.FC<{text: string; color: string; scale?: number; fs?: number}> = ({text, color, scale = 1, fs = 36}) => (
-  <div style={{fontFamily: FONT, fontWeight: 900, fontSize: fs, color: "#101820", background: "#FFFFFF", borderBottom: `7px solid ${color}`, borderRadius: 16, padding: "5px 20px 3px", boxShadow: "0 5px 0 rgba(0,0,0,0.28)", whiteSpace: "nowrap", transform: `scale(${scale})`}}>
-    {text}
-  </div>
-);
-
-type Lab = {id: string; text: string; p: [number, number, number]; word: string; until?: string; color: string};
-const LABELS: Lab[] = [
-  {id: "s3", text: "6 m", p: [1.5, 0.15, 1.5], word: "tamanho", until: "cava", color: "#1e88e5"},
-  {id: "s3", text: "3 m", p: [4.6, 0.15, 0.0], word: "tamanho", until: "cava", color: "#1e88e5"},
-  {id: "s3", text: "1,4 m", p: [-1.85, -0.7, 1.5], word: "profundidade", until: "cava", color: "#FFC400"},
-  {id: "s4", text: "1.000 kg", p: [-2.85, 0.45, 1.3], word: "mil", until: "Uma", color: "#E53935"},
-  {id: "s7", text: "RALO DE FUNDO", p: [1.5, -1.25, 1.2], word: "ralo", until: "bomba", color: "#1e88e5"},
-  {id: "s7", text: "BOMBA", p: [6.35, -0.65, 1.5], word: "bomba", color: "#1e88e5"},
-  {id: "s7", text: "BOCAIS", p: [-1.2, -0.3, 1.4], word: "bocais", color: "#1e88e5"},
-];
-
-const Labels: React.FC<{s: TimedScene; f: number}> = ({s, f}) => (
-  <>
-    {LABELS.filter((l) => l.id === s.id).map((l) => {
-      const f0 = wordLocal(s, l.word) ?? 0;
-      const f1 = l.until ? wordLocal(s, l.until) : undefined;
-      if (f < f0 || (f1 !== undefined && f >= f1)) return null;
-      const pt = project(s.startFrame + f, l.p);
-      if (!pt) return null;
-      const y = Math.max(520, Math.min(1150, pt.y));
-      const x = Math.max(200, Math.min(880, pt.x));
-      return (
-        <div key={l.text} style={{position: "absolute", left: x, top: y, transform: "translate(-50%, -50%)"}}>
-          <Card text={l.text} color={l.color} scale={SP(f, f0, 12, 160)} />
-        </div>
-      );
-    })}
-  </>
-);
-
-/* ---------- Painel genérico ---------- */
-const Panel: React.FC<{top: number; height: number; children: React.ReactNode; scale?: number; width?: number}> = ({top, height, children, scale = 1, width = 900}) => (
-  <div style={{position: "absolute", left: (1080 - width) / 2, width, top, height, background: "rgba(16,24,32,0.82)", border: "4px solid rgba(255,255,255,0.15)", borderRadius: 28, transform: `scale(${scale})`, transformOrigin: "50% 50%", fontFamily: FONT, fontWeight: 900, color: "#fff"}}>{children}</div>
-);
-
-/* lupa: s5 poros do concreto; s8 micróbios na água (estouram com o cloro) */
-const Lens: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
-  const pores = s.id === "s5";
-  const a = pores ? (wordLocal(s, "poros") ?? 30) - 4 : 4;
-  const endF = pores ? REWINDS.find((x) => x.id === "s5")!.P - s.startFrame + 20 : (wordLocal(s, "cloro") ?? 120) + 45;
-  if (f < a || f >= endF) return null;
-  const sc = SP(f, a, 12, 140) * (1 - clamp01((f - endF + 8) / 8));
-  const cl = wordLocal(s, "cloro") ?? 1e9;
-  const pop = pores ? 1 : 1 - clamp01((f - cl - 6) / 16);
-  const mic = (i: number) => {
-    const ang = i * 1.7 + f * 0.03;
-    const r = 70 + (i % 3) * 45;
-    return {x: 230 + Math.cos(ang) * r, y: 230 + Math.sin(ang * 1.3) * r, c: ["#7ed957", "#b388ff", "#ffb74d"][i % 3]};
-  };
-  return (
-    <div style={{position: "absolute", left: 600, top: 540, width: 460, height: 460, transform: `scale(${sc * 0.72})`, transformOrigin: "100% 0%"}}>
-      <svg width={460} height={520} viewBox="0 0 460 520">
-        <defs>
-          <clipPath id="lensClip"><circle cx={230} cy={230} r={200} /></clipPath>
-        </defs>
-        <rect x={300} y={380} width={40} height={140} rx={16} fill="#5b3a1e" transform="rotate(-35 320 450)" />
-        <circle cx={230} cy={230} r={200} fill={pores ? "#b9bec4" : "#4fb6ea"} />
-        <g clipPath="url(#lensClip)">
-          {pores
-            ? Array.from({length: 26}).map((_, i) => (
-                <g key={i}>
-                  <circle cx={30 + ((i * 97) % 400)} cy={30 + ((i * 61) % 400)} r={7 + (i % 5) * 4} fill="#5d6268" />
-                  {i % 4 === 0 && <circle cx={30 + ((i * 97) % 400)} cy={34 + ((i * 61) % 400) + ((f * 2 + i * 13) % 40)} r={6} fill="#3fb4f0" />}
-                </g>
-              ))
-            : Array.from({length: 7}).map((_, i) => {
-                const m = mic(i);
-                const ps = pop * (1 + (f > cl + 6 ? 0.4 * Math.sin((f - cl) * 0.6 + i) : 0));
-                return ps <= 0.02 ? null : (
-                  <g key={"m" + i} transform={`translate(${m.x} ${m.y}) scale(${ps})`}>
-                    {Array.from({length: 8}).map((__, k) => (
-                      <line key={k} x1={0} y1={0} x2={Math.cos((k / 8) * 6.28) * 34} y2={Math.sin((k / 8) * 6.28) * 34} stroke={m.c} strokeWidth={6} strokeLinecap="round" />
-                    ))}
-                    <circle r={24} fill={m.c} stroke="#101820" strokeWidth={4} />
-                    <circle cx={-8} cy={-4} r={5} fill="#101820" />
-                    <circle cx={8} cy={-4} r={5} fill="#101820" />
-                  </g>
-                );
-              })}
-        </g>
-        <circle cx={230} cy={230} r={200} fill="none" stroke="#2a2f38" strokeWidth={22} />
-        <circle cx={230} cy={230} r={200} fill="none" stroke="#c9d1da" strokeWidth={8} />
-      </svg>
-      <div style={{position: "absolute", left: 0, right: 0, top: 466, textAlign: "center"}}>
-        <Card text={pores ? "POROS" : "MICRÓBIOS"} color="#E53935" />
-      </div>
-    </div>
-  );
-};
-
-/* s8: medidor de pH (faixa verde = equilibrado); no "Imagina" sai do ponto */
-const PhGauge: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
-  const a = (wordLocal(s, "pH") ?? 150) - 4;
-  if (f < a) return null;
-  const gf = s.startFrame + f;
-  const r = REWINDS.find((x) => x.id === "s8")!;
-  const tt = te(gf);
-  const off = tt >= r.P && tt < r.R ? L(tt, r.P + 10, r.P + 35, 0, 1) : 0;
-  const ang = -10 + off * 100 + Math.sin(f * 0.2) * 3;
-  return (
-    <div style={{position: "absolute", right: 70, top: 640, width: 260, textAlign: "center", fontFamily: FONT, fontWeight: 900, color: "#fff", transform: `scale(${SP(f, a, 12, 140)})`}}>
-      <svg width={260} height={230} viewBox="0 0 260 230">
-        <circle cx={130} cy={130} r={110} fill="#ffffff" stroke="#101820" strokeWidth={10} />
-        <path d="M 52 182 A 95 95 0 0 1 75 60" fill="none" stroke="#E53935" strokeWidth={14} strokeLinecap="round" />
-        <path d="M 95 45 A 95 95 0 0 1 165 45" fill="none" stroke="#2E9E4F" strokeWidth={16} strokeLinecap="round" />
-        <path d="M 185 60 A 95 95 0 0 1 208 182" fill="none" stroke="#E53935" strokeWidth={14} strokeLinecap="round" />
-        <line x1={130} y1={130} x2={130 + Math.sin((ang * Math.PI) / 180) * 80} y2={130 - Math.cos((ang * Math.PI) / 180) * 80} stroke="#101820" strokeWidth={9} strokeLinecap="round" />
-        <circle cx={130} cy={130} r={13} fill="#101820" />
-      </svg>
-      <div style={{fontSize: 40, WebkitTextStroke: "7px #101820", paintOrder: "stroke fill"}}>pH</div>
-    </div>
-  );
-};
-
-/* s11 (b): marca do canal (sem ícones de comentar/compartilhar, a pedido do usuário) */
-const Brand: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
-  const wf = (wordLocal(s, "segue") ?? Math.round(318 * s.k)) + 2;
-  if (f < wf) return null;
-  return (
-    <div style={{position: "absolute", left: 0, right: 0, top: 290, textAlign: "center", fontFamily: FONT, fontWeight: 900, fontSize: 92, color: "#fff", WebkitTextStroke: "12px #101820", paintOrder: "stroke fill", transform: `scale(${SP(f, wf, 12, 140)})`}}>
-      POR DENTRO <span style={{color: "#4DD0FF"}}>LAB</span>
-    </div>
-  );
-};
-
-/* comemoração (s11): confete caindo e corações subindo a partir do "Parabéns" */
 const Celebration: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
   const cm = wordLocal(s, "Comenta");
   const c0 = cm !== undefined && f >= cm ? cm : finalCut - s.startFrame;
@@ -532,17 +461,16 @@ export const Overlay: React.FC<{s: TimedScene}> = ({s}) => {
   const f = useCurrentFrame();
   return (
     <AbsoluteFill>
-      {(s.id === "s5" || s.id === "s8") && <Lens s={s} f={f} />}
-      {s.id === "s5" && <Bill s={s} f={f} />}
-      {s.id === "s8" && <PhGauge s={s} f={f} />}
-      {s.id === "s9" && <Brand s={s} f={f} />}
-      {s.id === "s9" && <Celebration s={s} f={f} />}
-      {s.id === "s1" && <Heat s={s} f={f} />}
-      {(s.id === "s2" || s.id === "s9") && <Shout s={s} f={f} />}
+      {s.id === "s9" && <SpeedLines s={s} f={f} />}
+      {s.id === "s10" && <Celebration s={s} f={f} />}
       {s.id === "s1" && <TitleCard s={s} f={f} />}
-      {s.id === "s9" && <FinalCTA s={s} f={f} />}
+      {s.id === "s2" && <HistoryCard s={s} f={f} />}
+      {s.id === "s4" && <TempGauge s={s} f={f} />}
+      {(s.id === "s5" || s.id === "s9") && <Speedo s={s} f={f} />}
+      {s.id === "s6" && <CurveDiagram s={s} f={f} />}
+      {s.id === "s10" && <FinalCTA s={s} f={f} />}
+      <Balloon s={s} f={f} />
       <Imagine s={s} f={f} />
-      <Labels s={s} f={f} />
       <Stamps s={s} f={f} />
       <Badges s={s} f={f} />
       <Captions s={s} f={f} />

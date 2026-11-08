@@ -1,4 +1,4 @@
-// Vídeo 3 (piscina): cenas com tempos DERIVADOS DA VOZ (roteiro v5 aprovado). Sem timing.json => frames do plano.
+// Vídeo 4 (carro): cenas com tempos DERIVADOS DA VOZ (roteiro v5 aprovado). Sem timing.json => frames do plano.
 // Cada fala começa VO_OFFSET após o corte; a cena termina TAIL após o fim da fala.
 // Os frames locais do plano (câmera, animações, badges, sons) são reescalados para a nova duração,
 // e badges com anchorWord passam a entrar no frame real da palavra.

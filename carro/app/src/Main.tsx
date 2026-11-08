@@ -4,10 +4,9 @@ import * as THREE from "three";
 import {ThreeCanvas} from "@remotion/three";
 import {useThree} from "@react-three/fiber";
 import {VO_OFFSET, config, finalCut, hasVO, sceneAt, timed, wordLocal} from "./data/scenes";
-import {PoolWorld} from "./components/PoolWorld";
+import {CarWorld} from "./components/CarWorld";
 import {Overlay} from "./components/Overlay";
 import {REWINDS, W, heat, imagineAmount, rew, skyDark, start} from "./lib/story";
-import {neighborLand} from "./lib/mascotPose";
 import {FOV, poseAt} from "./lib/camera";
 import {track} from "./lib/track";
 import {clamp01, mixHex} from "./lib/anim";
@@ -63,7 +62,7 @@ export const Scene3D: React.FC<{at?: number; fixed?: FixedPose; sunny?: boolean;
   return (
     <ThreeCanvas width={width} height={height} shadows={{type: THREE.PCFSoftShadowMap}} camera={{fov: FOV, near: 0.1, far: 400, position: [0, 2, 40]}}>
       <CamRig at={at} fixed={fixed} />
-      <PoolWorld gf={gf} />
+      <CarWorld gf={gf} />
       {/* círculos vermelhos removidos a pedido do usuário */}
       {children}
     </ThreeCanvas>
@@ -85,29 +84,24 @@ const World: React.FC = () => {
 
 // efeitos pontuais amarrados às palavras (frames globais)
 const SFX_AT: [number, string, number][] = [
-  [W("s1", "ideia") - 4, "pop.wav", 0.35],
-  [W("s1", "abrir"), "thud.wav", 0.3],
-  [W("s1", "abrir") + 18, "thud.wav", 0.3],
-  [W("s1", "abrir") + 36, "thud.wav", 0.3],
-  [W("s1", "encher") - 4, "gurgle.wav", 0.3],
-  [start("s2"), "whoosh.wav", 0.3],
-  [W("s2", "desmoronam") - 4, "thud.wav", 0.45],
-  [rew("s2").P + 32, "splash.wav", 0.4],
-  [neighborLand(), "splash.wav", 0.5],
-  [neighborLand("s9"), "splash.wav", 0.5],
-  [W("s3", "máquina") - 10, "pump.wav", 0.25],
-  [W("s3", "socado"), "thud.wav", 0.3],
-  [W("s3", "racha"), "crinkle.wav", 0.4],
-  [W("s4", "trincava"), "crinkle.wav", 0.4],
-  [W("s4", "envolve") - 10, "pump.wav", 0.25],
-  [W("s5", "enche"), "gurgle.wav", 0.3],
-  [start("s7"), "gurgle.wav", 0.3],
-  [W("s7", "bomba"), "pump.wav", 0.3],
-  [W("s7", "bocais"), "bubble.wav", 0.3],
-  [W("s8", "cloro"), "drip.wav", 0.35],
-  [rew("s8").P + 22, "splash.wav", 0.3],
-  [W("s9", "pular") + 30, "splash.wav", 0.5],
-  [W("s9", "Parabéns"), "pop.wav", 0.35],
+  [W("s1", "Pega") + 10, "crinkle.wav", 0.25],
+  [W("s2", "faísca"), "tick.wav", 0.45],
+  [W("s2", "explode"), "boom.wav", 0.5],
+  [W("s2", "motor"), "engine.wav", 0.35],
+  [rew("s3").P, "engine.wav", 0.4],
+  [W("s3", "lisinho") - 10, "engine.wav", 0.3],
+  [rew("s4").P + 20, "steam.wav", 0.4],
+  [W("s4", "radiador"), "engine.wav", 0.3],
+  [rew("s5").P + 10, "horn.wav", 0.4],
+  [W("s5", "Quinta"), "engine.wav", 0.35],
+  [W("s6", "chia") - 4, "screech.wav", 0.4],
+  [rew("s7").P + 10, "screech.wav", 0.3],
+  [W("s8", "buraco"), "thud.wav", 0.5],
+  [rew("s9").P, "whoosh.wav", 0.4],
+  [W("s9", "freio"), "screech.wav", 0.45],
+  [W("s10", "cinto"), "tick.wav", 0.5],
+  [W("s10", "Parabéns"), "horn.wav", 0.35],
+  [W("s10", "Parabéns") + 4, "pop.wav", 0.35],
 ];
 
 export const Main: React.FC = () => (

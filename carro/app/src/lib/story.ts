@@ -1,6 +1,6 @@
-// Linha do tempo da história (vídeo 3): palavras-âncora, "E se…?" (pausa + imaginação) e REBOBINAR.
-// Tudo deriva do frame global; durante o rebobinar o mundo e o mascote leem um tempo que volta para trás.
-import {S, timed, wordLocal} from "../data/scenes";
+// Vídeo 4 (carro): linha do tempo da história. Tudo deriva do frame global.
+// Cada erro: ⏸ (P) → cena da falha → ⏪ no "Então você…" (R) volta até "back" → entra a peça nova.
+import {S, timed, totalFrames, wordLocal} from "../data/scenes";
 import {L, clamp01} from "./anim";
 
 export const RW = 26; // frames do rebobinar
@@ -13,80 +13,106 @@ export const W = (id: string, word: string, occ = 0, fb = 0.5): number => {
 export const start = (id: string) => S(id).startFrame;
 export const end = (id: string) => S(id).startFrame + S(id).durationInFrames;
 
-/** janelas "E se fizer errado?": P = pausa (início da imaginação), R = começa a rebobinar, back = para onde volta */
-export type Rewind = {id: string; P: number; R: number; back: number};
+export type Rewind = {id: string; P: number; R: number; back: number; label: string};
+const mk = (id: string, pWord: string, label: string, occ = 0): Rewind => {
+  const P = W(id, pWord, occ) - 6;
+  return {id, P, R: W(id, "Então"), back: P, label};
+};
 export const REWINDS: Rewind[] = [
-  {id: "s2", P: W("s2", "Imagina") - 8, R: W("s2", "Volta"), back: start("s1")},
-  {id: "s3", P: W("s3", "se") - 6, R: W("s3", "Volta"), back: W("s3", "se") - 6},
-  {id: "s4", P: W("s4", "Se") - 6, R: W("s4", "Por", 2), back: W("s4", "Se") - 6},
-  {id: "s5", P: W("s5", "Sem") - 6, R: W("s5", "Por"), back: W("s5", "Sem") - 6},
-  {id: "s8", P: W("s8", "Imagina") - 8, R: W("s8", "Por"), back: W("s8", "Imagina") - 8},
+  mk("s3", "trancos", "TREME"),
+  mk("s4", "esquenta", "SUPERAQUECE"),
+  mk("s5", "Mas", "NÃO PARA"),
+  mk("s7", "se", "TOMBA"),
+  mk("s9", "corre", "SEM FREIO"),
 ];
+export const rew = (id: string) => REWINDS.find((x) => x.id === id)!;
 
-/** tempo efetivo do mundo: igual ao frame, exceto durante o rebobinar (volta rápido até "back") */
+/** tempo efetivo: igual ao frame, exceto durante o rebobinar (volta rápido até "back") */
 export const te = (gf: number): number => {
   for (const r of REWINDS) if (gf >= r.R && gf < r.R + RW) return Math.round(r.R - ((gf - r.R) / RW) * (r.R - r.back));
   return gf;
 };
-/** dentro da imaginação (entre a pausa e o começo do rebobinar), no tempo efetivo */
+/** dentro da falha (entre a pausa e o rebobinar), no tempo efetivo */
 export const failing = (id: string, t: number) => {
-  const r = REWINDS.find((x) => x.id === id)!;
+  const r = rew(id);
   return t >= r.P && t < r.R;
 };
-export const rew = (id: string) => REWINDS.find((x) => x.id === id)!;
-/** quanto a tela está "em modo imaginação" (sépia + vinheta) */
+/** tela "congelada/imaginação" (sépia + vinheta) durante a falha */
 export const imagineAmount = (gf: number) => {
   for (const r of REWINDS) {
-    if (gf >= r.P - 8 && gf < r.R + RW + 6) return L(gf, r.P - 8, r.P + 2, 0, 1) * (1 - L(gf, r.R + RW - 6, r.R + RW + 6, 0, 1));
+    if (gf >= r.P - 8 && gf < r.R + RW + 6) return L(gf, r.P - 4, r.P + 4, 0, 1) * (1 - L(gf, r.R + RW - 6, r.R + RW + 6, 0, 1));
   }
   return 0;
 };
-/** depois do rebobinar do s2, o quintal volta limpo até o fim da cena */
-export const undoneS2 = (gf: number) => gf >= rew("s2").R + RW && gf < start("s3");
+export const skyDark = (_gf: number) => 0;
+export const heat = (_gf: number) => 0;
 
-/** céu: dias passando rápido (teste de estanqueidade e água parada) — 0 = dia, 1 = noite */
-export const skyDark = (gf: number) => {
-  const spans: [number, number, number][] = [
-    [start("s2"), W("s2", "cadê") - 4, 1], // "No outro dia": uma noite passando rápido
-    [W("s5", "espera"), W("s5", "teste") + 5, 3],
-    [W("s7", "dias") - 5, W("s7", "verde") + 5, 3],
-  ];
-  for (const [a, b, n] of spans) {
-    if (gf >= a && gf < b) {
-      const k = (gf - a) / Math.max(1, b - a);
-      return 0.8 * Math.pow(Math.sin(k * Math.PI * n), 2);
-    }
+const inS = (id: string, t: number) => t >= start(id) && t < end(id);
+const after = (t: number, f: number) => t >= f;
+
+/* ---------- velocidade do carro (u/frame) e posição acumulada ---------- */
+const speed = (t: number): number => {
+  if (inS("s1", t)) return t > W("s1", "Pega") + 10 && t < W("s1", "fôlego") - 8 ? 0.018 : 0;
+  if (inS("s2", t)) return t > W("s2", "motor") ? 0.05 : 0;
+  if (inS("s3", t)) {
+    if (failing("s3", t)) return 0.04;
+    return t > W("s3", "quatro") ? 0.07 : 0.03;
   }
+  if (inS("s4", t)) {
+    const r = rew("s4");
+    if (t < r.P) return 0.07;
+    if (failing("s4", t)) return L(t, r.P, r.P + 40, 0.07, 0);
+    return t > W("s4", "radiador") ? 0.07 : 0;
+  }
+  if (inS("s5", t)) {
+    const r = rew("s5");
+    if (t < r.R) return 0.07; // não consegue parar: passa o semáforo
+    if (t < W("s5", "Primeira")) return 0;
+    if (t < W("s5", "Quinta")) return 0.03;
+    return 0.11;
+  }
+  if (inS("s6", t)) return 0.07;
+  if (inS("s7", t)) return 0.05;
+  if (inS("s8", t)) return 0.06;
+  if (inS("s9", t)) {
+    const fr = W("s9", "freio");
+    if (t < fr) return 0.14;
+    return L(t, fr, W("s9", "calor"), 0.14, 0);
+  }
+  if (inS("s10", t)) return t > W("s10", "Parabéns") ? 0.06 : 0;
   return 0;
 };
+const XS: number[] = (() => {
+  const out = new Array(totalFrames + 2).fill(0);
+  for (let f = 1; f < out.length; f++) out[f] = out[f - 1] + speed(f - 1);
+  return out;
+})();
+export const carX = (t: number) => XS[Math.max(0, Math.min(XS.length - 1, Math.round(t)))];
+export const carSpeed = (t: number) => speed(t);
+
+/* ---------- objetos fixos na rua, posicionados pela posição do carro ---------- */
+export const lightX = () => carX(rew("s5").P) + 3.2; // semáforo do s5
+export const potholeX = () => carX(W("s8", "buraco")) + 1.05 + 0.4; // buraco do s8 (roda da frente passa logo depois)
+export const boxesX = () => carX(W("s9", "calor") + 20) + 2.2; // caixas do s9 (o carro para antes)
+
+/* ---------- peças: 0 → 1 quando surgem (por palavra) ---------- */
+const appear = (t: number, f: number, d = 12) => (t < f ? 0 : clamp01((t - f) / d));
+export const parts = (t: number) => ({
+  engine: appear(t, W("s2", "cilindro") - 6),
+  crank: appear(t, W("s2", "barra") - 4),
+  four: appear(t, W("s3", "quatro") - 4),
+  radiator: appear(t, W("s4", "grade") - 6),
+  clutch: appear(t, W("s5", "discos") - 6),
+  gearbox: appear(t, W("s5", "engrenagens") - 6),
+  diff: appear(t, W("s6", "engrenagens") - 6),
+  steering: appear(t, W("s7", "articulação") - 6),
+  springs: appear(t, W("s8", "molas") - 6),
+  tires: appear(t, W("s8", "borracha") - 4),
+  brakes: appear(t, W("s9", "disco") - 6),
+  body: appear(t, start("s10") + 4, 20),
+  lights: appear(t, W("s10", "faróis") - 2, 6),
+  wiper: appear(t, W("s10", "limpador") - 2, 6),
+  belt: appear(t, W("s10", "cinto") - 2, 6),
+});
 export const lastScene = timed[timed.length - 1];
-export {clamp01};
-
-/** calor do começo (s1): céu alaranjado, sol forte — some depois da "ideia" */
-export const heat = (gf: number) => (gf < end("s1") ? 1 - L(gf, W("s1", "ideia") + 10, W("s1", "abrir") + 10, 0, 1) : 0);
-
-/* ---------- trabalho do mascote dentro da piscina (desce e sobe pela escada) ---------- */
-/** s3: desce a escada de obra, passa o compactador da esquerda para a direita, volta para o lado firme */
-export const s3Work = () => {
-  const d0 = W("s3", "socado");
-  return {d0, d1: d0 + 20, c1: W("s3", "magro") + 6};
-};
-export const compX = (t: number) => {
-  const w = s3Work();
-  return L(t, w.d1, w.c1, -0.5, 3.6);
-};
-/** s5: depois do rebobinar desce a escada da piscina, vai até a parede da direita e puxa o rolo até a escada */
-export const s5Work = () => {
-  const r0 = rew("s5").R + RW;
-  const v = W("s5", "veda") + 20;
-  return {r0, d1: r0 + 18, w1: r0 + 34, v, back: v + 12, up: v + 36};
-};
-export const IN_X0 = -1.3, IN_X1 = 4.3;
-export const rollX = (t: number) => {
-  const w = s5Work();
-  return L(t, w.w1, w.v, IN_X1, IN_X0 + 0.6);
-};
-export const proofK = (t: number) => {
-  const w = s5Work();
-  return L(t, w.w1, w.v, 0, 1);
-};
+export {after};
