@@ -1,0 +1,24 @@
+name: Transcrever referência (carro)
+on:
+  push:
+    paths: ["carro/stt/PEDIDO.txt"]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency: stt-carro
+jobs:
+  stt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Transcrever
+        env:
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+        run: python carro/stt/transcrever.py
+      - name: Guardar no branch
+        run: |
+          git config user.name "claude-bot"; git config user.email "bot@users.noreply.github.com"
+          git add carro/stt/words.json
+          git commit -m "Transcrição da referência (carro)" || exit 0
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
