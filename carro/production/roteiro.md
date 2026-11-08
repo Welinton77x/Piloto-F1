@@ -1,6 +1,6 @@
 # Vídeo 4 — Você construiu um carro do zero
 
-**Versão:** v1 (AGUARDANDO APROVAÇÃO — implementação e renderização não iniciadas)  
+**Versão:** v2 (AGUARDANDO APROVAÇÃO — implementação e renderização não iniciadas)  
 **Canal:** Por Dentro Lab · **Formato:** Short vertical 1080 × 1920, 9:16, 30 fps
 
 ## 1. Briefing de produção
@@ -13,6 +13,7 @@
 - **Voz:** ElevenLabs, **Liam** (speed 1,08), gerada pelo workflow do GitHub com tempos por palavra. Legenda uma palavra por vez.
 - **Cenário:** rua de cidade low-poly (prédios coloridos, calçada, árvores, faixa de pedestre, semáforo), no estilo liso e claro do canal; a câmera acompanha o carro e entra em close nas peças em corte.
 - **Mascote:** o do canal (boné e camisa azuis), dirigindo e testando cada etapa, com reações e balões (UFA!, BUM!, EITA!, AI!, SOCORRO!). Sem sincronia labial; câmera sempre em movimento.
+- **Pausar e rebobinar (pedido do usuário):** em cada falha principal a cena congela com o **botão ⏸ grande no meio da tela**; no "Então você…" vem o **⏪ (duas setas) grande no meio da tela**, com "VOLTANDO…", som de fita e a cena voltando no tempo até antes do erro; aí entra a peça nova. Momentos: carro tremendo (s3), motor fumaçando e travando (s4), carro passando o semáforo vermelho (s5), carro quase tombando na curva (s7) e carro sem freio indo nas caixas (s9). A narração não muda.
 - **Sem círculos vermelhos** (pedido do usuário no vídeo 3). Destaques: etiquetas com bolinha, nomes em amarelo, ✓/✕, termômetro do motor, velocímetro, cartão histórico de 1886.
 
 ## 2. Tabela cronológica
