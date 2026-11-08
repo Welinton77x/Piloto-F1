@@ -52,9 +52,7 @@ const BadgeView: React.FC<{b: Badge; top: number; f: number; from: number}> = ({
   return (
     <div style={{position: "absolute", top, left: 70, right: 70, display: "flex", justifyContent: "center", transform: `scale(${sc * out})`, transformOrigin: "50% 0%", opacity: out}}>
       <div style={{display: "flex", alignItems: "center", gap: 16, background: "#FFFFFF", color: "#101820", fontFamily: FONT, fontWeight: 900, fontSize: 42, lineHeight: 1.08, padding: "12px 30px 12px 16px", borderRadius: 60, boxShadow: "0 6px 0 rgba(0,0,0,0.28)", textAlign: "center", maxWidth: 900}}>
-        <div style={{width: 50, height: 50, borderRadius: 25, background: k.bg, display: "flex", alignItems: "center", justifyContent: "center", flex: "none", boxShadow: `0 0 0 ${4 + 3 * Math.abs(Math.sin(f * 0.15))}px ${k.bg}44`}}>
-          <Icon kind={b.kind} size={44} />
-        </div>
+        <div style={{width: 24, height: 24, borderRadius: 12, background: k.bg, flex: "none", marginLeft: 10, boxShadow: `0 0 0 ${3 + 3 * Math.abs(Math.sin(f * 0.15))}px ${k.bg}44`}} />
         <span>{b.text}</span>
       </div>
     </div>
@@ -254,9 +252,25 @@ const SpeedLines: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
 /* ---------- ✓ e ✕ grandes ---------- */
 type Stamp = {id: string; word: string; ok: boolean; x: number; y: number};
 const STAMPS: Stamp[] = [
-  {id: "s3", word: "lisinho", ok: true, x: 860, y: 760},
-  {id: "s6", word: "diferencial", ok: true, x: 860, y: 760},
-  {id: "s9", word: "freio", ok: true, x: 860, y: 760},
+  // ✕ vermelho grande quando dá errado; ✓ verde grande quando dá certo (pedido do usuário)
+  {id: "s1", word: "fôlego", ok: false, x: 860, y: 900},
+  {id: "s2", word: "motor", ok: true, x: 860, y: 900},
+  {id: "s3", word: "trancos", ok: false, x: 860, y: 900},
+  {id: "s3", word: "lisinho", ok: true, x: 860, y: 900},
+  {id: "s4", word: "esquenta", ok: false, x: 860, y: 1000},
+  {id: "s4", word: "radiador", ok: true, x: 860, y: 1000},
+  {id: "s5", word: "semáforo", ok: false, x: 860, y: 900},
+  {id: "s5", word: "embreagem", ok: true, x: 860, y: 900},
+  {id: "s5", word: "câmbio", ok: true, x: 860, y: 900},
+  {id: "s6", word: "chia", ok: false, x: 860, y: 900},
+  {id: "s6", word: "diferencial", ok: true, x: 860, y: 900},
+  {id: "s7", word: "tombar", ok: false, x: 860, y: 900},
+  {id: "s7", word: "direção", ok: true, x: 860, y: 900},
+  {id: "s8", word: "coluna", ok: false, x: 860, y: 900},
+  {id: "s8", word: "suspensão", ok: true, x: 860, y: 900},
+  {id: "s8", word: "pneu", ok: true, x: 860, y: 900},
+  {id: "s9", word: "demais", ok: false, x: 860, y: 900},
+  {id: "s9", word: "freio", ok: true, x: 860, y: 900},
 ];
 const Stamps: React.FC<{s: TimedScene; f: number}> = ({s, f}) => (
   <>
@@ -266,8 +280,8 @@ const Stamps: React.FC<{s: TimedScene; f: number}> = ({s, f}) => (
       const sc = SP(f, a, 9, 170) * (1 - clamp01((f - a - 47) / 8));
       const c = t.ok ? "#2E9E4F" : "#E53935";
       return (
-        <svg key={t.word} width={170} height={170} viewBox="0 0 24 24" style={{position: "absolute", left: t.x - 85, top: t.y - 85, transform: `scale(${sc}) rotate(${t.ok ? -8 : 8}deg)`}}>
-          <circle cx="12" cy="12" r="11" fill={c} stroke="#fff" strokeWidth="1.6" />
+        <svg key={t.word} width={190} height={190} viewBox="0 0 24 24" style={{position: "absolute", left: t.x - 95, top: t.y - 95, transform: `scale(${sc})`, filter: "drop-shadow(0 6px 0 rgba(0,0,0,0.3))"}}>
+          <circle cx="12" cy="12" r="10.6" fill={c} stroke="#101820" strokeWidth="1.6" />
           {t.ok ? <path d="M6.5 12.5l3.8 3.8 7.4-8.3" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none" /> : <path d="M7.5 7.5l9 9M16.5 7.5l-9 9" stroke="#fff" strokeWidth="3" strokeLinecap="round" />}
         </svg>
       );

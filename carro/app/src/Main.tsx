@@ -5,6 +5,7 @@ import {ThreeCanvas} from "@remotion/three";
 import {useThree} from "@react-three/fiber";
 import {VO_OFFSET, config, finalCut, hasVO, sceneAt, timed, wordLocal} from "./data/scenes";
 import {CarWorld} from "./components/CarWorld";
+import {Post} from "./components/Post";
 import {Overlay} from "./components/Overlay";
 import {REWINDS, W, heat, imagineAmount, rew, skyDark, start} from "./lib/story";
 import {FOV, poseAt} from "./lib/camera";
@@ -63,6 +64,7 @@ export const Scene3D: React.FC<{at?: number; fixed?: FixedPose; sunny?: boolean;
     <ThreeCanvas width={width} height={height} shadows={{type: THREE.PCFSoftShadowMap}} camera={{fov: FOV, near: 0.1, far: 400, position: [0, 2, 40]}}>
       <CamRig at={at} fixed={fixed} />
       <CarWorld gf={gf} />
+      <Post focus={poseAt(gf).pos.distanceTo(poseAt(gf).target)} />
       {/* círculos vermelhos removidos a pedido do usuário */}
       {children}
     </ThreeCanvas>
