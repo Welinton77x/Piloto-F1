@@ -1,6 +1,6 @@
 # Vídeo 4 — Você construiu um carro do zero
 
-**Versão:** v2 (AGUARDANDO APROVAÇÃO — implementação e renderização não iniciadas)  
+**Versão:** v3 (AGUARDANDO APROVAÇÃO — implementação e renderização não iniciadas)  
 **Canal:** Por Dentro Lab · **Formato:** Short vertical 1080 × 1920, 9:16, 30 fps
 
 ## 1. Briefing de produção
@@ -9,7 +9,7 @@
 - **Referência analisada:** vídeo "Você construiu uma bicicleta do zero" (2:26) que o usuário enviou: quadros a cada 2 s e transcrição completa da fala. Estrutura observada: desejo → gambiarra que falha → "Então você…" → nome da peça ("Esse é o…") → novo problema; o personagem testa e se dá mal (EITA!, cai); etiquetas brancas com bolinha colorida; nome da peça em amarelo grudado nela; cartão histórico; velocímetro; linhas de velocidade; final "Parabéns, você construiu…" + "Comente X se você não sabia dessa". Mantemos a estrutura com texto, personagem e cenário próprios.
 - **Sistema construído:** uma carroça de madeira vira, peça por peça, um carro: motor (pistão + virabrequim) → 4 cilindros → radiador → embreagem → câmbio → diferencial → direção → suspensão → pneus → freio → faróis, limpador e cinto.
 - **Público:** leigos de 18 a 50 anos. **Tom:** como o narrador da referência e o do vídeo 3: contando como novidade, explicando o porquê.
-- **Duração estimada:** ~166 s (4992 frames). A voz real decide os cortes.
+- **Duração estimada:** ~169 s (5060 frames). A voz real decide os cortes.
 - **Voz:** ElevenLabs, **Liam** (speed 1,08), gerada pelo workflow do GitHub com tempos por palavra. Legenda uma palavra por vez.
 - **Cenário:** rua de cidade low-poly (prédios coloridos, calçada, árvores, faixa de pedestre, semáforo), no estilo liso e claro do canal; a câmera acompanha o carro e entra em close nas peças em corte.
 - **Mascote:** o do canal (boné e camisa azuis), dirigindo e testando cada etapa, com reações e balões (UFA!, BUM!, EITA!, AI!, SOCORRO!). Sem sincronia labial; câmera sempre em movimento.
@@ -40,9 +40,9 @@ Convenção: MM:SS:FF (FF de 00 a 29), intervalos semiabertos [início, fim). Te
 | 02:00:28 - 02:13:11 | 3628 - 4001 (s8) | Só que cada buraco vai direto na sua coluna. Então você prende as rodas em molas, que absorvem a pancada, e em amortecedores, que seguram o balanço. Essa é a suspensão. | Carro passa num buraco e o mascote pula do banco (EITA!); depois close nas molas comprimindo e no amortecedor; carro passa liso. | pothole, springs, dampers, mascot | spring.compress; car.body bounce reduzido | Balão EITA!; título amarelo SUSPENSÃO |
 | 02:13:11 - 02:19:12 | 4001 - 4182 (s8) | E troca as rodas de madeira por borracha cheia de ar. Esse é o pneu. | Rodas de madeira viram pneus pretos com aro; seta de ar entrando. | tires | wheel.swap (spring) | Título amarelo PNEU |
 | 02:19:12 - 02:34:13 | 4182 - 4633 (s9) | Agora o carro corre demais. Então você põe um disco de metal em cada roda, e duas pastilhas apertam ele quando você pisa no pedal. Esse é o freio. No fim, frear é transformar velocidade em calor. | Velocímetro alto, linhas de velocidade; um muro de caixas à frente; close no disco com pastilhas apertando; disco fica laranja de calor; carro para a centímetros das caixas. | speedometer, speedLines, brakeDisc, pads, boxes | speed 90→0; disc.heat 0→1; car para | Balão SOCORRO!; título amarelo FREIO; etiqueta i VELOCIDADE → CALOR |
-| 02:34:13 - 02:46:12 | 4633 - 4992 (s10) | Coloque faróis, limpador e cinto de segurança. Parabéns, você construiu um carro! Comente vrum se você não sabia dessa e segue o Por Dentro Lab. | Faróis acendem, limpador passa, cinto encaixa; carro moderno pronto andando na rua; mascote acena; confete. | headlights, wipers, seatbelt, finalCar, confetti | lights on; wiper sweep; belt click; car drive | Título amarelo CARRO!; pergunta final COMENTE "VRUM" com confete; POR DENTRO LAB em "segue" |
+| 02:34:13 - 02:48:20 | 4633 - 5060 (s10) | Coloque faróis, limpador e cinto de segurança. Parabéns, você construiu um carro! Comente vrum se você não sabia dessa, e comenta aí embaixo o que você quer ver no próximo vídeo. | Faróis acendem, limpador passa, cinto encaixa; carro moderno pronto andando na rua; mascote acena; confete. | headlights, wipers, seatbelt, finalCar, confetti | lights on; wiper sweep; belt click; car drive | Título amarelo CARRO!; pergunta final COMENTE "VRUM" com confete; pergunta PRÓXIMO VÍDEO? em "próximo" |
 
-Soma: 4992 frames contíguos (0 a 4991).
+Soma: 5060 frames contíguos (0 a 5059).
 
 ## 3. Narração integral
 
@@ -64,9 +64,9 @@ Soma: 4992 frames contíguos (0 a 4991).
 
 **s9.** Agora o carro corre demais. Então você põe um disco de metal em cada roda, e duas pastilhas apertam ele quando você pisa no pedal. Esse é o freio. No fim, frear é transformar velocidade em calor.
 
-**s10.** Coloque faróis, limpador e cinto de segurança. Parabéns, você construiu um carro! Comente vrum se você não sabia dessa e segue o Por Dentro Lab.
+**s10.** Coloque faróis, limpador e cinto de segurança. Parabéns, você construiu um carro! Comente vrum se você não sabia dessa, e comenta aí embaixo o que você quer ver no próximo vídeo.
 
-**Contagem:** 408 palavras → ~156 s de fala + pausas ≈ 166 s.
+**Contagem:** 414 palavras → ~158 s de fala + pausas ≈ 169 s.
 
 ## 4. Áudio e montagem
 - Voz Liam (ElevenLabs, `stability 0.45, similarity 0.8, style 0.4, speed 1.08`), uma faixa por cena, com tempos por palavra.

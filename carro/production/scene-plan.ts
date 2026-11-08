@@ -10,8 +10,8 @@ export type ScenePlan = {
   camera: CamKey[]; objects: string[]; animations: Anim[]; badges: Badge[]; highlights: string[];
   captions: { mode: "one-word-at-a-time"; status: "provisional" }; audioCues: AudioCue[];
 };
-export type VideoConfig = { width: 1080; height: 1920; fps: 30; durationInFrames: 4992; theme: "smooth-3d-city-car"; language: "pt-BR" };
-export const config: VideoConfig = { width: 1080, height: 1920, fps: 30, durationInFrames: 4992, theme: "smooth-3d-city-car", language: "pt-BR" };
+export type VideoConfig = { width: 1080; height: 1920; fps: 30; durationInFrames: 5060; theme: "smooth-3d-city-car"; language: "pt-BR" };
+export const config: VideoConfig = { width: 1080, height: 1920, fps: 30, durationInFrames: 5060, theme: "smooth-3d-city-car", language: "pt-BR" };
 const cap = { mode: "one-word-at-a-time", status: "provisional" } as const;
 const cue = (id: string, f: number, kind: "sfx" | "music" = "sfx"): AudioCue => ({ id, f, kind, status: "planned" });
 
@@ -82,12 +82,12 @@ export const scenes: ScenePlan[] = [
     animations: [{ target: "speed", unit: "ver roteiro", from: 0, to: 1, f0: 0, f1: 451, fn: "easeInOut" }, { target: "disc.heat", unit: "ver roteiro", from: 0, to: 1, f0: 0, f1: 451, fn: "easeInOut" }, { target: "car", unit: "ver roteiro", from: 0, to: 1, f0: 0, f1: 451, fn: "easeInOut" }],
     badges: [{ text: "FREIO", kind: "solution", f0: 0, anchorWord: "freio" }, { text: "VELOCIDADE → CALOR", kind: "neutral", f0: 0, anchorWord: "calor" }], highlights: ["calor", "freio"], captions: cap,
     audioCues: [cue("whoosh-s9", 0)] },
-  { id: "s10", voKey: "s10", startFrame: 4633, durationInFrames: 359,
-    narration: "Coloque faróis, limpador e cinto de segurança. Parabéns, você construiu um carro! Comente vrum se você não sabia dessa e segue o Por Dentro Lab.",
-    camera: [{ f: 0, az: 10, el: 10, dist: 9, target: [0, 0.8, 0] }, { f: 359, az: -6, el: 8, dist: 7, target: [0.6, 0.7, 0] }],
+  { id: "s10", voKey: "s10", startFrame: 4633, durationInFrames: 427,
+    narration: "Coloque faróis, limpador e cinto de segurança. Parabéns, você construiu um carro! Comente vrum se você não sabia dessa, e comenta aí embaixo o que você quer ver no próximo vídeo.",
+    camera: [{ f: 0, az: 10, el: 10, dist: 9, target: [0, 0.8, 0] }, { f: 427, az: -6, el: 8, dist: 7, target: [0.6, 0.7, 0] }],
     objects: ["confetti", "finalCar", "headlights", "seatbelt", "wipers"],
-    animations: [{ target: "lights", unit: "ver roteiro", from: 0, to: 1, f0: 0, f1: 359, fn: "easeInOut" }, { target: "wiper", unit: "ver roteiro", from: 0, to: 1, f0: 0, f1: 359, fn: "easeInOut" }, { target: "belt", unit: "ver roteiro", from: 0, to: 1, f0: 0, f1: 359, fn: "easeInOut" }, { target: "car", unit: "ver roteiro", from: 0, to: 1, f0: 0, f1: 359, fn: "easeInOut" }],
+    animations: [{ target: "lights", unit: "ver roteiro", from: 0, to: 1, f0: 0, f1: 427, fn: "easeInOut" }, { target: "wiper", unit: "ver roteiro", from: 0, to: 1, f0: 0, f1: 427, fn: "easeInOut" }, { target: "belt", unit: "ver roteiro", from: 0, to: 1, f0: 0, f1: 427, fn: "easeInOut" }, { target: "car", unit: "ver roteiro", from: 0, to: 1, f0: 0, f1: 427, fn: "easeInOut" }],
     badges: [{ text: "CARRO PRONTO!", kind: "solution", f0: 0, anchorWord: "Parabéns" }], highlights: ["parabéns"], captions: cap,
     audioCues: [cue("whoosh-s10", 0)] },
 ];
-// Integridade: 10 cenas contíguas, soma 4992 frames.
+// Integridade: 10 cenas contíguas, soma 5060 frames.
