@@ -2,7 +2,7 @@
 // Posições no referencial do carro (frente em +x). Recebe o tempo efetivo t (que volta no rebobinar).
 import type {MascotLook, MascotPose} from "../components/Mascot";
 import {clamp01} from "./anim";
-import {W, end, failing, rew, start} from "./story";
+import {W, brakePress, clutchPress, end, failing, gear, handOnShifter, rew, start} from "./story";
 
 export const REWIND_FRAMES = 26;
 export type Look = MascotLook & {at?: [number, number, number]; ry?: number; rx?: number; pivotHip?: boolean};
@@ -38,9 +38,14 @@ export const mascotLook = (t: number): Look => {
 export const mascotPose = (t: number): MascotPose => {
   const p = base(t);
   if (t >= W("s7", "volante") - 4) {
-    p.lArm = [-58, 4]; // mãos no volante
-    p.rArm = [-58, 4];
+    // mãos no volante, acompanhando o giro
+    const st = inS("s7", t) && !failing("s7", t) ? Math.sin((t - W("s7", "volante")) * 0.08) * 0.35 : 0;
+    p.lArm = [-62 + st * 30, -14];
+    p.rArm = [-62 - st * 30, -14];
   }
+  if (handOnShifter(t)) p.rArm = gear(t) === 1 ? [-26, 6] : [-50, 6]; // mão direita na alavanca: puxa (1ª) / empurra (5ª)
+  // pés nos pedais: esquerdo na embreagem, direito no freio
+  p.legPress = [clutchPress(t) * 22, brakePress(t) * 22];
   const scared = () => {
     p.emotion = "scared";
     p.lArm = [-10, 150 + Math.sin(t * 0.6) * 12];
@@ -104,6 +109,13 @@ export const mascotPose = (t: number): MascotPose => {
       p.rArm = t > W("s10", "comenta", 1) - 6 ? [-88, 8] : [-10, 150 + Math.sin(t * 0.4) * 18]; // acena / aponta
     } else p.emotion = "grin";
   }
+  if (handOnShifter(t)) p.rArm = gear(t) === 1 ? [-26, 6] : [-50, 6];
+  if (t >= W("s7", "volante") - 4 && !inS("s10", t) && !(inS("s8", t) && t >= W("s8", "buraco") && t < W("s8", "molas")) && !failing("s9", t)) {
+    const st = inS("s7", t) && !failing("s7", t) ? Math.sin((t - W("s7", "volante")) * 0.08) * 0.35 : 0;
+    p.lArm = [-62 + st * 30, -14];
+    p.rArm = [-62 - st * 30, -14];
+  }
+  p.legPress = [clutchPress(t) * 22, brakePress(t) * 22];
   return p;
 };
 export const _c = clamp01;

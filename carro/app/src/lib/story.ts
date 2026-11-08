@@ -116,3 +116,16 @@ export const parts = (t: number) => ({
 });
 export const lastScene = timed[timed.length - 1];
 export {after};
+
+/* ---------- pedais e câmbio (mascote pisando e trocando marcha) ---------- */
+/** pé esquerdo na embreagem (0-1) */
+export const clutchPress = (t: number) => {
+  const pulse = (c: number, w = 14) => (t >= c - 4 && t < c + w ? Math.sin(((t - c + 4) / (w + 4)) * Math.PI) : 0);
+  if (t >= W("s5", "discos") && t < W("s5", "embreagem") + 20) return Math.max(0, Math.sin((t - W("s5", "discos")) * 0.12));
+  return Math.max(pulse(W("s5", "Primeira")), pulse(W("s5", "Quinta")));
+};
+/** pé direito no freio (0-1) */
+export const brakePress = (t: number) => (t >= W("s9", "pastilhas") - 6 && t < W("s9", "calor") + 20 ? clamp01((t - W("s9", "pastilhas") + 6) / 6) : 0);
+/** marcha engatada (1 a 5) e se a mão está na alavanca */
+export const gear = (t: number) => (t < W("s5", "Quinta") ? 1 : 5);
+export const handOnShifter = (t: number) => t >= W("s5", "Primeira") - 8 && t < W("s5", "câmbio") + 25;

@@ -213,7 +213,7 @@ const Rocks: React.FC<{spots: [number, number, number][]}> = ({spots}) => (
 
 /* ================= CARRO ================= */
 import {L, easeOut} from "../lib/anim";
-import {W, boxesX, carSpeed, carX, failing, lightX, parts, potholeX, rew, start, end, te} from "../lib/story";
+import {W, boxesX, brakePress, carSpeed, carX, clutchPress, failing, gear, lightX, parts, potholeX, rew, start, end, te} from "../lib/story";
 import {mascotLook, mascotPose} from "../lib/mascotPose";
 
 const K = {
@@ -424,8 +424,8 @@ export const CarWorld: React.FC<{gf: number}> = ({gf}) => {
   const braking = inS("s9") && t > W("s9", "freio") && t < W("s9", "calor") + 30;
   const bheat = braking ? L(t, W("s9", "freio"), W("s9", "calor"), 0, 1) * (1 - L(t, W("s9", "calor") + 10, W("s9", "calor") + 30, 0, 1)) : 0;
   const rpm = P.four > 0.5 ? 0.6 : 0.35;
-  const clutchGap = inS("s5") && t > W("s5", "discos") && t < W("s5", "câmbio") ? Math.max(0, Math.sin((t - W("s5", "discos")) * 0.12)) * 0.1 : 0;
-  const gearSel = inS("s5") ? (t < W("s5", "Quinta") ? 1 : 5) : 5;
+  const clutchGap = clutchPress(t) * 0.1;
+  const gearSel = inS("s5") ? gear(t) : 5;
   const light = inS("s5") ? (t < rew("s5").R ? "red" : t < W("s5", "Primeira") ? "red" : "green") : null;
   const ml = mascotLook(t), mp = mascotPose(t);
   const lo = (lo0: number) => lo0; // ajuda de leitura
@@ -557,13 +557,18 @@ export const CarWorld: React.FC<{gf: number}> = ({gf}) => {
           <group scale={[1, 1, 1]}>
             {[WZ - 0.12, -WZ + 0.12].map((z) => <B key={"kn" + z} x={[WX - 0.06, WX + 0.06]} y={[WR - 0.08, WR + 0.08]} z={[z - 0.05, z + 0.05]} c="#ffc400" />)}
             <Seg a={[WX - 0.18, WR, -WZ + 0.1]} b={[WX - 0.18, WR, WZ - 0.1]} r={0.025 * P.steering} c="#ffc400" />
-            <Seg a={[WX - 0.18, WR, 0]} b={[0.3, 1.05, 0]} r={0.025 * P.steering} c={K.metalD} />
-            <group position={[0.28, 1.08, 0]} rotation={[0, 0, -0.9]}>
-              <group rotation={[0, steer * 3, 0]}>
-                <mesh rotation={[0, 0, 0]} scale={P.steering}>
-                  <torusGeometry args={[0.17, 0.025, 10, 28]} />
-                  <M c="#263238" />
-                </mesh>
+            <Seg a={[WX - 0.18, WR, 0]} b={[0.2, 0.98, 0]} r={0.025 * P.steering} c={K.metalD} />
+            {/* volante virado para o motorista (inclinado), girando junto com a direção */}
+            <group position={[0.14, 1.02, 0]} rotation={[0, 0, 0.45]}>
+              <group rotation={[0, Math.PI / 2, 0]}>
+                <group rotation={[0, 0, steer * 3]} scale={P.steering}>
+                  <mesh>
+                    <torusGeometry args={[0.15, 0.025, 10, 28]} />
+                    <M c="#263238" />
+                  </mesh>
+                  <B x={[-0.15, 0.15]} y={[-0.015, 0.015]} z={[-0.01, 0.01]} c="#37474f" />
+                  <B x={[-0.015, 0.015]} y={[-0.15, 0]} z={[-0.01, 0.01]} c="#37474f" />
+                </group>
               </group>
             </group>
           </group>
@@ -677,6 +682,33 @@ export const CarWorld: React.FC<{gf: number}> = ({gf}) => {
           <group position={[0.56, 1.06, -0.3]} rotation={[0, 0, 0]}>
             <group rotation={[Math.sin(t * 0.25) * 0.9, 0, 0]}>
               <B x={[-0.015, 0.015]} y={[0, 0.45]} z={[-0.015, 0.015]} c="#212121" />
+            </group>
+          </group>
+        )}
+
+        {/* pedais no assoalho: embreagem (esquerda) e freio (direita), descem quando o pé pisa */}
+        {P.clutch > 0.01 && (
+          <group position={[0.36, 0.7, 0.12]} rotation={[0, 0, -0.5 * clutchPress(t)]} scale={P.clutch}>
+            <B x={[-0.02, 0.02]} y={[0, 0.22]} z={[-0.02, 0.02]} c="#455a64" />
+            <B x={[-0.03, 0.03]} y={[0.18, 0.26]} z={[-0.06, 0.06]} c="#212121" />
+          </group>
+        )}
+        {(P.brakes > 0.01 || P.clutch > 0.01) && (
+          <group position={[0.36, 0.7, -0.12]} rotation={[0, 0, -0.5 * brakePress(t)]} scale={Math.max(P.brakes, P.clutch)}>
+            <B x={[-0.02, 0.02]} y={[0, 0.22]} z={[-0.02, 0.02]} c="#455a64" />
+            <B x={[-0.03, 0.03]} y={[0.18, 0.26]} z={[-0.07, 0.07]} c={P.brakes > 0.5 ? "#e53935" : "#212121"} />
+          </group>
+        )}
+        {/* alavanca do câmbio ao lado do banco (mão direita) */}
+        {P.gearbox > 0.01 && (
+          <group position={[0.0, 0.68, -0.34]} scale={P.gearbox}>
+            <B x={[-0.08, 0.08]} y={[0, 0.06]} z={[-0.08, 0.08]} c="#263238" />
+            <group rotation={[0, 0, gear(t) === 1 ? 0.35 : -0.35]}>
+              <B x={[-0.015, 0.015]} y={[0, 0.34]} z={[-0.015, 0.015]} c="#90a4ae" />
+              <mesh position={[0, 0.36, 0]}>
+                <sphereGeometry args={[0.045, 12, 10]} />
+                <M c="#212121" />
+              </mesh>
             </group>
           </group>
         )}
