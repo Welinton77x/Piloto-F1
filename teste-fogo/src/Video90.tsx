@@ -724,6 +724,7 @@ const shotIndex = (f: number) => {
 };
 
 const Scene: React.FC<{f: number}> = ({f}) => {
+  if (f >= SPLIT1) return <color attach="background" args={["#0b1a30"]} />;
   const i = shotIndex(f);
   const s = SHOTS[i];
   const b = SHOTS[i + 1]?.from ?? TOTAL90;
@@ -733,6 +734,168 @@ const Scene: React.FC<{f: number}> = ({f}) => {
       <C key={i} f={f} a={s.from} b={b} t={f / FPS} />
       <Post />
     </>
+  );
+};
+
+
+/* ---------- final em tela dividida: A em cima, B embaixo (as duas escolhas) ---------- */
+const SPLIT1 = at(17, "caio") - 6;
+const SPLIT2 = at(17, "descobrirem") - 12;
+
+/* Q1-A: conta pra turma — mostra a mão em chamas na frente da sala */
+const P1A: React.FC<ShotProps> = ({f, a, t}) => {
+  const palm = useRef<THREE.Object3D>(null);
+  const pose = physics("p1a", (fr) => idle(fr, {pos: [0, 0, -2.6], ...palmUp(ramp(fr, a, a + 10, easeOut), 1), smile: 1, brow: 0.3, head: [-0.05, 0, 0], pupil: [0, 0]}), a, f);
+  const wow = ramp(f, a + 10, a + 20, easeOut);
+  const kids: {look: Look; pos: V3}[] = [
+    {look: {...NPC.ana, coat: undefined}, pos: [-1.1, 0, -1.1]},
+    {look: {...NPC.leo, coat: undefined}, pos: [1.1, 0, -1.0]},
+    {look: {...NPC.rafa, coat: undefined}, pos: [-0.45, 0, -0.2]},
+  ];
+  return (
+    <>
+      <Cam pos={[0.2, 2.3, 1.2]} look={[0, 1.25, -2.6]} fov={36} />
+      <SalaBase />
+      <Boy pose={pose} palmRef={palm} />
+      <PalmFire palm={palm} t={t} power={1} size={1} />
+      {kids.map((k, i) => (
+        <Boy key={i} look={k.look} pose={idle(f + i * 9, {pos: [k.pos[0], Math.abs(Math.sin((f + i * 5) / 7)) * 0.08 * wow, k.pos[2]], rotY: Math.PI + (k.pos[0] > 0 ? 0.3 : -0.3), rShoulder: [0, 0, -2.5 * wow], lShoulder: [0, 0, 2.5 * wow], rElbow: -0.3, lElbow: -0.3, mouthOpen: 0.8 * wow, eyeWide: wow})} />
+      ))}
+    </>
+  );
+};
+
+/* Q1-B: esconde — mão atrás das costas soltando fumaça, sorriso nervoso */
+const P1B: React.FC<ShotProps> = ({f, a, t}) => {
+  const pose = physics("p1b", (fr) => idle(fr, {rShoulder: [0.7, 0, -0.2], rElbow: -0.9, lShoulder: [0.6, 0, 0.2], lElbow: -0.9, smile: 0.6, brow: 0.8, eyeWide: 0.4, pupil: [Math.sin(fr / 9) * 0.8, 0], head: [0, Math.sin(fr / 18) * 0.15, 0.05]}), a, f);
+  return (
+    <>
+      <Cam pos={[0.9, 1.45, 2.2]} look={[0, 1.2, 0]} fov={36} />
+      <Quarto t={t} dim={0.55} />
+      <Boy pose={pose} />
+      <Steam t={t} origin={[-0.05, 0.9, -0.35]} count={16} spread={0.12} rise={1.3} size={0.3} power={0.6} color="#9a9a9a" seed={41} />
+      <Embers t={t} origin={[-0.05, 0.85, -0.3]} count={14} spread={0.08} rise={0.8} size={0.02} power={0.8} seed={42} />
+      <pointLight position={[0, 0.9, -0.5]} color="#ff6a1a" intensity={1.6} distance={1.5} />
+    </>
+  );
+};
+
+/* Q2-A: foge — corre pela rua ao entardecer, a sombra para trás */
+const P2A: React.FC<ShotProps> = ({f, a, t}) => {
+  const lt = (f - a) / FPS;
+  const ph = lt * Math.PI * 2 * 2.6;
+  const x = -1.5 + lt * 2.2;
+  const pose = idle(f, {
+    pos: [x, 0.12 + Math.abs(Math.sin(ph)) * 0.06, -0.2],
+    rotY: Math.PI / 2,
+    torso: [0.25, 0, 0],
+    walk: ph,
+    walkAmt: 1.5,
+    rShoulder: [Math.sin(ph) * 0.9, 0, -0.1],
+    lShoulder: [-Math.sin(ph) * 0.9, 0, 0.1],
+    rElbow: -1.4,
+    lElbow: -1.4,
+    eyeWide: 1,
+    brow: 1,
+    mouthOpen: 0.6,
+    head: [0, -0.5, 0],
+  });
+  return (
+    <>
+      <Cam pos={[x + 0.3, 1.25, 3.3]} look={[x - 0.3, 1.0, -0.4]} fov={40} />
+      <color attach="background" args={["#2b2350"]} />
+      <ExteriorLights variant="dusk" />
+      <Exterior variant="dusk" kind="school" />
+      <Boy pose={pose} />
+      <Boy look={NPC.sombra} pose={idle(f, {pos: [x - 2.2, 0.12, -0.6], rotY: Math.PI / 2, rShoulder: [-1.4, 0, -0.1], rElbow: -0.2})} />
+      <Steam t={t} origin={[x - 0.3, 0.2, -0.2]} count={10} spread={0.2} rise={0.4} size={0.3} power={0.5} color="#b8a59a" seed={43} />
+    </>
+  );
+};
+
+/* Q2-B: enfrenta — as duas mãos em chamas, olhos em brasa */
+const P2B: React.FC<ShotProps> = ({f, a, t}) => {
+  const palm = useRef<THREE.Object3D>(null);
+  const k = ramp(f, a + 4, a + 16, easeOut);
+  const pose = physics("p2b", (fr) => {
+    const kk = ramp(fr, a + 4, a + 16, easeOut);
+    return idle(fr, {pos: [0, 0.12, -1.0], rotY: Math.PI - 0.3, ...palmUp(kk, 0.3), lShoulder: [-0.5 * kk, -0.2 * kk, 0.12], lElbow: -1.6 * kk, brow: -0.9, glow: kk, smile: 0.2, squash: -0.05 * kk, hairLift: kk});
+  }, a, f);
+  return (
+    <>
+      <Cam pos={[1.7, 1.3, 1.0]} look={[-0.3, 1.15, -2.0]} fov={40} />
+      <color attach="background" args={["#2b2350"]} />
+      <ExteriorLights variant="dusk" />
+      <Exterior variant="dusk" kind="school" />
+      <Boy pose={pose} palmRef={palm} />
+      <PalmFire palm={palm} t={t} power={k} size={1.2} />
+      <FireHelix t={t} power={0.55 * k} center={[0, 0.12, -1.0]} />
+      <Boy look={NPC.sombra} pose={idle(f, {pos: [-0.6, 0.12, -3.0], rotY: 0.3, brow: -0.6, rShoulder: [0, 0, -0.3], lShoulder: [0, 0, 0.3], rElbow: -0.6, lElbow: -0.6})} />
+    </>
+  );
+};
+
+const PanelScene: React.FC<{C: React.FC<ShotProps>; a: number}> = ({C, a}) => {
+  const f = useCurrentFrame();
+  return (
+    <>
+      <C f={f} a={a} b={TOTAL90} t={f / FPS} />
+      <Post />
+    </>
+  );
+};
+
+const Panel: React.FC<{top: number; letter: string; label: string; active: boolean; C: React.FC<ShotProps>; a: number}> = ({top, letter, label, active, C, a}) => {
+  const f = useCurrentFrame();
+  const glow = active ? 1 : 0;
+  return (
+    <div
+      style={{
+        position: "absolute",
+        top,
+        left: 20,
+        width: 1040,
+        height: 720,
+        borderRadius: 26,
+        overflow: "hidden",
+        border: `7px solid ${active ? "#ffd21f" : "rgba(160,190,230,0.55)"}`,
+        boxShadow: active ? "0 0 38px rgba(255,210,31,0.75)" : "0 0 18px rgba(0,0,0,0.5)",
+        transform: `scale(${(1 + 0.015 * glow) * Math.min(1, pop(f, a, 10))})`,
+      }}
+    >
+      <ThreeCanvas width={1026} height={706} shadows gl={{antialias: false}} dpr={1}>
+        <PanelScene C={C} a={a} />
+      </ThreeCanvas>
+      {!active && <AbsoluteFill style={{background: "rgba(10,20,40,0.35)"}} />}
+      <div style={{position: "absolute", top: 22, left: 22, width: 104, height: 104, borderRadius: 52, background: "#0d1b33", border: `6px solid ${active ? "#ffd21f" : "#9fb8dc"}`, color: active ? "#ffd21f" : "#fff", fontFamily, fontWeight: 900, fontSize: 66, display: "flex", alignItems: "center", justifyContent: "center"}}>
+        {letter}
+      </div>
+      <div style={{position: "absolute", bottom: 20, left: 0, right: 0, textAlign: "center", fontFamily, fontWeight: 900, fontSize: 56, color: "#fff", WebkitTextStroke: "8px #0d1b33", paintOrder: "stroke fill", textTransform: "uppercase"}}>{label}</div>
+    </div>
+  );
+};
+
+const Split: React.FC = () => {
+  const f = useCurrentFrame();
+  if (f < SPLIT1) return null;
+  const q1 = f < SPLIT2;
+  const aOn = q1 ? f >= at(17, "conta") && f < at(17, "ou", 0) + 2 : f >= at(17, "foge") && f < at(17, "ou", 1) + 2;
+  const bOn = q1 ? f >= at(17, "esconde") : f >= at(17, "enfrenta") && f < at(17, "comenta");
+  const bothOn = !q1 && f >= at(17, "comenta");
+  return (
+    <AbsoluteFill style={{background: "radial-gradient(ellipse at 50% 50%, #17375f 0%, #0b1a30 70%)"}}>
+      {q1 ? (
+        <React.Fragment key="q1">
+          <Panel top={150} letter="A" label="Conta pra turma" active={aOn} C={P1A} a={SPLIT1} />
+          <Panel top={1050} letter="B" label="Esconde de todos" active={bOn} C={P1B} a={SPLIT1 + 4} />
+        </React.Fragment>
+      ) : (
+        <React.Fragment key="q2">
+          <Panel top={150} letter="A" label="Ele foge" active={aOn || bothOn} C={P2A} a={SPLIT2} />
+          <Panel top={1050} letter="B" label="Ele enfrenta" active={bOn || bothOn} C={P2B} a={SPLIT2 + 4} />
+        </React.Fragment>
+      )}
+    </AbsoluteFill>
   );
 };
 
@@ -761,14 +924,14 @@ const Captions: React.FC = () => {
   }, []);
   const t = f / FPS;
   const i = chunks.findIndex((c, k) => t >= c[0].s - 0.05 && t < (chunks[k + 1]?.[0].s ?? c[c.length - 1].e + 0.8) - 0.05);
-  if (i < 0) return null;
+  if (i < 0 || f >= at(17, "comenta")) return null;
   const c = chunks[i];
   const sc = pop(f, Math.round(c[0].s * FPS) - 2, 8);
   return (
     <div
       style={{
         position: "absolute",
-        top: 1250,
+        top: f >= SPLIT1 ? 905 : 1250,
         left: 50,
         right: 50,
         textAlign: "center",
@@ -1000,10 +1163,9 @@ export const Video90: React.FC = () => {
           {at: at(14, "janela"), text: "Janela aberta"},
         ]}
       />
-      <Poll from={at(17, "caio") - 4} to={at(17, "descobrirem") - 6} q="O CAIO..." a="CONTA PRA TURMA" b="ESCONDE DE TODOS" />
-      <Poll from={at(17, "descobrirem") - 6} to={TOTAL90} q="SE DESCOBRIREM..." a="ELE FOGE" b="ELE ENFRENTA" />
-      <Chip from={at(17, "comenta")} to={TOTAL90} text="COMENTA AÍ ↓" bg="#2E9E4F" top={1080} />
+      <Split />
       <Captions />
+      <Chip from={at(17, "comenta")} to={TOTAL90} text="COMENTA AÍ ↓" bg="#2E9E4F" top={905} />
       <Audio src={staticFile("voz90.mp3")} />
       {cuts.map((c) => (
         <Sequence key={"w" + c} from={c - 3} durationInFrames={45}>
