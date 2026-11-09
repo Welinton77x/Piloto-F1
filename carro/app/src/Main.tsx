@@ -106,12 +106,12 @@ const SFX_AT: [number, string, number][] = [
   [W("s10", "Parabéns") + 4, "pop.wav", 0.35],
 ];
 
-export const Main: React.FC = () => (
+export const Main: React.FC<{audioOnly?: boolean}> = ({audioOnly}) => (
   <AbsoluteFill style={{backgroundColor: "#101820"}}>
-    <World />
+    {!audioOnly && <World />}
     {timed.map((s) => (
       <Sequence key={s.id} from={s.startFrame} durationInFrames={s.durationInFrames} name={s.id}>
-        <Overlay s={s} />
+        {!audioOnly && <Overlay s={s} />}
         {hasVO(s.voKey) && (
           <Sequence from={VO_OFFSET} name={`vo-${s.id}`}>
             <Audio src={staticFile(`vo/${s.voKey}.mp3`)} />
