@@ -24,7 +24,7 @@ if (typeof document !== "undefined" && !document.getElementById("rc-font")) {
 }
 
 /** Troque para true depois de gerar public/voz.mp3 (scripts/voz.py) */
-export const HAS_VOICE = false;
+export const HAS_VOICE = true;
 
 import {T, SHOT_B, SHOT_C, SHOT_D, TOTAL, stateAt} from "./Anim";
 export {TOTAL};
