@@ -1,3 +1,5 @@
 node_modules
 out/*.jpg
+out/*.log
+out/*-raw.mp4
 .cache

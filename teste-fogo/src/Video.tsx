@@ -11,7 +11,7 @@ import {Flame, Embers, FireLight} from "./Fire";
 import {FPS, clamp, lerp, ramp, pop, shake, easeInOut, easeOut} from "./util";
 import words from "./timing.json";
 
-const fontFamily = "RC";
+export const fontFamily = "RC";
 /* fonte local (Roboto Condensed) — não depende de internet na renderização */
 if (typeof document !== "undefined" && !document.getElementById("rc-font")) {
   const h = delayRender("fonte");
@@ -30,7 +30,7 @@ import {T, SHOT_B, SHOT_C, SHOT_D, TOTAL, stateAt} from "./Anim";
 export {TOTAL};
 
 /* ---------- câmera ---------- */
-const Cam: React.FC<{pos: [number, number, number]; look: [number, number, number]; fov: number}> = ({pos, look, fov}) => {
+export const Cam: React.FC<{pos: [number, number, number]; look: [number, number, number]; fov: number}> = ({pos, look, fov}) => {
   const {camera} = useThree();
   const c = camera as THREE.PerspectiveCamera;
   c.position.set(...pos);
@@ -43,7 +43,7 @@ const Cam: React.FC<{pos: [number, number, number]; look: [number, number, numbe
 };
 
 /** Chama que acompanha a palma da mão (posição de mundo lida a cada quadro) */
-const PalmFire: React.FC<{palm: React.RefObject<THREE.Object3D | null>; t: number; power: number; size: number}> = ({palm, t, power, size}) => {
+export const PalmFire: React.FC<{palm: React.RefObject<THREE.Object3D | null>; t: number; power: number; size: number}> = ({palm, t, power, size}) => {
   const g = useRef<THREE.Group>(null);
   const v = useMemo(() => new THREE.Vector3(), []);
   useFrame(() => {
@@ -61,7 +61,7 @@ const PalmFire: React.FC<{palm: React.RefObject<THREE.Object3D | null>; t: numbe
   );
 };
 
-const PalmSparks: React.FC<{palm: React.RefObject<THREE.Object3D | null>; t: number; at: number}> = ({palm, t, at}) => {
+export const PalmSparks: React.FC<{palm: React.RefObject<THREE.Object3D | null>; t: number; at: number}> = ({palm, t, at}) => {
   const g = useRef<THREE.Group>(null);
   const v = useMemo(() => new THREE.Vector3(), []);
   useFrame(() => {
@@ -81,7 +81,7 @@ const PalmSparks: React.FC<{palm: React.RefObject<THREE.Object3D | null>; t: num
 };
 
 /** Espiral de fogo em volta do personagem (apresentação do poder) */
-const FireHelix: React.FC<{t: number; power: number; center: [number, number, number]}> = ({t, power, center}) => {
+export const FireHelix: React.FC<{t: number; power: number; center: [number, number, number]}> = ({t, power, center}) => {
   const n = 16;
   return (
     <group position={center}>
@@ -201,7 +201,7 @@ const Captions: React.FC = () => {
 };
 
 /** Faixa de título inclinada (ex.: "FOGO") */
-const TitleTag: React.FC<{text: string; from: number; to: number}> = ({text, from, to}) => {
+export const TitleTag: React.FC<{text: string; from: number; to: number}> = ({text, from, to}) => {
   const f = useCurrentFrame();
   if (f < from || f > to) return null;
   const inn = pop(f, from, 10);
@@ -231,7 +231,7 @@ const TitleTag: React.FC<{text: string; from: number; to: number}> = ({text, fro
   );
 };
 
-const Flash: React.FC<{at: number; strength?: number}> = ({at, strength = 0.7}) => {
+export const Flash: React.FC<{at: number; strength?: number}> = ({at, strength = 0.7}) => {
   const f = useCurrentFrame();
   const k = f - at;
   if (k < 0 || k > 14) return null;
@@ -243,7 +243,7 @@ const Flash: React.FC<{at: number; strength?: number}> = ({at, strength = 0.7}) 
 };
 
 /** Corte seco com leve “flash” de transição */
-const Cut: React.FC<{at: number}> = ({at}) => {
+export const Cut: React.FC<{at: number}> = ({at}) => {
   const f = useCurrentFrame();
   const k = f - at;
   if (k < 0 || k > 5) return null;

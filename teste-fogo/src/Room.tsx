@@ -159,7 +159,7 @@ const Books: React.FC<{p: [number, number, number]; n: number; seed: number; rot
 };
 
 /** Quarto: parede com lambri, janela com luz do sol, cama, mesa com livros, pôster, tapete */
-export const Room: React.FC<{t: number; bookBurn?: number}> = ({t, bookBurn = 0}) => {
+export const Room: React.FC<{t: number; bookBurn?: number; fuelGlow?: number}> = ({t, bookBurn = 0, fuelGlow = 0}) => {
   const mats = useMemo(
     () => ({
       floor: new THREE.MeshStandardMaterial({map: woodTex("floor", [150, 92, 58], 8, [3, 3]), roughness: 0.65}),
@@ -188,6 +188,12 @@ export const Room: React.FC<{t: number; bookBurn?: number}> = ({t, bookBurn = 0}
   mats.book.emissive.set("#ff4a00");
   mats.book.emissiveIntensity = bookBurn > 0 ? 0.35 * (0.7 + 0.3 * Math.sin(t * 17)) * Math.min(1, bookBurn * 3) : 0;
 
+  // objetos inflamáveis piscando em laranja ("tudo em volta é combustível")
+  for (const k of ["blanket", "curtain", "sheet", "wood"] as const) {
+    const mm = mats[k] as THREE.MeshStandardMaterial;
+    mm.emissive.set("#ff5a10");
+    mm.emissiveIntensity = fuelGlow * (0.35 + 0.25 * Math.sin(t * 8));
+  }
   const hx = WIN.w / 2;
   return (
     <group>

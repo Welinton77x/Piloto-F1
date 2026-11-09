@@ -168,3 +168,55 @@ export const FireLight: React.FC<{t: number; power: number; position: [number, n
   const flick = 0.85 + 0.15 * Math.sin(t * 23) * Math.sin(t * 7.3 + 1);
   return <pointLight position={position} color="#ff7a2a" intensity={intensity * power * flick} distance={distance} decay={1.6} />;
 };
+
+/* ---------- vapor / fumaça: sprites brancos que sobem e se espalham ---------- */
+const puffTex = () =>
+  canvasTex("puff", 128, 128, (c) => {
+    const g = c.createRadialGradient(64, 64, 0, 64, 64, 64);
+    g.addColorStop(0, "rgba(255,255,255,0.9)");
+    g.addColorStop(0.5, "rgba(255,255,255,0.35)");
+    g.addColorStop(1, "rgba(255,255,255,0)");
+    c.fillStyle = g;
+    c.fillRect(0, 0, 128, 128);
+  });
+
+export const Steam: React.FC<{
+  t: number;
+  origin?: [number, number, number];
+  count?: number;
+  spread?: number;
+  rise?: number;
+  size?: number;
+  power?: number;
+  color?: string;
+  seed?: number;
+  life?: number;
+}> = ({t, origin = [0, 0, 0], count = 24, spread = 0.2, rise = 1, size = 0.25, power = 1, color = "#ffffff", seed = 3, life = 2}) => {
+  const items = useMemo(() => {
+    const r = rng(seed * 31 + 1);
+    return Array.from({length: count}, () => [r(), r(), r(), r()]);
+  }, [count, seed]);
+  const mats = useMemo(
+    () => items.map(() => new THREE.SpriteMaterial({map: puffTex(), color, transparent: true, depthWrite: false})),
+    [items, color],
+  );
+  if (power <= 0.001) return null;
+  return (
+    <group position={origin}>
+      {items.map(([a, b, c, d], i) => {
+        const ph = (t / (life * (0.7 + d * 0.6)) + a) % 1;
+        const sc = size * (0.4 + ph * 1.4);
+        mats[i].opacity = power * 0.55 * Math.sin(ph * Math.PI);
+        mats[i].rotation = a * 6 + t * 0.3;
+        return (
+          <sprite
+            key={i}
+            material={mats[i]}
+            position={[(b - 0.5) * spread * 2 * (1 + ph), ph * rise, (c - 0.5) * spread * 2 * (1 + ph)]}
+            scale={[sc, sc, sc]}
+          />
+        );
+      })}
+    </group>
+  );
+};
