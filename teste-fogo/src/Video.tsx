@@ -26,20 +26,8 @@ if (typeof document !== "undefined" && !document.getElementById("rc-font")) {
 /** Troque para true depois de gerar public/voz.mp3 (scripts/voz.py) */
 export const HAS_VOICE = false;
 
-/* ---------- linha do tempo (frames, 30 fps) ---------- */
-const S = (w: number) => Math.round(words[w].s * FPS);
-export const T = {
-  fogo1: S(4), // "fogo."
-  snap: S(8) + 3, // "dedos..."
-  ignite: S(12), // "acende."
-  reach: S(17), // "tudo"
-  touch: S(20) + 8, // "encosta..."
-  burn: S(21), // "pega"
-};
-const SHOT_B = Math.round((words[4].e + 0.45) * FPS);
-const SHOT_C = Math.round((words[12].e + 0.5) * FPS);
-const SHOT_D = T.burn - 6;
-export const TOTAL = Math.round((words[words.length - 1].e + 1.4) * FPS);
+import {T, SHOT_B, SHOT_C, SHOT_D, TOTAL, stateAt} from "./Anim";
+export {TOTAL};
 
 /* ---------- câmera ---------- */
 const Cam: React.FC<{pos: [number, number, number]; look: [number, number, number]; fov: number}> = ({pos, look, fov}) => {
@@ -125,114 +113,8 @@ const FireHelix: React.FC<{t: number; power: number; center: [number, number, nu
 const Scene: React.FC<{f: number}> = ({f}) => {
   const t = f / FPS;
   const palm = useRef<THREE.Object3D>(null);
-  const breathe = Math.sin(t * 2.4);
-  const blinkAt = (fr: number) => clamp(1 - Math.abs(f - fr) / 3);
-  const blink = Math.max(blinkAt(16), blinkAt(110), blinkAt(200));
 
-  let pose: Pose = {breathe, blink};
-  let cam: {pos: [number, number, number]; look: [number, number, number]; fov: number};
-  let helix = 0;
-  let palmPower = 0;
-  let palmSize = 1;
-  let bookBurn = 0;
-  let dim = 0;
-
-  if (f < SHOT_B) {
-    // A — apresentação: olha para a câmera, sorriso de canto, olhos em brasa e espiral de fogo
-    const k = ramp(f, T.fogo1 - 2, T.fogo1 + 14);
-    helix = ramp(f, T.fogo1, T.fogo1 + 16);
-    pose = {
-      ...pose,
-      head: [0.02 - 0.05 * k, 0.12 * (1 - k), 0.05 * (1 - k)],
-      brow: lerp(0, -0.7, k),
-      smile: lerp(0.3, 0.9, k),
-      glow: k,
-      rShoulder: [0, 0, lerp(-0.08, -0.35, k)],
-      lShoulder: [0, 0, lerp(0.08, 0.35, k)],
-      rElbow: lerp(-0.15, -0.4, k),
-      lElbow: lerp(-0.15, -0.4, k),
-      rFist: k,
-      torso: [0, 0, 0],
-    };
-    const p = ramp(f, 0, SHOT_B, easeInOut);
-    const sh = shake(f, 0.012 * helix);
-    cam = {pos: [lerp(0.3, 0, p) + sh[0], 1.4 + sh[1], lerp(3.6, 2.9, p)], look: [0, 1.12, 0], fov: 42};
-    dim = 0.25 * helix;
-  } else if (f < SHOT_C) {
-    // B — close na mão: estala os dedos, faíscas, a mão acende
-    const up = ramp(f, SHOT_B - 4, SHOT_B + 14, easeOut);
-    const fist = ramp(f, T.snap - 12, T.snap - 3) * (1 - ramp(f, T.snap, T.snap + 2));
-    const flick = Math.exp(-Math.max(0, f - T.snap) / 3) * (f >= T.snap ? 1 : 0);
-    palmPower = pop(f, T.ignite, 14);
-    const lit = ramp(f, T.ignite, T.ignite + 10);
-    pose = {
-      ...pose,
-      rShoulder: [lerp(0, -0.5, up), 0.2 * up, lerp(-0.08, -0.12, up)],
-      rElbow: lerp(-0.15, -1.75, up),
-      rWrist: [0.15 * up - 0.5 * flick, 0, -0.35 * flick],
-      rFist: fist,
-      head: [0.22, -0.32, 0],
-      pupil: [-0.6, -0.5],
-      brow: lerp(-0.3, 0.5, lit),
-      eyeWide: 0.6 * lit,
-      smile: lerp(0.6, 1, lit),
-      mouthOpen: 0.35 * lit * (1 - ramp(f, T.ignite + 20, T.ignite + 30)),
-      glow: 0.3 * lit,
-    };
-    const p = ramp(f, SHOT_B, SHOT_C, easeInOut);
-    const sh = shake(f, 0.006 * Math.exp(-Math.max(0, f - T.ignite) / 8) * (f >= T.ignite ? 1 : 0));
-    cam = {
-      pos: [lerp(-1.05, -0.85, p) + sh[0], lerp(1.3, 1.28, p) + sh[1], lerp(1.75, 1.45, p)],
-      look: [-0.22, 1.3, 0.2],
-      fov: 34,
-    };
-    dim = 0.35 * lit;
-  } else if (f < SHOT_D) {
-    // C — vai até a mesa e estende a mão para o livro
-    const reach = ramp(f, T.reach, T.touch, easeInOut);
-    palmPower = 0.75;
-    palmSize = 0.7;
-    pose = {
-      ...pose,
-      pos: [1.2, 0, -0.82],
-      rotY: Math.PI,
-      rShoulder: [lerp(-0.45, -1.0, reach), 0.15 * (1 - reach), lerp(-0.15, -0.02, reach)],
-      rElbow: lerp(-1.4, -0.35, reach),
-      rWrist: [lerp(0.1, 0.5, reach), lerp(0, Math.PI, reach), 0],
-      head: [lerp(0.25, 0.42, reach), lerp(-0.2, 0, reach), 0],
-      pupil: [0, -0.7],
-      smile: 0.6,
-    };
-    const p = ramp(f, SHOT_C, SHOT_D, easeInOut);
-    cam = {pos: [lerp(2.25, 2.05, p), lerp(1.95, 1.8, p), lerp(0.45, 0.15, p)], look: [1.4, 0.9, -1.4], fov: 40};
-    dim = 0.25;
-  } else {
-    // D — o livro pega fogo, susto
-    bookBurn = ramp(f, T.burn, T.burn + 40, (x) => x);
-    const jolt = ramp(f, T.burn + 2, T.burn + 9, easeOut);
-    palmPower = 0.75 * (1 - jolt * 0.6);
-    palmSize = 0.7;
-    pose = {
-      ...pose,
-      pos: [1.2, 0, lerp(-0.82, -0.7, jolt)],
-      rotY: Math.PI,
-      torso: [lerp(0, -0.12, jolt), 0, 0],
-      rShoulder: [lerp(-1.0, -0.2, jolt), 0, lerp(-0.02, -0.35, jolt)],
-      rElbow: lerp(-0.35, -1.9, jolt),
-      rWrist: [0.5, lerp(Math.PI, 0, jolt), 0],
-      lShoulder: [lerp(0, -0.4, jolt), 0, lerp(0.08, 0.5, jolt)],
-      lElbow: lerp(-0.15, -1.6, jolt),
-      head: [lerp(0.42, -0.08, jolt), 0, 0],
-      eyeWide: jolt,
-      brow: lerp(0, 1, jolt),
-      mouthOpen: jolt * 0.9,
-      pupil: [0, lerp(-0.7, -0.4, jolt)],
-    };
-    const sh = shake(f, 0.025 * Math.exp(-Math.max(0, f - T.burn) / 10) * (f >= T.burn ? 1 : 0) + 0.004 * bookBurn);
-    const p = ramp(f, SHOT_D, TOTAL, easeInOut);
-    cam = {pos: [lerp(1.5, 1.45, p) + sh[0], lerp(1.08, 1.02, p) + sh[1], lerp(-2.38, -2.28, p)], look: [1.42, 1.12, -0.85], fov: 52};
-    dim = 0.25 + 0.3 * ramp(f, T.burn, T.burn + 8);
-  }
+  const {pose, cam, helix, palmPower, palmSize, bookBurn, dim} = stateAt(f);
 
   const bookPower = bookBurn > 0 ? Math.min(1, pop(f, T.burn, 10)) : 0;
   return (

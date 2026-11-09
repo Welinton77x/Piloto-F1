@@ -22,10 +22,13 @@ export type Pose = {
   smile?: number; // 0..1 (sorriso de canto)
   breathe?: number;
   rFist?: number; // 0 mão aberta .. 1 fechada
+  squash?: number; // >0 amassa (aterrissagem), <0 estica
+  hair?: [number, number]; // balanço do cabelo (inércia)
+  hairLift?: number; // cabelo levantando com o calor
 };
 
 const SKIN = "#f1c08f";
-const SHIRT = "#8ec3ee";
+const SHIRT = "#d4302a";
 const PANTS = "#6d7480";
 const HAIR = "#a4501f";
 const SHOE = "#2c2f3a";
@@ -38,6 +41,7 @@ const useMats = () =>
     () => ({
       skin: std(SKIN, 0.6),
       shirt: std(SHIRT, 0.85),
+      trim: std("#8f1712", 0.8),
       pants: std(PANTS, 0.9),
       hair: std(HAIR, 0.55),
       shoe: std(SHOE, 0.6),
@@ -143,13 +147,16 @@ export const Boy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>}> = 
     smile = 0,
     breathe = 0,
     rFist = 0,
+    squash = 0,
+    hair = [0, 0],
+    hairLift = 0,
   } = pose;
   m.pupil.emissiveIntensity = glow * 6;
   const eyeY = (1 - blink) * (1 + eyeWide * 0.25);
   const browY = 0.105 + brow * 0.03 + eyeWide * 0.015;
   const browRot = brow < 0 ? brow * 0.35 : brow * 0.12;
   return (
-    <group position={pos} rotation={[0, rotY, 0]}>
+    <group position={pos} rotation={[0, rotY, 0]} scale={[1 + squash * 0.5, 1 - squash, 1 + squash * 0.5]}>
       {/* pernas */}
       {[-1, 1].map((s) => (
         <group key={s} position={[0.1 * s, 0, 0]}>
@@ -172,6 +179,10 @@ export const Boy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>}> = 
         <mesh position={[0, 0.72, 0]} scale={[1, 1, 0.7]} material={m.pants} castShadow>
           <cylinderGeometry args={[0.185, 0.17, 0.28, 24]} />
         </mesh>
+        {/* gola */}
+        <mesh position={[0, 1.3, 0.0]} rotation={[Math.PI / 2, 0, 0]} scale={[1, 0.75, 1]} material={m.trim}>
+          <torusGeometry args={[0.085, 0.022, 8, 20]} />
+        </mesh>
         {/* pescoço */}
         <mesh position={[0, 1.33, 0]} material={m.skin}>
           <cylinderGeometry args={[0.055, 0.06, 0.12, 12]} />
@@ -189,6 +200,7 @@ export const Boy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>}> = 
               <sphereGeometry args={[0.06, 12, 10]} />
             </mesh>
           ))}
+          <group rotation={[hair[0] - 0.12 * hairLift, 0, hair[1]]} position={[0, 0.03 * hairLift, 0]} scale={[1, 1 + 0.12 * hairLift, 1]}>
           {/* calota do cabelo */}
           <mesh position={[0, 0.02, -0.01]} rotation={[0.12, 0, 0]} material={m.hair} castShadow>
             <sphereGeometry args={[0.285, 32, 16, 0, Math.PI * 2, 0, 1.3]} />
@@ -198,6 +210,7 @@ export const Boy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>}> = 
               <coneGeometry args={[0.09, 0.3, 7]} />
             </mesh>
           ))}
+          </group>
           {/* olhos */}
           {[-1, 1].map((s) => (
             <group key={s} position={[0.095 * s, 0.015, 0.228]} scale={[1, Math.max(0.06, eyeY), 1]}>
