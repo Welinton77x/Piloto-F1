@@ -740,7 +740,6 @@ const Scene: React.FC<{f: number}> = ({f}) => {
 
 /* ---------- final em tela dividida: A em cima, B embaixo (as duas escolhas) ---------- */
 const SPLIT1 = at(17, "caio") - 6;
-const SPLIT2 = at(17, "descobrirem") - 12;
 
 /* Q1-A: conta pra turma — mostra a mão em chamas na frente da sala */
 const P1A: React.FC<ShotProps> = ({f, a, t}) => {
@@ -776,61 +775,6 @@ const P1B: React.FC<ShotProps> = ({f, a, t}) => {
       <Steam t={t} origin={[-0.05, 0.9, -0.35]} count={16} spread={0.12} rise={1.3} size={0.3} power={0.6} color="#9a9a9a" seed={41} />
       <Embers t={t} origin={[-0.05, 0.85, -0.3]} count={14} spread={0.08} rise={0.8} size={0.02} power={0.8} seed={42} />
       <pointLight position={[0, 0.9, -0.5]} color="#ff6a1a" intensity={1.6} distance={1.5} />
-    </>
-  );
-};
-
-/* Q2-A: foge — corre pela rua ao entardecer, a sombra para trás */
-const P2A: React.FC<ShotProps> = ({f, a, t}) => {
-  const lt = (f - a) / FPS;
-  const ph = lt * Math.PI * 2 * 2.6;
-  const x = -1.5 + lt * 2.2;
-  const pose = idle(f, {
-    pos: [x, 0.12 + Math.abs(Math.sin(ph)) * 0.06, -0.2],
-    rotY: Math.PI / 2,
-    torso: [0.25, 0, 0],
-    walk: ph,
-    walkAmt: 1.5,
-    rShoulder: [Math.sin(ph) * 0.9, 0, -0.1],
-    lShoulder: [-Math.sin(ph) * 0.9, 0, 0.1],
-    rElbow: -1.4,
-    lElbow: -1.4,
-    eyeWide: 1,
-    brow: 1,
-    mouthOpen: 0.6,
-    head: [0, -0.5, 0],
-  });
-  return (
-    <>
-      <Cam pos={[x + 0.3, 1.25, 3.3]} look={[x - 0.3, 1.0, -0.4]} fov={40} />
-      <color attach="background" args={["#2b2350"]} />
-      <ExteriorLights variant="dusk" />
-      <Exterior variant="dusk" kind="school" />
-      <Boy pose={pose} />
-      <Boy look={NPC.sombra} pose={idle(f, {pos: [x - 2.2, 0.12, -0.6], rotY: Math.PI / 2, rShoulder: [-1.4, 0, -0.1], rElbow: -0.2})} />
-      <Steam t={t} origin={[x - 0.3, 0.2, -0.2]} count={10} spread={0.2} rise={0.4} size={0.3} power={0.5} color="#b8a59a" seed={43} />
-    </>
-  );
-};
-
-/* Q2-B: enfrenta — as duas mãos em chamas, olhos em brasa */
-const P2B: React.FC<ShotProps> = ({f, a, t}) => {
-  const palm = useRef<THREE.Object3D>(null);
-  const k = ramp(f, a + 4, a + 16, easeOut);
-  const pose = physics("p2b", (fr) => {
-    const kk = ramp(fr, a + 4, a + 16, easeOut);
-    return idle(fr, {pos: [0, 0.12, -1.0], rotY: Math.PI - 0.3, ...palmUp(kk, 0.3), lShoulder: [-0.5 * kk, -0.2 * kk, 0.12], lElbow: -1.6 * kk, brow: -0.9, glow: kk, smile: 0.2, squash: -0.05 * kk, hairLift: kk});
-  }, a, f);
-  return (
-    <>
-      <Cam pos={[1.7, 1.3, 1.0]} look={[-0.3, 1.15, -2.0]} fov={40} />
-      <color attach="background" args={["#2b2350"]} />
-      <ExteriorLights variant="dusk" />
-      <Exterior variant="dusk" kind="school" />
-      <Boy pose={pose} palmRef={palm} />
-      <PalmFire palm={palm} t={t} power={k} size={1.2} />
-      <FireHelix t={t} power={0.55 * k} center={[0, 0.12, -1.0]} />
-      <Boy look={NPC.sombra} pose={idle(f, {pos: [-0.6, 0.12, -3.0], rotY: 0.3, brow: -0.6, rShoulder: [0, 0, -0.3], lShoulder: [0, 0, 0.3], rElbow: -0.6, lElbow: -0.6})} />
     </>
   );
 };
@@ -878,23 +822,13 @@ const Panel: React.FC<{top: number; letter: string; label: string; active: boole
 const Split: React.FC = () => {
   const f = useCurrentFrame();
   if (f < SPLIT1) return null;
-  const q1 = f < SPLIT2;
-  const aOn = q1 ? f >= at(17, "conta") && f < at(17, "ou", 0) + 2 : f >= at(17, "foge") && f < at(17, "ou", 1) + 2;
-  const bOn = q1 ? f >= at(17, "esconde") : f >= at(17, "enfrenta") && f < at(17, "comenta");
-  const bothOn = !q1 && f >= at(17, "comenta");
+  const both = f >= at(17, "comenta");
+  const aOn = both || (f >= at(17, "conta") && f < at(17, "ou") + 2);
+  const bOn = both || f >= at(17, "esconde");
   return (
     <AbsoluteFill style={{background: "radial-gradient(ellipse at 50% 50%, #17375f 0%, #0b1a30 70%)"}}>
-      {q1 ? (
-        <React.Fragment key="q1">
-          <Panel top={150} letter="A" label="Conta pra turma" active={aOn} C={P1A} a={SPLIT1} />
-          <Panel top={1050} letter="B" label="Esconde de todos" active={bOn} C={P1B} a={SPLIT1 + 4} />
-        </React.Fragment>
-      ) : (
-        <React.Fragment key="q2">
-          <Panel top={150} letter="A" label="Ele foge" active={aOn || bothOn} C={P2A} a={SPLIT2} />
-          <Panel top={1050} letter="B" label="Ele enfrenta" active={bOn || bothOn} C={P2B} a={SPLIT2 + 4} />
-        </React.Fragment>
-      )}
+      <Panel top={150} letter="A" label="Conta pra turma" active={aOn} C={P1A} a={SPLIT1} />
+      <Panel top={1050} letter="B" label="Esconde de todos" active={bOn} C={P1B} a={SPLIT1 + 4} />
     </AbsoluteFill>
   );
 };
