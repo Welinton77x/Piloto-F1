@@ -24,7 +24,7 @@ export const MascotTest: React.FC = () => (
           <ambientLight intensity={0.5} />
           <hemisphereLight args={["#ffffff", "#7a6a5a", 0.8]} />
           <directionalLight position={[3, 5, 4]} intensity={1.5} />
-          <Mascot position={[0, 0, 0]} scale={1} pose={pose} gf={10} look={{outfit: "swim", floaty: "arm"}} />
+          <Mascot position={[0, 0, 0]} scale={1} pose={pose} gf={10} look={{outfit: "shirt", hoodie: true, backpack: true, hat: true}} />
         </ThreeCanvas>
       </div>
     ))}

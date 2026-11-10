@@ -4,14 +4,14 @@ import * as THREE from "three";
 import {ThreeCanvas} from "@remotion/three";
 import {useThree} from "@react-three/fiber";
 import {VO_OFFSET, config, finalCut, hasVO, sceneAt, timed, wordLocal} from "./data/scenes";
-import {CarWorld} from "./components/CarWorld";
+import {KitWorld} from "./components/KitWorld";
 import {Post} from "./components/Post";
 import {Overlay} from "./components/Overlay";
-import {REWINDS, W, heat, imagineAmount, rew, skyDark, start} from "./lib/story";
+import {REWINDS, W, heat, imagineAmount, skyDark, start} from "./lib/story";
 import {FOV, poseAt} from "./lib/camera";
 import {track} from "./lib/track";
 import {clamp01, mixHex} from "./lib/anim";
-import {SFX, musicVolume} from "./lib/audio";
+import {SFX, musicVolume, rainVolume} from "./lib/audio";
 
 // fontes locais (Montserrat 800/900), sem depender de rede no render
 const fontHandle = delayRender("fonts");
@@ -63,7 +63,7 @@ export const Scene3D: React.FC<{at?: number; fixed?: FixedPose; sunny?: boolean;
   return (
     <ThreeCanvas width={width} height={height} shadows={{type: THREE.PCFSoftShadowMap}} camera={{fov: FOV, near: 0.1, far: 400, position: [0, 2, 40]}}>
       <CamRig at={at} fixed={fixed} />
-      <CarWorld gf={gf} />
+      <KitWorld gf={gf} />
       <Post focus={poseAt(gf).pos.distanceTo(poseAt(gf).target)} />
       {/* círculos vermelhos removidos a pedido do usuário */}
       {children}
@@ -86,24 +86,19 @@ const World: React.FC = () => {
 
 // efeitos pontuais amarrados às palavras (frames globais)
 const SFX_AT: [number, string, number][] = [
-  [W("s1", "Pega") + 10, "crinkle.wav", 0.25],
-  [W("s2", "faísca"), "tick.wav", 0.45],
-  [W("s2", "explode"), "boom.wav", 0.5],
-  [W("s2", "motor"), "engine.wav", 0.35],
-  [rew("s3").P, "engine.wav", 0.4],
-  [W("s3", "lisinho") - 10, "engine.wav", 0.3],
-  [rew("s4").P + 20, "steam.wav", 0.4],
-  [W("s4", "radiador"), "engine.wav", 0.3],
-  [rew("s5").P + 10, "horn.wav", 0.4],
-  [W("s5", "Quinta"), "engine.wav", 0.35],
-  [W("s6", "chia") - 4, "screech.wav", 0.4],
-  [rew("s7").P + 10, "screech.wav", 0.3],
-  [W("s8", "buraco"), "thud.wav", 0.5],
-  [rew("s9").P, "whoosh.wav", 0.4],
-  [W("s9", "freio"), "screech.wav", 0.45],
-  [W("s10", "cinto"), "tick.wav", 0.5],
-  [W("s10", "Parabéns"), "horn.wav", 0.35],
-  [W("s10", "Parabéns") + 4, "pop.wav", 0.35],
+  [start("s2"), "thunder.wav", 0.4],
+  [W("s2", "energia") - 2, "thud.wav", 0.4],
+  [W("s2", "romper"), "splash.wav", 0.3],
+  [W("s4", "potável"), "pop.wav", 0.3],
+  [W("s4", "comida"), "pop.wav", 0.3],
+  [W("s5", "lanterna"), "tick.wav", 0.5],
+  [W("s5", "rádio"), "crinkle.wav", 0.3],
+  [W("s5", "carregador"), "pop.wav", 0.3],
+  [W("s6", "remédios"), "pop.wav", 0.3],
+  [W("s6", "documentos"), "pop.wav", 0.3],
+  [W("s6", "higiene"), "pop.wav", 0.3],
+  [W("s7", "mochila"), "whoosh.wav", 0.35],
+  [W("s8", "Parabéns"), "pop.wav", 0.35],
 ];
 
 export const Main: React.FC<{audioOnly?: boolean}> = ({audioOnly}) => (
@@ -142,5 +137,6 @@ export const Main: React.FC<{audioOnly?: boolean}> = ({audioOnly}) => (
       </React.Fragment>
     ))}
     <Audio src={staticFile("sfx/music.wav")} loop volume={(f) => musicVolume(f)} />
+    <Audio src={staticFile("sfx/rain.wav")} loop volume={(f) => rainVolume(f)} />
   </AbsoluteFill>
 );

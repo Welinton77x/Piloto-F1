@@ -230,10 +230,11 @@ const Umbrella: React.FC<{state: "open" | "closed"; tilt: number}> = ({state, ti
 );
 
 export type Hand = "fist" | "open" | "point";
-const Arm: React.FC<{side: -1 | 1; rot: [number, number]; hand?: Hand; sleeve?: string; skin?: string; ring?: boolean; children?: React.ReactNode}> = ({side, rot, hand = "fist", sleeve = col.shirt, skin = col.skin, ring, children}) => (
+const Arm: React.FC<{side: -1 | 1; rot: [number, number]; hand?: Hand; sleeve?: string; skin?: string; ring?: boolean; longSleeve?: boolean; children?: React.ReactNode}> = ({side, rot, hand = "fist", sleeve = col.shirt, skin = col.skin, ring, longSleeve, children}) => (
   <group position={[side * 0.335, 1.18, 0]} rotation={[rad(rot[0]), 0, rad(side * rot[1])]}>
     <RB w={0.16} h={0.2} d={0.17} r={0.07} c={sleeve} position={[0, -0.08, 0]} />
     <RB w={0.14} h={0.5} d={0.15} r={0.06} c={skin} position={[0, -0.36, 0]} />
+    {longSleeve && <RB w={0.155} h={0.42} d={0.165} r={0.06} c={sleeve} position={[0, -0.32, 0]} />}
     {ring && (
       <mesh position={[0, -0.2, 0]} rotation={[Math.PI / 2, 0, 0]}>
         <torusGeometry args={[0.13, 0.055, 12, 24]} />
@@ -332,7 +333,7 @@ const CurlyHair: React.FC = () => {
 };
 
 export type Prop = "jug" | "bottle" | "glassDirty" | "glass" | "shovel" | "fan";
-export type MascotLook = {hot?: number; neighbor?: boolean; muddy?: number; redEyes?: number; floaty?: "arm" | "waist"; hair?: "short" | "curly"; outfit?: "shirt" | "overall" | "swim"; wrench?: boolean; wrenchTilt?: number; wrenchLeft?: boolean; capLogo?: boolean; lHand?: Hand; rHand?: Hand; prop?: Prop; propHand?: "l" | "r"; propTilt?: number; pouring?: number};
+export type MascotLook = {hoodie?: boolean; backpack?: boolean; hat?: boolean; hot?: number; neighbor?: boolean; muddy?: number; redEyes?: number; floaty?: "arm" | "waist"; hair?: "short" | "curly"; outfit?: "shirt" | "overall" | "swim"; wrench?: boolean; wrenchTilt?: number; wrenchLeft?: boolean; capLogo?: boolean; lHand?: Hand; rHand?: Hand; prop?: Prop; propHand?: "l" | "r"; propTilt?: number; pouring?: number};
 
 /** objetos que o mascote segura para demonstrar cada etapa (sempre na vertical; inclinam para despejar) */
 const PropMesh: React.FC<{prop: Prop; tilt: number; pouring: number; side: -1 | 1}> = ({prop, tilt, pouring, side}) => {
@@ -509,7 +510,8 @@ export const Mascot: React.FC<{position: [number, number, number]; scale?: numbe
   // roupa de banho de clube aquático: camiseta de lycra turquesa, bermuda de praia laranja com faixa, chinelo
   const nb = !!look.neighbor;
   // vizinho engraçado: regata branca, sunga/bermuda vermelha, careca de bigode, máscara de mergulho com snorkel
-  const lycra = dirt(nb ? "#f4f4f4" : swim ? "#18b6c9" : col.shirt), lycraD = dirt(nb ? "#d9d9d9" : swim ? "#0f8fa1" : col.shirtD);
+  const hood = !!look.hoodie;
+  const lycra = dirt(nb ? "#f4f4f4" : swim ? "#18b6c9" : hood ? "#e0672c" : col.shirt), lycraD = dirt(nb ? "#d9d9d9" : swim ? "#0f8fa1" : hood ? "#b8501f" : col.shirtD);
   const shorts = dirt(nb ? "#e53935" : swim ? "#ff7a1a" : col.pants), shortsD = dirt(nb ? "#ffffff" : "#ffd23f");
   const hairC = dirt(nb ? "#9e9e9e" : col.hair);
   const bodySkin = dirt(col.skin);
@@ -583,6 +585,26 @@ export const Mascot: React.FC<{position: [number, number, number]; scale?: numbe
           <Mat c="#ffffff" />
         </mesh>
         <RB w={0.62} h={0.07} d={0.38} r={0.03} c={shorts} position={[0, 0.02, 0]} />
+        {hood && (
+          <group>
+            {/* capuz caído nas costas, bolso canguru e cordões */}
+            <mesh position={[0, 0.58, -0.16]} scale={[1.15, 0.6, 0.75]}>
+              <sphereGeometry args={[0.2, 20, 14]} />
+              <Mat c={lycraD} />
+            </mesh>
+            <RB w={0.36} h={0.14} d={0.03} r={0.03} c={lycraD} position={[0, 0.16, 0.172]} />
+            {[-0.05, 0.05].map((x) => <RB key={x} w={0.018} h={0.14} d={0.018} r={0.008} c="#ffffff" position={[x, 0.5, 0.18]} />)}
+          </group>
+        )}
+        {look.backpack && (
+          <group position={[0, 0.32, -0.27]}>
+            {/* mochila verde com bolso, zíper e alças */}
+            <RB w={0.48} h={0.56} d={0.24} r={0.08} c="#2e7d32" />
+            <RB w={0.36} h={0.22} d={0.06} r={0.04} c="#1b5e20" position={[0, -0.12, -0.14]} />
+            <RB w={0.34} h={0.02} d={0.02} r={0.01} c="#ffc400" position={[0, 0.14, -0.13]} />
+            {[-0.15, 0.15].map((x) => <RB key={x} w={0.06} h={0.5} d={0.05} r={0.02} c="#1b5e20" position={[x, 0.02, 0.17]} />)}
+          </group>
+        )}
         {look.floaty === "waist" && (
           <mesh position={[0, 0.12, 0]} rotation={[Math.PI / 2, 0, 0]}>
             <torusGeometry args={[0.42, 0.13, 16, 32]} />
@@ -590,12 +612,12 @@ export const Mascot: React.FC<{position: [number, number, number]; scale?: numbe
           </mesh>
         )}
       </group>
-      <Arm side={-1} rot={pose.lArm} hand={look.lHand} sleeve={lycra} skin={bodySkin} ring={look.floaty === "arm"}>
+      <Arm side={-1} rot={pose.lArm} hand={look.lHand} sleeve={lycra} skin={bodySkin} ring={look.floaty === "arm"} longSleeve={hood}>
         {umbrella}
         {look.prop && look.propHand === "l" ? <group rotation={new THREE.Euler(-rad(pose.lArm[0]), 0, rad(pose.lArm[1]), "ZYX")}><PropMesh prop={look.prop} tilt={look.propTilt ?? 0} pouring={look.pouring ?? 0} side={-1} /></group> : null}
         {look.wrench && look.wrenchLeft ? <group rotation={new THREE.Euler(-rad(pose.lArm[0]), 0, rad(pose.lArm[1]), "ZYX")}><Wrench tilt={look.wrenchTilt} /></group> : null}
       </Arm>
-      <Arm side={1} rot={pose.rArm} hand={look.rHand} sleeve={lycra} skin={bodySkin} ring={look.floaty === "arm"}>{look.prop && look.propHand !== "l" ? <group rotation={new THREE.Euler(-rad(pose.rArm[0]), 0, -rad(pose.rArm[1]), "ZYX")}><PropMesh prop={look.prop} tilt={look.propTilt ?? 0} pouring={look.pouring ?? 0} side={1} /></group> : null}{look.wrench && !look.wrenchLeft ? <group rotation={new THREE.Euler(-rad(pose.rArm[0]), 0, -rad(pose.rArm[1]), "ZYX")}><Wrench tilt={look.wrenchTilt} /></group> : null}</Arm>
+      <Arm side={1} rot={pose.rArm} hand={look.rHand} sleeve={lycra} skin={bodySkin} ring={look.floaty === "arm"} longSleeve={hood}>{look.prop && look.propHand !== "l" ? <group rotation={new THREE.Euler(-rad(pose.rArm[0]), 0, -rad(pose.rArm[1]), "ZYX")}><PropMesh prop={look.prop} tilt={look.propTilt ?? 0} pouring={look.pouring ?? 0} side={1} /></group> : null}{look.wrench && !look.wrenchLeft ? <group rotation={new THREE.Euler(-rad(pose.rArm[0]), 0, -rad(pose.rArm[1]), "ZYX")}><Wrench tilt={look.wrenchTilt} /></group> : null}</Arm>
       <group position={[0, 1.5 + breath * 0.5, 0]} rotation={[0, 0, rad(headTilt)]} scale={0.86}>
         <RB w={0.54} h={0.5} d={0.48} r={0.14} c={headSkin} />
         {[-1, 1].map((s) => (
@@ -613,7 +635,28 @@ export const Mascot: React.FC<{position: [number, number, number]; scale?: numbe
             <RB w={0.57} h={0.3} d={0.12} r={0.06} c={hairC} position={[0, 0.02, -0.2]} />
           </>
         )}
-        {swim ? (
+        {look.hat && !swim ? (
+          <group>
+            {/* chapéu cáqui de aba redonda (estilo explorador) com faixa marrom */}
+            <mesh position={[0, 0.18, -0.01]} scale={[1.0, 0.95, 0.96]}>
+              <cylinderGeometry args={[0.27, 0.31, 0.26, 32]} />
+              <Mat c="#c8b07a" />
+            </mesh>
+            <mesh position={[0, 0.31, -0.01]} scale={[1.0, 0.35, 0.96]}>
+              <sphereGeometry args={[0.27, 28, 12, 0, Math.PI * 2, 0, Math.PI / 2]} />
+              <Mat c="#c8b07a" />
+            </mesh>
+            <mesh position={[0, 0.1, -0.01]}>
+              <cylinderGeometry args={[0.315, 0.315, 0.06, 32]} />
+              <Mat c="#6d4c41" />
+            </mesh>
+            <mesh position={[0, 0.06, -0.01]} rotation={[rad(6), 0, 0]}>
+              <cylinderGeometry args={[0.52, 0.54, 0.025, 40]} />
+              <Mat c="#b89c62" />
+            </mesh>
+            <RB w={0.565} h={0.16} d={0.42} r={0.06} c={hairC} position={[0, 0.0, -0.06]} />
+          </group>
+        ) : swim ? (
           <group>
             {/* sem boné: cabelo curto por cima e óculos de natação na testa */}
             <mesh position={[0, 0.12, -0.01]} scale={[1.0, 0.72, 0.96]}>

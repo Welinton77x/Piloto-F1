@@ -4,7 +4,6 @@ import {Easing, interpolate} from "remotion";
 import type {CamKey} from "../data/scene-plan";
 import {config, sceneAt} from "../data/scenes";
 import {rad} from "./anim";
-import {carX, te} from "./story";
 
 export const FOV = 24;
 
@@ -32,7 +31,7 @@ export const poseAt = (gf: number): Pose => {
   const az = rad(g((k) => k.az) + orbit);
   const el = rad(g((k) => k.el) + Math.sin(gf / 70) * 1.5);
   const d = g((k) => k.dist) * (1 - 0.05 * (f / Math.max(1, s.durationInFrames)) + 0.015 * Math.sin(gf / 40));
-  const tx = mapX(g((k) => k.target[0])) + carX(te(gf)); // alvos da câmera são relativos ao carro (que anda pela rua)
+  const tx = mapX(g((k) => k.target[0])); // vídeo 5: cenário fixo (casa em corte)
   const ty = mapY(g((k) => k.target[1])) + Math.sin(gf / 47) * 0.03;
   const tz = g((k) => k.target[2]);
   const pos = new THREE.Vector3(tx + d * Math.sin(az) * Math.cos(el), ty + d * Math.sin(el), tz + d * Math.cos(az) * Math.cos(el));

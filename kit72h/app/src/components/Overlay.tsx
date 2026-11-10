@@ -6,8 +6,7 @@ import type {TimedScene} from "../data/scenes";
 import {L, SP, clamp01, easeOut, mixHex} from "../lib/anim";
 import {project} from "../lib/camera";
 import {track} from "../lib/track";
-import {REWINDS, RW, W, carSpeed, carX, failing, imagineAmount, rew, te} from "../lib/story";
-import {mascotLook} from "../lib/mascotPose";
+import {ITEMS, W, end, inS, itemK, start} from "../lib/story";
 
 export const FONT = "Montserrat";
 const KIND: Record<Kind, {bg: string; fg: string}> = {
@@ -42,7 +41,7 @@ const Icon: React.FC<{kind: Kind; size: number}> = ({kind, size}) => {
 
 /* ---------- Etiquetas (pílulas brancas com bolinha colorida, como no vídeo de exemplo) ---------- */
 // termos técnicos aparecem primeiro como TÍTULO GRANDE AMARELO e depois viram etiqueta
-const TERMS = new Set(["PISTÃO", "VIRABREQUIM", "MOTOR", "RADIADOR", "EMBREAGEM", "CÂMBIO", "DIFERENCIAL", "DIREÇÃO", "SUSPENSÃO", "PNEU", "FREIO", "CARRO PRONTO!"]);
+const TERMS = new Set(["72 HORAS = 3 DIAS", "ÁGUA POTÁVEL", "COMIDA", "LANTERNA + PILHAS", "RÁDIO A PILHA", "REMÉDIOS", "DOCUMENTOS", "MOCHILA PERTO DA PORTA"]);
 const BIG = 46;
 
 const BadgeView: React.FC<{b: Badge; top: number; f: number; from: number}> = ({b, top, f, from}) => {
@@ -95,182 +94,167 @@ const Badges: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
   );
 };
 
-/* ---------- s1: a pergunta grande ---------- */
+/* ---------- s1: a pergunta grande + a notícia no celular ---------- */
 const TitleCard: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
-  const a = (wordLocal(s, "viajar") ?? 10) - 2;
-  const out = (wordLocal(s, "fôlego") ?? 1e9) - 10;
-  if (f < a - 4 || f >= out + 8) return null;
-  const sc = SP(f, a - 4, 10, 140) * (1 - clamp01((f - out) / 8));
-  const line = (t: string, c: string, fs: number, d: number) => (
-    <div style={{fontSize: fs, color: c, transform: `scale(${SP(f, a - 4 + d, 10, 160)})`}}>{t}</div>
-  );
+  const a = 6;
+  const out = (wordLocal(s, "Vamos") ?? 1e9) + 10;
+  if (f >= out + 8) return null;
+  const sc = SP(f, a, 10, 140) * (1 - clamp01((f - out) / 8));
+  const line = (t: string, c: string, fs: number, d: number) => <div style={{fontSize: fs, color: c, transform: `scale(${SP(f, a + d, 10, 160)})`}}>{t}</div>;
   return (
     <div style={{position: "absolute", top: 250, left: 40, right: 40, textAlign: "center", fontFamily: FONT, fontWeight: 900, lineHeight: 1.02, WebkitTextStroke: "14px #101820", paintOrder: "stroke fill", textShadow: "0 9px 0 rgba(16,24,32,0.4)", transform: `scale(${sc}) rotate(${Math.sin(f * 0.1) * 1.2}deg)`}}>
-      {line("VOCÊ CONSTRUIU", "#FFFFFF", 92, 0)}
-      {line("UM CARRO", "#FFD60A", 140, 4)}
-      {line("DO ZERO?", "#FFFFFF", 100, 8)}
+      {line("O QUE VAI NO", "#FFFFFF", 90, 0)}
+      {line("KIT DE 72 HORAS?", "#FFD60A", 104, 4)}
     </div>
   );
 };
-
-/* ---------- balões de reação do mascote (como na referência: EITA!, UHUL!) ---------- */
-const BALLOONS: [string, string, string][] = [
-  ["s1", "fôlego", "UFA!"], ["s2", "explode", "BUM!"], ["s3", "trancos", "EITA!"], ["s4", "travar", "AI!"],
-  ["s5", "semáforo", "SOCORRO!"], ["s6", "chia", "IIIH!"], ["s7", "tombar", "OPA!"], ["s8", "coluna", "AI!"],
-  ["s9", "demais", "SOCORRO!"], ["s10", "Parabéns", "VRUM!"],
-];
-const Balloon: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
-  const gf = s.startFrame + f;
-  const b = BALLOONS.find((x) => x[0] === s.id);
-  if (!b) return null;
-  const a = (wordLocal(s, b[1]) ?? -999) - 4;
-  if (f < a || f > a + 45) return null;
-  const t = te(gf);
-  const ml = mascotLook(t);
-  if (!ml.at) return null;
-  const pt = project(gf, [carX(t) + ml.at[0], ml.at[1] + (ml.pivotHip ? 1.05 : 1.55), ml.at[2]]);
-  if (!pt) return null;
-  const x = Math.max(200, Math.min(880, pt.x + 120)), y = Math.max(540, Math.min(1080, pt.y - 60));
-  const o = 1 - clamp01((f - a - 38) / 7);
+const NewsCard: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
+  const a = 10, e = (wordLocal(s, "Vamos") ?? 200) + 10;
+  if (f < a || f > e + 8) return null;
+  const o = 1 - clamp01((f - e) / 8);
   return (
-    <div style={{position: "absolute", left: x, top: y, transform: `translate(-50%, -100%) scale(${SP(f, a, 9, 170)}) rotate(-6deg)`, opacity: o, fontFamily: FONT, fontWeight: 900, fontSize: 60, color: "#101820", background: "#FFD60A", border: "6px solid #101820", borderRadius: 40, padding: "6px 26px", boxShadow: "0 6px 0 rgba(0,0,0,0.3)", whiteSpace: "nowrap"}}>
-      {b[2]}
-    </div>
-  );
-};
-
-/* ---------- s2: cartão histórico (como o "chacoalha-ossos" da referência) ---------- */
-const HistoryCard: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
-  const a = (wordLocal(s, "motor") ?? 1e9) + 4;
-  if (f < a || f > a + 75) return null;
-  const o = 1 - clamp01((f - a - 68) / 7);
-  return (
-    <div style={{position: "absolute", left: 140, right: 140, top: 1300, opacity: o, transform: `scale(${SP(f, a, 10, 150) * 0.85}) rotate(-2deg)`, fontFamily: FONT, fontWeight: 900, textAlign: "center"}}>
-      <div style={{background: "#fff8e1", border: "6px solid #101820", borderRadius: 26, padding: "18px 22px", boxShadow: "0 8px 0 rgba(0,0,0,0.3)"}}>
-        <div style={{fontSize: 46, color: "#e65100"}}>PRIMEIRO CARRO</div>
-        <div style={{fontSize: 30, color: "#101820", marginTop: 4}}>1886 · 3 RODAS · ~16 km/h</div>
-        <svg width={360} height={130} viewBox="0 0 360 130" style={{marginTop: 8}}>
-          <circle cx={80} cy={95} r={30} fill="none" stroke="#101820" strokeWidth={8} />
-          <circle cx={280} cy={95} r={30} fill="none" stroke="#101820" strokeWidth={8} />
-          <path d="M80 95 L150 60 L250 60 L280 95 M150 60 L170 25 L210 25" stroke="#101820" strokeWidth={8} fill="none" strokeLinecap="round" />
-          <rect x={185} y={62} width={50} height={26} fill="#8d6e63" stroke="#101820" strokeWidth={5} />
-        </svg>
+    <div style={{position: "absolute", left: 120, right: 120, top: 1330, opacity: o, transform: `scale(${SP(f, a, 11, 150) * 0.9})`, fontFamily: FONT, fontWeight: 900}}>
+      <div style={{background: "#ffffff", border: "6px solid #101820", borderRadius: 24, padding: "14px 20px", boxShadow: "0 8px 0 rgba(0,0,0,0.3)"}}>
+        <div style={{display: "inline-block", background: "#E53935", color: "#fff", fontSize: 26, padding: "4px 14px", borderRadius: 10}}>ALERTA</div>
+        <div style={{fontSize: 34, color: "#101820", marginTop: 8, lineHeight: 1.1}}>DEFESA CIVIL RECOMENDA KIT DE EMERGÊNCIA PARA 72 HORAS</div>
       </div>
     </div>
   );
 };
 
-/* ---------- s4: termômetro do motor ---------- */
-const TempGauge: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
+/* ---------- checklist do kit na tela, marcado item a item (s4–s7) ---------- */
+const Checklist: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
   const gf = s.startFrame + f;
-  const t = te(gf);
-  const r = rew("s4");
-  const a = r.P - s.startFrame - 6, e = (wordLocal(s, "radiador") ?? 200) + 50;
-  if (f < a || f > e) return null;
-  const hot = failing("s4", t) ? L(t, r.P, r.P + 30, 0.4, 1) : t >= r.R ? L(gf, W("s4", "água"), W("s4", "radiador"), 1, 0.45) : 0.4;
-  const ang = -110 + 220 * hot;
+  const a = W("s4", "Agora") - 4, e = W("s7", "família") + 30;
+  if (gf < a || gf > e + 10) return null;
+  const o = 1 - clamp01((gf - e) / 10);
   return (
-    <div style={{position: "absolute", right: 60, top: 600, width: 250, textAlign: "center", fontFamily: FONT, fontWeight: 900, transform: `scale(${SP(f, a, 12, 140)})`}}>
-      <svg width={250} height={220} viewBox="0 0 260 230">
-        <circle cx={130} cy={130} r={110} fill="#ffffff" stroke="#101820" strokeWidth={10} />
-        <path d="M 52 182 A 95 95 0 0 1 130 35" fill="none" stroke="#1e88e5" strokeWidth={14} strokeLinecap="round" />
-        <path d="M 130 35 A 95 95 0 0 1 208 182" fill="none" stroke="#E53935" strokeWidth={14} strokeLinecap="round" />
-        <line x1={130} y1={130} x2={130 + Math.sin((ang * Math.PI) / 180) * 80} y2={130 - Math.cos((ang * Math.PI) / 180) * 80} stroke="#101820" strokeWidth={9} strokeLinecap="round" />
-        <circle cx={130} cy={130} r={13} fill="#101820" />
-      </svg>
-      <div style={{fontSize: 36, color: "#fff", WebkitTextStroke: "7px #101820", paintOrder: "stroke fill"}}>MOTOR</div>
+    <div style={{position: "absolute", left: 40, top: 600, width: 420, opacity: o, transform: `scale(${SP(gf, a, 11, 150)})`, transformOrigin: "0% 0%", fontFamily: FONT, fontWeight: 900}}>
+      <div style={{background: "rgba(255,255,255,0.94)", border: "5px solid #101820", borderRadius: 22, padding: "14px 16px", boxShadow: "0 8px 0 rgba(0,0,0,0.3)"}}>
+        <div style={{fontSize: 30, color: "#101820", marginBottom: 8}}>KIT 72 HORAS</div>
+        {ITEMS.map((it, i) => {
+          const k = itemK(i, gf);
+          const done = k > 0.5;
+          const cur = done && (i === ITEMS.length - 1 || itemK(i + 1, gf) <= 0.5) && gf < W("s7", "mochila");
+          return (
+            <div key={it.k} style={{display: "flex", alignItems: "center", gap: 10, fontSize: 22, color: done ? "#101820" : "#9e9e9e", padding: "3px 6px", borderRadius: 10, background: cur ? "#FFF3B0" : "transparent", marginTop: 2}}>
+              <div style={{width: 28, height: 28, borderRadius: 7, border: "3px solid #101820", background: done ? "#2E9E4F" : "#fff", display: "flex", alignItems: "center", justifyContent: "center", flex: "none", transform: `scale(${done ? SP(gf, W(it.w[0], it.w[1]) - 4, 8, 180) : 1})`}}>
+                {done && (
+                  <svg width={20} height={20} viewBox="0 0 24 24">
+                    <path d="M5 12.5l4.5 4.5 9.5-10" stroke="#fff" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+                  </svg>
+                )}
+              </div>
+              {it.label}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };
 
-/* ---------- s5/s9: velocímetro ---------- */
-const Speedo: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
-  const gf = s.startFrame + f;
-  const t = te(gf);
-  let a: number, e: number;
-  if (s.id === "s5") {
-    a = (wordLocal(s, "Primeira") ?? 0) - 6;
-    e = (wordLocal(s, "câmbio") ?? 0) + 40;
-  } else {
-    a = 0;
-    e = (wordLocal(s, "calor") ?? 0) + 30;
-  }
+/* ---------- cartão 199 / 193 ---------- */
+const PhoneCard: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
+  const a = (wordLocal(s, "Defesa", 1) ?? 1e9) - 4, e = (wordLocal(s, "Defesa", 1) ?? 1e9) + 100;
   if (f < a || f > e) return null;
-  const kmh = Math.round(carSpeed(t) * 700);
-  const ang = -120 + 240 * clamp01(kmh / 120);
-  return (
-    <div style={{position: "absolute", left: 60, top: 600, width: 250, textAlign: "center", fontFamily: FONT, fontWeight: 900, transform: `scale(${SP(f, a, 12, 140)})`}}>
-      <svg width={250} height={220} viewBox="0 0 260 230">
-        <circle cx={130} cy={130} r={110} fill="#101820" stroke="#ffffff" strokeWidth={8} />
-        <path d="M 52 182 A 95 95 0 1 1 208 182" fill="none" stroke="#2E9E4F" strokeWidth={12} strokeLinecap="round" />
-        <path d="M 180 50 A 95 95 0 0 1 208 182" fill="none" stroke="#E53935" strokeWidth={12} strokeLinecap="round" />
-        <line x1={130} y1={130} x2={130 + Math.sin((ang * Math.PI) / 180) * 82} y2={130 - Math.cos((ang * Math.PI) / 180) * 82} stroke="#ff7a1a" strokeWidth={8} strokeLinecap="round" />
-        <text x={130} y={190} textAnchor="middle" fontSize={38} fontFamily={FONT} fontWeight={900} fill="#ffffff">{kmh}</text>
-      </svg>
-      <div style={{fontSize: 32, color: "#fff", WebkitTextStroke: "7px #101820", paintOrder: "stroke fill"}}>km/h</div>
-    </div>
-  );
-};
-
-/* ---------- s6: na curva, a roda de fora anda mais (diagrama visto de cima) ---------- */
-const CurveDiagram: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
-  const a = (wordLocal(s, "curioso") ?? 1e9) - 4, e = (wordLocal(s, "Então") ?? 1e9) + 10;
-  if (f < a || f > e) return null;
-  const k = clamp01((f - a) / 30);
-  const arc = (r: number) => `M ${90 + r} 520 A ${r} ${r} 0 0 0 90 ${520 - r}`;
   const o = 1 - clamp01((f - e + 8) / 8);
   return (
-    <div style={{position: "absolute", left: 140, top: 520, opacity: o, transform: `scale(${SP(f, a, 11, 150)})`, transformOrigin: "0% 0%"}}>
-      <svg width={800} height={560} viewBox="0 0 800 560">
-        <rect x={0} y={0} width={800} height={560} rx={36} fill="rgba(16,24,32,0.78)" />
-        <path d={arc(420)} stroke="#E53935" strokeWidth={22} fill="none" strokeLinecap="round" strokeDasharray={700} strokeDashoffset={700 * (1 - k)} />
-        <path d={arc(270)} stroke="#4DD0FF" strokeWidth={22} fill="none" strokeLinecap="round" strokeDasharray={460} strokeDashoffset={460 * (1 - k)} />
-        <text x={480} y={150} fontSize={44} fontFamily={FONT} fontWeight={900} fill="#ff6b6b">FORA: MAIS</text>
-        <text x={350} y={330} fontSize={44} fontFamily={FONT} fontWeight={900} fill="#4DD0FF">DENTRO: MENOS</text>
-      </svg>
+    <div style={{position: "absolute", right: 60, top: 640, width: 360, opacity: o, transform: `scale(${SP(f, a, 10, 160)}) rotate(3deg)`, fontFamily: FONT, fontWeight: 900, textAlign: "center"}}>
+      <div style={{background: "#fffde7", border: "6px solid #101820", borderRadius: 18, padding: "14px 10px", boxShadow: "0 8px 0 rgba(0,0,0,0.3)"}}>
+        <div style={{fontSize: 70, color: "#e65100", lineHeight: 1}}>199</div>
+        <div style={{fontSize: 26, color: "#101820"}}>DEFESA CIVIL</div>
+        <div style={{height: 4, background: "#101820", margin: "8px 20px"}} />
+        <div style={{fontSize: 70, color: "#E53935", lineHeight: 1}}>193</div>
+        <div style={{fontSize: 26, color: "#101820"}}>BOMBEIROS</div>
+      </div>
     </div>
   );
 };
 
-/* ---------- s9: linhas de velocidade (como na referência) ---------- */
-const SpeedLines: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
-  const t = te(s.startFrame + f);
-  if (carSpeed(t) < 0.12) return null;
+/* ---------- aviso saindo do rádio ---------- */
+const RadioAlert: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
+  const a = (wordLocal(s, "avisos") ?? 1e9) - 6, e = (wordLocal(s, "carregador") ?? 1e9) - 8;
+  if (f < a || f > e) return null;
   return (
-    <AbsoluteFill style={{pointerEvents: "none"}}>
-      <svg width={1080} height={1920}>
-        {Array.from({length: 26}).map((_, i) => {
-          const ang = (i / 26) * Math.PI * 2 + random("sl" + i);
-          const r0 = 520 + ((f * 37 + i * 91) % 300), r1 = r0 + 220;
-          return <line key={i} x1={540 + Math.cos(ang) * r0} y1={960 + Math.sin(ang) * r0} x2={540 + Math.cos(ang) * r1} y2={960 + Math.sin(ang) * r1} stroke="#ffffff" strokeWidth={6} opacity={0.7} strokeLinecap="round" />;
-        })}
+    <div style={{position: "absolute", left: 560, right: 50, top: 640, transform: `scale(${SP(f, a, 10, 160)}) rotate(-3deg)`, fontFamily: FONT, fontWeight: 900}}>
+      <div style={{background: "#101820", color: "#FFD60A", border: "5px solid #FFD60A", borderRadius: 22, padding: "14px 18px", fontSize: 30, lineHeight: 1.15, boxShadow: "0 8px 0 rgba(0,0,0,0.3)"}}>
+        📻 ATENÇÃO: PROCURE UM LOCAL ALTO
+      </div>
+    </div>
+  );
+};
+
+/* ---------- s2/s3: ícones do que para (energia, água, comunicação) e o relógio de 72 h ---------- */
+const Outage: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
+  const gf = s.startFrame + f;
+  if (!inS("s2", gf)) return null;
+  const items: [string, string, string][] = [["energia", "⚡", "ENERGIA"], ["água", "💧", "ÁGUA"], ["comunicação", "📶", "SINAL"]];
+  return (
+    <div style={{position: "absolute", left: 0, right: 0, top: 1350, display: "flex", justifyContent: "center", gap: 26, fontFamily: FONT, fontWeight: 900}}>
+      {items.map(([w, ic, lb]) => {
+        const a = wordLocal(s, w) ?? 1e9;
+        if (f < a - 4) return <div key={lb} style={{width: 200}} />;
+        return (
+          <div key={lb} style={{width: 200, textAlign: "center", transform: `scale(${SP(f, a - 4, 10, 160)})`}}>
+            <div style={{position: "relative", width: 120, height: 120, margin: "0 auto", borderRadius: 60, background: "#ffffff", border: "6px solid #101820", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 64}}>
+              {ic}
+              <svg width={120} height={120} viewBox="0 0 24 24" style={{position: "absolute", left: -6, top: -6}}>
+                <path d="M5 5l14 14" stroke="#E53935" strokeWidth="3" strokeLinecap="round" />
+              </svg>
+            </div>
+            <div style={{fontSize: 30, color: "#fff", WebkitTextStroke: "7px #101820", paintOrder: "stroke fill", marginTop: 6}}>{lb}</div>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+const Clock72: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
+  const gf = s.startFrame + f;
+  if (!inS("s3", gf)) return null;
+  const h = Math.round(Math.min(72, (f / s.durationInFrames) * 90));
+  return (
+    <div style={{position: "absolute", right: 60, top: 620, width: 260, textAlign: "center", fontFamily: FONT, fontWeight: 900, transform: `scale(${SP(f, 4, 11, 150)})`}}>
+      <svg width={240} height={240} viewBox="0 0 240 240">
+        <circle cx={120} cy={120} r={104} fill="#ffffff" stroke="#101820" strokeWidth={10} />
+        <circle cx={120} cy={120} r={88} fill="none" stroke="#FFD60A" strokeWidth={16} strokeDasharray={553} strokeDashoffset={553 * (1 - h / 72)} transform="rotate(-90 120 120)" />
+        <text x={120} y={136} textAnchor="middle" fontSize={56} fontFamily={FONT} fontWeight={900} fill="#101820">{h}h</text>
       </svg>
-    </AbsoluteFill>
+    </div>
+  );
+};
+/* ---------- s7: calendário de 6 meses ---------- */
+const Calendar: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
+  const a = (wordLocal(s, "seis") ?? 1e9) - 10, e = (wordLocal(s, "Não") ?? 1e9) - 4;
+  if (f < a || f > e) return null;
+  return (
+    <div style={{position: "absolute", right: 70, top: 640, transform: `scale(${SP(f, a, 10, 160)}) rotate(4deg)`, fontFamily: FONT, fontWeight: 900, textAlign: "center"}}>
+      <svg width={230} height={230} viewBox="0 0 24 24">
+        <rect x="2.5" y="4" width="19" height="17" rx="3" fill="#fff" stroke="#101820" strokeWidth="1.4" />
+        <rect x="2.5" y="4" width="19" height="5" rx="2" fill="#E53935" stroke="#101820" strokeWidth="1.4" />
+        <path d="M7 2.5v3M17 2.5v3" stroke="#101820" strokeWidth="1.6" strokeLinecap="round" />
+        <text x="12" y="18.4" textAnchor="middle" fontSize="8.5" fontWeight="900" fontFamily={FONT} fill="#101820">6</text>
+      </svg>
+      <div style={{fontSize: 36, color: "#fff", WebkitTextStroke: "7px #101820", paintOrder: "stroke fill"}}>MESES</div>
+    </div>
   );
 };
 
 /* ---------- ✓ e ✕ grandes ---------- */
 type Stamp = {id: string; word: string; ok: boolean; x: number; y: number};
 const STAMPS: Stamp[] = [
-  // ✕ vermelho grande quando dá errado; ✓ verde grande quando dá certo (pedido do usuário)
-  {id: "s1", word: "fôlego", ok: false, x: 860, y: 900},
-  {id: "s2", word: "motor", ok: true, x: 860, y: 900},
-  {id: "s3", word: "trancos", ok: false, x: 860, y: 900},
-  {id: "s3", word: "lisinho", ok: true, x: 860, y: 900},
-  {id: "s4", word: "esquenta", ok: false, x: 860, y: 1000},
-  {id: "s4", word: "radiador", ok: true, x: 860, y: 1000},
-  {id: "s5", word: "semáforo", ok: false, x: 860, y: 900},
-  {id: "s5", word: "embreagem", ok: true, x: 860, y: 900},
-  {id: "s5", word: "câmbio", ok: true, x: 860, y: 900},
-  {id: "s6", word: "chia", ok: false, x: 860, y: 900},
-  {id: "s6", word: "diferencial", ok: true, x: 860, y: 900},
-  {id: "s7", word: "tombar", ok: false, x: 860, y: 900},
-  {id: "s7", word: "direção", ok: true, x: 860, y: 900},
-  {id: "s8", word: "coluna", ok: false, x: 860, y: 900},
-  {id: "s8", word: "suspensão", ok: true, x: 860, y: 900},
-  {id: "s8", word: "pneu", ok: true, x: 860, y: 900},
-  {id: "s9", word: "demais", ok: false, x: 860, y: 900},
-  {id: "s9", word: "freio", ok: true, x: 860, y: 900},
+  // ✕ vermelho no que dá errado / ✓ verde no que resolve (pedido do usuário)
+  {id: "s2", word: "geladeira", ok: false, x: 860, y: 900},
+  {id: "s2", word: "bomba", ok: false, x: 860, y: 900},
+  {id: "s2", word: "romper", ok: false, x: 860, y: 900},
+  {id: "s2", word: "sinal", ok: false, x: 860, y: 900},
+  {id: "s4", word: "potável", ok: true, x: 880, y: 1050},
+  {id: "s4", word: "comida", ok: true, x: 880, y: 1050},
+  {id: "s5", word: "vela", ok: false, x: 880, y: 1050},
+  {id: "s5", word: "rádio", ok: true, x: 880, y: 1050},
+  {id: "s6", word: "documentos", ok: true, x: 880, y: 1050},
+  {id: "s7", word: "pegar", ok: true, x: 880, y: 1050},
 ];
 const Stamps: React.FC<{s: TimedScene; f: number}> = ({s, f}) => (
   <>
@@ -289,62 +273,20 @@ const Stamps: React.FC<{s: TimedScene; f: number}> = ({s, f}) => (
   </>
 );
 
-/* ---------- pausar e rebobinar: ⏸ e ⏪ GRANDES NO MEIO DA TELA (pedido do usuário) ---------- */
-const Imagine: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
-  const gf = s.startFrame + f;
-  const r = REWINDS.find((x) => x.id === s.id);
-  if (!r) return null;
-  const k = imagineAmount(gf);
-  const rewOn = gf >= r.R && gf < r.R + RW;
-  const pauseOn = gf >= r.P && gf < r.P + 30;
-  const icon = (kind: "pause" | "rew", sc: number, o: number) => (
-    <svg width={300} height={300} viewBox="0 0 24 24" style={{position: "absolute", left: 540 - 150, top: 960 - 150, transform: `scale(${sc})`, opacity: o}}>
-      <circle cx="12" cy="12" r="11.5" fill="rgba(16,24,32,0.55)" />
-      {kind === "pause" ? (
-        <>
-          <rect x="7.5" y="6.5" width="3" height="11" rx="1" fill="#fff" />
-          <rect x="13.5" y="6.5" width="3" height="11" rx="1" fill="#fff" />
-        </>
-      ) : (
-        <>
-          <path d="M12 7v10l-6.5-5z" fill="#fff" />
-          <path d="M19 7v10l-6.5-5z" fill="#fff" />
-        </>
-      )}
-    </svg>
-  );
-  const po = 1 - clamp01((gf - r.P - 22) / 8);
-  return (
-    <AbsoluteFill style={{pointerEvents: "none"}}>
-      {k > 0.01 && <AbsoluteFill style={{boxShadow: `inset 0 0 ${260 * k}px ${80 * k}px rgba(30,20,10,0.7)`}} />}
-      {pauseOn && icon("pause", SP(gf, r.P, 10, 160), po)}
-      {rewOn && (
-        <>
-          {icon("rew", 1 + 0.08 * Math.sin(f * 0.9), 1)}
-          {Array.from({length: 7}).map((_, i) => (
-            <div key={i} style={{position: "absolute", left: 0, right: 0, top: ((i * 293 + f * 97) % 1920), height: 6 + (i % 3) * 5, background: "rgba(255,255,255,0.35)"}} />
-          ))}
-          <div style={{position: "absolute", top: 740, left: 0, right: 0, textAlign: "center", fontFamily: FONT, fontWeight: 900, fontSize: 58, color: "#fff", WebkitTextStroke: "10px #101820", paintOrder: "stroke fill", opacity: Math.floor(f / 6) % 2 ? 1 : 0.6}}>VOLTANDO...</div>
-        </>
-      )}
-    </AbsoluteFill>
-  );
-};
-
-/* ---------- s10: pergunta final grande ---------- */
+/* ---------- s8: pergunta final grande ---------- */
 const FinalCTA: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
-  const a = (wordLocal(s, "Comente") ?? Math.round(s.durationInFrames * 0.6)) - 6;
+  const a = (wordLocal(s, "Você") ?? Math.round(s.durationInFrames * 0.6)) - 6;
   const c = (wordLocal(s, "próximo") ?? a + 70) - 30;
   if (f < a) return null;
   return (
     <div style={{position: "absolute", top: 260, left: 40, right: 40, textAlign: "center", fontFamily: FONT, fontWeight: 900, lineHeight: 1.02, WebkitTextStroke: "13px #101820", paintOrder: "stroke fill", textShadow: "0 9px 0 rgba(16,24,32,0.4)", transform: `scale(${SP(f, a, 10, 140)})`}}>
-      <div style={{fontSize: 100, color: "#fff"}}>COMENTE</div>
-      <div style={{fontSize: 140, color: "#FFD60A", transform: `rotate(${Math.sin(f * 0.25) * 3}deg)`}}>"VRUM"</div>
+      <div style={{fontSize: 92, color: "#fff"}}>VOCÊ JÁ TEM</div>
+      <div style={{fontSize: 120, color: "#FFD60A", transform: `rotate(${Math.sin(f * 0.25) * 3}deg)`}}>O SEU KIT?</div>
       {f >= c && (
-        <div style={{fontSize: 62, color: "#fff", marginTop: 14, transform: `scale(${SP(f, c, 9, 170)})`}}>
-          O QUE VOCÊ QUER VER
+        <div style={{fontSize: 60, color: "#fff", marginTop: 14, transform: `scale(${SP(f, c, 9, 170)})`}}>
+          COMENTA O QUE VOCÊ QUER VER
           <br />
-          NO <span style={{color: "#4DD0FF"}}>PRÓXIMO VÍDEO?</span>
+          NO <span style={{color: "#4DD0FF"}}>PRÓXIMO VÍDEO!</span>
         </div>
       )}
     </div>
@@ -475,16 +417,16 @@ export const Overlay: React.FC<{s: TimedScene}> = ({s}) => {
   const f = useCurrentFrame();
   return (
     <AbsoluteFill>
-      {s.id === "s9" && <SpeedLines s={s} f={f} />}
-      {s.id === "s10" && <Celebration s={s} f={f} />}
+      {s.id === "s8" && <Celebration s={s} f={f} />}
       {s.id === "s1" && <TitleCard s={s} f={f} />}
-      {s.id === "s2" && <HistoryCard s={s} f={f} />}
-      {s.id === "s4" && <TempGauge s={s} f={f} />}
-      {(s.id === "s5" || s.id === "s9") && <Speedo s={s} f={f} />}
-      {s.id === "s6" && <CurveDiagram s={s} f={f} />}
-      {s.id === "s10" && <FinalCTA s={s} f={f} />}
-      <Balloon s={s} f={f} />
-      <Imagine s={s} f={f} />
+      {s.id === "s1" && <NewsCard s={s} f={f} />}
+      <Outage s={s} f={f} />
+      <Clock72 s={s} f={f} />
+      <Checklist s={s} f={f} />
+      {s.id === "s5" && <PhoneCard s={s} f={f} />}
+      {s.id === "s5" && <RadioAlert s={s} f={f} />}
+      {s.id === "s7" && <Calendar s={s} f={f} />}
+      {s.id === "s8" && <FinalCTA s={s} f={f} />}
       <Stamps s={s} f={f} />
       <Badges s={s} f={f} />
       <Captions s={s} f={f} />
@@ -492,3 +434,4 @@ export const Overlay: React.FC<{s: TimedScene}> = ({s}) => {
   );
 };
 export const unusedMix = mixHex;
+export const _u = [end, start, W];
