@@ -1,6 +1,6 @@
 # Vídeo 5 — Kit de emergência para 72 horas: por que ter um?
 
-**Versão:** v2 (AGUARDANDO APROVAÇÃO — implementação e renderização não iniciadas)  
+**Versão:** v3 (AGUARDANDO APROVAÇÃO — implementação e renderização não iniciadas)  
 **Canal:** Por Dentro Lab · **Formato:** Short vertical 1080 × 1920, 9:16, 30 fps
 
 ## 1. Briefing de produção
@@ -8,7 +8,7 @@
 - **Tema:** a recomendação da Defesa Civil Nacional (início de novembro de 2026) para as famílias montarem um kit de emergência para 72 horas, a partir da notícia da Veja enviada pelo usuário.
 - **Fontes:** a página da Veja não abriu neste ambiente; usamos a cobertura de outros veículos sobre a mesma orientação (Diário do Nordeste, DCI, Compre Rural, Correio Braziliense). Pontos usados: 2 L de água por pessoa por dia (6 L em 3 dias); comida que não precisa de geladeira; remédios de uso contínuo; rádio a pilha e telefones anotados em papel; documentos protegidos da água; itens para bebês, crianças e pets; conferir validade a cada 6 meses; 199 (Defesa Civil) e 193 (Bombeiros); recomendação preventiva, não obrigatória; 72 h porque grandes desastres podem interromper serviços e dificultar o acesso do socorro. Lanterna, pilhas extras, primeiros socorros e carregador portátil são itens comuns em listas de kit (pedido do usuário incluir lanternas e pilhas).
 - **Formato (pedido v2):** vídeo informativo e de ajuda: (1) por que 72 horas — energia, água e comunicação podem parar juntas, e o socorro não chega em todos de uma vez; (2) checklist de 8 itens na tela, marcado um a um, cada item com o porquê; (3) dicas para montar (mochila perto da porta, validade a cada 6 meses, montar aos poucos, adaptar à família).
-- **Mascote (pedido do usuário):** o do canal, com **blusão de moletom com capuz no lugar da camisa e mochila nas costas**.
+- **Mascote (pedido do usuário):** o do canal, com **blusão de moletom com capuz no lugar da camisa, mochila nas costas e chapéu no lugar do boné** (chapéu de aba redonda, estilo explorador/pescador, cor cáqui).
 - **Tom:** o mesmo dos vídeos 3 e 4 (contando como novidade, explicando o porquê), calmo e sem alarmismo: "não é pra ter medo, é pra estar pronto".
 - **Recursos:** checklist na tela; ✕ vermelho e ✓ verde grandes; etiquetas com bolinha; nome do item em amarelo; cartão 199/193; sem círculos vermelhos; acabamento com fundo desfocado como no vídeo do carro.
 - **Duração estimada:** ~164 s (4914 frames). Voz Liam (speed 1,08).
