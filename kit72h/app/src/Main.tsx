@@ -7,7 +7,7 @@ import {VO_OFFSET, config, finalCut, hasVO, sceneAt, timed, wordLocal} from "./d
 import {KitWorld} from "./components/KitWorld";
 import {Post} from "./components/Post";
 import {Overlay} from "./components/Overlay";
-import {REWINDS, W, heat, imagineAmount, skyDark, start} from "./lib/story";
+import {ITEMS, REWINDS, W, heat, imagineAmount, itemAt, skyDark, start} from "./lib/story";
 import {FOV, poseAt} from "./lib/camera";
 import {track} from "./lib/track";
 import {clamp01, mixHex} from "./lib/anim";
@@ -99,6 +99,12 @@ const SFX_AT: [number, string, number][] = [
   [W("s6", "higiene"), "pop.wav", 0.3],
   [W("s7", "mochila"), "whoosh.wav", 0.35],
   [W("s8", "Parabéns"), "pop.wav", 0.35],
+  // sons do mascote: susto, pulinhos de comemoração a cada item, passos e a comemoração final
+  [W("s2", "energia") - 4, "ohno.wav", 0.45],
+  [W("s2", "Terceira") - 10, "ohno.wav", 0.3],
+  ...ITEMS.map((_, i) => [itemAt(i) + 8, i % 2 ? "cheer.wav" : "hop.wav", 0.35] as [number, string, number]),
+  [W("s7", "pegar") - 6, "steps.wav", 0.4],
+  [W("s8", "Parabéns") + 2, "cheer.wav", 0.5],
 ];
 
 export const Main: React.FC<{audioOnly?: boolean}> = ({audioOnly}) => (

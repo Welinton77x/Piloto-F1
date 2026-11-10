@@ -1,7 +1,7 @@
 // Vídeo 5 (kit 72h): mascote do canal de blusão laranja com capuz, chapéu cáqui e mochila (pedido do usuário).
 import type {MascotLook, MascotPose} from "../components/Mascot";
 import {clamp01} from "./anim";
-import {W, end, flashlightOn, inS, start} from "./story";
+import {ITEMS, W, end, flashlightOn, inS, itemAt, start} from "./story";
 
 export const REWIND_FRAMES = 26;
 export type Look = MascotLook & {at?: [number, number, number]; ry?: number; rx?: number; pivotHip?: boolean};
@@ -67,6 +67,30 @@ export const mascotPose = (t: number): MascotPose => {
     p.rArm = [-75, 35];
     p.lArm = talk();
   }
+  // pulinho de comemoração a cada item que entra no kit (com braços pra cima)
+  for (let i = 0; i < ITEMS.length; i++) {
+    const d = t - itemAt(i) - 8;
+    if (d >= 0 && d < 22) {
+      p.jump = Math.abs(Math.sin((d / 22) * Math.PI)) * 0.14;
+      p.emotion = "joy";
+      p.lArm = [-10, 140 + Math.sin(d * 0.6) * 15];
+      p.rArm = [-10, 140 - Math.sin(d * 0.6) * 15];
+    }
+  }
+  // susto quando a luz acaba: pula de susto e treme
+  const e = t - W("s2", "energia");
+  if (e >= -6 && e < 18) {
+    p.jump = Math.max(p.jump, Math.abs(Math.sin(((e + 6) / 24) * Math.PI)) * 0.18);
+    p.shiver = 0.8;
+  }
+  // final: comemoração com pulos seguidos
+  if (inS("s8", t) && t > W("s8", "Parabéns") - 4) {
+    const d = t - W("s8", "Parabéns");
+    p.jump = Math.abs(Math.sin(d * 0.2)) * 0.2 * Math.exp(-Math.max(0, d - 40) * 0.03);
+    p.lArm = [-10, 150 + Math.sin(d * 0.4) * 15];
+  }
+  // respiração/balanço leve quando parado e cabeça acompanhando
+  if (!p.walking && p.jump < 0.01) p.jump = Math.abs(Math.sin(t * 0.09)) * 0.012;
   // lanterna na mão esquerda quando acesa (s5–s7)
   if (flashlightOn(t) && !inS("s7", t)) p.lArm = [-70, -10];
   void start;

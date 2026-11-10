@@ -73,7 +73,7 @@ export const scenes: ScenePlan[] = [
     camera: [{ f: 0, az: 0, el: 10, dist: 9, target: [0.4, 1.3, 0.3] }, { f: 0, az: 5, el: 8, dist: 6.5, target: [0.6, 1.2, 0.4], atWord: "Parabéns", wordOffset: -4 }, { f: 496, az: 0, el: 8, dist: 6, target: [0.6, 1.2, 0.4] }],
     objects: ["confetti", "mascot", "sun"],
     animations: [{ target: "rain", unit: "ver roteiro", from: 0, to: 1, f0: 0, f1: 496, fn: "easeInOut" }, { target: "sun", unit: "ver roteiro", from: 0, to: 1, f0: 0, f1: 496, fn: "easeInOut" }],
-    badges: [{ text: "AGORA VOCÊ SABE!", kind: "solution", f0: 0, anchorWord: "Parabéns", untilWord: "Você" }], highlights: ["parabéns"], captions: cap,
+    badges: [{ text: "AGORA VOCÊ SABE!", kind: "solution", f0: 0, anchorWord: "Parabéns", untilWord: "tem" }], highlights: ["parabéns"], captions: cap,
     audioCues: [cue("whoosh-s8", 0)] },
 ];
 // Integridade: 8 cenas contíguas, soma 4914 frames.

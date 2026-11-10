@@ -239,6 +239,25 @@ const Seg: React.FC<{a: [number, number, number]; b: [number, number, number]; r
   );
 };
 
+/** queda com quique amortecido (gravidade + perda de energia a cada batida): altura acima do apoio */
+export const dropBounce = (f: number, h0 = 0.9) => {
+  if (f < 0) return h0;
+  const g = 0.0042; // u/frame²
+  let v = 0, y = h0;
+  for (let i = 0; i < f; i++) {
+    v -= g;
+    y += v;
+    if (y < 0) {
+      y = 0;
+      v = -v * 0.42;
+      if (Math.abs(v) < 0.004) v = 0;
+    }
+  }
+  return Math.max(0, y);
+};
+/** inclinação de "assentar": balança e para */
+const settle = (f: number) => (f < 0 ? 0 : Math.sin(f * 0.6) * 0.35 * Math.exp(-f * 0.08));
+
 /** posições dos 8 itens em cima da mesa */
 const slot = (i: number): [number, number, number] => [TABLE.x0 + 0.3 + (i % 4) * 0.47, TABLE.top, i < 4 ? -0.92 : -0.36];
 
@@ -381,7 +400,9 @@ export const KitWorld: React.FC<{gf: number}> = ({gf}) => {
   const pw = power(t);
   const storm = t >= start("s2") && t < start("s8");
   const flood = t < start("s2") ? 0 : t < start("s7") ? L(t, W("s2", "enchente", 1) - 10, W("s2", "Terceira"), 0.05, 0.32, easeInOut) : L(t, start("s7"), end("s7"), 0.32, 0.05);
-  const poleFall = L(t, W("s2", "energia") - 8, W("s2", "energia") + 6, 0, 1.25, easeOut);
+  const pf = t - (W("s2", "energia") - 10);
+  // tomba acelerando (gravidade) e quica no chão antes de parar
+  const poleFall = pf < 0 ? 0 : pf < 16 ? 1.25 * (pf / 16) ** 2 : 1.25 - Math.abs(Math.sin((pf - 16) * 0.45)) * 0.12 * Math.exp(-(pf - 16) * 0.12);
   const lightning = storm && ((t % 97) < 3 || (t % 151) < 2) ? 1 : 0;
   const tapRun = t < W("s2", "Segunda") + 12 ? 1 : 0;
   const pipeBurst = t >= W("s2", "romper") - 4 && t < start("s4") ? 1 : 0;
@@ -474,9 +495,13 @@ export const KitWorld: React.FC<{gf: number}> = ({gf}) => {
         const into = clamp01(pack * 1.4 - i * 0.05);
         if (into >= 0.999) return null;
         const p = p0.clone().lerp(new THREE.Vector3(PACK_FLOOR[0], PACK_FLOOR[1] + 0.45, PACK_FLOOR[2]), easeInOut(into));
-        p.y += Math.sin(into * Math.PI) * 0.6 + (1 - k) * 0.6;
+        const fl = t - (W(ITEMS[i].w[0], ITEMS[i].w[1]) - 4);
+        const hb = dropBounce(fl);
+        p.y += Math.sin(into * Math.PI) * 0.6 + (into > 0 ? 0 : hb);
+        const sq = into > 0 || hb > 0.01 ? 1 : 1 - 0.18 * Math.max(0, Math.sin(fl * 0.9)) * Math.exp(-fl * 0.12);
+        const sc = Math.min(1, k * 3) * (1 - into * 0.7);
         return (
-          <group key={"it" + i} position={p} scale={k * (1 - into * 0.7)}>
+          <group key={"it" + i} position={p} rotation={[settle(fl) * 0.5, into * 4, settle(fl)]} scale={[sc * (2 - sq), sc * sq, sc * (2 - sq)]}>
             <ItemMesh i={i} />
           </group>
         );
@@ -497,7 +522,7 @@ export const KitWorld: React.FC<{gf: number}> = ({gf}) => {
       )}
       {/* mochila: no chão aberta (recebendo os itens), depois no gancho, depois nas costas */}
       {!worn && (
-        <group position={packPos} rotation={[0, -0.4, 0]}>
+        <group position={packPos} rotation={[toHook >= 1 ? Math.sin((t - W("s7", "porta")) * 0.35) * 0.12 * Math.exp(-Math.max(0, t - W("s7", "porta")) * 0.05) : 0, -0.4, pack > 0 && pack < 1 ? Math.sin(t * 0.9) * 0.05 : 0]}>
           <B x={[-0.26, 0.26]} y={[0, 0.6]} z={[-0.14, 0.14]} c="#2e7d32" />
           <B x={[-0.2, 0.2]} y={[0.06, 0.3]} z={[0.14, 0.2]} c="#1b5e20" />
           <B x={[-0.24, 0.24]} y={[0.58, 0.62]} z={[-0.12, 0.12]} c={pack > 0.98 ? "#ffc400" : "#1b5e20"} />
@@ -588,6 +613,23 @@ export const KitWorld: React.FC<{gf: number}> = ({gf}) => {
       ))}
       <Tree x={-5.5} z={-3.5} s={1.1} />
       <Tree x={5.0} z={-3.0} s={1.0} />
+
+      {/* respingos da chuva batendo no chão e ondinhas na enchente */}
+      {rainK > 0.2 && (() => {
+        const tg = poseAt(gf).target;
+        return Array.from({length: 40}).map((_, k) => {
+          const ph = ((t * 0.06 + random("sp" + k)) % 1);
+          const x = tg.x + (random("spx" + k) - 0.5) * 12, z = tg.z + (random("spz" + k) - 0.5) * 9;
+          const onStreet = z > 2.4 && z < 6.5;
+          const y = onStreet ? Math.max(0.02, flood) + 0.012 : 0.06;
+          return (
+            <mesh key={"sp" + k} position={[x, y, z]} rotation={[-Math.PI / 2, 0, 0]} scale={0.05 + ph * (onStreet ? 0.35 : 0.18)}>
+              <ringGeometry args={[0.8, 1, 16]} />
+              <meshBasicMaterial color="#e3f2fd" transparent opacity={0.6 * (1 - ph) * rainK} depthWrite={false} />
+            </mesh>
+          );
+        });
+      })()}
 
       {/* chuva */}
       {rainK > 0.02 && (() => {

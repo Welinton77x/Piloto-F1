@@ -275,7 +275,7 @@ const Stamps: React.FC<{s: TimedScene; f: number}> = ({s, f}) => (
 
 /* ---------- s8: pergunta final grande ---------- */
 const FinalCTA: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
-  const a = (wordLocal(s, "Você") ?? Math.round(s.durationInFrames * 0.6)) - 6;
+  const a = (wordLocal(s, "tem") ?? Math.round(s.durationInFrames * 0.6)) - 12;
   const c = (wordLocal(s, "próximo") ?? a + 70) - 30;
   if (f < a) return null;
   return (
