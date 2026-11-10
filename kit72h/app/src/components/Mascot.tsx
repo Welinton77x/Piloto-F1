@@ -576,11 +576,11 @@ export const Mascot: React.FC<{position: [number, number, number]; scale?: numbe
           </group>
         )}
         <RB w={0.3} h={0.06} d={0.3} r={0.03} c={lycraD} position={[0, 0.6, 0]} />
-        <mesh position={[0.13, 0.42, overall ? -5 : 0.172]}>
+        <mesh position={[0.13, 0.42, overall || hood ? -5 : 0.172]}>
           <circleGeometry args={[0.065, 20]} />
           <Mat c="#4DD0FF" />
         </mesh>
-        <mesh position={[0.13, 0.42, overall ? -5 : 0.173]}>
+        <mesh position={[0.13, 0.42, overall || hood ? -5 : 0.173]}>
           <ringGeometry args={[0.065, 0.078, 20]} />
           <Mat c="#ffffff" />
         </mesh>
