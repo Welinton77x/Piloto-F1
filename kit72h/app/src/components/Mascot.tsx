@@ -637,24 +637,36 @@ export const Mascot: React.FC<{position: [number, number, number]; scale?: numbe
         )}
         {look.hat && !swim ? (
           <group>
-            {/* chapéu cáqui de aba redonda (estilo explorador) com faixa marrom */}
-            <mesh position={[0, 0.18, -0.01]} scale={[1.0, 0.95, 0.96]}>
-              <cylinderGeometry args={[0.27, 0.31, 0.26, 32]} />
+            {/* chapéu cáqui de aba redonda (estilo explorador): encaixado no alto da cabeça, aba reta acima dos olhos */}
+            <mesh position={[0, 0.33, -0.01]}>
+              <cylinderGeometry args={[0.27, 0.3, 0.2, 32]} />
               <Mat c="#c8b07a" />
             </mesh>
-            <mesh position={[0, 0.31, -0.01]} scale={[1.0, 0.35, 0.96]}>
+            <mesh position={[0, 0.43, -0.01]} scale={[1.0, 0.28, 1.0]}>
               <sphereGeometry args={[0.27, 28, 12, 0, Math.PI * 2, 0, Math.PI / 2]} />
               <Mat c="#c8b07a" />
             </mesh>
-            <mesh position={[0, 0.1, -0.01]}>
-              <cylinderGeometry args={[0.315, 0.315, 0.06, 32]} />
+            {/* vinco no topo */}
+            <mesh position={[0, 0.47, -0.01]} scale={[0.5, 0.08, 1.0]}>
+              <sphereGeometry args={[0.2, 16, 8]} />
+              <Mat c="#b39a63" />
+            </mesh>
+            <mesh position={[0, 0.27, -0.01]}>
+              <cylinderGeometry args={[0.302, 0.302, 0.06, 32]} />
               <Mat c="#6d4c41" />
             </mesh>
-            <mesh position={[0, 0.06, -0.01]} rotation={[rad(6), 0, 0]}>
-              <cylinderGeometry args={[0.52, 0.54, 0.025, 40]} />
+            {/* aba larga em volta, reta, com a beirada levemente caída */}
+            <mesh position={[0, 0.235, -0.01]}>
+              <cylinderGeometry args={[0.5, 0.5, 0.022, 48]} />
               <Mat c="#b89c62" />
             </mesh>
-            <RB w={0.565} h={0.16} d={0.42} r={0.06} c={hairC} position={[0, 0.0, -0.06]} />
+            <mesh position={[0, 0.225, -0.01]} rotation={[Math.PI / 2, 0, 0]}>
+              <torusGeometry args={[0.5, 0.014, 8, 48]} />
+              <Mat c="#a68a52" />
+            </mesh>
+            {/* cabelo aparecendo por baixo do chapéu (laterais e nuca) */}
+            <RB w={0.565} h={0.16} d={0.42} r={0.06} c={hairC} position={[0, 0.12, -0.06]} />
+            <RB w={0.57} h={0.28} d={0.12} r={0.06} c={hairC} position={[0, 0.04, -0.2]} />
           </group>
         ) : swim ? (
           <group>
