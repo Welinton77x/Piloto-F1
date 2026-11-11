@@ -128,13 +128,35 @@ const Arm: React.FC<{
     <mesh position={[0.005 * side, -0.06, 0]} material={coat ? m.coat : m.shirt} castShadow scale={coat ? 1.15 : 1}>
       <capsuleGeometry args={[0.085 * th, 0.07, 8, 16]} />
     </mesh>
-    <mesh position={[0, -0.17, 0]} material={coat ? m.coat : m.skin} castShadow scale={coat ? 1.35 : 1}>
-      <capsuleGeometry args={[0.058 * th, 0.16 + 0.04 * (1 - th), 8, 16]} />
-    </mesh>
-    <group position={[0, -0.3, 0]} rotation={[elbow, 0, 0]}>
-      <mesh position={[0, -0.12, 0]} material={coat ? m.coat : m.skin} castShadow scale={coat ? 1.35 : 1}>
-        <capsuleGeometry args={[0.052 * th, 0.17 + 0.04 * (1 - th), 8, 16]} />
+    {th < 1 ? (
+      /* palito: braço vai do ombro ao cotovelo sem vão */
+      <mesh position={[0, -0.15, 0]} material={coat ? m.coat : m.skin} castShadow scale={coat ? [1.4, 1, 1.4] : 1}>
+        <capsuleGeometry args={[0.058 * th, 0.3 - 0.116 * th, 8, 16]} />
       </mesh>
+    ) : (
+      <mesh position={[0, -0.17, 0]} material={coat ? m.coat : m.skin} castShadow scale={coat ? 1.35 : 1}>
+        <capsuleGeometry args={[0.058, 0.16, 8, 16]} />
+      </mesh>
+    )}
+    <group position={[0, -0.3, 0]} rotation={[elbow, 0, 0]}>
+      {th < 1 ? (
+        <>
+          {/* cotovelo, antebraço até o pulso e pulso */}
+          <mesh material={coat ? m.coat : m.skin} castShadow scale={coat ? 1.4 : 1}>
+            <sphereGeometry args={[0.056 * th, 12, 10]} />
+          </mesh>
+          <mesh position={[0, -0.135, 0]} material={coat ? m.coat : m.skin} castShadow scale={coat ? [1.4, 1, 1.4] : 1}>
+            <capsuleGeometry args={[0.052 * th, 0.27 - 0.104 * th, 8, 16]} />
+          </mesh>
+          <mesh position={[0, -0.27, 0]} material={m.skin} castShadow>
+            <sphereGeometry args={[0.05 * th, 12, 10]} />
+          </mesh>
+        </>
+      ) : (
+        <mesh position={[0, -0.12, 0]} material={coat ? m.coat : m.skin} castShadow scale={coat ? 1.35 : 1}>
+          <capsuleGeometry args={[0.052, 0.17, 8, 16]} />
+        </mesh>
+      )}
       <group position={[0, -0.27, 0]} rotation={wrist} scale={0.4 + 0.6 * th}>
         {/* palma */}
         <mesh position={[0, -0.05, 0]} scale={[1, 1.1 - 0.35 * fist, 0.62]} material={m.skin} castShadow>
@@ -212,12 +234,12 @@ export const Boy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; loo
                 <capsuleGeometry args={[0.095 * lt, 0.16, 8, 16]} />
               </mesh>
               <mesh position={[0, 0.3, 0]} material={m.skin} castShadow receiveShadow>
-                <capsuleGeometry args={[0.068 * lt, 0.42, 8, 16]} />
+                <capsuleGeometry args={[0.068 * lt, look.palito ? 0.5 : 0.42, 8, 16]} />
               </mesh>
             </>
           ) : (
             <mesh position={[0, 0.42, 0]} material={m.pants} castShadow receiveShadow>
-              <capsuleGeometry args={[0.085 * lt, 0.5, 8, 16]} />
+              <capsuleGeometry args={[0.085 * lt, look.palito ? 0.72 - 0.17 * lt : 0.5, 8, 16]} />
             </mesh>
           )}
           <mesh position={[0, 0.06, 0.04]} scale={[1, 0.7, 1.5]} material={m.shoe} castShadow>
