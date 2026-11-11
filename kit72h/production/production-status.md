@@ -6,6 +6,6 @@
 - **Preferências herdadas:** voz Liam; legenda uma palavra por vez; sem sincronia labial; ⏸/⏪ no meio da tela; ✕ vermelho / ✓ verde grandes; etiquetas com bolinha; sem círculos vermelhos; final pedindo para comentar o que quer ver no próximo vídeo; duração até 2:45.
 
 ## Fase 2 CONCLUÍDA
-- `kit72h/out/kit72h.mp4`: H.264 1080×1920, 30 fps, 4915 frames, 163,8 s; AAC; −15,4 LUFS, pico −1,8 dBTP; sem silêncios longos; 26 quadros do MP4 revisados (`kit72h/out/folha-de-contato.png`). Não verificado por audição.
+- `kit72h/out/kit72h.mp4`: H.264 1080×1920, 30 fps, 4915 frames, 163,8 s; AAC; −15,4 LUFS, pico −1,5 dBTP (v2: chuva baixa, mascote separando os itens, lua e estrelas, mais casas, zoom e tremida, confetes); sem silêncios longos; 26 quadros do MP4 revisados (`kit72h/out/folha-de-contato.png`). Não verificado por audição.
 - Pedidos do usuário durante a Fase 2: chapéu encaixado na cabeça; sem a bolinha azul no blusão; mais física (itens caem e quicam, poste tomba e quica, respingos, mochila balança), pulinhos/susto do mascote e sons de comemoração.
 - Render em 3 partes (limite de 2 h por comando) + áudio pela composição `Audio`.
