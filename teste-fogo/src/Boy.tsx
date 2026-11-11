@@ -53,6 +53,10 @@ export type Look = {
   scarf?: string;
   cap?: string; // boné
   glasses?: boolean;
+  helmet?: string; // capacete militar
+  helmetEar?: boolean; // orelha pintada no capacete (o "Eco")
+  slim?: number; // 1 normal, <1 mais magro
+  mustache?: string;
 };
 
 const useMats = (L: Look) =>
@@ -67,6 +71,9 @@ const useMats = (L: Look) =>
       scarf: std(L.scarf ?? "#c33", 0.95),
       cap: std(L.cap ?? "#235", 0.7),
       frame: std("#222", 0.4),
+      helmet: std(L.helmet ?? "#4d5a32", 0.75),
+      earPaint: std("#f2e6c8", 0.8),
+      mustache: std(L.mustache ?? "#1a1a1a", 0.8),
       shoe: std(SHOE, 0.6),
       white: std("#ffffff", 0.3),
       dark: std("#2a1a12", 0.3),
@@ -76,7 +83,7 @@ const useMats = (L: Look) =>
       pupil: new THREE.MeshStandardMaterial({color: "#3a2416", roughness: 0.3, emissive: new THREE.Color("#ff6a00"), emissiveIntensity: 0}),
       sole: std("#e9e9ee", 0.7),
     }),
-    [L.skin, L.shirt, L.trim, L.pants, L.hair, L.coat, L.scarf, L.cap],
+    [L.skin, L.shirt, L.trim, L.pants, L.hair, L.coat, L.scarf, L.cap, L.helmet, L.mustache],
   );
 
 /* Cabelo espetado: direções determinísticas */
@@ -216,7 +223,7 @@ export const Boy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; loo
           </group>
         </group>
       ))}
-      <group rotation={torso} position={[0, 0, 0]}>
+      <group rotation={torso} position={[0, 0, 0]} scale={[look.slim ?? 1, 1, look.slim ?? 1]}>
         {/* tronco */}
         <mesh position={[0, 1.07 + breathe * 0.006, 0]} scale={[1, 1, 0.7]} material={m.shirt} castShadow receiveShadow>
           <capsuleGeometry args={[0.2, 0.3, 10, 24]} />
@@ -239,12 +246,16 @@ export const Boy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; loo
             <mesh position={[0, 1.02, 0]} scale={[1.18, 1.05, 0.9]} material={m.coat} castShadow>
               <capsuleGeometry args={[0.2, 0.34, 10, 24]} />
             </mesh>
-            <mesh position={[0, 1.33, 0]} rotation={[Math.PI / 2, 0, 0]} material={m.scarf} castShadow>
-              <torusGeometry args={[0.1, 0.045, 10, 20]} />
-            </mesh>
-            <mesh position={[0.06, 1.18, 0.15]} rotation={[0.2, 0, 0.15]} material={m.scarf}>
-              <boxGeometry args={[0.07, 0.22, 0.03]} />
-            </mesh>
+            {look.scarf && (
+              <>
+                <mesh position={[0, 1.33, 0]} rotation={[Math.PI / 2, 0, 0]} material={m.scarf} castShadow>
+                  <torusGeometry args={[0.1, 0.045, 10, 20]} />
+                </mesh>
+                <mesh position={[0.06, 1.18, 0.15]} rotation={[0.2, 0, 0.15]} material={m.scarf}>
+                  <boxGeometry args={[0.07, 0.22, 0.03]} />
+                </mesh>
+              </>
+            )}
           </>
         )}
         {/* cabeça */}
@@ -269,7 +280,7 @@ export const Boy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; loo
             </mesh>
           ))}
           {style !== "bald" && spikes.map((sp, i) => (
-            <mesh key={i} position={sp.p} quaternion={sp.q} scale={style === "short" ? sp.s * 0.45 : sp.s} material={m.hair} castShadow>
+            <mesh key={i} position={sp.p} quaternion={sp.q} scale={look.helmet ? sp.s * 0.3 : style === "short" ? sp.s * 0.45 : sp.s} material={m.hair} castShadow>
               <coneGeometry args={[0.09, 0.3, 7]} />
             </mesh>
           ))}
@@ -283,6 +294,31 @@ export const Boy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; loo
                 <cylinderGeometry args={[0.2, 0.2, 0.1, 24, 1, false, -Math.PI / 2, Math.PI]} />
               </mesh>
             </group>
+          )}
+          {look.helmet && (
+            <group position={[0, 0.07, -0.01]}>
+              <mesh material={m.helmet} castShadow scale={[1.08, 0.95, 1.1]}>
+                <sphereGeometry args={[0.3, 28, 14, 0, Math.PI * 2, 0, 1.45]} />
+              </mesh>
+              <mesh position={[0, 0.035, 0]} rotation={[0, 0, 0]} material={m.helmet} castShadow>
+                <cylinderGeometry args={[0.36, 0.37, 0.02, 32]} />
+              </mesh>
+              {look.helmetEar && (
+                <group position={[0, 0.17, 0.25]} rotation={[-0.55, 0, 0]}>
+                  <mesh material={m.earPaint} scale={[0.07, 0.1, 0.012]}>
+                    <sphereGeometry args={[1, 16, 12]} />
+                  </mesh>
+                  <mesh position={[0.005, 0, 0.008]} material={m.helmet} scale={[0.035, 0.06, 0.008]}>
+                    <sphereGeometry args={[1, 12, 10]} />
+                  </mesh>
+                </group>
+              )}
+            </group>
+          )}
+          {look.mustache && (
+            <mesh position={[0, -0.065, 0.255]} scale={[0.07, 0.016, 0.02]} material={m.mustache}>
+              <sphereGeometry args={[1, 12, 8]} />
+            </mesh>
           )}
           {look.glasses &&
             [-1, 1].map((sd) => (
