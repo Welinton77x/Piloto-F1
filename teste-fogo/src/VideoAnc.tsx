@@ -628,7 +628,7 @@ const SHOTS: Shot[] = [
   {from: L(16) - 3, Comp: S16},
   {from: L(17) - 3, Comp: S17},
 ];
-const SPLIT = at(18, "davi") - 8;
+const SPLIT = at(18, "tommy") - 8;
 
 const Scene: React.FC<{f: number}> = ({f}) => {
   if (f >= SPLIT) return <Dark />;
@@ -821,7 +821,7 @@ const LittleWindow: React.FC = () => {
   );
 };
 
-const KEY = new Set(["davi", "farmacia", "luz", "birmingham", "1880", "acelerar", "tempo", "viu", "chapeucoco", "luvas", "pernas", "andavam", "mel", "pesado", "gravidade", "devagar", "2010", "trinta", "tres", "centimetros", "ancora", "pulso", "bolha", "ralo", "apito", "voltaram", "gola", "agnes", "porao", "tipo", "pressa", "eco", "ferrugem", "problema", "energia", "acucar", "glicogenio", "duas", "mil", "calorias", "dez", "tremedeira", "fome", "vela", "primeira", "pequena", "cinco", "tontura", "levado", "voltou", "sozinho", "camera", "lenta", "pombo", "janela", "enfrenta", "foge", "esgotos", "comenta"]);
+const KEY = new Set(["tommy", "farmacia", "luz", "birmingham", "1880", "acelerar", "tempo", "viu", "chapeucoco", "luvas", "pernas", "andavam", "mel", "pesado", "gravidade", "devagar", "2010", "trinta", "tres", "centimetros", "ancora", "pulso", "bolha", "ralo", "apito", "voltaram", "gola", "agnes", "porao", "tipo", "pressa", "eco", "ferrugem", "problema", "energia", "acucar", "glicogenio", "duas", "mil", "calorias", "dez", "tremedeira", "fome", "vela", "primeira", "pequena", "cinco", "tontura", "levado", "voltou", "sozinho", "camera", "lenta", "pombo", "janela", "enfrenta", "foge", "esgotos", "comenta"]);
 
 const Split: React.FC = () => {
   const f = useCurrentFrame();
