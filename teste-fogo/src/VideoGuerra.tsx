@@ -29,25 +29,25 @@ const at = (i: number, txt: string, n = 0) => {
 export const TOTAL_GUERRA = F(words[words.length - 1].e + 1.6);
 
 /* ---------- personagens ---------- */
-const DAVI_CIVIL: Look = {skin: "#b77b4e", hair: "#17110c", hairStyle: "short", shirt: "#f1efe8", trim: "#c9c4b5", pants: "#34507a", shorts: true, slim: 0.8};
-const DAVI: Look = {skin: "#b77b4e", hair: "#17110c", hairStyle: "short", shirt: "#5b6b3a", trim: "#4a5830", pants: "#4f5a35", coat: "#55633a", helmet: "#4d5a32", slim: 0.85};
+const DAVI_CIVIL: Look = {palito: true, skin: "#b77b4e", hair: "#17110c", hairStyle: "short", shirt: "#f1efe8", trim: "#c9c4b5", pants: "#34507a", shorts: true, slim: 0.8};
+const DAVI: Look = {palito: true, skin: "#b77b4e", hair: "#17110c", hairStyle: "short", shirt: "#5b6b3a", trim: "#4a5830", pants: "#4f5a35", coat: "#55633a", helmet: "#4d5a32", slim: 0.85};
 const ECO: Look = {...DAVI, helmetEar: true};
-const TIAO_RIO: Look = {skin: "#7a4a2a", hair: "#111", hairStyle: "short", shirt: "#5b6b3a", trim: "#4a5830", pants: "#4f5a35", helmet: "#4d5a32", mustache: "#141414"};
+const TIAO_RIO: Look = {palito: true, skin: "#7a4a2a", hair: "#111", hairStyle: "short", shirt: "#5b6b3a", trim: "#4a5830", pants: "#4f5a35", helmet: "#4d5a32", mustache: "#141414"};
 const TIAO: Look = {...TIAO_RIO, coat: "#55633a"};
-const MEDICO: Look = {skin: "#e8b48a", hairStyle: "bald", hair: "#cfcfcf", glasses: true, coat: "#f4f4f4", shirt: "#ddd", pants: "#555"};
-const RECRUTAS: Look[] = [
+const MEDICO: Look = {palito: true, skin: "#e8b48a", hairStyle: "bald", hair: "#cfcfcf", glasses: true, coat: "#f4f4f4", shirt: "#ddd", pants: "#555"};
+const RECRUTAS: Look[] = ([
   {shirt: "#8fb4d9", pants: "#3a3a3a", hair: "#3a2a1a", hairStyle: "short", skin: "#d9a070"},
   {shirt: "#d9c58f", pants: "#5a4a3a", hair: "#111", hairStyle: "short", skin: "#8d5a3a"},
   {shirt: "#c98f8f", pants: "#333", hair: "#6a4a2a", hairStyle: "short", skin: "#e8b48a"},
   {shirt: "#9fc79a", pants: "#3a3a48", hair: "#2a1a10", hairStyle: "short", skin: "#c68a5a"},
-];
+] as Look[]).map((l) => ({...l, palito: true}));
 const SOLDADOS: Look[] = [
   {...TIAO, mustache: undefined, skin: "#e0a878"},
   {...TIAO, mustache: undefined, skin: "#8d5a3a"},
   {...TIAO, mustache: undefined, skin: "#c68a5a"},
   {...TIAO, mustache: undefined, skin: "#f0c090"},
 ];
-const PATRULHA: Look = {skin: "#9a8a80", hair: "#111", hairStyle: "short", shirt: "#2a2c30", pants: "#2a2c30", coat: "#26282c", helmet: "#3a3d40"};
+const PATRULHA: Look = {palito: true, skin: "#9a8a80", hair: "#111", hairStyle: "short", shirt: "#2a2c30", pants: "#2a2c30", coat: "#26282c", helmet: "#3a3d40"};
 
 /* ---------- utilidades de pose ---------- */
 const blinkCurve = (f: number) => clamp(1 - Math.abs(((f + 20) % 97) - 3) / 3);
