@@ -128,10 +128,10 @@ const S1: React.FC<ShotProps> = ({f, a, b}) => {
       <Cam pos={[cx, 1.45, 2.1]} look={[cx - 0.15, 1.1, -1.0]} fov={42} />
       <Rio />
       {xs.map((x, i) => (
-        <Boy key={i} look={RECRUTAS[i]} pose={idle(f + i * 13, {pos: [x, 0, -1.0], rotY: Math.PI / 2, head: [0, Math.sin((f + i * 20) / 30) * 0.2, 0], rShoulder: [0, 0, -0.1], lShoulder: [0, 0, 0.1]})} />
+        <Boy key={i} look={RECRUTAS[i]} pose={physics(`a1_${i}`, (f) => (idle(f + i * 13, {pos: [x, 0, -1.0], rotY: Math.PI / 2, head: [0, Math.sin((f + i * 20) / 30) * 0.2, 0], rShoulder: [0, 0, -0.1], lShoulder: [0, 0, 0.1]})), a, f)} />
       ))}
-      <Boy look={DAVI_CIVIL} pose={idle(f, {pos: [-1.55, 0, -1.0], rotY: Math.PI / 2 - 0.4, head: [0, -0.3, 0], smile: 0.4, pupil: [-0.5, 0]})} />
-      <Boy look={TIAO_RIO} pose={idle(f + 40, {pos: [2.2, 0, -2.2], rotY: -0.3})} />
+      <Boy look={DAVI_CIVIL} pose={physics("a2", (f) => (idle(f, {pos: [-1.55, 0, -1.0], rotY: Math.PI / 2 - 0.4, head: [0, -0.3, 0], smile: 0.4, pupil: [-0.5, 0]})), a, f)} />
+      <Boy look={TIAO_RIO} pose={physics("a3", (f) => (idle(f + 40, {pos: [2.2, 0, -2.2], rotY: -0.3})), a, f)} />
     </>
   );
 };
@@ -144,7 +144,7 @@ const S2: React.FC<ShotProps> = ({f, a}) => {
     return idle(fr, {pos: [0.95, 0, -0.75], rotY: -1.2, rShoulder: [-0.5 - 1.6 * up, 0, -0.1], rElbow: -0.8 + 0.4 * up, rFist: 1, head: [0.15, 0.3, 0], brow: -0.3, mouthOpen: talk(fr, a, a + 10)});
   }, a, f);
   const sad = ramp(f, st, st + 10);
-  const davi = idle(f, {pos: [-0.45, 0.1, -1.6], rotY: 0.5, head: [0.25 * sad, 0.2, 0], brow: lerp(0.4, 0.9, sad), smile: lerp(0.5, 0, sad), mouthOpen: 0.2 * sad, pupil: [0.4, -0.3 * sad]});
+  const davi = physics("c18", (f) => idle(f, {pos: [-0.45, 0.1, -1.6], rotY: 0.5, head: [0.25 * sad, 0.2, 0], brow: lerp(0.4, 0.9, sad), smile: lerp(0.5, 0, sad), mouthOpen: 0.2 * sad, pupil: [0.4, -0.3 * sad]}), a, f);
   return (
     <>
       <Cam pos={[0.3 + shake(f, 0.02 * kick(f, st, 4))[0], 1.5, 2.2]} look={[0.25, 1.1, -1.2]} fov={48} />
@@ -170,8 +170,8 @@ const crateAt = (f: number) => {
 /* 3 — volta e volta; o sargento Tião pergunta */
 const S3: React.FC<ShotProps> = ({f, a, b}) => {
   const ask = at(3, "por");
-  const tiao = idle(f, {pos: [0.9, 0, -0.5], rotY: -1.06, rShoulder: [-0.75, 0, 0.42], lShoulder: [-0.75, 0, -0.42], rElbow: -1.8, lElbow: -1.8, brow: -0.4, mouthOpen: talk(f, ask, at(3, "insiste") + 10), head: [0.1, 0, 0]});
-  const davi = idle(f, {pos: [0, 0, 0], rotY: 1.6, smile: 0.5, pupil: [0.6, 0.3], head: [-0.1, 0, 0]});
+  const tiao = physics("c19", (f) => idle(f, {pos: [0.9, 0, -0.5], rotY: -1.06, rShoulder: [-0.75, 0, 0.42], lShoulder: [-0.75, 0, -0.42], rElbow: -1.8, lElbow: -1.8, brow: -0.4, mouthOpen: talk(f, ask, at(3, "insiste") + 10), head: [0.1, 0, 0]}), a, f);
+  const davi = physics("c20", (f) => idle(f, {pos: [0, 0, 0], rotY: 1.6, smile: 0.5, pupil: [0.6, 0.3], head: [-0.1, 0, 0]}), a, f);
   const p = ramp(f, a, b, easeInOut);
   return (
     <>
@@ -180,8 +180,8 @@ const S3: React.FC<ShotProps> = ({f, a, b}) => {
       <Truck p={TRUCK_P} ry={Math.PI / 2} crate={crateAt(f)} />
       <Boy look={TIAO_RIO} pose={tiao} />
       <Boy look={DAVI_CIVIL} pose={davi} />
-      <Boy look={RECRUTAS[0]} pose={idle(f, {pos: [-3.1, 0, -0.3], rotY: 0.3})} />
-      <Boy look={RECRUTAS[1]} pose={idle(f + 30, {pos: [-2.55, 0, -0.35], rotY: -0.2})} />
+      <Boy look={RECRUTAS[0]} pose={physics("a4", (f) => (idle(f, {pos: [-3.1, 0, -0.3], rotY: 0.3})), a, f)} />
+      <Boy look={RECRUTAS[1]} pose={physics("a5", (f) => (idle(f + 30, {pos: [-2.55, 0, -0.35], rotY: -0.2})), a, f)} />
     </>
   );
 };
@@ -221,7 +221,7 @@ const S4: React.FC<ShotProps> = ({f, a, b, t}) => {
       <Cam pos={[lerp(-0.4, -1.0, p) + sh[0], lerp(1.5, 1.1, p) + sh[1], lerp(3.2, 2.8, p)]} look={[-2.4, 0.9, -0.5]} fov={44} />
       <Rio />
       <Truck p={TRUCK_P} ry={Math.PI / 2} crate={cr} />
-      <Boy look={TIAO_RIO} pose={idle(f, {pos: [0.9, 0, -0.5], rotY: -1.6, eyeWide: ramp(f, landF, landF + 6), brow: ramp(f, landF, landF + 6)})} />
+      <Boy look={TIAO_RIO} pose={physics("a6", (f) => (idle(f, {pos: [0.9, 0, -0.5], rotY: -1.6, eyeWide: ramp(f, landF, landF + 6), brow: ramp(f, landF, landF + 6)})), a, f)} />
       <Boy look={DAVI_CIVIL} pose={davi} />
       <Boy look={RECRUTAS[0]} pose={fall(0)} />
       <Boy look={RECRUTAS[1]} pose={fall(1)} />
@@ -235,7 +235,7 @@ const S6: React.FC<ShotProps> = ({f, a, b}) => {
   const rip = at(6, "rasgou");
   const k = ramp(f, rip, rip + 8, easeOut);
   const tiao = physics("g6", (fr) => idle(fr, {pos: [0.35, 0, -0.2], rotY: -0.95, rShoulder: [-1.1, 0.4 * ramp(fr, rip, rip + 8), -0.1], lShoulder: [-1.1, -0.4 * ramp(fr, rip, rip + 8), 0.1], rElbow: -0.8, lElbow: -0.8, smile: 0.4 * ramp(fr, rip + 6, rip + 14), head: [0.15, 0, 0]}), a, f);
-  const davi = idle(f, {pos: [-0.35, 0, 0.3], rotY: 2.19, smile: lerp(0.2, 1, ramp(f, rip + 4, rip + 12)), eyeWide: 0.6 * ramp(f, rip, rip + 6), pupil: [0.5, -0.2]});
+  const davi = physics("c21", (f) => idle(f, {pos: [-0.35, 0, 0.3], rotY: 2.19, smile: lerp(0.2, 1, ramp(f, rip + 4, rip + 12)), eyeWide: 0.6 * ramp(f, rip, rip + 6), pupil: [0.5, -0.2]}), a, f);
   const paper = useMemo(() => new THREE.MeshStandardMaterial({color: "#fbf6e8", roughness: 0.9, side: THREE.DoubleSide}), []);
   const red = useMemo(() => new THREE.MeshBasicMaterial({color: "#c0201a", side: THREE.DoubleSide}), []);
   const p = ramp(f, a, b, easeInOut);
@@ -272,7 +272,7 @@ const S7: React.FC<ShotProps> = ({f, a, b, t}) => {
         <directionalLight position={[4, 7, 4]} intensity={2.4} castShadow shadow-mapSize={[2048, 2048]} shadow-camera-left={-6} shadow-camera-right={6} shadow-camera-top={6} shadow-camera-bottom={-6} />
         <ShipDeck t={t} />
         {[-1.5, -0.5, 0.5, 1.5].map((x, i) => (
-          <Boy key={i} look={i === 1 ? DAVI : SOLDADOS[i]} pose={idle(f + i * 9, {pos: [x * 0.9 + 1.5, 0, -1.5 - i * 0.3], rotY: 1.5, head: [0, 0.1 * Math.sin((f + i * 10) / 25), 0]})} />
+          <Boy key={i} look={i === 1 ? DAVI : SOLDADOS[i]} pose={physics(`a7_${i}`, (f) => (idle(f + i * 9, {pos: [x * 0.9 + 1.5, 0, -1.5 - i * 0.3], rotY: 1.5, head: [0, 0.1 * Math.sin((f + i * 10) / 25), 0]})), a, f)} />
         ))}
       </>
     );
@@ -285,7 +285,7 @@ const S7: React.FC<ShotProps> = ({f, a, b, t}) => {
       <Snow v="day" t={t} fall={0.3} center={[x0, 0, 0]} />
       {[0, 1, 2, 3].map((i) => {
         const look = i === 2 ? DAVI : SOLDADOS[i];
-        const pose = idle(f + i * 11, {...walkP(f, it - i * 4, 1.1), pos: [x0 - i * 0.9 + 1.0, 0.02, -0.3 - (i % 2) * 0.4], rotY: Math.PI / 2, ...(i === 2 ? {...shiverP(f), walk: ((f - it) / FPS) * 6.9, walkAmt: 1, brow: 0.7, mouthOpen: 0.15} : {})});
+        const pose = physics("c22", (f) => idle(f + i * 11, {...walkP(f, it - i * 4, 1.1), pos: [x0 - i * 0.9 + 1.0, 0.02, -0.3 - (i % 2) * 0.4], rotY: Math.PI / 2, ...(i === 2 ? {...shiverP(f), walk: ((f - it) / FPS) * 6.9, walkAmt: 1, brow: 0.7, mouthOpen: 0.15} : {})}), a, f);
         return <Boy key={i} look={look} pose={pose} />;
       })}
       <Steam t={t} origin={[x0 - 1.8 + 1.0 + 0.25, 1.55, -0.3]} count={5} spread={0.03} rise={0.3} size={0.12} power={0.6} seed={9} life={1} />
@@ -319,7 +319,7 @@ const S8: React.FC<ShotProps> = ({f, a, b, t}) => {
 
 /* 9 — close no ouvido */
 const S9: React.FC<ShotProps> = ({f, a, b, t}) => {
-  const davi = idle(f, {pos: [0, TR, 0.05], rotY: Math.PI, head: [0.05, 0.6, 0.1], blink: 0.6, pupil: [0.8, 0]});
+  const davi = physics("c23", (f) => idle(f, {pos: [0, TR, 0.05], rotY: Math.PI, head: [0.05, 0.6, 0.1], blink: 0.6, pupil: [0.8, 0]}), a, f);
   const p = ramp(f, a, b, easeInOut);
   return <Trench f={f} t={t} fall={0.2} mates={false} davi={davi} cam={{pos: [lerp(-0.8, -0.6, p), 1.2, lerp(-0.5, -0.35, p)], look: [0, 1.18, 0.05], fov: 34}} />;
 };
@@ -327,7 +327,7 @@ const S9: React.FC<ShotProps> = ({f, a, b, t}) => {
 /* 10 — estala a língua e conta o eco (vista por trás, olhando a neblina) */
 const S10: React.FC<ShotProps> = ({f, a, b, t}) => {
   const cl = at(10, "estalava");
-  const davi = idle(f, {pos: [0, TR, 0.05], rotY: Math.PI, mouthOpen: f >= cl && f < cl + 30 ? 0.3 * Math.abs(Math.sin(f / 2)) : 0, head: [-0.05, 0, 0]});
+  const davi = physics("c24", (f) => idle(f, {pos: [0, TR, 0.05], rotY: Math.PI, mouthOpen: f >= cl && f < cl + 30 ? 0.3 * Math.abs(Math.sin(f / 2)) : 0, head: [-0.05, 0, 0]}), a, f);
   const p = ramp(f, a, b, easeInOut);
   return (
     <Trench
@@ -337,7 +337,7 @@ const S10: React.FC<ShotProps> = ({f, a, b, t}) => {
       davi={davi}
       cam={{pos: [0.35, 1.45, lerp(1.4, 1.2, p)], look: [0, 1.0, -4], fov: 44}}
       extra={
-        <Boy look={PATRULHA} pose={idle(f, {pos: [1.2, 0, -6.5], rotY: 0.2})} />
+        <Boy look={PATRULHA} pose={physics("a8", (f) => (idle(f, {pos: [1.2, 0, -6.5], rotY: 0.2})), a, f)} />
       }
     />
   );
@@ -356,7 +356,7 @@ const S12: React.FC<ShotProps> = ({f, a, b, t}) => {
 };
 const S13: React.FC<ShotProps> = ({f, a, b, t}) => {
   const k = ramp(f, a, b);
-  const davi = idle(f, {pos: [0, TR, 0.05], rotY: Math.PI, brow: 0.6 * k, head: [0.05, Math.sin(f / 10) * 0.25 * k, 0], pupil: [Math.sin(f / 10) * 0.6, 0], rShoulder: [-0.6, 0, 0.3 * k], lShoulder: [-0.6, 0, -0.3 * k], rElbow: -0.8 - 1.0 * k, lElbow: -0.8 - 1.0 * k});
+  const davi = physics("c25", (f) => idle(f, {pos: [0, TR, 0.05], rotY: Math.PI, brow: 0.6 * k, head: [0.05, Math.sin(f / 10) * 0.25 * k, 0], pupil: [Math.sin(f / 10) * 0.6, 0], rShoulder: [-0.6, 0, 0.3 * k], lShoulder: [-0.6, 0, -0.3 * k], rElbow: -0.8 - 1.0 * k, lElbow: -0.8 - 1.0 * k}), a, f);
   return <Trench f={f} t={t} fall={0.4 + 0.6 * k} davi={davi} cam={FRONT_CAM(ramp(f, a, b, easeInOut))} />;
 };
 
@@ -368,7 +368,7 @@ const S14: React.FC<ShotProps> = ({f, a, b, t}) => {
   const z = zAt(f);
   const turned = ramp(f, back - 4, back + 6, easeInOut);
   const walking = f < stop || f >= back;
-  const davi = idle(f, {pos: [0, TR - 0.15, 0.05], rotY: Math.PI, eyeWide: 1, brow: 1, blink: 0, head: [0.1, 0, 0]});
+  const davi = physics("c26", (f) => idle(f, {pos: [0, TR - 0.15, 0.05], rotY: Math.PI, eyeWide: 1, brow: 1, blink: 0, head: [0.1, 0, 0]}), a, f);
   return (
     <Trench
       f={f}
@@ -380,7 +380,7 @@ const S14: React.FC<ShotProps> = ({f, a, b, t}) => {
       extra={
         <>
           {[-0.9, 0.2, 1.2].map((x, i) => (
-            <Boy key={i} look={PATRULHA} pose={idle(f + i * 7, {...(walking ? walkP(f, a + i * 5, 1.2) : {}), pos: [x, 0, z - i * 0.5], rotY: lerp(0, Math.PI, turned), head: [0, f >= stop && f < back ? Math.sin((f + i * 10) / 12) * 0.5 : 0, 0]})} />
+            <Boy key={i} look={PATRULHA} pose={physics(`a9_${i}`, (f) => (idle(f + i * 7, {...(walking ? walkP(f, a + i * 5, 1.2) : {}), pos: [x, 0, z - i * 0.5], rotY: lerp(0, Math.PI, turned), head: [0, f >= stop && f < back ? Math.sin((f + i * 10) / 12) * 0.5 : 0, 0]})), a, f)} />
           ))}
         </>
       }
@@ -396,8 +396,8 @@ const S15: React.FC<ShotProps> = ({f, a, b, t}) => {
     <>
       <Cam pos={[x + 0.5, 1.4, 3.0]} look={[x, 1.0, -0.6]} fov={44} />
       <Snow v="day" t={t} fall={0.1} />
-      <Boy look={TIAO} pose={idle(f, {...walkP(f, a, 1.1), pos: [x + 0.5, 0.02, -0.5], rotY: Math.PI / 2 - 0.3, mouthOpen: talk(f, at(15, "primeira"), at(15, "dura") + 12), head: [0, -0.5, 0]})} />
-      <Boy look={DAVI} pose={idle(f + 9, {...walkP(f, a + 4, 1.1), pos: [x - 0.2, 0.02, -0.2], rotY: Math.PI / 2 + 0.2, head: [0, 0.5, 0], pupil: [0.6, 0]})} />
+      <Boy look={TIAO} pose={physics("a10", (f) => (idle(f, {...walkP(f, a, 1.1), pos: [x + 0.5, 0.02, -0.5], rotY: Math.PI / 2 - 0.3, mouthOpen: talk(f, at(15, "primeira"), at(15, "dura") + 12), head: [0, -0.5, 0]})), a, f)} />
+      <Boy look={DAVI} pose={physics("a11", (f) => (idle(f + 9, {...walkP(f, a + 4, 1.1), pos: [x - 0.2, 0.02, -0.2], rotY: Math.PI / 2 + 0.2, head: [0, 0.5, 0], pupil: [0.6, 0]})), a, f)} />
     </>
   );
 };
@@ -424,13 +424,13 @@ const S16: React.FC<ShotProps> = ({f, a, b, t}) => {
       <Snow v="day" t={t} fall={0.1} />
       <BigRock />
       <Boy look={DAVI} pose={pose} />
-      <Boy look={TIAO} pose={idle(f, {pos: [-1.3, 0.02, -1.3], rotY: 0.7, rShoulder: [-0.75, 0, 0.42], lShoulder: [-0.75, 0, -0.42], rElbow: -1.8, lElbow: -1.8, smile: 0.3 * k})} />
+      <Boy look={TIAO} pose={physics("a12", (f) => (idle(f, {pos: [-1.3, 0.02, -1.3], rotY: 0.7, rShoulder: [-0.75, 0, 0.42], lShoulder: [-0.75, 0, -0.42], rElbow: -1.8, lElbow: -1.8, smile: 0.3 * k})), a, f)} />
     </>
   );
 };
 const S17: React.FC<ShotProps> = ({f, a, b, t}) => {
   const z = at(17, "zumbido");
-  const pose = idle(f, {...kneel(f, a, 1), blink: f > z ? 0 : 1, eyeWide: ramp(f, z, z + 6), brow: ramp(f, z, z + 6)});
+  const pose = physics("c27", (f) => idle(f, {...kneel(f, a, 1), blink: f > z ? 0 : 1, eyeWide: ramp(f, z, z + 6), brow: ramp(f, z, z + 6)}), a, f);
   const p = ramp(f, a, b, easeInOut);
   return (
     <>
@@ -456,7 +456,7 @@ const S18: React.FC<ShotProps> = ({f, a, b, t}) => {
       <Plane p={[planeX, 7.5, -12]} ry={Math.PI} />
       <Boy look={DAVI} pose={davi} />
       {[-1.3, -0.7, 0.8, 1.5].map((x, i) => (
-        <Boy key={i} look={SOLDADOS[i]} pose={idle(f + i * 5, {pos: [x, lerp(0, TR, ramp(f, jump + i * 2, jump + 8 + i * 2)) + hop(f, jump + i * 2, jump + 8 + i * 2, 0.25), lerp(0.6, 0.05, ramp(f, jump + i * 2, jump + 8 + i * 2))], rotY: Math.PI, rShoulder: [-1.2, 0, -0.3], lShoulder: [-1.2, 0, 0.3], rElbow: -1.6, lElbow: -1.6, head: [0.4, 0, 0]})} />
+        <Boy key={i} look={SOLDADOS[i]} pose={physics(`a13_${i}`, (f) => (idle(f + i * 5, {pos: [x, lerp(0, TR, ramp(f, jump + i * 2, jump + 8 + i * 2)) + hop(f, jump + i * 2, jump + 8 + i * 2, 0.25), lerp(0.6, 0.05, ramp(f, jump + i * 2, jump + 8 + i * 2))], rotY: Math.PI, rShoulder: [-1.2, 0, -0.3], lShoulder: [-1.2, 0, 0.3], rElbow: -1.6, lElbow: -1.6, head: [0.4, 0, 0]})), a, f)} />
       ))}
       {f >= boom && <Steam t={(f - boom) / FPS} origin={[-3, 0.5, -9]} count={22} spread={1.2} rise={3} size={2.5} power={Math.max(0, 1 - (f - boom) / 70)} color="#e8ecf0" seed={31} life={2.5} />}
     </>
@@ -475,9 +475,9 @@ const S19: React.FC<ShotProps> = ({f, a, b, t}) => {
       <Cam pos={[lerp(0.9, 0.35, closeK), lerp(1.5, 1.85, closeK), lerp(2.6, 1.2, closeK) - 0.2 * p]} look={[0, lerp(1.25, 1.7, closeK), 0]} fov={40} />
       <Snow v="day" t={t} fall={0.15} />
       <Boy look={f >= ear ? ECO : DAVI} pose={davi} />
-      <Boy look={TIAO} pose={idle(f, {pos: [0.6, 0.02, -0.3], rotY: -1.0, rShoulder: [-1.0 * pat - 0.2, 0, -0.9 * pat], rElbow: -0.3, smile: 0.8})} />
+      <Boy look={TIAO} pose={physics("a14", (f) => (idle(f, {pos: [0.6, 0.02, -0.3], rotY: -1.0, rShoulder: [-1.0 * pat - 0.2, 0, -0.9 * pat], rElbow: -0.3, smile: 0.8})), a, f)} />
       {[-1.0, 1.4].map((x, i) => (
-        <Boy key={i} look={SOLDADOS[i + 1]} pose={idle(f + i * 8, {pos: [x, Math.abs(Math.sin((f + i * 5) / 8)) * 0.1 * ramp(f, at(19, "eco"), at(19, "eco") + 5), -0.9], rotY: x < 0 ? 0.6 : -0.6, rShoulder: [0, 0, -2.4 * ramp(f, at(19, "eco"), at(19, "eco") + 5)], lShoulder: [0, 0, 2.4 * ramp(f, at(19, "eco"), at(19, "eco") + 5)], mouthOpen: 0.6 * ramp(f, at(19, "eco"), at(19, "eco") + 5), smile: 1})} />
+        <Boy key={i} look={SOLDADOS[i + 1]} pose={physics(`a15_${i}`, (f) => (idle(f + i * 8, {pos: [x, Math.abs(Math.sin((f + i * 5) / 8)) * 0.1 * ramp(f, at(19, "eco"), at(19, "eco") + 5), -0.9], rotY: x < 0 ? 0.6 : -0.6, rShoulder: [0, 0, -2.4 * ramp(f, at(19, "eco"), at(19, "eco") + 5)], lShoulder: [0, 0, 2.4 * ramp(f, at(19, "eco"), at(19, "eco") + 5)], mouthOpen: 0.6 * ramp(f, at(19, "eco"), at(19, "eco") + 5), smile: 1})), a, f)} />
       ))}
     </>
   );
@@ -492,7 +492,7 @@ const S20: React.FC<ShotProps> = ({f, a, b, t}) => {
       <Snow v="dawn" t={t} fall={0.6} fog={[3, 16]} />
       {[0, 1, 2, 3, 4].map((i) => {
         const z = -0.5 - i * 1.0 - ((f - a) / FPS) * 0.5;
-        return <Boy key={i} look={i === 1 ? ECO : SOLDADOS[i % 4]} pose={idle(f + i * 6, {...walkP(f, a + i * 6, 0.9), pos: [Math.sin(i * 1.7) * 0.6, 0.02 + Math.max(0, -z - 4) * 0.08, z], rotY: Math.PI, torso: [0.25, 0, 0]})} />;
+        return <Boy key={i} look={i === 1 ? ECO : SOLDADOS[i % 4]} pose={physics(`a16_${i}`, (f) => (idle(f + i * 6, {...walkP(f, a + i * 6, 0.9), pos: [Math.sin(i * 1.7) * 0.6, 0.02 + Math.max(0, -z - 4) * 0.08, z], rotY: Math.PI, torso: [0.25, 0, 0]})), a, f)} />;
       })}
     </>
   );
@@ -501,7 +501,7 @@ const S20: React.FC<ShotProps> = ({f, a, b, t}) => {
 /* 21 — neve que deixa o Davi surdo */
 const S21: React.FC<ShotProps> = ({f, a, b, t}) => {
   const k = ramp(f, a, b);
-  const davi = idle(f, {pos: [0, 0.02, 0], rotY: 0, brow: 0.7, head: [0.1 * k, Math.sin(f / 12) * 0.2, 0], pupil: [Math.sin(f / 12) * 0.5, -0.2], blink: Math.max(blinkCurve(f), 0.2)});
+  const davi = physics("c28", (f) => idle(f, {pos: [0, 0.02, 0], rotY: 0, brow: 0.7, head: [0.1 * k, Math.sin(f / 12) * 0.2, 0], pupil: [Math.sin(f / 12) * 0.5, -0.2], blink: Math.max(blinkCurve(f), 0.2)}), a, f);
   return (
     <>
       <Cam pos={[0.2, 1.62, lerp(1.4, 1.0, k)]} look={[0, 1.6, 0]} fov={40} />
@@ -553,8 +553,8 @@ const Scene: React.FC<{f: number}> = ({f}) => {
 
 /* ---------- tela dividida A/B ---------- */
 const PA: React.FC<ShotProps> = ({f, a, t}) => {
-  const davi = idle(f, {pos: [0, 0.02, 0], rotY: 0.9, mouthOpen: talk(f, a + 4, a + 200), brow: 0.6, pupil: [0.5, 0.2], rShoulder: [-0.3, 0, -0.4], rElbow: -1.2});
-  const tiao = idle(f, {pos: [0.85, 0.02, -0.3], rotY: -2.2, head: [0.12 + 0.08 * Math.sin(f / 10), 0, 0], brow: 0.3, lShoulder: [-1.0, 0, 0.6], lElbow: -0.3});
+  const davi = physics("c29", (f) => idle(f, {pos: [0, 0.02, 0], rotY: 0.9, mouthOpen: talk(f, a + 4, a + 200), brow: 0.6, pupil: [0.5, 0.2], rShoulder: [-0.3, 0, -0.4], rElbow: -1.2}), a, f);
+  const tiao = physics("c30", (f) => idle(f, {pos: [0.85, 0.02, -0.3], rotY: -2.2, head: [0.12 + 0.08 * Math.sin(f / 10), 0, 0], brow: 0.3, lShoulder: [-1.0, 0, 0.6], lElbow: -0.3}), a, f);
   return (
     <>
       <Cam pos={[-0.4, 1.5, 2.3]} look={[0.4, 1.35, -0.2]} fov={36} />
@@ -566,14 +566,14 @@ const PA: React.FC<ShotProps> = ({f, a, t}) => {
 };
 const PB: React.FC<ShotProps> = ({f, a, t}) => {
   const z = -((f - a) / FPS) * 0.45;
-  const davi = idle(f, {...walkP(f, a, 0.9), pos: [0, 0.02, z], rotY: Math.PI - 0.15, torso: [0.25, 0, 0], brow: -0.6, head: [0, 0.4, 0]});
+  const davi = physics("c31", (f) => idle(f, {...walkP(f, a, 0.9), pos: [0, 0.02, z], rotY: Math.PI - 0.15, torso: [0.25, 0, 0], brow: -0.6, head: [0, 0.4, 0]}), a, f);
   return (
     <>
       <Cam pos={[0.9, 1.4, z + 2.4]} look={[-0.1, 1.2, z - 1]} fov={40} />
       <Snow v="dawn" t={t} fall={0.9} fog={[2, 12]} center={[0, 0, z]} />
       <Boy look={ECO} pose={davi} />
       {[0, 1].map((i) => (
-        <Boy key={i} look={SOLDADOS[i]} pose={idle(f + i * 9, {...walkP(f, a + i * 7, 0.9), pos: [i ? 0.8 : -0.9, 0.02, z - 1.8 - i * 0.6], rotY: Math.PI, torso: [0.25, 0, 0]})} />
+        <Boy key={i} look={SOLDADOS[i]} pose={physics(`a17_${i}`, (f) => (idle(f + i * 9, {...walkP(f, a + i * 7, 0.9), pos: [i ? 0.8 : -0.9, 0.02, z - 1.8 - i * 0.6], rotY: Math.PI, torso: [0.25, 0, 0]})), a, f)} />
       ))}
     </>
   );
@@ -934,36 +934,80 @@ export const VideoGuerra: React.FC = () => {
       <Captions />
       <Chip from={at(22, "comenta")} to={TOTAL_GUERRA} text="COMENTA AÍ ↓" bg="#2E9E4F" top={905} />
       <Audio src={staticFile("vozguerra.mp3")} />
+      {/* trilha: baixa por baixo da narração */}
+      <Audio src={staticFile("trilha-guerra.mp3")} volume={(fr) => 0.16 * clamp(fr / 30) * (1 - ramp(fr, TOTAL_GUERRA - 40, TOTAL_GUERRA))} />
+      {/* ambientes */}
+      <Sequence from={0} durationInFrames={L(7) - 3}>
+        <Audio src={staticFile("sfx2/rio.mp3")} volume={0.18} loop />
+      </Sequence>
+      <Sequence from={L(7) - 3} durationInFrames={at(7, "italia") - L(7)}>
+        <Audio src={staticFile("sfx2/sea.mp3")} volume={0.3} />
+      </Sequence>
+      <Sequence from={at(7, "italia") - 3} durationInFrames={SPLIT - at(7, "italia") + 3}>
+        <Audio src={staticFile("sfx2/wind.mp3")} volume={(fr) => 0.22 * clamp(fr / 20)} loop />
+      </Sequence>
+      <Sequence from={at(7, "italia") - 3} durationInFrames={L(8) - at(7, "italia")}>
+        <Audio src={staticFile("sfx2/march.mp3")} volume={0.3} />
+      </Sequence>
+      <Sequence from={L(8) - 3} durationInFrames={L(15) - L(8)}>
+        <Audio src={staticFile("sfx2/tension.mp3")} volume={0.25} loop />
+      </Sequence>
+      {/* transições */}
       {cuts.map((c) => (
-        <Sequence key={"w" + c} from={c - 3} durationInFrames={45}>
-          <Audio src={staticFile("sfx/whoosh.wav")} volume={0.1} />
+        <Sequence key={"w" + c} from={c - 4} durationInFrames={30}>
+          <Audio src={staticFile("sfx2/whoosh.mp3")} volume={0.22} />
         </Sequence>
       ))}
-      <Sequence from={0} durationInFrames={40}>
-        <Audio src={staticFile("sfx/boom.wav")} volume={0.4} />
+      {/* pontuais */}
+      <Sequence from={12} durationInFrames={30}>
+        <Audio src={staticFile("sfx2/land.mp3")} volume={0.7} />
       </Sequence>
-      <Sequence from={at(2, "inapto")} durationInFrames={20}>
-        <Audio src={staticFile("sfx/stamp.wav")} volume={0.8} />
+      <Sequence from={at(2, "inapto")} durationInFrames={30}>
+        <Audio src={staticFile("sfx2/stamp.mp3")} volume={0.9} />
       </Sequence>
-      <Sequence from={at(5, "despencou") + 11} durationInFrames={40}>
-        <Audio src={staticFile("sfx/boom.wav")} volume={0.55} />
+      <Sequence from={at(5, "despencou") - 4} durationInFrames={30}>
+        <Audio src={staticFile("sfx2/rope.mp3")} volume={0.8} />
       </Sequence>
-      <Sequence from={at(5, "corda") - 2} durationInFrames={10}>
-        <Audio src={staticFile("sfx/snap.wav")} volume={0.6} />
+      <Sequence from={at(5, "despencou") + 9} durationInFrames={60}>
+        <Audio src={staticFile("sfx2/crate.mp3")} volume={0.9} />
+      </Sequence>
+      <Sequence from={at(6, "rasgou")} durationInFrames={30}>
+        <Audio src={staticFile("sfx2/tear.mp3")} volume={0.9} />
+      </Sequence>
+      <Sequence from={at(8, "passos") - 6} durationInFrames={150}>
+        <Audio src={staticFile("sfx2/steps.mp3")} volume={0.45} />
       </Sequence>
       {[0, 1, 2].map((i) => (
-        <Sequence key={"c" + i} from={at(10, "estalava") + i * 12} durationInFrames={10}>
-          <Audio src={staticFile("sfx/snap.wav")} volume={0.35} />
+        <Sequence key={"c" + i} from={at(10, "estalava") + i * 14} durationInFrames={15}>
+          <Audio src={staticFile("sfx2/click.mp3")} volume={0.9} />
         </Sequence>
       ))}
-      <Sequence from={wind[0]} durationInFrames={wind[1] - wind[0]}>
-        <Audio src={staticFile("sfx/wind.wav")} volume={0.1} loop />
+      <Sequence from={at(11, "morcego") - 4} durationInFrames={60}>
+        <Audio src={staticFile("sfx2/bat.mp3")} volume={0.5} />
       </Sequence>
-      <Sequence from={at(17, "zumbido") - 4} durationInFrames={110}>
-        <Audio src={staticFile("sfx/plane.wav")} volume={0.35} />
+      <Sequence from={at(11, "sonar") - 4} durationInFrames={60}>
+        <Audio src={staticFile("sfx2/sonar.mp3")} volume={0.6} />
       </Sequence>
-      <Sequence from={at(18, "estrondo")} durationInFrames={40}>
-        <Audio src={staticFile("sfx/boom.wav")} volume={0.6} />
+      <Sequence from={at(13, "surdo") - 4} durationInFrames={L(14) - at(13, "surdo")}>
+        <Audio src={staticFile("sfx2/muffle.mp3")} volume={0.35} />
+      </Sequence>
+      <Sequence from={L(14) - 3} durationInFrames={L(15) - L(14)}>
+        <Audio src={staticFile("sfx2/steps.mp3")} volume={0.6} loop />
+      </Sequence>
+      <Sequence from={at(17, "zumbido") - 8} durationInFrames={180}>
+        <Audio src={staticFile("sfx2/plane.mp3")} volume={0.6} />
+      </Sequence>
+      <Sequence from={at(18, "estrondo")} durationInFrames={120}>
+        <Audio src={staticFile("sfx2/boom.mp3")} volume={0.85} />
+      </Sequence>
+      <Sequence from={at(19, "eco")} durationInFrames={90}>
+        <Audio src={staticFile("sfx2/cheer.mp3")} volume={0.45} />
+      </Sequence>
+      <Sequence from={L(20) - 3} durationInFrames={L(21) - L(20)}>
+        <Audio src={staticFile("sfx2/march.mp3")} volume={0.3} />
+      </Sequence>
+      <Sequence from={at(21, "surdo") - 6} durationInFrames={SPLIT - at(21, "surdo") + 6}>
+        <Audio src={staticFile("sfx2/muffle.mp3")} volume={0.45} />
       </Sequence>
     </AbsoluteFill>
   );
