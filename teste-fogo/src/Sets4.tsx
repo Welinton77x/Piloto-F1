@@ -197,3 +197,110 @@ export const NoticeBoard: React.FC<{p: V3}> = ({p}) => {
     </group>
   );
 };
+
+/* ---------- objetos do porão ---------- */
+export const Bread: React.FC<{p: V3; bite?: number}> = ({p, bite = 0}) => {
+  const m = useMemo(() => ({crust: M("#b8783a", 0.8), plate: M("#d8d0c0", 0.5)}), []);
+  return (
+    <group position={p}>
+      <mesh position={[0, 0.01, 0]} material={m.plate}>
+        <cylinderGeometry args={[0.14, 0.12, 0.02, 24]} />
+      </mesh>
+      <mesh position={[0, 0.06, 0]} scale={[1.3 * (1 - 0.5 * bite), 0.7, 0.85]} material={m.crust} castShadow>
+        <sphereGeometry args={[0.08, 16, 12]} />
+      </mesh>
+    </group>
+  );
+};
+
+export const HoneyJar: React.FC<{p: V3}> = ({p}) => {
+  const m = useMemo(() => ({glass: new THREE.MeshStandardMaterial({color: "#ffb030", roughness: 0.1, transparent: true, opacity: 0.85, emissive: new THREE.Color("#a05a00"), emissiveIntensity: 0.3}), lid: M("#7a4a20", 0.7)}), []);
+  return (
+    <group position={p}>
+      <mesh position={[0, 0.06, 0]} material={m.glass} castShadow>
+        <cylinderGeometry args={[0.045, 0.05, 0.12, 20]} />
+      </mesh>
+      <mesh position={[0, 0.13, 0]} material={m.lid}>
+        <cylinderGeometry args={[0.05, 0.05, 0.02, 20]} />
+      </mesh>
+    </group>
+  );
+};
+
+export const CandleBody: React.FC<{p: V3}> = ({p}) => {
+  const m = useMemo(() => ({wax: M("#efe6cf", 0.7), dish: M("#6a5a40", 0.4, {metalness: 0.5})}), []);
+  return (
+    <group position={p}>
+      <mesh position={[0, 0.01, 0]} material={m.dish}>
+        <cylinderGeometry args={[0.07, 0.07, 0.015, 20]} />
+      </mesh>
+      <mesh position={[0, 0.09, 0]} material={m.wax} castShadow>
+        <cylinderGeometry args={[0.022, 0.024, 0.16, 14]} />
+      </mesh>
+    </group>
+  );
+};
+
+/** pombo (asas abertas, pode ficar "parado no ar") */
+export const Pigeon: React.FC<{p: V3; flap: number}> = ({p, flap}) => {
+  const m = useMemo(() => ({body: M("#7a808a", 0.8), wing: M("#5a606a", 0.8), beak: M("#d8a040", 0.6)}), []);
+  return (
+    <group position={p}>
+      <mesh scale={[1.6, 1, 1]} material={m.body} castShadow>
+        <sphereGeometry args={[0.07, 12, 10]} />
+      </mesh>
+      <mesh position={[0.11, 0.04, 0]} material={m.body}>
+        <sphereGeometry args={[0.045, 10, 8]} />
+      </mesh>
+      <mesh position={[0.16, 0.035, 0]} rotation={[0, 0, -Math.PI / 2]} material={m.beak}>
+        <coneGeometry args={[0.012, 0.04, 6]} />
+      </mesh>
+      {[-1, 1].map((s) => (
+        <mesh key={s} position={[0, 0.02, s * 0.06]} rotation={[s * (0.4 + flap), 0, 0]} material={m.wing}>
+          <boxGeometry args={[0.12, 0.01, 0.22]} />
+        </mesh>
+      ))}
+    </group>
+  );
+};
+
+/** túnel de esgoto de tijolo, ao longo de -z */
+export const Sewer: React.FC<{t: number; len?: number}> = ({t, len = 40}) => {
+  const m = useMemo(
+    () => ({
+      brick: new THREE.MeshStandardMaterial({
+        map: canvasTex("esgoto", 256, 256, (c, r) => {
+          c.fillStyle = "#1e1612";
+          c.fillRect(0, 0, 256, 256);
+          for (let y = 0; y < 12; y++)
+            for (let x = -1; x < 5; x++) {
+              const v = 0.55 + r() * 0.35;
+              c.fillStyle = `rgb(${90 * v},${60 * v},${44 * v})`;
+              c.fillRect(x * 64 + (y % 2) * 32 + 2, y * 22 + 2, 60, 18);
+            }
+        }, [8, 10]),
+        roughness: 0.9,
+        side: THREE.BackSide,
+      }),
+      water: new THREE.MeshStandardMaterial({color: "#2a3a2a", roughness: 0.1, metalness: 0.4}),
+      walk: M("#3a2e26", 0.9),
+    }),
+    [],
+  );
+  return (
+    <group>
+      <mesh position={[0, 1.2, -len / 2 + 4]} rotation={[Math.PI / 2, 0, 0]} material={m.brick}>
+        <cylinderGeometry args={[1.8, 1.8, len, 24, 1, true, Math.PI * 0.5, Math.PI * 2]} />
+      </mesh>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0.5, -0.05, -len / 2 + 4]} material={m.water}>
+        <planeGeometry args={[1.6, len]} />
+      </mesh>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[-0.9, 0.0, -len / 2 + 4]} material={m.walk}>
+        <planeGeometry args={[1.0, len]} />
+      </mesh>
+      {Array.from({length: 6}, (_, i) => (
+        <pointLight key={i} position={[0, 2.4, -i * 6]} color="#ffb060" intensity={2.2 + 0.3 * Math.sin(t * 7 + i)} distance={6} decay={1.6} />
+      ))}
+    </group>
+  );
+};

@@ -59,6 +59,8 @@ export type Look = {
   mustache?: string;
   palito?: boolean; // estilo palito: membros finos, tronco reto, cabeça pequena
   bobby?: boolean; // capacete alto de policial inglês
+  bowler?: string; // chapéu-coco
+  gloves?: string; // luvas
   ghost?: number; // 0..1 opacidade (rastro/borrão)
 };
 
@@ -76,6 +78,8 @@ const useMats = (L: Look) =>
       frame: std("#222", 0.4),
       helmet: std(L.helmet ?? "#4d5a32", 0.75),
       bobbyHat: std("#1c2333", 0.5),
+      bowler: std(L.bowler ?? "#151515", 0.45),
+      hand: std(L.gloves ?? L.skin ?? SKIN, L.gloves ? 0.45 : 0.6),
       badge: std("#d8dce4", 0.25, {metalness: 0.9}),
       earPaint: std("#f2e6c8", 0.8),
       mustache: std(L.mustache ?? "#1a1a1a", 0.8),
@@ -88,7 +92,7 @@ const useMats = (L: Look) =>
       pupil: new THREE.MeshStandardMaterial({color: "#3a2416", roughness: 0.3, emissive: new THREE.Color("#ff6a00"), emissiveIntensity: 0}),
       sole: std("#e9e9ee", 0.7),
     }),
-    [L.skin, L.shirt, L.trim, L.pants, L.hair, L.coat, L.scarf, L.cap, L.helmet, L.mustache],
+    [L.skin, L.shirt, L.trim, L.pants, L.hair, L.coat, L.scarf, L.cap, L.helmet, L.mustache, L.bowler, L.gloves],
   );
 
 /* Cabelo espetado: direções determinísticas */
@@ -152,7 +156,7 @@ const Arm: React.FC<{
           <mesh position={[0, -0.135, 0]} material={coat ? m.coat : m.skin} castShadow scale={coat ? [1.4, 1, 1.4] : 1}>
             <capsuleGeometry args={[0.052 * th, 0.27 - 0.104 * th, 8, 16]} />
           </mesh>
-          <mesh position={[0, -0.27, 0]} material={m.skin} castShadow>
+          <mesh position={[0, -0.27, 0]} material={m.hand} castShadow>
             <sphereGeometry args={[0.05 * th, 12, 10]} />
           </mesh>
         </>
@@ -163,17 +167,17 @@ const Arm: React.FC<{
       )}
       <group position={[0, -0.27, 0]} rotation={wrist} scale={0.4 + 0.6 * th}>
         {/* palma */}
-        <mesh position={[0, -0.05, 0]} scale={[1, 1.1 - 0.35 * fist, 0.62]} material={m.skin} castShadow>
+        <mesh position={[0, -0.05, 0]} scale={[1, 1.1 - 0.35 * fist, 0.62]} material={m.hand} castShadow>
           <sphereGeometry args={[0.068, 20, 16]} />
         </mesh>
         {/* dedos (somem quando fecha) */}
         {[-1, 0, 1].map((k) => (
-          <mesh key={k} position={[k * 0.03, -0.12 + 0.05 * fist, 0.005 + 0.03 * fist]} rotation={[-1.4 * fist, 0, 0]} material={m.skin} castShadow>
+          <mesh key={k} position={[k * 0.03, -0.12 + 0.05 * fist, 0.005 + 0.03 * fist]} rotation={[-1.4 * fist, 0, 0]} material={m.hand} castShadow>
             <capsuleGeometry args={[0.016, 0.05 * (1 - 0.6 * fist), 6, 8]} />
           </mesh>
         ))}
         {/* polegar */}
-        <mesh position={[-0.062 * side, -0.035, 0.02]} rotation={[0.3, 0, 0.7 * side]} material={m.skin} castShadow>
+        <mesh position={[-0.062 * side, -0.035, 0.02]} rotation={[0.3, 0, 0.7 * side]} material={m.hand} castShadow>
           <capsuleGeometry args={[0.019, 0.045, 6, 8]} />
         </mesh>
         {/* ponto da palma onde nasce a chama */}
@@ -328,7 +332,7 @@ export const Boy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; loo
             </mesh>
           ))}
           {style !== "bald" && spikes.map((sp, i) => (
-            <mesh key={i} position={sp.p} quaternion={sp.q} scale={look.helmet || look.bobby ? sp.s * 0.3 : style === "short" ? sp.s * 0.45 : sp.s} material={m.hair} castShadow>
+            <mesh key={i} position={sp.p} quaternion={sp.q} scale={look.helmet || look.bobby || look.bowler ? sp.s * 0.3 : style === "short" ? sp.s * 0.45 : sp.s} material={m.hair} castShadow>
               <coneGeometry args={[0.09, 0.3, 7]} />
             </mesh>
           ))}
@@ -340,6 +344,19 @@ export const Boy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; loo
               </mesh>
               <mesh position={[0, 0.04, 0.27]} rotation={[-0.15, 0, 0]} scale={[1, 0.12, 0.75]} material={m.cap} castShadow>
                 <cylinderGeometry args={[0.2, 0.2, 0.1, 24, 1, false, -Math.PI / 2, Math.PI]} />
+              </mesh>
+            </group>
+          )}
+          {look.bowler && (
+            <group position={[0, 0.2, -0.01]} rotation={[-0.08, 0, 0]}>
+              <mesh material={m.bowler} castShadow scale={[1, 0.85, 1.05]}>
+                <sphereGeometry args={[0.25, 28, 16, 0, Math.PI * 2, 0, Math.PI / 2]} />
+              </mesh>
+              <mesh position={[0, 0.0, 0]} material={m.bowler} castShadow>
+                <cylinderGeometry args={[0.36, 0.37, 0.025, 32]} />
+              </mesh>
+              <mesh position={[0, 0.03, 0]} material={m.frame}>
+                <cylinderGeometry args={[0.252, 0.252, 0.035, 32]} />
               </mesh>
             </group>
           )}
