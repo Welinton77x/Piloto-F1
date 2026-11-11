@@ -7,7 +7,7 @@ Voz: Matheus (energético) · Personagens palito · Palavras em **negrito** = de
 
 | # | Narração | Cena | Ciência na tela |
 |---|----------|------|-----------------|
-| 1 | O **Davi** tava saindo da farmácia quando uma **luz** acendeu no chão. Um círculo. E puxou ele. | Porta da farmácia, círculo de luz no chão, clarão | — |
+| 1 | O **Davi** tava saindo da **farmácia**, com a sacolinha na mão, quando uma **luz** acendeu no chão. Um círculo. E puxou ele. | Farmácia de hoje em dia (letreiro com cruz verde, porta de vidro). Davi sai com a sacolinha, o círculo de luz acende na calçada, a sacolinha cai, clarão | — |
 | 2 | Ele caiu em **Birmingham**, Inglaterra, **1880**. A cidade das mil fábricas. | Rua de tijolos, chaminés, fumaça, lampiões a gás | Faixa "BIRMINGHAM · 1880" |
 | 3 | E o ouvido do Davi, que escuta tudo... virou **tortura**. Martelo a vapor, apito, ferro batendo em ferro. | Davi tapando os ouvidos, fábricas | Ondas por todo lado |
 | 4 | Barulho se mede em **decibel**. Conversa: **60**. Rua de fábrica: **110**. | — | Escala de decibéis subindo |
