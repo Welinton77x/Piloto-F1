@@ -5,3 +5,5 @@ out/*-raw.mp4
 .cache
 out/*_stt.json
 out/*.wav
+out/vozes/
+out/sotaque/

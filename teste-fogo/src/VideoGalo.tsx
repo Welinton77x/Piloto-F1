@@ -12,7 +12,7 @@ import {
   Mini, SHIRTS, SKINS, HAIRS, Sea, Sand, sandY, SandWall, WALL_Z, Hotel, Umbrella, Towel, BeachChair, PalmTree, House, Bucket, Shovel, Bus, Bedroom, Blanket, SILL, TrashCan, lp, V3,
 } from "./Sets5";
 import {FPS, clamp, lerp, ramp, pop, shake, easeInOut, easeOut, rng} from "./util";
-import W from "./timingGalo3.json";
+import W from "./timingGalo4.json";
 
 type Wd = {w: string; s: number; e: number; line: number};
 const words = W as Wd[];
@@ -1234,8 +1234,8 @@ const Cross: React.FC = () => (
 
 /* ======================= vídeo ======================= */
 /** volume dos efeitos e da trilha (a voz fica bem na frente, como na referência) */
-const FX = 0.26;
-const MUSIC = 0.09;
+const FX = 0.37;
+const MUSIC = 0.125;
 export const VideoGalo: React.FC = () => {
   const f = useCurrentFrame();
   const cuts = SHOTS.slice(1).map((s) => s.from);
@@ -1306,7 +1306,7 @@ export const VideoGalo: React.FC = () => {
       <Captions />
 
       {/* ---------- áudio ---------- */}
-      <Audio src={staticFile("vozgalo3.mp3")} />
+      <Audio src={staticFile("vozgalo4.mp3")} />
       <Audio src={staticFile("trilha-galo.mp3")} volume={(fr) => MUSIC * clamp(fr / 20) * (1 - ramp(fr, TOTAL_GALO - 30, TOTAL_GALO))} />
       {cuts.map((c) => (
         <Sequence key={"w" + c} from={c - 3} durationInFrames={25}>
