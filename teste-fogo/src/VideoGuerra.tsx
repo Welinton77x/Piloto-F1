@@ -81,7 +81,7 @@ const Rio: React.FC = () => (
     <color attach="background" args={["#9fd0ff"]} />
     <hemisphereLight args={["#e8f4ff", "#8a7a5a", 0.9]} />
     <directionalLight position={[4, 7, 4]} intensity={3.0} color="#fff3dc" castShadow shadow-mapSize={[2048, 2048]} shadow-camera-left={-6} shadow-camera-right={6} shadow-camera-top={6} shadow-camera-bottom={-6} shadow-bias={-0.0004} shadow-normalBias={0.02} />
-    <RioStreet />
+    <RioStreet usa />
   </>
 );
 const Snow: React.FC<{v: "day" | "night" | "dawn"; trench?: boolean; t: number; fall?: number; fog?: [number, number]; center?: V3}> = ({v, trench, t, fall = 0, fog, center = [0, 0, 0]}) => {
@@ -285,7 +285,7 @@ const S7: React.FC<ShotProps> = ({f, a, b, t}) => {
       <Snow v="day" t={t} fall={0.3} center={[x0, 0, 0]} />
       {[0, 1, 2, 3].map((i) => {
         const look = i === 2 ? DAVI : SOLDADOS[i];
-        const pose = physics("c22", (f) => idle(f + i * 11, {...walkP(f, it - i * 4, 1.1), pos: [x0 - i * 0.9 + 1.0, 0.02, -0.3 - (i % 2) * 0.4], rotY: Math.PI / 2, ...(i === 2 ? {...shiverP(f), walk: ((f - it) / FPS) * 6.9, walkAmt: 1, brow: 0.7, mouthOpen: 0.15} : {})}), a, f);
+        const pose = physics(`c22_${i}`, (f) => idle(f + i * 11, {...walkP(f, it - i * 4, 1.1), pos: [x0 - i * 0.9 + 1.0, 0.02, -0.3 - (i % 2) * 0.4], rotY: Math.PI / 2, ...(i === 2 ? {...shiverP(f), walk: ((f - it) / FPS) * 6.9, walkAmt: 1, brow: 0.7, mouthOpen: 0.15} : {})}), a, f);
         return <Boy key={i} look={look} pose={pose} />;
       })}
       <Steam t={t} origin={[x0 - 1.8 + 1.0 + 0.25, 1.55, -0.3]} count={5} spread={0.03} rise={0.3} size={0.12} power={0.6} seed={9} life={1} />
@@ -606,14 +606,14 @@ const Split: React.FC = () => {
   const both = f >= at(22, "comenta");
   return (
     <AbsoluteFill style={{background: "radial-gradient(ellipse at 50% 50%, #17375f 0%, #0b1a30 70%)"}}>
-      <Panel top={150} letter="A" label="Conta pro Tião" active={both || (f >= at(22, "conta") && f < at(22, "ou") + 2)} C={PA} a={SPLIT} />
+      <Panel top={150} letter="A" label="Conta pro Cole" active={both || (f >= at(22, "conta") && f < at(22, "ou") + 2)} C={PA} a={SPLIT} />
       <Panel top={1050} letter="B" label="Vai sem contar" active={both || f >= at(22, "vai", 1)} C={PB} a={SPLIT + 4} />
     </AbsoluteFill>
   );
 };
 
 /* ---------- sobreposições 2D ---------- */
-const KEY = new Set(["davi", "1944", "segunda", "guerra", "feb", "inapto", "tiao", "caixote", "corda", "rasgou", "italia", "vinte", "zero", "passos", "trezentos", "trinta", "eco", "duzentos", "cinquenta", "morcego", "sonar", "engole", "espuma", "surdo", "dura", "rocha", "quatro", "mil", "zumbido", "aviao", "dez", "ouvido", "monte", "castello", "neve", "conta", "comenta"]);
+const KEY = new Set(["davi", "1943", "estados", "unidos", "segunda", "guerra", "inapto", "cole", "f", "decima", "divisao", "montanha", "riva", "ridge", "caixote", "corda", "rasgou", "italia", "vinte", "zero", "passos", "trezentos", "trinta", "eco", "duzentos", "cinquenta", "morcego", "sonar", "engole", "espuma", "surdo", "dura", "rocha", "quatro", "mil", "zumbido", "aviao", "dez", "ouvido", "monte", "castello", "neve", "conta", "comenta"]);
 const STROKE = {WebkitTextStroke: "10px #0a0f18", paintOrder: "stroke fill" as const};
 
 const Captions: React.FC = () => {
@@ -670,7 +670,7 @@ const Stamp: React.FC<{at: number; to: number}> = ({at: a, to}) => {
   const k = ramp(f, a, a + 5, easeOut);
   return (
     <div style={{position: "absolute", top: 520, left: 0, right: 0, display: "flex", justifyContent: "center", opacity: 1 - ramp(f, to - 6, to)}}>
-      <div style={{transform: `rotate(-14deg) scale(${lerp(2.2, 1, k)})`, opacity: k, border: "14px solid #d01f1a", borderRadius: 22, padding: "10px 50px", color: "#d01f1a", fontFamily, fontWeight: 900, fontSize: 150, letterSpacing: 12, background: "rgba(255,240,230,0.18)", boxShadow: "0 0 0 6px rgba(208,31,26,0.25)"}}>INAPTO</div>
+      <div style={{transform: `rotate(-14deg) scale(${lerp(2.2, 1, k)})`, opacity: k, border: "14px solid #d01f1a", borderRadius: 22, padding: "10px 50px", color: "#d01f1a", fontFamily, fontWeight: 900, fontSize: 96, letterSpacing: 6, whiteSpace: "nowrap", background: "rgba(255,240,230,0.18)", boxShadow: "0 0 0 6px rgba(208,31,26,0.25)"}}>4-F · INAPTO</div>
     </div>
   );
 };
@@ -905,16 +905,16 @@ export const VideoGuerra: React.FC = () => {
       </Muffle>
       {cuts.map((c) => (f >= c && f < c + 5 ? <AbsoluteFill key={c} style={{background: "#000", opacity: 0.35 * (1 - (f - c) / 5)}} /> : null))}
       <Flash at={0} strength={0.9} />
-      <TitleTag text="RIO · 1944" from={at(0, "1944")} to={L(1) - 4} />
+      <TitleTag text="EUA · 1943" from={at(0, "1943")} to={L(1) - 4} />
       <Chip from={at(0, "segunda")} to={L(1) - 4} text="SEGUNDA GUERRA" bg="#7a1f1a" top={420} size={60} />
-      <Chip from={at(1, "feb")} to={L(2) - 4} text="FEB" bg="#1f6f3a" />
-      <Cobra from={at(1, "feb")} to={L(2) - 4} />
+      <Chip from={at(1, "exercito")} to={L(2) - 4} text="EXÉRCITO DOS EUA" bg="#1f3a6b" size={60} />
       <Chip from={at(1, "cinquenta")} to={L(2) - 4} text="50 KG" bg="#555" top={420} />
       <Stamp at={at(2, "inapto")} to={L(3) - 4} />
       <Chip from={at(3, "dia")} to={at(3, "outro") - 1} text="2ª TENTATIVA" bg="#d07a1a" />
       <Chip from={at(3, "outro")} to={L(4) - 4} text="3ª TENTATIVA" bg="#d01f1a" />
       <Rings from={at(5, "corda") - 2} to={L(6) - 4} x={300} y={760} color="#ffd21f" label="ESTALO" />
       <TitleTag text="ITÁLIA · INVERNO" from={at(7, "italia")} to={L(8) - 4} />
+      <Chip from={at(7, "decima")} to={L(8) - 4} text="10ª DIVISÃO DE MONTANHA" bg="#3a5a2a" top={560} size={52} />
       <Chip from={at(7, "vinte")} to={L(8) - 4} text="-20 °C" bg="#2f6fd6" top={420} />
       <Rings from={at(8, "passos") - 2} to={L(9) - 4} x={980} y={900} color="#8fd3ff" inward label="" />
       <BigStat from={at(9, "trezentos")} to={L(10) - 4} value={330} unit="m/s" label="VELOCIDADE DO SOM NO AR" />
@@ -928,7 +928,8 @@ export const VideoGuerra: React.FC = () => {
       <Chip from={at(18, "dez")} to={L(19) - 4} text="10 SEGUNDOS ANTES" bg="#d01f1a" />
       <Flash at={at(18, "estrondo")} strength={0.7} />
       <TitleTag text="ECO" from={at(19, "eco")} to={L(20) - 4} />
-      <TitleTag text="MONTE CASTELLO" from={at(20, "monte")} to={L(21) - 4} />
+      <TitleTag text="RIVA RIDGE" from={at(20, "riva")} to={L(21) - 4} />
+      <Chip from={at(20, "riva") + 6} to={L(21) - 4} text="FEVEREIRO DE 1945" bg="#3a2a5a" top={420} size={52} />
       <Chip from={at(21, "surdo")} to={SPLIT - 2} text="AUDIÇÃO 0%" bg="#d01f1a" />
       <Split />
       <Captions />

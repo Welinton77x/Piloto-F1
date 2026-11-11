@@ -60,7 +60,7 @@ export const Truck: React.FC<{p: V3; ry?: number; crate?: {y: number; x?: number
 };
 
 /* ---------- Rio de Janeiro, 1944 ---------- */
-export const RioStreet: React.FC = () => {
+export const RioStreet: React.FC<{usa?: boolean}> = ({usa}) => {
   const m = useMemo(
     () => ({
       street: new THREE.MeshStandardMaterial({
@@ -84,13 +84,28 @@ export const RioStreet: React.FC = () => {
       leaf: M("#3f8f3f", 0.8),
       table: M("#6b4a2a", 0.6),
       cloth: M("#2f6f3f", 0.9),
-      fac: ["#f2c46b", "#9fd0c8", "#f0a3a3", "#c8d98f", "#f4e3b0"].map((c) => M(c, 0.85)),
+      fac: (usa ? ["#8a4a36", "#a35a40", "#7a4030", "#9a6a4a", "#6e3a2a"] : ["#f2c46b", "#9fd0c8", "#f0a3a3", "#c8d98f", "#f4e3b0"]).map((c) => M(c, 0.85)),
+      lamp: M("#2a2a2e", 0.5),
+      bulb: new THREE.MeshStandardMaterial({color: "#fff2c0", emissive: new THREE.Color("#ffd27a"), emissiveIntensity: 0.6}),
+      banner: new THREE.MeshStandardMaterial({
+        map: canvasTex("usarmy", 512, 128, (c) => {
+          c.fillStyle = "#1f3a6b";
+          c.fillRect(0, 0, 512, 128);
+          c.fillStyle = "#f4efe4";
+          c.font = "bold 64px sans-serif";
+          c.textAlign = "center";
+          c.fillText("U.S. ARMY", 256, 70);
+          c.font = "bold 30px sans-serif";
+          c.fillText("RECRUITING STATION", 256, 112);
+        }),
+        roughness: 0.8,
+      }),
     }),
     [],
   );
   return (
     <group>
-      <SkyDome k="rio" c={["#3e93e8", "#9fd0ff", "#fff3d8"]} />
+      <SkyDome k={usa ? "usa" : "rio"} c={usa ? ["#6f9fd0", "#b9d3ea", "#f2ead8"] : ["#3e93e8", "#9fd0ff", "#fff3d8"]} />
       <mesh rotation={[-Math.PI / 2, 0, 0]} material={m.street} receiveShadow>
         <planeGeometry args={[40, 30]} />
       </mesh>
@@ -110,8 +125,16 @@ export const RioStreet: React.FC = () => {
           )}
         </group>
       ))}
-      {/* palmeiras */}
-      {[-6.5, -1.2, 4.5].map((x, i) => (
+      {/* palmeiras (Rio) ou postes de luz (EUA) */}
+      {usa && [-6.5, -1.2, 4.5].map((x) => (
+        <group key={x} position={[x, 0, -3.6]}>
+          <Box p={[0, 1.6, 0]} s={[0.08, 3.2, 0.08]} m={m.lamp} />
+          <mesh position={[0, 3.25, 0]} material={m.bulb}>
+            <sphereGeometry args={[0.14, 12, 10]} />
+          </mesh>
+        </group>
+      ))}
+      {!usa && [-6.5, -1.2, 4.5].map((x, i) => (
         <group key={i} position={[x, 0, -3.6]}>
           <mesh position={[0, 2.2, 0]} rotation={[0, 0, 0.06]} material={m.trunk} castShadow>
             <cylinderGeometry args={[0.1, 0.16, 4.4, 8]} />
@@ -126,7 +149,8 @@ export const RioStreet: React.FC = () => {
       {/* mesa de alistamento */}
       <group position={[2.2, 0, -1.6]}>
         <Box p={[0, 0.75, 0]} s={[1.6, 0.06, 0.8]} m={m.table} />
-        <Box p={[0, 0.45, 0.38]} s={[1.6, 0.6, 0.02]} m={m.cloth} />
+        <Box p={[0, 0.45, 0.38]} s={[1.6, 0.6, 0.02]} m={usa ? m.banner : m.cloth} />
+        {usa && <Box p={[0, 2.9, -3.55]} s={[2.6, 0.65, 0.04]} m={m.banner} />}
         {[-0.7, 0.7].map((x) => (
           <Box key={x} p={[x, 0.37, -0.3]} s={[0.05, 0.74, 0.05]} m={m.table} />
         ))}
