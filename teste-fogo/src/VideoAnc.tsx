@@ -885,7 +885,7 @@ export const VideoAnc: React.FC = () => {
         <Audio src={staticFile("sfx2/land.mp3")} volume={0.7} />
       </Sequence>
       <Sequence from={at(0, "caiu") - 3} durationInFrames={at(7, "porta") - at(0, "caiu")}>
-        <Audio src={staticFile("sfx4/rua1880.mp3")} volume={(fr) => street(fr + at(0, "caiu") - 3)} loop />
+        <Audio src={staticFile("sfx5/crowdday.mp3")} volume={(fr) => street(fr + at(0, "caiu") - 3)} loop />
       </Sequence>
       <Sequence from={at(0, "acelerar") - 4} durationInFrames={60}>
         <Audio src={staticFile("sfx4/slow.mp3")} volume={0.35} />
