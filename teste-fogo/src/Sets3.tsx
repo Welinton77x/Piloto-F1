@@ -561,3 +561,143 @@ export const WineGlass: React.FC<{t: number; p: V3; wobble: number; broken?: boo
     </group>
   );
 };
+
+/* ---------- carruagem com dois cavalos ---------- */
+const Horse: React.FC<{ph: number; m: {body: THREE.Material; dark: THREE.Material; mane: THREE.Material}}> = ({ph, m}) => {
+  const leg = (x: number, z: number, o: number) => (
+    <group position={[x, 0.95, z]} rotation={[0, 0, Math.sin(ph + o) * 0.6]}>
+      <mesh position={[0, -0.45, 0]} material={m.dark} castShadow>
+        <cylinderGeometry args={[0.05, 0.04, 0.9, 8]} />
+      </mesh>
+    </group>
+  );
+  return (
+    <group>
+      <mesh position={[0, 1.15 + Math.abs(Math.sin(ph)) * 0.06, 0]} rotation={[0, 0, Math.PI / 2]} material={m.body} castShadow>
+        <capsuleGeometry args={[0.24, 0.9, 8, 16]} />
+      </mesh>
+      <mesh position={[0.62, 1.5, 0]} rotation={[0, 0, -0.75]} material={m.body} castShadow>
+        <capsuleGeometry args={[0.12, 0.42, 6, 10]} />
+      </mesh>
+      <mesh position={[0.86, 1.68, 0]} rotation={[0, 0, -0.35]} scale={[1.6, 0.75, 0.7]} material={m.body} castShadow>
+        <sphereGeometry args={[0.13, 12, 10]} />
+      </mesh>
+      <mesh position={[0.6, 1.62, 0]} rotation={[0, 0, -0.75]} scale={[0.4, 1.4, 0.3]} material={m.mane}>
+        <sphereGeometry args={[0.15, 8, 6]} />
+      </mesh>
+      <mesh position={[-0.68, 1.15, 0]} rotation={[0, 0, 0.9 + Math.sin(ph * 2) * 0.2]} material={m.mane}>
+        <coneGeometry args={[0.06, 0.45, 6]} />
+      </mesh>
+      {leg(0.42, 0.13, 0)}
+      {leg(0.42, -0.13, Math.PI * 0.5)}
+      {leg(-0.42, 0.13, Math.PI)}
+      {leg(-0.42, -0.13, Math.PI * 1.5)}
+    </group>
+  );
+};
+
+/** carruagem andando ao longo do eixo x (dir = +1 para a direita). ph = fase do galope */
+export const Carriage: React.FC<{x: number; z?: number; ph: number; dust?: number; t: number}> = ({x, z = 0, ph, dust = 0, t}) => {
+  const m = useMemo(
+    () => ({
+      body: M("#5a3a24", 0.7),
+      body2: M("#3e2a1c", 0.7),
+      dark: M("#2a1a10", 0.8),
+      mane: M("#1a120c", 0.9),
+      coach: M("#1d2a22", 0.5),
+      gold: M("#c8a050", 0.3, {metalness: 0.8}),
+      wheel: M("#3a2414", 0.7),
+      win: M("#2a3540", 0.2),
+    }),
+    [],
+  );
+  const wheel = (wx: number, wz: number, r: number) => (
+    <group position={[wx, r, wz]} rotation={[0, 0, -ph * 0.35]}>
+      <mesh rotation={[Math.PI / 2, 0, 0]} material={m.wheel} castShadow>
+        <torusGeometry args={[r, 0.04, 8, 24]} />
+      </mesh>
+      {[0, 1, 2, 3].map((k) => (
+        <mesh key={k} rotation={[0, 0, (k / 4) * Math.PI]} material={m.wheel}>
+          <boxGeometry args={[r * 2, 0.03, 0.03]} />
+        </mesh>
+      ))}
+    </group>
+  );
+  return (
+    <group position={[x, 0, z]}>
+      <group position={[1.9, 0, 0.35]}>
+        <Horse ph={ph} m={{body: m.body, dark: m.dark, mane: m.mane}} />
+      </group>
+      <group position={[1.9, 0, -0.35]}>
+        <Horse ph={ph + 0.7} m={{body: m.body2, dark: m.dark, mane: m.mane}} />
+      </group>
+      {/* cabine */}
+      <Box p={[0, 1.35, 0]} s={[1.5, 1.1, 1.2]} m={m.coach} />
+      <Box p={[0, 1.95, 0]} s={[1.6, 0.08, 1.3]} m={m.gold} />
+      <Box p={[0, 1.4, 0.61]} s={[0.6, 0.5, 0.02]} m={m.win} />
+      <Box p={[0.95, 1.0, 0]} s={[0.4, 0.08, 0.9]} m={m.body2} />
+      <Box p={[1.4, 0.85, 0]} s={[1.0, 0.06, 0.06]} m={m.dark} />
+      {wheel(0.55, 0.62, 0.42)}
+      {wheel(0.55, -0.62, 0.42)}
+      {wheel(-0.55, 0.62, 0.5)}
+      {wheel(-0.55, -0.62, 0.5)}
+      {dust > 0 && <Steam t={t} origin={[0.6, 0.1, 0]} count={18} spread={0.8} rise={0.6} size={0.7} power={dust} color="#b8a888" seed={70} life={1.6} />}
+    </group>
+  );
+};
+
+/* ---------- bolha do tempo ---------- */
+const bubbleVert = /* glsl */ `
+varying vec3 vN; varying vec3 vV; varying vec3 vP;
+void main(){ vec4 mv = modelViewMatrix * vec4(position,1.0); vN = normalize(normalMatrix*normal); vV = normalize(-mv.xyz); vP = position; gl_Position = projectionMatrix * mv; }`;
+const bubbleFrag = /* glsl */ `
+uniform float uT; uniform float uP;
+varying vec3 vN; varying vec3 vV; varying vec3 vP;
+void main(){
+  float fr = pow(1.0 - abs(dot(vN, vV)), 2.2);
+  float rings = 0.5 + 0.5*sin(vP.y*18.0 - uT*6.0);
+  float glow = fr*0.75 + 0.03 + rings*fr*0.35;
+  vec3 col = mix(vec3(0.25,0.55,1.0), vec3(0.75,0.95,1.0), fr);
+  gl_FragColor = vec4(col*glow*uP, 1.0);
+}`;
+export const TimeBubble: React.FC<{t: number; power: number; r?: number; p?: V3}> = ({t, power, r = 1.1, p = [0, 1, 0]}) => {
+  const mat = useMemo(() => new THREE.ShaderMaterial({vertexShader: bubbleVert, fragmentShader: bubbleFrag, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, uniforms: {uT: {value: 0}, uP: {value: 0}}}), []);
+  if (power <= 0.001) return null;
+  mat.uniforms.uT.value = t;
+  mat.uniforms.uP.value = power;
+  return (
+    <mesh position={p} scale={r * (0.85 + 0.15 * power)} material={mat}>
+      <sphereGeometry args={[1, 40, 28]} />
+    </mesh>
+  );
+};
+
+/* ---------- relógios na vitrine da relojoaria (prédio 2) ---------- */
+export const ClockWindow: React.FC<{t: number; spin: number}> = ({t, spin}) => {
+  const faces = useMemo(() => ["#f4ead2", "#efe2c0", "#e8f0f0"].map((c, i) => new THREE.MeshStandardMaterial({map: clockFace("v" + i, c), roughness: 0.6, emissive: new THREE.Color("#ffd890"), emissiveIntensity: 0.25})), []);
+  const hand = useMemo(() => M("#111", 0.5), []);
+  const items = [
+    [-0.32, 1.05, 0.14],
+    [0.0, 1.1, 0.17],
+    [0.32, 1.02, 0.12],
+    [-0.18, 0.62, 0.11],
+    [0.2, 0.62, 0.13],
+  ];
+  return (
+    <group position={[-0.65, 0, -3.39]}>
+      {items.map(([x, y, s], i) => (
+        <group key={i} position={[x, y, 0]}>
+          <mesh material={faces[i % 3]}>
+            <circleGeometry args={[s, 24]} />
+          </mesh>
+          <mesh position={[0, 0, 0.01]} rotation={[0, 0, -(t * (0.5 + i * 0.2) + spin * (8 + i * 3) * t)]} material={hand}>
+            <planeGeometry args={[0.012, s * 1.6]} />
+          </mesh>
+          <mesh position={[0, 0, 0.012]} rotation={[0, 0, -(t * 0.05 + spin * (1 + i) * t)]} material={hand}>
+            <planeGeometry args={[0.02, s * 1.1]} />
+          </mesh>
+        </group>
+      ))}
+    </group>
+  );
+};
