@@ -58,6 +58,8 @@ export type Look = {
   slim?: number; // 1 normal, <1 mais magro
   mustache?: string;
   palito?: boolean; // estilo palito: membros finos, tronco reto, cabeça pequena
+  bobby?: boolean; // capacete alto de policial inglês
+  ghost?: number; // 0..1 opacidade (rastro/borrão)
 };
 
 const useMats = (L: Look) =>
@@ -73,6 +75,8 @@ const useMats = (L: Look) =>
       cap: std(L.cap ?? "#235", 0.7),
       frame: std("#222", 0.4),
       helmet: std(L.helmet ?? "#4d5a32", 0.75),
+      bobbyHat: std("#1c2333", 0.5),
+      badge: std("#d8dce4", 0.25, {metalness: 0.9}),
       earPaint: std("#f2e6c8", 0.8),
       mustache: std(L.mustache ?? "#1a1a1a", 0.8),
       shoe: std(SHOE, 0.6),
@@ -181,6 +185,14 @@ const Arm: React.FC<{
 
 export const Boy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; look?: Look}> = ({pose, palmRef, look = {}}) => {
   const m = useMats(look);
+  if (look.ghost !== undefined) {
+    for (const v of Object.values(m)) {
+      const mat = v as THREE.Material;
+      mat.transparent = true;
+      mat.opacity = look.ghost;
+      mat.depthWrite = false;
+    }
+  }
   const coat = !!look.coat;
   const style = look.hairStyle ?? "spiky";
   const lt = look.palito ? 0.5 : 1; // espessura de braços/pernas
@@ -316,7 +328,7 @@ export const Boy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; loo
             </mesh>
           ))}
           {style !== "bald" && spikes.map((sp, i) => (
-            <mesh key={i} position={sp.p} quaternion={sp.q} scale={look.helmet ? sp.s * 0.3 : style === "short" ? sp.s * 0.45 : sp.s} material={m.hair} castShadow>
+            <mesh key={i} position={sp.p} quaternion={sp.q} scale={look.helmet || look.bobby ? sp.s * 0.3 : style === "short" ? sp.s * 0.45 : sp.s} material={m.hair} castShadow>
               <coneGeometry args={[0.09, 0.3, 7]} />
             </mesh>
           ))}
@@ -328,6 +340,22 @@ export const Boy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; loo
               </mesh>
               <mesh position={[0, 0.04, 0.27]} rotation={[-0.15, 0, 0]} scale={[1, 0.12, 0.75]} material={m.cap} castShadow>
                 <cylinderGeometry args={[0.2, 0.2, 0.1, 24, 1, false, -Math.PI / 2, Math.PI]} />
+              </mesh>
+            </group>
+          )}
+          {look.bobby && (
+            <group position={[0, 0.12, -0.01]}>
+              <mesh material={m.bobbyHat} scale={[1.0, 1.55, 1.05]} castShadow>
+                <sphereGeometry args={[0.29, 28, 18, 0, Math.PI * 2, 0, 1.7]} />
+              </mesh>
+              <mesh position={[0, -0.02, 0]} material={m.bobbyHat}>
+                <cylinderGeometry args={[0.33, 0.34, 0.025, 28]} />
+              </mesh>
+              <mesh position={[0, 0.2, 0.29]} rotation={[-0.25, 0, 0]} material={m.badge}>
+                <circleGeometry args={[0.07, 6]} />
+              </mesh>
+              <mesh position={[0, 0.5, 0]} material={m.badge}>
+                <sphereGeometry args={[0.035, 10, 8]} />
               </mesh>
             </group>
           )}
