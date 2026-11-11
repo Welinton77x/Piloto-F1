@@ -4,3 +4,4 @@ out/*.log
 out/*-raw.mp4
 .cache
 out/*_stt.json
+out/*.wav

@@ -12,7 +12,7 @@ import {
   Mini, SHIRTS, SKINS, HAIRS, Sea, Sand, sandY, SandWall, WALL_Z, Hotel, Umbrella, Towel, BeachChair, PalmTree, House, Bucket, Shovel, Bus, Bedroom, Blanket, SILL, TrashCan, lp, V3,
 } from "./Sets5";
 import {FPS, clamp, lerp, ramp, pop, shake, easeInOut, easeOut, rng} from "./util";
-import W from "./timingGalo2.json";
+import W from "./timingGalo3.json";
 
 type Wd = {w: string; s: number; e: number; line: number};
 const words = W as Wd[];
@@ -1233,6 +1233,9 @@ const Cross: React.FC = () => (
 );
 
 /* ======================= vídeo ======================= */
+/** volume dos efeitos e da trilha (a voz fica bem na frente, como na referência) */
+const FX = 0.26;
+const MUSIC = 0.09;
 export const VideoGalo: React.FC = () => {
   const f = useCurrentFrame();
   const cuts = SHOTS.slice(1).map((s) => s.from);
@@ -1303,91 +1306,91 @@ export const VideoGalo: React.FC = () => {
       <Captions />
 
       {/* ---------- áudio ---------- */}
-      <Audio src={staticFile("vozgalo2.mp3")} />
-      <Audio src={staticFile("trilha-galo.mp3")} volume={(fr) => 0.13 * clamp(fr / 20) * (1 - ramp(fr, TOTAL_GALO - 30, TOTAL_GALO))} />
+      <Audio src={staticFile("vozgalo3.mp3")} />
+      <Audio src={staticFile("trilha-galo.mp3")} volume={(fr) => MUSIC * clamp(fr / 20) * (1 - ramp(fr, TOTAL_GALO - 30, TOTAL_GALO))} />
       {cuts.map((c) => (
         <Sequence key={"w" + c} from={c - 3} durationInFrames={25}>
-          <Audio src={staticFile("sfx7/whoosh.mp3")} volume={0.18} />
+          <Audio src={staticFile("sfx7/whoosh.mp3")} volume={FX * (0.18)} />
         </Sequence>
       ))}
       {[L(2), L(4), L(6), L(8), L(10)].map((b) => (
         <Sequence key={"b" + b} from={b + 3} durationInFrames={32}>
-          <Audio src={staticFile("sfx7/boing.mp3")} volume={0.75} />
+          <Audio src={staticFile("sfx7/boing.mp3")} volume={FX * (0.75)} />
         </Sequence>
       ))}
       <Sequence from={0} durationInFrames={at(0, "primeiro")}>
-        <Audio src={staticFile("sfx7/snore.mp3")} volume={0.45} />
+        <Audio src={staticFile("sfx7/snore.mp3")} volume={FX * (0.45)} />
       </Sequence>
       <Sequence from={L(15) + 20} durationInFrames={at(15, "convencer") - L(15) - 20}>
-        <Audio src={staticFile("sfx7/snore.mp3")} volume={0.35} />
+        <Audio src={staticFile("sfx7/snore.mp3")} volume={FX * (0.35)} />
       </Sequence>
       {[at(0, "ferias") - 2, at(15, "ferias") - 2, at(1, "passagem") + 2, at(13, "pousa") + 2, at(14, "sem"), at(14, "quarenta"), at(14, "muro"), at(14, "lugar")].map((p, i) => (
         <Sequence key={"p" + i} from={p} durationInFrames={22}>
-          <Audio src={staticFile("sfx7/pof.mp3")} volume={0.55} />
+          <Audio src={staticFile("sfx7/pof.mp3")} volume={FX * (0.55)} />
         </Sequence>
       ))}
       <Sequence from={at(1, "bicicleta") - 1} durationInFrames={37}>
-        <Audio src={staticFile("sfx7/cash.mp3")} volume={0.75} />
+        <Audio src={staticFile("sfx7/cash.mp3")} volume={FX * (0.75)} />
       </Sequence>
       <Sequence from={at(1, "bicicleta") + 14} durationInFrames={37}>
-        <Audio src={staticFile("sfx7/bell.mp3")} volume={0.45} />
+        <Audio src={staticFile("sfx7/bell.mp3")} volume={FX * (0.45)} />
       </Sequence>
       <Sequence from={at(3, "entao") - 2} durationInFrames={L(5) - at(3, "entao") + 2}>
-        <Audio src={staticFile("sfx7/truck.mp3")} volume={(fr) => 0.38 * clamp(fr / 15)} loop />
+        <Audio src={staticFile("sfx7/truck.mp3")} volume={(fr) => FX * (0.38 * clamp(fr / 15))} loop />
       </Sequence>
       <Sequence from={L(5)} durationInFrames={BRAKE - L(5) + 30}>
-        <Audio src={staticFile("sfx7/truck.mp3")} volume={(fr) => 0.38 * (1 - ramp(fr, BRAKE - L(5), BRAKE - L(5) + 25))} />
+        <Audio src={staticFile("sfx7/truck.mp3")} volume={(fr) => FX * (0.38 * (1 - ramp(fr, BRAKE - L(5), BRAKE - L(5) + 25)))} />
       </Sequence>
       <Sequence from={at(3, "caminhao") - 14} durationInFrames={50}>
-        <Audio src={staticFile("sfx7/brake.mp3")} volume={0.22} />
+        <Audio src={staticFile("sfx7/brake.mp3")} volume={FX * (0.22)} />
       </Sequence>
       <Sequence from={BRAKE - 2} durationInFrames={61}>
-        <Audio src={staticFile("sfx7/brake.mp3")} volume={0.6} />
+        <Audio src={staticFile("sfx7/brake.mp3")} volume={FX * (0.6)} />
       </Sequence>
       {[0, 18, 34, 52, 70, 90].map((d, i) => (
         <Sequence key={"bo" + i} from={SIM0 + 10 + d} durationInFrames={150}>
-          <Audio src={staticFile("sfx7/bounce.mp3")} volume={0.55 - i * 0.04} />
+          <Audio src={staticFile("sfx7/bounce.mp3")} volume={FX * (0.55 - i * 0.04)} />
         </Sequence>
       ))}
       {[0, 12, 24].map((d, i) => (
         <Sequence key={"cr" + i} from={L(6) + 16 + d} durationInFrames={60}>
-          <Audio src={staticFile("sfx7/crash.mp3")} volume={0.5 - i * 0.1} />
+          <Audio src={staticFile("sfx7/crash.mp3")} volume={FX * (0.5 - i * 0.1)} />
         </Sequence>
       ))}
       <Sequence from={L(7) - 2} durationInFrames={L(12) - L(7) + 2}>
-        <Audio src={staticFile("sfx7/beach.mp3")} volume={(fr) => 0.3 * clamp(fr / 10)} loop />
+        <Audio src={staticFile("sfx7/beach.mp3")} volume={(fr) => FX * (0.3 * clamp(fr / 10))} loop />
       </Sequence>
       <Sequence from={at(7, "param") + 8} durationInFrames={22}>
-        <Audio src={staticFile("sfx7/pof.mp3")} volume={0.5} />
+        <Audio src={staticFile("sfx7/pof.mp3")} volume={FX * (0.5)} />
       </Sequence>
       <Sequence from={at(7, "e", 0) - 4} durationInFrames={L(9) - at(7, "e", 0) + 4}>
-        <Audio src={staticFile("sfx5/crowdday.mp3")} volume={(fr) => 0.4 * clamp(fr / 10)} loop />
+        <Audio src={staticFile("sfx5/crowdday.mp3")} volume={(fr) => FX * (0.4 * clamp(fr / 10))} loop />
       </Sequence>
       <Sequence from={L(9) - 2} durationInFrames={L(11) - L(9)}>
-        <Audio src={staticFile("sfx7/waves.mp3")} volume={0.32} loop />
+        <Audio src={staticFile("sfx7/waves.mp3")} volume={FX * (0.32)} loop />
       </Sequence>
       <Sequence from={SEA_UP - 14} durationInFrames={90}>
-        <Audio src={staticFile("sfx7/rumble.mp3")} volume={0.45} />
+        <Audio src={staticFile("sfx7/rumble.mp3")} volume={FX * (0.45)} />
       </Sequence>
       {Array.from({length: Math.floor((L(10) - at(9, "entao")) / DIG_P)}, (_, i) => (
         <Sequence key={"sh" + i} from={at(9, "entao") + i * DIG_P + Math.round(0.3 * DIG_P)} durationInFrames={30}>
-          <Audio src={staticFile("sfx7/shovel.mp3")} volume={0.5} />
+          <Audio src={staticFile("sfx7/shovel.mp3")} volume={FX * (0.5)} />
         </Sequence>
       ))}
       <Sequence from={at(9, "tamanho") - 6} durationInFrames={90}>
-        <Audio src={staticFile("sfx7/rumble.mp3")} volume={0.35} />
+        <Audio src={staticFile("sfx7/rumble.mp3")} volume={FX * (0.35)} />
       </Sequence>
       <Sequence from={at(11, "frio") - 6} durationInFrames={61}>
-        <Audio src={staticFile("sfx7/brr.mp3")} volume={0.6} />
+        <Audio src={staticFile("sfx7/brr.mp3")} volume={FX * (0.6)} />
       </Sequence>
       <Sequence from={L(12) - 2} durationInFrames={L(13) - L(12)}>
-        <Audio src={staticFile("sfx7/bus.mp3")} volume={0.45} loop />
+        <Audio src={staticFile("sfx7/bus.mp3")} volume={FX * (0.45)} loop />
       </Sequence>
       <Sequence from={CANTA - 2} durationInFrames={91}>
-        <Audio src={staticFile("sfx7/rooster.mp3")} volume={0.9} />
+        <Audio src={staticFile("sfx7/rooster.mp3")} volume={FX * (0.9)} />
       </Sequence>
       <Sequence from={pb - 2} durationInFrames={61}>
-        <Audio src={staticFile("sfx7/confetti.mp3")} volume={0.6} />
+        <Audio src={staticFile("sfx7/confetti.mp3")} volume={FX * (0.6)} />
       </Sequence>
     </AbsoluteFill>
   );
