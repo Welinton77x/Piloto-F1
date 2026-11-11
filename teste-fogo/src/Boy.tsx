@@ -301,12 +301,9 @@ export const Boy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; loo
             {/* coxa */}
             {bk ? (
               <>
-                {/* perna do short (acompanha a coxa) */}
-                <mesh position={[0, -0.09, 0]} scale={[1, 1, 0.92]} material={m.pants} castShadow receiveShadow>
-                  <cylinderGeometry args={[0.102, 0.096, 0.25, 7]} />
-                </mesh>
-                <mesh position={[0, -0.18, 0]} material={m.skin} castShadow receiveShadow>
-                  <cylinderGeometry args={[0.064, 0.06, 0.38, 6]} />
+                {/* calça: coxa (acompanha o quadril) */}
+                <mesh position={[0, -0.17, 0]} material={m.pants} castShadow receiveShadow>
+                  <cylinderGeometry args={[0.094, 0.081, 0.44, 7]} />
                 </mesh>
               </>
             ) : look.shorts ? (
@@ -327,11 +324,12 @@ export const Boy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; loo
             <group position={[0, -0.36, 0]} rotation={[knee, 0, 0]}>
               {bk ? (
                 <>
-                  <mesh material={m.skin}>
-                    <icosahedronGeometry args={[0.061, 0]} />
+                  {/* calça: joelho e canela (dobram juntos) */}
+                  <mesh material={m.pants} castShadow>
+                    <icosahedronGeometry args={[0.081, 1]} />
                   </mesh>
-                  <mesh position={[0, -0.16, 0]} material={m.skin} castShadow receiveShadow>
-                    <cylinderGeometry args={[0.06, 0.056, 0.33, 6]} />
+                  <mesh position={[0, -0.165, 0]} material={m.pants} castShadow receiveShadow>
+                    <cylinderGeometry args={[0.079, 0.075, 0.33, 7]} />
                   </mesh>
                 </>
               ) : (
@@ -374,7 +372,7 @@ export const Boy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; loo
             <mesh position={[0, 1.105 + breathe * 0.004, 0]} scale={[1, 1 + breathe * 0.01, 0.78]} material={m.shirt} castShadow receiveShadow>
               <cylinderGeometry args={[0.2, 0.185, 0.5, 7]} />
             </mesh>
-            {/* cós do short */}
+            {/* cós da calça */}
             <mesh position={[0, 0.8, 0]} scale={[1, 1, 0.8]} material={m.pants} castShadow receiveShadow>
               <cylinderGeometry args={[0.19, 0.2, 0.17, 7]} />
             </mesh>

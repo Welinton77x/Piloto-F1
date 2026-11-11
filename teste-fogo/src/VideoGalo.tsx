@@ -30,7 +30,7 @@ const at = (i: number, txt: string, n = 0) => {
 export const TOTAL_GALO = F(words[words.length - 1].e + 1.6);
 
 /* ---------- personagem: estilo low-poly, cabeção, camiseta amarela, bermuda azul ---------- */
-const KID: Look = {lowpoly: true, blocky: true, headScale: 1.12, skin: "#f0c49a", shirt: "#ffc928", trim: "#e9a514", pants: "#2f6bd1", shorts: true, hair: "#6b4426", hairStyle: "bowl"};
+const KID: Look = {lowpoly: true, blocky: true, headScale: 1.12, skin: "#f0c49a", shirt: "#ffc928", trim: "#e9a514", pants: "#2f5fc4", hair: "#6b4426", hairStyle: "bowl"};
 
 const blinkCurve = (f: number) => clamp(1 - Math.abs(((f + 20) % 97) - 3) / 3);
 const idle = (f: number, extra: Pose = {}): Pose => ({breathe: Math.sin((f / FPS) * 2.4), blink: blinkCurve(f), ...extra});
@@ -99,7 +99,7 @@ const UMBS = (() => {
   }
   return out;
 })();
-const Beach: React.FC<{t: number; sea?: number; wall?: number; target?: V3; dir?: V3; ext?: number; sun?: number; hemi?: number; noUmb?: boolean}> = ({t, sea = 0, wall = 0, target = [0, 0, 8], dir = [-5, 11, 6], ext = 14, sun = 2.7, hemi = 1.15, noUmb}) => (
+const Beach: React.FC<{t: number; sea?: number; wall?: number; target?: V3; dir?: V3; ext?: number; sun?: number; hemi?: number; noUmb?: boolean; umbKeep?: (x: number, z: number) => boolean}> = ({t, sea = 0, wall = 0, target = [0, 0, 8], dir = [-5, 11, 6], ext = 14, sun = 2.7, hemi = 1.15, noUmb, umbKeep}) => (
   <>
     <Sky />
     <fog attach="fog" args={["#cdeeff", 40, 140]} />
@@ -124,7 +124,7 @@ const Beach: React.FC<{t: number; sea?: number; wall?: number; target?: V3; dir?
       <PalmTree key={i} p={[x, sandY(15), 15]} lean={i % 2 ? -0.22 : 0.22} s={1.15} />
     ))}
     {!noUmb &&
-      UMBS.map((u, i) => (
+      UMBS.filter((u) => !umbKeep || umbKeep(u.p[0], u.p[2])).map((u, i) => (
         <group key={i}>
           <Umbrella p={[u.p[0], u.p[1] - 0.05, u.p[2]]} a={u.c[0]} b={u.c[1]} />
           <Towel p={[u.p[0] + 0.7, u.p[1] + 0.02, u.p[2] + 0.4]} c={u.towel} r={0.2} />
@@ -641,14 +641,14 @@ const wallH = (f: number) => {
   const s = Math.floor(k * steps);
   return WALL_H * Math.min(1, (s + easeOut((k * steps) % 1)) / steps);
 };
-const S16: React.FC<ShotProps> = ({f, a, t}) => {
+const digPose = (a: number) => (fr: number): Pose => {
+  const c = ((fr - a) % 14) / 14;
+  const up = c < 0.5 ? easeInOut(c * 2) : 1 - easeInOut((c - 0.5) * 2);
+  return {...idle(fr), pos: [0.6, sandY(10.0), 10.0], rotY: 2.0, rShoulder: [-0.4 - 1.6 * up, 0, -0.2], lShoulder: [-0.4 - 1.6 * up, 0, 0.2], rElbow: -0.5 + 0.3 * up, lElbow: -0.5 + 0.3 * up, rFist: 1, torso: [0.35 - 0.45 * up, 0, 0], smile: 0.5, brow: 0.5, mouthOpen: 0.2 * up};
+};
+const Digging: React.FC<{f: number; a: number; t: number; wide?: boolean}> = ({f, a, t, wide}) => {
   const palm = useRef<THREE.Object3D>(null);
-  const pose = physics("dig" + a, (fr) => {
-    const c = ((fr - a) % 14) / 14;
-    const up = c < 0.5 ? easeInOut(c * 2) : 1 - easeInOut((c - 0.5) * 2);
-    return {...idle(fr), pos: [0.6, sandY(10.0), 10.0], rotY: 2.55, rShoulder: [-0.4 - 1.6 * up, 0, -0.2], lShoulder: [-0.4 - 1.6 * up, 0, 0.2], rElbow: -0.5 + 0.3 * up, lElbow: -0.5 + 0.3 * up, rFist: 1, torso: [0.35 - 0.45 * up, 0, 0], smile: 0.5, brow: 0.5, mouthOpen: 0.2 * up};
-  }, a, f);
-  const pull = ramp(f, at(9, "tamanho") - 4, at(9, "predio") + 12, easeInOut);
+  const pose = physics("dig" + a, digPose(a), a, f);
   const puffs = Array.from({length: 6}, (_, i) => {
     const k = (((f - a) / 14 + i / 6) % 1);
     return (
@@ -659,8 +659,7 @@ const S16: React.FC<ShotProps> = ({f, a, t}) => {
   });
   return (
     <>
-      <Cam pos={[lerp(4.5, 3.2, pull), lerp(1.7, 6.5, pull), lerp(13.4, 21, pull)]} look={[lerp(0.5, 1.6, pull), lerp(1.4, 5.0, pull), lerp(8.5, 7.5, pull)]} fov={48} f={f} a={a} />
-      <Beach t={t} sea={0.3} wall={wallH(f)} target={[0, 0, 9]} ext={16} />
+      <Beach t={t} sea={0.3} wall={wallH(f)} target={[0, 0, 9]} ext={16} umbKeep={wide ? (x) => x > 2.5 : undefined} />
       <BeachMelons f={f} />
       <Boy pose={pose} look={KID} palmRef={palm} />
       <AtPalm palm={palm}>
@@ -668,6 +667,26 @@ const S16: React.FC<ShotProps> = ({f, a, t}) => {
       </AtPalm>
       <Bucket p={[1.2, sandY(10.2) + 0.2, 10.3]} s={1.4} />
       {puffs}
+    </>
+  );
+};
+/* perto: o menino cavando, a câmera sobe junto com o muro */
+const S16: React.FC<ShotProps> = ({f, a, t}) => {
+  const k = ramp(f, a, at(9, "tamanho"), easeInOut);
+  return (
+    <>
+      <Cam pos={[2.6, lerp(1.7, 2.0, k), lerp(13.6, 14.0, k)]} look={[-0.4, lerp(1.3, 2.4, k), 8.2]} fov={48} f={f} a={a} />
+      <Digging f={f} a={a} t={t} />
+    </>
+  );
+};
+/* aberto, de lado: menino, muro e prédio juntos ("do tamanho de um prédio") */
+const S16b: React.FC<ShotProps> = ({f, a, t}) => {
+  const k = ramp(f, a, a + 50, easeOut);
+  return (
+    <>
+      <Cam pos={[lerp(-10.5, -11.5, k), lerp(6.2, 6.6, k), 14.0]} look={[3, 5.6, 11.6]} fov={50} f={f} a={a} />
+      <Digging f={f} a={at(9, "entao")} t={t} wide />
     </>
   );
 };
@@ -904,6 +923,7 @@ const SHOTS: Shot[] = [
   {from: L(8), Comp: S14},
   {from: L(9), Comp: S15},
   {from: at(9, "entao"), Comp: S16},
+  {from: at(9, "tamanho") - 2, Comp: S16b},
   {from: L(10), Comp: S17},
   {from: L(11), Comp: S18},
   {from: at(11, "e", 0), Comp: S19},
