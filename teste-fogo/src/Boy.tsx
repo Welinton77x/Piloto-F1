@@ -239,34 +239,56 @@ export const Boy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; loo
   const browY = 0.105 + brow * 0.03 + eyeWide * 0.015;
   const browRot = brow < 0 ? brow * 0.35 : brow * 0.12;
   return (
-    <group position={pos} rotation={[0, rotY, 0]} scale={[1 + squash * 0.5, 1 - squash, 1 + squash * 0.5]}>
-      {/* pernas */}
-      {[-1, 1].map((s) => (
-        <group key={s} position={[0.1 * s, 0.78, 0]} rotation={[Math.sin(walk + (s > 0 ? 0 : Math.PI)) * 0.5 * walkAmt - 0.9 * legLift, 0, 0]}>
-          <group position={[0, -0.78, 0]}>
-          {look.shorts ? (
-            <>
-              <mesh position={[0, 0.6, 0]} material={m.pants} castShadow receiveShadow>
-                <capsuleGeometry args={[0.095 * lt, 0.16, 8, 16]} />
+    <group position={[pos[0], pos[1] + 0.025 * walkAmt * (Math.cos(2 * walk) - 1), pos[2]]} rotation={[0, rotY, 0]} scale={[1 + squash * 0.5, 1 - squash, 1 + squash * 0.5]}>
+      {/* pernas: coxa + canela com joelho; o pé fica mais plano no chão */}
+      {[-1, 1].map((sd) => {
+        const ph = walk + (sd > 0 ? 0 : Math.PI);
+        const A = 0.38 * walkAmt;
+        const thigh = Math.sin(ph) * A; // + = perna pra trás
+        const swing = walkAmt > 0 ? Math.max(0, -Math.cos(ph)) : 0; // perna indo pra frente
+        const knee = 0.95 * walkAmt * swing + 0.08 * walkAmt + Math.max(0, legLift) * 0.9;
+        const hipRot = thigh - 0.9 * legLift;
+        const foot = -(hipRot + knee) * (walkAmt > 0 ? 0.7 : 0) + (legLift > 0 ? 0 : 0);
+        const shoeR = 0.085 * (0.4 + 0.6 * lt);
+        return (
+          <group key={sd} position={[0.1 * sd, 0.78, 0]} rotation={[hipRot, 0, 0]}>
+            {/* coxa */}
+            {look.shorts ? (
+              <>
+                <mesh position={[0, -0.16, 0]} material={m.pants} castShadow receiveShadow>
+                  <capsuleGeometry args={[0.095 * lt, 0.16, 8, 16]} />
+                </mesh>
+                <mesh position={[0, -0.3, 0]} material={m.skin} castShadow receiveShadow>
+                  <capsuleGeometry args={[0.068 * lt, 0.1, 8, 12]} />
+                </mesh>
+              </>
+            ) : (
+              <mesh position={[0, -0.18, 0]} material={m.pants} castShadow receiveShadow>
+                <capsuleGeometry args={[0.085 * lt, 0.36 - 0.17 * lt * 0.5, 8, 16]} />
               </mesh>
-              <mesh position={[0, 0.3, 0]} material={m.skin} castShadow receiveShadow>
-                <capsuleGeometry args={[0.068 * lt, look.palito ? 0.5 : 0.42, 8, 16]} />
+            )}
+            {/* joelho */}
+            <group position={[0, -0.36, 0]} rotation={[knee, 0, 0]}>
+              <mesh material={look.shorts ? m.skin : m.pants} castShadow>
+                <sphereGeometry args={[(look.shorts ? 0.068 : 0.085) * lt, 12, 10]} />
               </mesh>
-            </>
-          ) : (
-            <mesh position={[0, 0.42, 0]} material={m.pants} castShadow receiveShadow>
-              <capsuleGeometry args={[0.085 * lt, look.palito ? 0.72 - 0.17 * lt : 0.5, 8, 16]} />
-            </mesh>
-          )}
-          <mesh position={[0, 0.06, 0.04]} scale={[1, 0.7, 1.5]} material={m.shoe} castShadow>
-            <sphereGeometry args={[0.085 * (0.4 + 0.6 * lt), 16, 12]} />
-          </mesh>
-          <mesh position={[0, 0.02, 0.04]} scale={[1.05, 0.25, 1.55]} material={m.sole}>
-            <sphereGeometry args={[0.085 * (0.4 + 0.6 * lt), 16, 12]} />
-          </mesh>
+              {/* canela */}
+              <mesh position={[0, -0.16, 0]} material={look.shorts ? m.skin : m.pants} castShadow receiveShadow>
+                <capsuleGeometry args={[(look.shorts ? 0.068 : 0.085) * lt * 0.95, 0.3 - 0.1 * lt, 8, 16]} />
+              </mesh>
+              {/* pé */}
+              <group position={[0, -0.33, 0]} rotation={[foot, 0, 0]}>
+                <mesh position={[0, -0.03, 0.04]} scale={[1, 0.7, 1.5]} material={m.shoe} castShadow>
+                  <sphereGeometry args={[shoeR, 16, 12]} />
+                </mesh>
+                <mesh position={[0, -0.07, 0.04]} scale={[1.05, 0.25, 1.55]} material={m.sole}>
+                  <sphereGeometry args={[shoeR, 16, 12]} />
+                </mesh>
+              </group>
+            </group>
           </group>
-        </group>
-      ))}
+        );
+      })}
       <group rotation={torso}>
         <group scale={[sl, 1, slz]}>
         {/* tronco */}

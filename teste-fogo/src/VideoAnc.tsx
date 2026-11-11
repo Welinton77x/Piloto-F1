@@ -254,7 +254,7 @@ const ANC_POS: V3 = [0.75, 0, -0.5];
 /* 0a — saindo da farmácia; a luz no chão */
 const S0: React.FC<ShotProps> = ({f, a, b, t}) => {
   const palm = useRef<THREE.Object3D>(null);
-  const out = a + 34;
+  const out = a + 52;
   const luz = at(0, "luz");
   const pux = at(0, "caiu") - 8;
   const sink = ramp(f, pux, pux + 10, (x) => x * x);
@@ -262,7 +262,7 @@ const S0: React.FC<ShotProps> = ({f, a, b, t}) => {
     const w = 1 - ramp(fr, out - 6, out);
     const look = ramp(fr, luz, luz + 8, easeOut);
     const s = ramp(fr, pux, pux + 10, (x) => x * x);
-    return idle(fr, {...(w > 0 ? walkP(fr, a, 1.3) : {}), walkAmt: w, pos: [0, -1.8 * s, lerp(-2.0, 0.2, ramp(fr, a, out))], rShoulder: [0, 0, -0.12 - 1.2 * s], lShoulder: [0, 0, 0.12 + 1.2 * s], head: [0.55 * look * (1 - s), 0, 0], pupil: [0, -0.8 * look], eyeWide: look, brow: look, mouthOpen: 0.6 * look, squash: -0.25 * s, smile: 0.6 * (1 - look)});
+    return idle(fr, {...(w > 0 ? walkP(fr, a, 1.3) : {}), walkAmt: w, pos: [0, -1.8 * s, lerp(-2.0, 0.2, ramp(fr, a, out, (x) => x))], rShoulder: [0, 0, -0.12 - 1.2 * s], lShoulder: [0, 0, 0.12 + 1.2 * s], head: [0.55 * look * (1 - s), 0, 0], pupil: [0, -0.8 * look], eyeWide: look, brow: look, mouthOpen: 0.6 * look, squash: -0.25 * s, smile: 0.6 * (1 - look)});
   }, a, f);
   const sh = shake(f, 0.03 * kick(f, pux, 8));
   return (
@@ -306,7 +306,7 @@ const S0b: React.FC<ShotProps> = ({f, a, b, t}) => {
       <Boy pose={pose} look={DAVI} />
       <TimeBubble t={f / FPS} power={k} p={[0, 1.0, 0.6]} r={1.1} />
       {[-2.2, 2.3, -1.0].map((x, i) => (
-        <Boy key={i} look={POVO[i]} pose={idle(Math.round(tt * FPS) + i * 20, {...walkP(Math.round(tt * FPS), 0, 1.1), pos: [x + (tt - a / FPS) * (i === 1 ? -0.5 : 0.5), 0, -1.6 - i * 0.3], rotY: i === 1 ? -Math.PI / 2 : Math.PI / 2})} />
+        <Boy key={i} look={POVO[i]} pose={idle(Math.round(tt * FPS) + i * 20, {...walkP(Math.round(tt * FPS), 0, 0.95), pos: [x + (tt - a / FPS) * (i === 1 ? -0.95 : 0.95), 0, -1.6 - i * 0.3], rotY: i === 1 ? -Math.PI / 2 : Math.PI / 2})} />
       ))}
     </>
   );
@@ -456,8 +456,8 @@ const BasementA: React.FC<{t: number; win?: boolean}> = ({t, win = true}) => {
   );
 };
 const S7b: React.FC<ShotProps> = ({f, a, b}) => {
-  const ag = physics("a7b", (fr) => idle(fr, {...walkP(fr, a, 1.0), walkAmt: 1 - ramp(fr, a + 40, a + 50), pos: [lerp(-0.6, 1.4, ramp(fr, a, a + 50)), 0, -1.5], rotY: Math.PI / 2, lShoulder: [-1.1, 0, 0.2], lElbow: -0.6}), a, f);
-  const davi = physics("a7c", (fr) => idle(fr, {...walkP(fr, a, 1.0), walkAmt: 1 - ramp(fr, a + 46, a + 56), pos: [lerp(-1.2, 1.9, ramp(fr, a, a + 56)), 0, -1.75], rotY: Math.PI / 2, head: [0, 0.4, 0], eyeWide: 0.5}), a, f);
+  const ag = physics("a7b", (fr) => idle(fr, {...walkP(fr, a, 1.15), walkAmt: 1 - ramp(fr, a + 44, a + 50), pos: [lerp(-0.6, 1.4, ramp(fr, a, a + 50, (x) => x)), 0, -1.5], rotY: Math.PI / 2, lShoulder: [-1.1, 0, 0.2], lElbow: -0.6}), a, f);
+  const davi = physics("a7c", (fr) => idle(fr, {...walkP(fr, a, 1.55), walkAmt: 1 - ramp(fr, a + 50, a + 56), pos: [lerp(-1.2, 1.9, ramp(fr, a, a + 56, (x) => x)), 0, -1.75], rotY: Math.PI / 2, head: [0, 0.4, 0], eyeWide: 0.5}), a, f);
   const p = ramp(f, a, b, easeInOut);
   return (
     <>
@@ -659,8 +659,8 @@ const PA: React.FC<ShotProps> = ({f, a, t}) => {
   );
 };
 const PB: React.FC<ShotProps> = ({f, a, t}) => {
-  const z = -((f - a) / FPS) * 1.4;
-  const pose = idle(f, {...walkP(f, a, 2.8), walkAmt: 1.4, pos: [-0.9, 0.0, z], rotY: Math.PI, torso: [0.3, 0, 0], mouthOpen: 0.5, brow: 0.8});
+  const z = -((f - a) / FPS) * 2.2;
+  const pose = idle(f, {...walkP(f, a, 1.7), walkAmt: 1.25, pos: [-0.9, 0.0, z], rotY: Math.PI, torso: [0.3, 0, 0], mouthOpen: 0.5, brow: 0.8});
   return (
     <>
       <Cam pos={[-0.6, 1.4, z + 2.6]} look={[-0.6, 1.1, z - 2]} fov={50} />
