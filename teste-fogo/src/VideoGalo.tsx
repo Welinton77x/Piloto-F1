@@ -30,7 +30,7 @@ const at = (i: number, txt: string, n = 0) => {
 export const TOTAL_GALO = F(words[words.length - 1].e + 1.6);
 
 /* ---------- personagem: estilo low-poly, cabeção, camiseta amarela, bermuda azul ---------- */
-const KID: Look = {lowpoly: true, headScale: 1.38, skin: "#f3c193", shirt: "#ffc928", trim: "#e9a514", pants: "#2f6bd1", shorts: true, hair: "#5a3418", hairStyle: "spiky"};
+const KID: Look = {lowpoly: true, blocky: true, headScale: 1.12, skin: "#f0c49a", shirt: "#ffc928", trim: "#e9a514", pants: "#2f6bd1", shorts: true, hair: "#6b4426", hairStyle: "bowl"};
 
 const blinkCurve = (f: number) => clamp(1 - Math.abs(((f + 20) % 97) - 3) / 3);
 const idle = (f: number, extra: Pose = {}): Pose => ({breathe: Math.sin((f / FPS) * 2.4), blink: blinkCurve(f), ...extra});
@@ -291,7 +291,7 @@ const S5: React.FC<ShotProps> = ({f, a, t}) => {
 };
 
 /* sem bicicleta: andando com o galo na cabeça; placa da rodoviária */
-const RIDE_HEAD = 2.08;
+const RIDE_HEAD = 1.95;
 const S6: React.FC<ShotProps> = ({f, a, t}) => {
   const x0 = -21.5;
   const bx = x0 + (f - a) * 0.042;
