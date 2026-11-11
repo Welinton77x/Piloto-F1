@@ -49,3 +49,17 @@ export const itemK = (i: number, gf: number) => clamp01((gf - itemAt(i) + 4) / 1
 /** itens indo para a mochila (s7, "mochila") */
 export const packK = (gf: number) => L(gf, W("s7", "mochila") - 4, W("s7", "mochila") + 30, 0, 1);
 export const lastScene = timed[timed.length - 1];
+
+/* ---------- mascote separando cada item na mesa ---------- */
+export const TABLE_X0 = -0.6;
+/** x do lugar de cada item na mesa (água, comida, lanterna, rádio / carregador, remédios, documentos, higiene) */
+export const slotX = (i: number) => TABLE_X0 + 0.3 + (i % 4) * 0.47;
+export const slotZ = (i: number) => (i < 4 ? -0.92 : -0.36);
+export const CARRY = 16; // frames segurando e olhando o item antes de colocar
+export const PLACE = 10; // frames descendo até a mesa
+/** índice do item que o mascote está cuidando agora (ou -1) */
+export const currentItem = (t: number) => {
+  let c = -1;
+  for (let i = 0; i < ITEMS.length; i++) if (t >= itemAt(i) - CARRY - 14) c = i;
+  return c;
+};

@@ -214,7 +214,7 @@ const Rocks: React.FC<{spots: [number, number, number][]}> = ({spots}) => (
 
 /* ================= KIT 72 H ================= */
 import {L, easeInOut, easeOut} from "../lib/anim";
-import {ITEMS, W, end, flashlightOn, inS, itemK, packK, power, rain, start} from "../lib/story";
+import {CARRY, ITEMS, PLACE, W, end, flashlightOn, inS, itemAt, itemK, packK, power, rain, skyDark, slotX, slotZ, start} from "../lib/story";
 import {mascotLook, mascotPose} from "../lib/mascotPose";
 
 const H = {
@@ -418,6 +418,7 @@ export const KitWorld: React.FC<{gf: number}> = ({gf}) => {
   const worn = t >= W("s7", "pegar") - 6;
   const ml = mascotLook(t), mp = mascotPose(t);
   const rainK = rain(t);
+  const skyK = skyDark(t);
 
   const packPos = new THREE.Vector3(...PACK_FLOOR).lerp(new THREE.Vector3(...HOOK), toHook);
 
@@ -490,16 +491,25 @@ export const KitWorld: React.FC<{gf: number}> = ({gf}) => {
       {/* ---------- ITENS DO KIT NA MESA ---------- */}
       {ITEMS.map((_, i) => {
         const k = itemK(i, t);
-        if (k <= 0.001) return null;
+        if (t < itemAt(i) - CARRY) return null;
         const p0 = new THREE.Vector3(...slot(i));
         const into = clamp01(pack * 1.4 - i * 0.05);
         if (into >= 0.999) return null;
         const p = p0.clone().lerp(new THREE.Vector3(PACK_FLOOR[0], PACK_FLOOR[1] + 0.45, PACK_FLOOR[2]), easeInOut(into));
-        const fl = t - (W(ITEMS[i].w[0], ITEMS[i].w[1]) - 4);
-        const hb = dropBounce(fl);
-        p.y += Math.sin(into * Math.PI) * 0.6 + (into > 0 ? 0 : hb);
-        const sq = into > 0 || hb > 0.01 ? 1 : 1 - 0.18 * Math.max(0, Math.sin(fl * 0.9)) * Math.exp(-fl * 0.12);
-        const sc = Math.min(1, k * 3) * (1 - into * 0.7);
+        // nas mãos do mascote → desce em arco até o lugar → pousa com um quique pequeno
+        const it = itemAt(i);
+        const fl = t - (it + PLACE);
+        if (into <= 0 && t < it + PLACE) {
+          const lift = t < it ? Math.sin(clamp01((t - (it - CARRY)) / CARRY) * Math.PI) * 0.08 : 0; // levanta um pouco para olhar
+          const hand = new THREE.Vector3(slotX(i), 0.98 + lift, -1.3);
+          const kk = t < it ? 0 : easeInOut(clamp01((t - it) / PLACE));
+          p.copy(hand.lerp(new THREE.Vector3(slotX(i), TABLE.top, slotZ(i)), kk));
+          p.y += Math.sin(kk * Math.PI) * 0.12;
+        }
+        const hb = t >= it + PLACE && into <= 0 ? dropBounce(fl, 0.06) : 0;
+        p.y += Math.sin(into * Math.PI) * 0.6 + hb;
+        const sq = into > 0 || t < it + PLACE ? 1 : 1 - 0.12 * Math.max(0, Math.sin(fl * 0.9)) * Math.exp(-fl * 0.15);
+        const sc = (t >= it - CARRY ? 1 : 0) * (1 - into * 0.7);
         return (
           <group key={"it" + i} position={p} rotation={[settle(fl) * 0.5, into * 4, settle(fl)]} scale={[sc * (2 - sq), sc * sq, sc * (2 - sq)]}>
             <ItemMesh i={i} />
@@ -611,6 +621,36 @@ export const KitWorld: React.FC<{gf: number}> = ({gf}) => {
       {[[-15, -3, "#f8e1e7", "#4f6d8f"], [6, -6, "#dfe9f2", "#c9563c"], [14, -2, "#fff3c4", "#6d4c41"], [-6, -8, "#e3f1df", "#b24a36"], [-20, 10, "#d7ccc8", "#4f6d8f"], [12, 11, "#f5d9b8", "#c9563c"]].map(([x, z, c, r], k) => (
         <SmallHouse key={"sh" + k} x={x as number} z={z as number} c={c as string} r={r as string} lit={pw} />
       ))}
+      {/* mais casas na vizinhança: uma fileira atrás e outra do outro lado da rua */}
+      {Array.from({length: 9}).map((_, k) => {
+        const cols = ["#f8e1e7", "#dfe9f2", "#fff3c4", "#e3f1df", "#f5d9b8", "#d7ccc8", "#ffe0b2", "#e1bee7", "#c8e6c9"];
+        const roofs = ["#4f6d8f", "#c9563c", "#6d4c41", "#b24a36"];
+        return <SmallHouse key={"rowb" + k} x={-20 + k * 5} z={-13} c={cols[k % cols.length]} r={roofs[k % roofs.length]} lit={pw} />;
+      })}
+      {Array.from({length: 8}).map((_, k) => {
+        const cols = ["#ffe0b2", "#dfe9f2", "#f8e1e7", "#e3f1df", "#fff3c4", "#d7ccc8", "#f5d9b8", "#c8e6c9"];
+        const roofs = ["#c9563c", "#4f6d8f", "#b24a36", "#6d4c41"];
+        return <group key={"rowf" + k} rotation={[0, 0, 0]}><SmallHouse x={-17 + k * 5} z={10.5} c={cols[k % cols.length]} r={roofs[k % roofs.length]} lit={pw} /></group>;
+      })}
+      {/* lua e estrelas (aparecem com o céu escuro) */}
+      {skyK > 0.4 && (
+        <group>
+          <mesh position={[-12, 8.5, -38]}>
+            <sphereGeometry args={[2.2, 32, 24]} />
+            <meshBasicMaterial color="#fff8e1" fog={false} transparent opacity={clamp01((skyK - 0.4) * 2.5)} />
+          </mesh>
+          <mesh position={[-11.2, 9.1, -37.2]}>
+            <sphereGeometry args={[0.5, 16, 12]} />
+            <meshBasicMaterial color="#efe3c2" fog={false} transparent opacity={clamp01((skyK - 0.4) * 2.5)} />
+          </mesh>
+          {Array.from({length: 70}).map((_, k) => (
+            <mesh key={"st" + k} position={[(random("stx" + k) - 0.5) * 90, 4.5 + random("sty" + k) * 14, -42 - random("stz" + k) * 6]}>
+              <sphereGeometry args={[0.08 + random("sts" + k) * 0.1, 6, 4]} />
+              <meshBasicMaterial color="#ffffff" fog={false} transparent opacity={clamp01((skyK - 0.4) * 2.5) * (0.55 + 0.45 * Math.sin(t * 0.15 + k))} />
+            </mesh>
+          ))}
+        </group>
+      )}
       <Tree x={-5.5} z={-3.5} s={1.1} />
       <Tree x={5.0} z={-3.0} s={1.0} />
 

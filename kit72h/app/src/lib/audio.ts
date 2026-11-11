@@ -27,4 +27,4 @@ export const musicVolume = (f: number) => {
   return (speaking(f) ? 0.07 : 0.14) * fadeIn * fadeOut;
 };
 
-export const rainVolume = (f: number) => 0.22 * rain(f); // vídeo 5: temporal
+export const rainVolume = (f: number) => 0.07 * rain(f); // vídeo 5: temporal (baixo, pedido do usuário)

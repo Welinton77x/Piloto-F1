@@ -129,7 +129,7 @@ const Checklist: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
   if (gf < a || gf > e + 10) return null;
   const o = 1 - clamp01((gf - e) / 10);
   return (
-    <div style={{position: "absolute", left: 40, top: 600, width: 420, opacity: o, transform: `scale(${SP(gf, a, 11, 150)})`, transformOrigin: "0% 0%", fontFamily: FONT, fontWeight: 900}}>
+    <div style={{position: "absolute", left: 30, top: 1320, width: 420, opacity: o, transform: `scale(${SP(gf, a, 11, 150) * 0.82})`, transformOrigin: "0% 0%", fontFamily: FONT, fontWeight: 900}}>
       <div style={{background: "rgba(255,255,255,0.94)", border: "5px solid #101820", borderRadius: 22, padding: "14px 16px", boxShadow: "0 8px 0 rgba(0,0,0,0.3)"}}>
         <div style={{fontSize: 30, color: "#101820", marginBottom: 8}}>KIT 72 HORAS</div>
         {ITEMS.map((it, i) => {
@@ -397,18 +397,21 @@ const Celebration: React.FC<{s: TimedScene; f: number}> = ({s, f}) => {
           const rot = t * (6 + random("cr" + i) * 10);
           return <div key={i} style={{position: "absolute", left: x + Math.sin(t * 0.15 + i) * 30, top: y, width: 18, height: 30, background: COL[i % COL.length], transform: `rotate(${rot}deg) scaleX(${Math.cos(t * 0.3 + i)})`, borderRadius: 4, opacity: 1 - clamp01((t - 90) / 20)}} />;
         })}
-      {Array.from({length: 10}).map((_, i) => {
-        const d = random("hd" + i) * 120;
-        const tt = t - d;
-        if (tt < 0 || tt > 150) return null;
-        const x = 120 + random("hx" + i) * 840;
-        const y = 1250 - tt * 6;
-        return (
-          <svg key={i} width={80} height={72} viewBox="0 0 24 22" style={{position: "absolute", left: x, top: y, opacity: Math.min(1, tt / 10) * (1 - clamp01((tt - 110) / 40)), transform: `scale(${0.8 + Math.sin(tt * 0.2) * 0.1})`}}>
-            <path d="M12 21s-9-5.6-9-12a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 6.4-9 12-9 12z" fill="#ff4d6d" stroke="#ffffff" strokeWidth="1.2" />
-          </svg>
-        );
-      })}
+      {/* canhões de confete saindo dos dois cantos de baixo (no lugar dos corações) */}
+      {[0, 1].map((side) =>
+        Array.from({length: 45}).map((_, i) => {
+          const d = random("cc" + side + i) * 12;
+          const tt = t - d;
+          if (tt < 0 || tt > 110) return null;
+          const ang = (side ? -1 : 1) * (0.35 + random("ca" + side + i) * 0.45);
+          const v = 30 + random("cv2" + side + i) * 22;
+          const x = (side ? 1080 : 0) + Math.sin(ang) * v * tt;
+          const y = 1900 - Math.cos(ang) * v * tt + 0.55 * tt * tt;
+          if (y > 1960) return null;
+          const COL2 = ["#E53935", "#FFC400", "#2E9E4F", "#1E88E5", "#4DD0FF", "#ff7aa8", "#ffffff"];
+          return <div key={"cc" + side + i} style={{position: "absolute", left: x, top: y, width: 16, height: 26, background: COL2[i % COL2.length], borderRadius: 3, transform: `rotate(${tt * (8 + random("cr2" + side + i) * 12)}deg) scaleX(${Math.cos(tt * 0.35 + i)})`, opacity: 1 - clamp01((tt - 90) / 20)}} />;
+        }),
+      )}
     </AbsoluteFill>
   );
 };
