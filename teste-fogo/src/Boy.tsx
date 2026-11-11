@@ -299,9 +299,15 @@ export const Boy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; loo
           <group key={sd} position={[hipX * sd, 0.78, 0]} rotation={[hipRot, 0, 0]}>
             {/* coxa */}
             {bk ? (
-              <mesh position={[0, -0.18, 0]} material={m.skin} castShadow receiveShadow>
-                <cylinderGeometry args={[0.064, 0.06, 0.38, 6]} />
-              </mesh>
+              <>
+                {/* perna do short (acompanha a coxa) */}
+                <mesh position={[0, -0.09, 0]} scale={[1, 1, 0.92]} material={m.pants} castShadow receiveShadow>
+                  <cylinderGeometry args={[0.102, 0.096, 0.25, 7]} />
+                </mesh>
+                <mesh position={[0, -0.18, 0]} material={m.skin} castShadow receiveShadow>
+                  <cylinderGeometry args={[0.064, 0.06, 0.38, 6]} />
+                </mesh>
+              </>
             ) : look.shorts ? (
               <>
                 <mesh position={[0, -0.15, 0]} material={m.pants} castShadow receiveShadow>
@@ -367,9 +373,9 @@ export const Boy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; loo
             <mesh position={[0, 1.105 + breathe * 0.004, 0]} scale={[1, 1 + breathe * 0.01, 0.78]} material={m.shirt} castShadow receiveShadow>
               <cylinderGeometry args={[0.2, 0.185, 0.5, 7]} />
             </mesh>
-            {/* bermuda larga */}
-            <mesh position={[0, 0.72, 0]} scale={[1, 1, 0.8]} material={m.pants} castShadow receiveShadow>
-              <cylinderGeometry args={[0.19, 0.235, 0.3, 7]} />
+            {/* cós do short */}
+            <mesh position={[0, 0.8, 0]} scale={[1, 1, 0.8]} material={m.pants} castShadow receiveShadow>
+              <cylinderGeometry args={[0.19, 0.2, 0.17, 7]} />
             </mesh>
           </>
         ) : (
