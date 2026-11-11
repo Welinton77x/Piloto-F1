@@ -905,7 +905,7 @@ export const VideoTempo: React.FC = () => {
   const f = useCurrentFrame();
   const {width, height} = useVideoConfig();
   const cuts = [...SHOTS.slice(1).map((s) => s.from), SPLIT];
-  const ruaVol = (g: number) => (g < SL ? 0.3 : g < RS ? 0 : g < L(4) - 3 ? 0.3 : g < L(7) - 3 ? 0.05 : g < L(9) - 3 ? 0.12 : g < at(11, "era") - 3 ? 0.25 : g < L(13) - 3 ? 0 : g < at(13, "ressonancia") - 3 ? 0.2 : 0);
+  const ruaVol = (g: number) => (g < SL ? 0.9 : g < RS ? 0 : g < L(4) - 3 ? 0.9 : g < L(9) - 3 ? 0 : g < at(11, "era") - 3 ? 0.5 : g < L(13) - 3 ? 0 : g < at(13, "ressonancia") - 3 ? 0.5 : 0);
   return (
     <AbsoluteFill style={{background: "#000"}}>
       <ThreeCanvas width={width} height={height} shadows gl={{antialias: false}} dpr={1}>
@@ -956,32 +956,32 @@ export const VideoTempo: React.FC = () => {
         <Audio src={staticFile("sfx2/whoosh.mp3")} volume={0.8} />
       </Sequence>
       <Sequence from={L(1) - 3} durationInFrames={L(17) - L(1)}>
-        <Audio src={staticFile("sfx3/factory.mp3")} volume={(fr) => ruaVol(fr + L(1) - 3)} loop />
+        <Audio src={staticFile("sfx4/rua1880.mp3")} volume={(fr) => ruaVol(fr + L(1) - 3)} loop />
       </Sequence>
       <Sequence from={L(1) + 9} durationInFrames={30}>
         <Audio src={staticFile("sfx2/land.mp3")} volume={0.7} />
       </Sequence>
       {/* carruagem: normal → câmera lenta (grave) → normal */}
       <Sequence from={at(1, "carruagem") - 30} durationInFrames={SL - at(1, "carruagem") + 30}>
-        <Audio src={staticFile("sfx4/carriage.mp3")} volume={(fr) => 0.3 + 0.5 * clamp(fr / 40)} />
+        <Audio src={staticFile("sfx4/carriage.mp3")} volume={(fr) => 0.2 + 0.3 * clamp(fr / 40)} />
       </Sequence>
       <Sequence from={SL - 4} durationInFrames={60}>
-        <Audio src={staticFile("sfx4/slow.mp3")} volume={0.8} />
+        <Audio src={staticFile("sfx4/slow.mp3")} volume={0.45} />
       </Sequence>
       <Sequence from={SL} durationInFrames={RS - SL}>
-        <Audio src={staticFile("sfx4/carriage_lenta.mp3")} volume={0.45} loop />
+        <Audio src={staticFile("sfx4/carriage_lenta.mp3")} volume={0.2} loop />
       </Sequence>
       <Sequence from={SL} durationInFrames={RS - SL}>
-        <Audio src={staticFile("sfx4/factory_grave.mp3")} volume={0.25} loop />
+        <Audio src={staticFile("sfx4/rua1880_grave.mp3")} volume={0.8} loop />
       </Sequence>
-      <Sequence from={at(2, "apito") - 4} durationInFrames={RS - at(2, "apito")}>
-        <Audio src={staticFile("sfx4/whistle_grave.mp3")} volume={0.5} />
+      <Sequence from={at(2, "apito") - 4} durationInFrames={100}>
+        <Audio src={staticFile("sfx4/whistle_grave_curto.mp3")} volume={0.2} />
       </Sequence>
       <Sequence from={RS - 3} durationInFrames={50}>
-        <Audio src={staticFile("sfx4/resume.mp3")} volume={0.8} />
+        <Audio src={staticFile("sfx4/resume.mp3")} volume={0.45} />
       </Sequence>
       <Sequence from={RS} durationInFrames={L(4) - RS}>
-        <Audio src={staticFile("sfx4/carriage.mp3")} volume={0.8} />
+        <Audio src={staticFile("sfx4/carriage.mp3")} volume={0.45} />
       </Sequence>
       {cuts.map((c) => (
         <Sequence key={"w" + c} from={c - 4} durationInFrames={30}>
@@ -993,10 +993,7 @@ export const VideoTempo: React.FC = () => {
         <Audio src={staticFile("sfx3/ticking.mp3")} volume={0.15} loop />
       </Sequence>
       <Sequence from={at(7, "bolha") - 4} durationInFrames={60}>
-        <Audio src={staticFile("sfx4/slow.mp3")} volume={0.6} />
-      </Sequence>
-      <Sequence from={L(8) - 3} durationInFrames={L(9) - L(8)}>
-        <Audio src={staticFile("sfx4/whistle_grave.mp3")} volume={0.25} />
+        <Audio src={staticFile("sfx4/slow.mp3")} volume={0.3} />
       </Sequence>
       <Sequence from={L(9) - 3} durationInFrames={L(10) - L(9)}>
         <Audio src={staticFile("sfx4/pant.mp3")} volume={0.6} loop />
