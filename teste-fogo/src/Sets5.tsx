@@ -155,7 +155,7 @@ const Strip: React.FC<{z0: number; z1: number; x0?: number; x1?: number; y?: num
 const WALLS = ["#f7d08a", "#f4a6a0", "#a9d9ee", "#c5e8a8", "#fbe3c0", "#f6b26b", "#c3b4e4", "#ffe58a"];
 const ROOFS = ["#d9534f", "#c0392b", "#e67e22", "#9c5a3c", "#d35400"];
 
-export const House: React.FC<{p: V3; w?: number; h?: number; d?: number; wall: string; roof: string; rotY?: number; door?: string; base?: number}> = ({p, w = 3.4, h = 2.7, d = 3, wall, roof, rotY = 0, door = "#8a4f2a", base = 0}) => {
+export const House: React.FC<{p: V3; w?: number; h?: number; d?: number; wall: string; roof: string; rotY?: number; door?: string; base?: number; lit?: boolean; dark?: boolean}> = ({p, w = 3.4, h = 2.7, d = 3, wall, roof, rotY = 0, door = "#8a4f2a", base = 0, lit, dark}) => {
   const roofGeo = useMemo(() => {
     const s = new THREE.Shape();
     const o = 0.28;
@@ -168,7 +168,7 @@ export const House: React.FC<{p: V3; w?: number; h?: number; d?: number; wall: s
     return g;
   }, [w, d]);
   const floors = h > 3.5 ? 2 : 1;
-  const glass = lp("#7cc6ec", 0.25, 0.1);
+  const glass = lit ? lp("#ffd98a", 0.4, 0, "#ffc25a", 1.6) : dark ? lp("#27304a", 0.3, 0.1) : lp("#7cc6ec", 0.25, 0.1);
   const frame = lp("#ffffff", 0.7);
   return (
     <group position={p} rotation={[0, rotY, 0]}>
@@ -288,7 +288,7 @@ export const RoadSign: React.FC<{p: V3; lines: string[]; bg?: string; rotY?: num
   );
 };
 
-export const LampPost: React.FC<{p: V3}> = ({p}) => (
+export const LampPost: React.FC<{p: V3; on?: boolean}> = ({p, on = true}) => (
   <group position={p}>
     <mesh position={[0, 1.6, 0]} material={lp("#4a5260", 0.5, 0.4)} castShadow>
       <cylinderGeometry args={[0.05, 0.07, 3.2, 6]} />
@@ -296,7 +296,7 @@ export const LampPost: React.FC<{p: V3}> = ({p}) => (
     <mesh position={[0, 3.25, 0.2]} rotation={[Math.PI / 2, 0, 0]} material={lp("#4a5260", 0.5, 0.4)}>
       <cylinderGeometry args={[0.04, 0.04, 0.45, 6]} />
     </mesh>
-    <mesh position={[0, 3.15, 0.42]} material={lp("#fff4c2", 0.4, 0, "#ffe28a", 0.4)}>
+    <mesh position={[0, 3.15, 0.42]} material={on ? lp("#fff4c2", 0.4, 0, "#ffe28a", 0.4) : lp("#6a6f7a", 0.5)}>
       <coneGeometry args={[0.16, 0.22, 6]} />
     </mesh>
   </group>
@@ -341,15 +341,16 @@ export const Fence: React.FC<{x0: number; x1: number; z: number; y?: number; h?:
 };
 
 /* ---------- a cidade ---------- */
-export const Town: React.FC<{t: number; cans?: number[]; frontHouses?: boolean}> = ({t, cans = [], frontHouses = false}) => {
-  const houses = useMemo(() => {
-    const r = rng(77);
-    const out: {x: number; w: number; h: number; wall: string; roof: string}[] = [];
-    for (let x = -46; x < 66; x += 4.9) {
-      out.push({x: x + (r() - 0.5) * 0.4, w: 3.2 + r() * 0.6, h: r() < 0.45 ? 4.2 : 2.7, wall: WALLS[Math.floor(r() * WALLS.length)], roof: ROOFS[Math.floor(r() * ROOFS.length)]});
-    }
-    return out;
-  }, []);
+export const TOWN_HOUSES = (() => {
+  const r = rng(77);
+  const out: {x: number; w: number; h: number; wall: string; roof: string}[] = [];
+  for (let x = -46; x < 66; x += 4.9) {
+    out.push({x: x + (r() - 0.5) * 0.4, w: 3.2 + r() * 0.6, h: r() < 0.45 ? 4.2 : 2.7, wall: WALLS[Math.floor(r() * WALLS.length)], roof: ROOFS[Math.floor(r() * ROOFS.length)]});
+  }
+  return out;
+})();
+export const Town: React.FC<{t: number; cans?: number[]; frontHouses?: boolean; galo?: boolean; lit?: (i: number) => boolean; dark?: boolean; lamps?: boolean; clouds?: boolean}> = ({t, cans = [], frontHouses = false, galo = true, lit, dark, lamps = true, clouds = true}) => {
+  const houses = TOWN_HOUSES;
   const dash = lp("#ffd84a", 0.6);
   return (
     <group>
@@ -367,7 +368,7 @@ export const Town: React.FC<{t: number; cans?: number[]; frontHouses?: boolean}>
         );
       })}
       {houses.map((h, i) => (
-        <House key={i} p={[h.x, groundY(h.x), -5.9]} w={h.w} h={h.h} wall={h.wall} roof={h.roof} base={Math.abs(groundY(h.x - 1.8) - groundY(h.x + 1.8)) + 0.3} />
+        <House key={i} p={[h.x, groundY(h.x), -5.9]} w={h.w} h={h.h} wall={h.wall} roof={h.roof} base={Math.abs(groundY(h.x - 1.8) - groundY(h.x + 1.8)) + 0.3} lit={lit ? lit(i) : false} dark={dark} />
       ))}
       {frontHouses &&
         houses
@@ -376,29 +377,33 @@ export const Town: React.FC<{t: number; cans?: number[]; frontHouses?: boolean}>
       {houses.map((h, i) => (i % 2 === 0 ? <Tree key={"t" + i} p={[h.x + 2.45, groundY(h.x + 2.45), -3.6]} s={0.9 + (i % 3) * 0.12} c={i % 3 ? "#5fae3e" : "#4c9a35"} /> : null))}
       {Array.from({length: 13}, (_, i) => {
         const x = -44 + i * 9;
-        return <LampPost key={"l" + i} p={[x, groundY(x) + 0.08, -2.25]} />;
+        return <LampPost key={"l" + i} p={[x, groundY(x) + 0.08, -2.25]} on={lamps} />;
       })}
       {Array.from({length: 22}, (_, i) => {
         const x = -46 + i * 5.3;
         return <Bush key={"b" + i} p={[x, groundY(x), 3.6 + (i % 3) * 0.6]} s={0.8 + (i % 2) * 0.3} />;
       })}
       {/* lixeiras do "dominó" na calçada da ladeira */}
-      {CANS.map((x, i) => (
+      {galo && CANS.map((x, i) => (
         <TrashCan key={"c" + i} p={[x, groundY(x) + 0.08, -2.05]} ang={groundAng(x)} fall={cans[i] ?? 0} color={i % 2 ? "#2f7fd0" : "#2f9e5a"} />
       ))}
       {/* cerca do vizinho e o poste do galo */}
-      <Fence x0={-5.1} x1={-1.7} z={-3.05} />
-      <mesh position={[-3.4, 0.55, -3.0]} material={lp("#fbfbf5", 0.7)} castShadow>
-        <boxGeometry args={[0.2, 1.1, 0.2]} />
-      </mesh>
-      <RoadSign p={[-17.5, 0.08, -2.2]} lines={["RODOVIÁRIA", "12 km  →"]} />
+      {galo && (
+        <>
+          <Fence x0={-5.1} x1={-1.7} z={-3.05} />
+          <mesh position={[-3.4, 0.55, -3.0]} material={lp("#fbfbf5", 0.7)} castShadow>
+            <boxGeometry args={[0.2, 1.1, 0.2]} />
+          </mesh>
+          <RoadSign p={[-17.5, 0.08, -2.2]} lines={["RODOVIÁRIA", "12 km  →"]} />
+        </>
+      )}
       {/* morros ao fundo */}
       {[-50, -20, 10, 40, 70].map((x, i) => (
         <mesh key={"m" + i} position={[x, -6, -48 - (i % 2) * 6]} scale={[22, 14 + (i % 3) * 3, 10]} material={lp(i % 2 ? "#6fbf55" : "#5cae48")}>
           <icosahedronGeometry args={[1, 1]} />
         </mesh>
       ))}
-      <Clouds t={t} />
+      {clouds && <Clouds t={t} />}
     </group>
   );
 };
