@@ -5,7 +5,9 @@ import base64, json, os, re, subprocess, time, urllib.request
 from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 VOICE = os.environ.get("VOICE_ID", "NQmLEqxcRTkWYIYZSYod")  # padrão: Matheus - Energetic and Dynamic
-GAP = 0.18  # respiro entre frases (s)
+GAP = float(os.environ.get("GAP", "0.18"))  # respiro entre linhas (s)
+GAP_IN = float(os.environ.get("GAP_IN", "0.4"))  # pausa entre frases da mesma linha (separadas por " | ")
+STAB = float(os.environ.get("STAB", "0.5"))
 lines = [l.strip() for l in (ROOT / os.environ.get("NARR", "narracao-90s.txt")).read_text(encoding="utf-8").splitlines() if l.strip()]
 out = ROOT / os.environ.get("VODIR", "public/vo90"); out.mkdir(parents=True, exist_ok=True)
 
@@ -13,7 +15,7 @@ def tts(text):
     req = urllib.request.Request(
         f"https://api.elevenlabs.io/v1/text-to-speech/{VOICE}/with-timestamps?output_format=mp3_44100_128",
         data=json.dumps({"text": text, "model_id": "eleven_v3", "language_code": "pt",
-                         "voice_settings": {"stability": 0.5, "similarity_boost": 0.8, "style": 0.6, "use_speaker_boost": True}}).encode(),
+                         "voice_settings": {"stability": STAB, "similarity_boost": 0.8, "style": 0.6, "use_speaker_boost": True}}).encode(),
         headers={"xi-api-key": os.environ.get("ELEVENLABS_API_KEY", "proxy-injected"), "Content-Type": "application/json"})
     return json.load(urllib.request.urlopen(req, timeout=180))
 
@@ -21,8 +23,9 @@ def dur(p):
     return float(subprocess.check_output(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", str(p)]).decode())
 
 words, t0, parts = [], 0.0, []
-for i, line in enumerate(lines):
-    mp3, js = out / f"l{i:02d}.mp3", out / f"l{i:02d}.json"
+chunks = [(i, j, c.strip()) for i, line in enumerate(lines) for j, c in enumerate(line.split(" | "))]
+for n, (i, j, line) in enumerate(chunks):
+    mp3, js = (out / f"l{i:02d}.mp3", out / f"l{i:02d}.json") if " | " not in lines[i] else (out / f"l{i:02d}_{j}.mp3", out / f"l{i:02d}_{j}.json")
     if not js.exists():
         for k in range(3):
             try:
@@ -43,7 +46,8 @@ for i, line in enumerate(lines):
         else:
             s0 = s if s0 is None else s0; cur += ch; e0 = e
     parts.append((mp3, t0))
-    t0 += dur(mp3) + GAP
+    last_of_line = n + 1 == len(chunks) or chunks[n + 1][0] != i
+    t0 += dur(mp3) + (GAP if last_of_line else GAP_IN)
     print(i, round(t0, 2), line[:50])
 
 # junta os áudios nas posições certas

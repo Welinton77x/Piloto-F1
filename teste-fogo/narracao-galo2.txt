@@ -1,0 +1,16 @@
+[excited] Se você quiser dormir até meio-dia, primeiro você precisa convencer o galo do vizinho a tirar férias.
+[playfully] Mas galo não tem dinheiro pra viajar. | [excited] Então, você vende a sua bicicleta pra pagar a passagem dele.
+[excited] Esse... é o investimento avícola.
+[playfully] Mas sem bicicleta, você não consegue levar o galo até a rodoviária. | [excited] Então, você pega carona num caminhão de melancia.
+[excited] Essa... é a logística frutífera.
+[surprised] Mas o caminhão freia na descida... | [excited] e quarenta melancias saem rolando ladeira abaixo.
+[excited] Esse... é o efeito dominó tropical.
+[playfully] As melancias param na praia. | [excited] E a cidade inteira vai atrás.
+[excited] Essa... é a migração de verão.
+[playfully] Mas com a cidade inteira dentro d'água, o mar sobe. | [excited] Então, você constrói um muro de areia do tamanho de um prédio.
+[excited] Essa... é a engenharia de balde.
+[playfully] Mas o muro faz sombra na praia inteira. | [mischievously] E o galo, que tava tomando sol de óculos escuros, fica com frio.
+[playfully] Ele pega o primeiro ônibus de volta. | [excited] Sentado do lado do motorista.
+[mischievously] Às cinco da manhã, ele pousa na sua janela, enche o peito... | [excited] e canta.
+[excited] Parabéns! | [excited] Você acordou de madrugada, sem bicicleta, com quarenta melancias na praia, e um muro de areia no lugar do sol.
+[playfully] E agora, pra dormir até meio-dia, você precisa convencer o galo a tirar férias... | [excited] de novo.

@@ -364,7 +364,8 @@ export const Boy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; loo
           </group>
         );
       })}
-      <group rotation={torso}>
+      <group position={[0, 0.78, 0]} rotation={torso}>
+      <group position={[0, -0.78, 0]}>
         <group scale={[sl, 1, slz]}>
         {/* tronco */}
         {bk ? (
@@ -596,6 +597,7 @@ export const Boy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; loo
             </mesh>
           )}
         </group>
+      </group>
       </group>
     </group>
   );

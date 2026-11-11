@@ -12,7 +12,7 @@ import {
   Mini, SHIRTS, SKINS, HAIRS, Sea, Sand, sandY, SandWall, WALL_Z, Hotel, Umbrella, Towel, BeachChair, PalmTree, House, Bucket, Shovel, Bus, Bedroom, Blanket, SILL, TrashCan, lp, V3,
 } from "./Sets5";
 import {FPS, clamp, lerp, ramp, pop, shake, easeInOut, easeOut, rng} from "./util";
-import W from "./timingGalo.json";
+import W from "./timingGalo2.json";
 
 type Wd = {w: string; s: number; e: number; line: number};
 const words = W as Wd[];
@@ -641,32 +641,104 @@ const wallH = (f: number) => {
   const s = Math.floor(k * steps);
   return WALL_H * Math.min(1, (s + easeOut((k * steps) % 1)) / steps);
 };
+const DIG_P = 22;
+const DIG_POS: V3 = [2.0, sandY(9.6), 9.6];
+const DIG_ROT = Math.PI - 0.9;
+const DIG_F: [number, number] = [Math.sin(DIG_ROT), Math.cos(DIG_ROT)];
+type DK = {c: number; torso: number; leg: number; A: number; w: number; lA: number};
+const DIG_KF: DK[] = [
+  {c: 0, torso: 0.12, leg: 0.15, A: -0.45, w: 0.3, lA: -0.35},
+  {c: 0.32, torso: 0.62, leg: 0.65, A: -0.8, w: 0.8, lA: -1.0},
+  {c: 0.4, torso: 0.58, leg: 0.6, A: -0.95, w: 0.55, lA: -1.0},
+  {c: 0.58, torso: -0.12, leg: 0.0, A: -2.35, w: -0.25, lA: -0.5},
+  {c: 1, torso: 0.12, leg: 0.15, A: -0.45, w: 0.3, lA: -0.35},
+];
+const digCycle = (f: number, a: number) => ((((f - a) % DIG_P) + DIG_P) % DIG_P) / DIG_P;
 const digPose = (a: number) => (fr: number): Pose => {
-  const c = ((fr - a) % 14) / 14;
-  const up = c < 0.5 ? easeInOut(c * 2) : 1 - easeInOut((c - 0.5) * 2);
-  return {...idle(fr), pos: [0.6, sandY(10.0), 10.0], rotY: 2.0, rShoulder: [-0.4 - 1.6 * up, 0, -0.2], lShoulder: [-0.4 - 1.6 * up, 0, 0.2], rElbow: -0.5 + 0.3 * up, lElbow: -0.5 + 0.3 * up, rFist: 1, torso: [0.35 - 0.45 * up, 0, 0], smile: 0.5, brow: 0.5, mouthOpen: 0.2 * up};
+  const c = digCycle(fr, a);
+  let k = 0;
+  while (k < DIG_KF.length - 2 && c >= DIG_KF[k + 1].c) k++;
+  const A0 = DIG_KF[k];
+  const A1 = DIG_KF[k + 1];
+  const u = easeInOut((c - A0.c) / (A1.c - A0.c));
+  const v = (key: "torso" | "leg" | "A" | "w" | "lA") => lerp(A0[key], A1[key], u);
+  const torso = v("torso");
+  const leg = v("leg");
+  const drop = 0.36 * (1 - Math.cos(0.9 * leg));
+  const back = 0.36 * Math.sin(0.9 * leg);
+  const throwing = c > 0.42 && c < 0.62;
+  return {
+    breathe: 0,
+    blink: blinkCurve(fr),
+    pos: [DIG_POS[0] - DIG_F[0] * back, DIG_POS[1] - drop, DIG_POS[2] - DIG_F[1] * back],
+    rotY: DIG_ROT,
+    torso: [torso, 0, 0],
+    legLift: leg,
+    rShoulder: [v("A") - torso, 0, -0.12],
+    rElbow: -0.12,
+    rWrist: [v("w"), 0, 0],
+    rFist: 1,
+    lShoulder: [v("lA") - torso, 0, 0.28],
+    lElbow: -0.7,
+    head: [-0.15 * (torso - 0.12), 0, 0],
+    smile: 0.6,
+    brow: 0.4,
+    mouthOpen: throwing ? 0.45 : 0.1,
+  };
+};
+/** prende o objeto na mão: copia posição e giro da palma */
+const InHand: React.FC<{palm: React.RefObject<THREE.Object3D | null>; children: React.ReactNode}> = ({palm, children}) => {
+  const g = useRef<THREE.Group>(null);
+  useFrame(() => {
+    if (!palm.current || !g.current) return;
+    palm.current.updateWorldMatrix(true, false);
+    palm.current.matrixWorld.decompose(g.current.position, g.current.quaternion, g.current.scale);
+  }, -1);
+  return <group ref={g}>{children}</group>;
+};
+/** torrões de areia: saem da pá no alto do arremesso e grudam no muro */
+const Clumps: React.FC<{f: number; a: number}> = ({f, a}) => {
+  const out: React.ReactNode[] = [];
+  const n0 = Math.max(0, Math.floor((f - a) / DIG_P) - 2);
+  for (let n = n0; n <= Math.floor((f - a) / DIG_P); n++) {
+    const rel = a + n * DIG_P + Math.round(0.56 * DIG_P);
+    const k = (f - rel) / 9;
+    if (k < 0) continue;
+    const r = rng(n * 7 + 3);
+    const p0: V3 = [DIG_POS[0] + DIG_F[0] * 0.5, DIG_POS[1] + 2.3, DIG_POS[2] + DIG_F[1] * 0.5];
+    const p1: V3 = [DIG_POS[0] + 0.3 + (r() - 0.5) * 0.8, DIG_POS[1] + 1.4 + r() * 1.2, WALL_Z + 1.12];
+    if (k <= 1) {
+      out.push(
+        <mesh key={n} position={[lerp(p0[0], p1[0], k), lerp(p0[1], p1[1], k) + Math.sin(k * Math.PI) * 0.5, lerp(p0[2], p1[2], k)]} scale={0.11} material={lp("#e2bd7a", 1)}>
+          <icosahedronGeometry args={[1, 0]} />
+        </mesh>,
+      );
+    } else if (k < 3) {
+      const o = 1 - (k - 1) / 2;
+      out.push(
+        <mesh key={n} position={p1} scale={[0.2 * (0.6 + 0.4 * o), 0.16 * (0.6 + 0.4 * o), 0.04]} material={lp("#d9b06a", 1)}>
+          <icosahedronGeometry args={[1, 0]} />
+        </mesh>,
+      );
+    }
+  }
+  return <>{out}</>;
 };
 const Digging: React.FC<{f: number; a: number; t: number; wide?: boolean}> = ({f, a, t, wide}) => {
   const palm = useRef<THREE.Object3D>(null);
-  const pose = physics("dig" + a, digPose(a), a, f);
-  const puffs = Array.from({length: 6}, (_, i) => {
-    const k = (((f - a) / 14 + i / 6) % 1);
-    return (
-      <mesh key={i} position={[0.3 + Math.sin(i * 2) * 0.8, sandY(8.6) + wallH(f) * 0.6 + k * 1.2, 8.4]} scale={0.25 * (1 - k) + 0.05} material={lp("#f3d697", 1)}>
-        <icosahedronGeometry args={[1, 0]} />
-      </mesh>
-    );
-  });
+  const pose = digPose(a)(f);
   return (
     <>
-      <Beach t={t} sea={0.3} wall={wallH(f)} target={[0, 0, 9]} ext={16} umbKeep={wide ? (x) => x > 2.5 : undefined} />
+      <Beach t={t} sea={0.3} wall={wallH(f)} target={[1, 0, 9]} ext={16} umbKeep={wide ? (x) => x > 3.5 : (x, z) => !(x > 0 && x < 6 && z > 9 && z < 12)} />
       <BeachMelons f={f} />
       <Boy pose={pose} look={KID} palmRef={palm} />
-      <AtPalm palm={palm}>
-        <Shovel r={[0.4, 0, 0.3]} s={1.6} />
-      </AtPalm>
-      <Bucket p={[1.2, sandY(10.2) + 0.2, 10.3]} s={1.4} />
-      {puffs}
+      <InHand palm={palm}>
+        <group position={[0, 0.03, -0.07]}>
+          <Shovel s={1.25} />
+        </group>
+      </InHand>
+      <Bucket p={[1.25, sandY(9.9) + 0.2, 9.9]} s={1.4} />
+      <Clumps f={f} a={a} />
     </>
   );
 };
@@ -675,7 +747,7 @@ const S16: React.FC<ShotProps> = ({f, a, t}) => {
   const k = ramp(f, a, at(9, "tamanho"), easeInOut);
   return (
     <>
-      <Cam pos={[2.6, lerp(1.7, 2.0, k), lerp(13.6, 14.0, k)]} look={[-0.4, lerp(1.3, 2.4, k), 8.2]} fov={48} f={f} a={a} />
+      <Cam pos={[5.2, lerp(1.6, 1.85, k), lerp(10.5, 10.9, k)]} look={[1.4, lerp(1.25, 1.75, k), 9.0]} fov={50} f={f} a={a} />
       <Digging f={f} a={a} t={t} />
     </>
   );
@@ -702,9 +774,11 @@ const S17: React.FC<ShotProps> = ({f, a, t}) => {
       <Cam pos={[lerp(2.0, 1.6, k), TOP + lerp(1.0, 1.6, k), WALL_Z + lerp(4.6, 3.8, k)]} look={[0.25, TOP + 1.0, WALL_Z - 0.4]} fov={48} f={f} a={a} />
       <Beach t={t} sea={0.3} wall={WALL_H} target={[0, TOP, WALL_Z]} dir={[-4, 9, 7]} ext={8} />
       <Boy pose={pose} look={KID} palmRef={palm} />
-      <AtPalm palm={palm}>
-        <Shovel r={[Math.PI, 0, 0.2]} s={1.6} />
-      </AtPalm>
+      <InHand palm={palm}>
+        <group position={[0, 0.03, -0.07]}>
+          <Shovel s={1.25} />
+        </group>
+      </InHand>
       <Bucket p={[-0.45, TOP + 0.2, WALL_Z + 0.35]} s={1.4} />
     </>
   );
@@ -804,7 +878,7 @@ const S22: React.FC<ShotProps> = ({f, a, t}) => {
 const CANTA = at(13, "canta");
 const S23: React.FC<ShotProps> = ({f, a, t}) => {
   const chest = ramp(f, at(13, "enche"), at(13, "peito") + 20, easeInOut);
-  const wind = ramp(f, at(13, "e", 1) - 4, CANTA - 1);
+  const wind = ramp(f, CANTA - 10, CANTA - 1);
   const crow = ramp(f, CANTA - 2, CANTA + 3) * (1 - ramp(f, CANTA + 30, CANTA + 40));
   const sh = shake(f, 0.03 * crow);
   const k = ramp(f, a, CANTA, easeInOut);
@@ -1229,7 +1303,7 @@ export const VideoGalo: React.FC = () => {
       <Captions />
 
       {/* ---------- áudio ---------- */}
-      <Audio src={staticFile("vozgalo.mp3")} />
+      <Audio src={staticFile("vozgalo2.mp3")} />
       <Audio src={staticFile("trilha-galo.mp3")} volume={(fr) => 0.13 * clamp(fr / 20) * (1 - ramp(fr, TOTAL_GALO - 30, TOTAL_GALO))} />
       {cuts.map((c) => (
         <Sequence key={"w" + c} from={c - 3} durationInFrames={25}>
@@ -1295,8 +1369,8 @@ export const VideoGalo: React.FC = () => {
       <Sequence from={SEA_UP - 14} durationInFrames={90}>
         <Audio src={staticFile("sfx7/rumble.mp3")} volume={0.45} />
       </Sequence>
-      {Array.from({length: 6}, (_, i) => (
-        <Sequence key={"sh" + i} from={at(9, "constroi") + i * 14} durationInFrames={30}>
+      {Array.from({length: Math.floor((L(10) - at(9, "entao")) / DIG_P)}, (_, i) => (
+        <Sequence key={"sh" + i} from={at(9, "entao") + i * DIG_P + Math.round(0.3 * DIG_P)} durationInFrames={30}>
           <Audio src={staticFile("sfx7/shovel.mp3")} volume={0.5} />
         </Sequence>
       ))}
