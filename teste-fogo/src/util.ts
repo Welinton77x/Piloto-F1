@@ -13,7 +13,7 @@ export const easeInOut = (t: number) => {
   return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
 };
 /** 0→1 entre os frames a e b com suavização */
-export const ramp = (f: number, a: number, b: number, ease = smooth) => ease((f - a) / (b - a));
+export const ramp = (f: number, a: number, b: number, ease = smooth) => ease(clamp((f - a) / (b - a)));
 /** mola com leve passada do ponto (pop) */
 export const pop = (f: number, start: number, dur = 12) => {
   const t = clamp((f - start) / dur);
