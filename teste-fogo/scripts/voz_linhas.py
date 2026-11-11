@@ -4,7 +4,7 @@ Linhas já geradas ficam em public/vo90/ e não são cobradas de novo."""
 import base64, json, os, re, subprocess, time, urllib.request
 from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
-VOICE = "NQmLEqxcRTkWYIYZSYod"  # Matheus - Energetic and Dynamic
+VOICE = os.environ.get("VOICE_ID", "NQmLEqxcRTkWYIYZSYod")  # padrão: Matheus - Energetic and Dynamic
 GAP = 0.18  # respiro entre frases (s)
 lines = [l.strip() for l in (ROOT / os.environ.get("NARR", "narracao-90s.txt")).read_text(encoding="utf-8").splitlines() if l.strip()]
 out = ROOT / os.environ.get("VODIR", "public/vo90"); out.mkdir(parents=True, exist_ok=True)
