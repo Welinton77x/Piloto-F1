@@ -969,9 +969,6 @@ export const VideoTempo: React.FC = () => {
         <Audio src={staticFile("sfx4/slow.mp3")} volume={0.45} />
       </Sequence>
       <Sequence from={SL} durationInFrames={RS - SL}>
-        <Audio src={staticFile("sfx4/carriage_lenta.mp3")} volume={0.2} loop />
-      </Sequence>
-      <Sequence from={SL} durationInFrames={RS - SL}>
         <Audio src={staticFile("sfx4/rua1880_grave.mp3")} volume={0.8} loop />
       </Sequence>
       <Sequence from={at(2, "apito") - 4} durationInFrames={100}>
@@ -979,9 +976,6 @@ export const VideoTempo: React.FC = () => {
       </Sequence>
       <Sequence from={RS - 3} durationInFrames={50}>
         <Audio src={staticFile("sfx4/resume.mp3")} volume={0.45} />
-      </Sequence>
-      <Sequence from={RS} durationInFrames={L(4) - RS}>
-        <Audio src={staticFile("sfx4/carriage.mp3")} volume={0.45} />
       </Sequence>
       {cuts.map((c) => (
         <Sequence key={"w" + c} from={c - 4} durationInFrames={30}>
