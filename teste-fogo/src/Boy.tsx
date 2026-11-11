@@ -187,6 +187,8 @@ const Arm: React.FC<{
   </group>
 );
 
+const clampH = (v: number) => Math.max(-0.3, Math.min(0.3, v));
+
 export const Boy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; look?: Look}> = ({pose, palmRef, look = {}}) => {
   const m = useMats(look);
   if (look.ghost !== undefined) {
@@ -203,6 +205,7 @@ export const Boy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; loo
   const sl = (look.slim ?? 1) * (look.palito ? 0.66 : 1); // largura do tronco
   const slz = (look.slim ?? 1) * (look.palito ? 0.6 : 1);
   const hs = look.palito ? 0.66 : 1; // tamanho da cabeça
+  const hipX = look.palito ? 0.115 * sl : 0.1; // perna presa dentro do quadril
   const spikes = useSpikes();
   const {
     pos = [0, 0, 0],
@@ -251,12 +254,12 @@ export const Boy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; loo
         const foot = -(hipRot + knee) * (walkAmt > 0 ? 0.7 : 0) + (legLift > 0 ? 0 : 0);
         const shoeR = 0.085 * (0.4 + 0.6 * lt);
         return (
-          <group key={sd} position={[0.1 * sd, 0.78, 0]} rotation={[hipRot, 0, 0]}>
+          <group key={sd} position={[hipX * sd, 0.78, 0]} rotation={[hipRot, 0, 0]}>
             {/* coxa */}
             {look.shorts ? (
               <>
-                <mesh position={[0, -0.16, 0]} material={m.pants} castShadow receiveShadow>
-                  <capsuleGeometry args={[0.095 * lt, 0.16, 8, 16]} />
+                <mesh position={[0, -0.15, 0]} material={m.pants} castShadow receiveShadow>
+                  <capsuleGeometry args={[(look.palito ? 0.072 : 0.095) * lt, 0.16, 8, 16]} />
                 </mesh>
                 <mesh position={[0, -0.3, 0]} material={m.skin} castShadow receiveShadow>
                   <capsuleGeometry args={[0.068 * lt, 0.1, 8, 12]} />
@@ -343,7 +346,7 @@ export const Boy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; loo
               <sphereGeometry args={[0.06, 12, 10]} />
             </mesh>
           ))}
-          <group rotation={[hair[0] - 0.12 * hairLift, 0, hair[1]]} position={[0, 0.03 * hairLift, 0]} scale={[1, 1 + 0.12 * hairLift, 1]}>
+          <group rotation={[clampH(hair[0]) - 0.12 * hairLift, 0, clampH(hair[1])]} position={[0, 0.03 * hairLift, 0]} scale={[1, 1 + 0.12 * hairLift, 1]}>
           {/* calota do cabelo */}
           {style !== "bald" && <mesh position={[0, 0.02, -0.01]} rotation={[0.12, 0, 0]} material={m.hair} castShadow>
             <sphereGeometry args={[0.285, 32, 16, 0, Math.PI * 2, 0, 1.3]} />

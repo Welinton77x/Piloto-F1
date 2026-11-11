@@ -55,7 +55,7 @@ export const physics = (key: string, poseAt: (f: number) => Pose, start: number,
     const y = (pose.pos ?? [0, 0, 0])[1];
     const vy = y - prevY;
     const ay = vy - prevVy;
-    hvX += (-hairX - (head[0] - prevHead[0]) * 6 + ay * 25) * 0.25;
+    hvX += (-hairX - (head[0] - prevHead[0]) * 6 + Math.max(-0.02, Math.min(0.02, ay)) * 25) * 0.25;
     hvZ += (-hairZ - (head[2] - prevHead[2]) * 6) * 0.25;
     hvX *= 0.78;
     hvZ *= 0.78;
@@ -64,6 +64,8 @@ export const physics = (key: string, poseAt: (f: number) => Pose, start: number,
     prevHead = [...head];
     prevY = y;
     prevVy = vy;
+    hairX = Math.max(-0.3, Math.min(0.3, hairX));
+    hairZ = Math.max(-0.3, Math.min(0.3, hairZ));
     pose.hair = [hairX, hairZ];
     out = pose;
   }
