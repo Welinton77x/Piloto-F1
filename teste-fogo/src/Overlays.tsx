@@ -1,7 +1,19 @@
 import React from "react";
-import {useCurrentFrame} from "remotion";
+import {continueRender, delayRender, staticFile, useCurrentFrame} from "remotion";
 import {fontFamily} from "./Video";
 import {FPS, clamp, lerp, ramp, pop, rng} from "./util";
+
+/* fonte arredondada (Fredoka, licença livre OFL) para os títulos das etapas, igual ao estilo da referência */
+export const titleFont = "FRD";
+if (typeof document !== "undefined" && !document.getElementById("frd-font")) {
+  const h = delayRender("fonte-titulo");
+  const st = document.createElement("style");
+  st.id = "frd-font";
+  st.textContent = `@font-face{font-family:FRD;font-weight:700;src:url(${staticFile("fonts/fredoka-latin.woff2")}) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+2000-206F}
+@font-face{font-family:FRD;font-weight:700;src:url(${staticFile("fonts/fredoka-latin-ext.woff2")}) format("woff2");unicode-range:U+0100-02BA,U+1E00-1EFF}`;
+  document.head.appendChild(st);
+  document.fonts.load('700 40px FRD', "ÃÉÇÍÂ").then(() => continueRender(h), () => continueRender(h));
+}
 
 /* ===== Camadas 2D reaproveitáveis (faixa amarela, legendas, chips, confete, figurinhas) ===== */
 export type Wd = {w: string; s: number; e: number; line: number};
@@ -202,3 +214,22 @@ export const Cross: React.FC = () => (
   </g>
 );
 
+
+/** nome da etapa no estilo da referência: letras grandes amarelas, contorno preto grosso, duas linhas, sem faixa */
+export const StageTitle: React.FC<{from: number; to: number; lines: string[]; top?: number}> = ({from, to, lines, top = 250}) => {
+  const f = useCurrentFrame();
+  if (f < from || f > to) return null;
+  const inn = pop(f, from, 12);
+  const out = ramp(f, to - 6, to);
+  const longest = Math.max(...lines.map((l) => l.length));
+  const size = Math.min(150, Math.round(1500 / Math.max(6, longest)));
+  return (
+    <div style={{position: "absolute", top, left: 0, right: 0, display: "flex", flexDirection: "column", alignItems: "center", transform: `scale(${inn * (1 - 0.2 * out)}) rotate(-3deg)`, opacity: 1 - out, transformOrigin: "50% 40%"}}>
+      {lines.map((l, i) => (
+        <div key={i} style={{fontFamily: titleFont, fontWeight: 700, fontSize: size, lineHeight: 0.98, color: "#FFD21F", WebkitTextStroke: `${Math.round(size * 0.13)}px #141414`, paintOrder: "stroke fill", textShadow: "0 10px 0 rgba(0,0,0,0.25)", letterSpacing: 1, whiteSpace: "nowrap", transform: `translateX(${i % 2 ? 12 : -8}px)`}}>
+          {l}
+        </div>
+      ))}
+    </div>
+  );
+};
