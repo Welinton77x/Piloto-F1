@@ -11,7 +11,9 @@ const P = (p: Partial<MascotPose>): MascotPose => ({emotion: "happy", talk: 0, l
 const CASES: {az: number; pose: MascotPose; look: RefLook; label: string; r?: number; y?: number}[] = [
   {az: 15, pose: P({emotion: "sick", rArm: [-150, -30], lArm: [-10, 25]}), look: {hot: 1, tongue: true}, label: "close (como no vídeo)", r: 4.4, y: 1.3},
   {az: 0, pose: P({emotion: "sick", rArm: [-150, -30], lArm: [-10, 25]}), look: {hot: 1, tongue: true}, label: "calor"},
-  {az: 40, pose: P({emotion: "happy"}), look: {}, label: "3/4"},
+  {az: 40, pose: P({emotion: "happy"}), look: {}, label: "3/4", r: 4.4, y: 1.3},
+  {az: 90, pose: P({emotion: "happy"}), look: {}, label: "lado", r: 4.4, y: 1.3},
+  {az: 160, pose: P({emotion: "happy"}), look: {}, label: "costas", r: 4.4, y: 1.3},
   {az: 0, pose: P({emotion: "curious", lArm: [-80, -40], rArm: [-80, -40]}), look: {}, label: "lápis"},
   {az: 0, pose: P({emotion: "joy", jump: 0.35, rArm: [-10, 160], lArm: [-10, 70]}), look: {}, label: "pulo"},
 ];

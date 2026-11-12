@@ -132,43 +132,13 @@ export const MascotRef: React.FC<{position?: [number, number, number]; scale?: n
               <Mat c={skin} />
             </mesh>
           ))}
-          {/* capacete de obra igual à foto do usuário, todo azul (sem partes pretas): cúpula alta, três frisos
-              no topo de frente para trás, aba estreita em volta, bico maior na frente e presilhas nas laterais */}
-          {(() => {
-            const HC = "#2257b0", HD = "#1d4c9c";
-            const mat = <meshStandardMaterial color={HC} roughness={0.22} metalness={0.05} />;
-            return (
-              <group position={[0, 0.17, -0.01]}>
-                <mesh scale={[1.1, 0.95, 1.16]}>
-                  <sphereGeometry args={[0.37, 44, 22, 0, Math.PI * 2, 0, Math.PI / 2]} />
-                  {mat}
-                </mesh>
-                {[-0.09, 0, 0.09].map((x) => (
-                  <mesh key={x} position={[x, 0, 0]} scale={[0.12, 0.965, 1.17]}>
-                    <sphereGeometry args={[0.37, 28, 16, 0, Math.PI * 2, 0, Math.PI / 2.6]} />
-                    <meshStandardMaterial color={HD} roughness={0.25} />
-                  </mesh>
-                ))}
-                <mesh position={[0, -0.005, 0]} scale={[1.1, 1, 1.16]}>
-                  <cylinderGeometry args={[0.395, 0.405, 0.04, 44]} />
-                  {mat}
-                </mesh>
-                <group position={[0, -0.01, 0.36]} rotation={[0.18, 0, 0]}>
-                  <mesh scale={[1, 1, 0.55]}>
-                    <cylinderGeometry args={[0.36, 0.36, 0.03, 40, 1, false, -Math.PI / 2, Math.PI]} />
-                    {mat}
-                  </mesh>
-                </group>
-                {[-1, 1].map((sd) => (
-                  <RB key={sd} w={0.05} h={0.07} d={0.12} r={0.02} c={HD} position={[sd * 0.43, 0.02, 0.1]} />
-                ))}
-              </group>
-            );
-          })()}
-          {/* cabelo aparecendo pouco por baixo (costeletas e nuca) */}
-          {[-1, 1].map((s2) => <RB key={"sb" + s2} w={0.04} h={0.09} d={0.1} r={0.02} c={C.hair} position={[s2 * 0.375, 0.13, -0.13]} />)}
-          <mesh position={[0, 0.06, -0.2]} scale={[1.0, 0.6, 0.55]}>
-            <sphereGeometry args={[0.37, 28, 16]} />
+          {/* cabelo igual ao da referência: "capacete" de cabelo castanho escuro, arredondado e liso,
+              topo cheio, franja grossa e roliça logo acima das sobrancelhas, laterais até a orelha e nuca coberta */}
+          <RB w={0.8} h={0.25} d={0.7} r={0.12} c={C.hair} position={[0, 0.285, -0.01]} />
+          <RB w={0.785} h={0.44} d={0.36} r={0.16} c={C.hair} position={[0, 0.12, -0.165]} />
+          {/* franja: rolo grosso de ponta a ponta na testa, logo acima das sobrancelhas */}
+          <mesh position={[0, 0.215, 0.255]} rotation={[0, 0, Math.PI / 2]} scale={[1, 1, 0.9]}>
+            <capsuleGeometry args={[0.07, 0.62, 8, 20]} />
             <Mat c={C.hair} />
           </mesh>
           {/* rosto (o mesmo do canal, ampliado para a cabeça maior) */}
