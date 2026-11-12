@@ -138,17 +138,19 @@ const fy = (u: number) => (u < -CRV ? 0 : u < CRV ? (-SLOPE * (u + CRV) ** 2) / 
 const fd = (u: number) => (u < -CRV ? 0 : u < CRV ? (-SLOPE * (u + CRV)) / (2 * CRV) : -SLOPE);
 export const groundY = (x: number) => fy(x - S0) - fy(x - S1);
 export const groundAng = (x: number) => Math.atan(fd(x - S0) - fd(x - S1));
+const groundYSlope = groundY;
+const groundAngSlope = groundAng;
 
-const Strip: React.FC<{z0: number; z1: number; x0?: number; x1?: number; y?: number; mat: THREE.Material}> = ({z0, z1, x0 = -70, x1 = 90, y = 0, mat}) => {
+const Strip: React.FC<{z0: number; z1: number; x0?: number; x1?: number; y?: number; mat: THREE.Material; flat?: boolean}> = ({z0, z1, x0 = -70, x1 = 90, y = 0, mat, flat = false}) => {
   const geo = useMemo(() => {
     const n = 200;
     const g = new THREE.PlaneGeometry(x1 - x0, z1 - z0, n, 1);
     g.rotateX(-Math.PI / 2);
     const pos = g.attributes.position as THREE.BufferAttribute;
-    for (let i = 0; i < pos.count; i++) pos.setY(i, groundY(pos.getX(i) + (x0 + x1) / 2) + y);
+    for (let i = 0; i < pos.count; i++) pos.setY(i, (flat ? 0 : groundY(pos.getX(i) + (x0 + x1) / 2)) + y);
     g.computeVertexNormals();
     return g;
-  }, [z0, z1, x0, x1, y]);
+  }, [z0, z1, x0, x1, y, flat]);
   return <mesh geometry={geo} position={[(x0 + x1) / 2, 0, (z0 + z1) / 2]} material={mat} receiveShadow />;
 };
 
@@ -349,16 +351,20 @@ export const TOWN_HOUSES = (() => {
   }
   return out;
 })();
-export const Town: React.FC<{t: number; cans?: number[]; frontHouses?: boolean; galo?: boolean; lit?: (i: number) => boolean; dark?: boolean; lamps?: boolean; clouds?: boolean}> = ({t, cans = [], frontHouses = false, galo = true, lit, dark, lamps = true, clouds = true}) => {
+export const Town: React.FC<{t: number; cans?: number[]; frontHouses?: boolean; galo?: boolean; lit?: (i: number) => boolean; dark?: boolean; lamps?: boolean; clouds?: boolean; flat?: boolean; clear?: [number, number]}> = ({t, cans = [], frontHouses = false, galo = true, lit, dark, lamps = true, clouds = true, flat = false, clear}) => {
+  const free = (x: number) => !clear || x < clear[0] || x > clear[1];
   const houses = TOWN_HOUSES;
+  // flat: cidade sem a ladeira (rua toda no nível 0)
+  const groundY = flat ? (_x: number) => 0 : groundYSlope;
+  const groundAng = flat ? (_x: number) => 0 : groundAngSlope;
   const dash = lp("#ffd84a", 0.6);
   return (
     <group>
-      <Strip z0={-60} z1={-2.7} mat={lp("#7ccc58")} />
-      <Strip z0={-2.7} z1={-1.55} y={0.08} mat={lp("#dcd5c6")} />
-      <Strip z0={-1.55} z1={1.55} mat={lp("#5b5f69", 0.9)} />
-      <Strip z0={1.55} z1={2.7} y={0.08} mat={lp("#dcd5c6")} />
-      <Strip z0={2.7} z1={40} mat={lp("#86d260")} />
+      <Strip flat={flat} z0={-60} z1={-2.7} mat={lp("#7ccc58")} />
+      <Strip flat={flat} z0={-2.7} z1={-1.55} y={0.08} mat={lp("#dcd5c6")} />
+      <Strip flat={flat} z0={-1.55} z1={1.55} mat={lp("#5b5f69", 0.9)} />
+      <Strip flat={flat} z0={1.55} z1={2.7} y={0.08} mat={lp("#dcd5c6")} />
+      <Strip flat={flat} z0={2.7} z1={40} mat={lp("#86d260")} />
       {Array.from({length: 60}, (_, i) => {
         const x = -60 + i * 2.6;
         return (
@@ -374,14 +380,14 @@ export const Town: React.FC<{t: number; cans?: number[]; frontHouses?: boolean; 
         houses
           .filter((h) => h.x < -22)
           .map((h, i) => <House key={"f" + i} p={[h.x + 2, 0, 5.9]} rotY={Math.PI} w={h.w} h={i % 2 ? 4.2 : 2.7} wall={WALLS[(i + 3) % WALLS.length]} roof={ROOFS[(i + 2) % ROOFS.length]} />)}
-      {houses.map((h, i) => (i % 2 === 0 ? <Tree key={"t" + i} p={[h.x + 2.45, groundY(h.x + 2.45), -3.6]} s={0.9 + (i % 3) * 0.12} c={i % 3 ? "#5fae3e" : "#4c9a35"} /> : null))}
+      {houses.map((h, i) => (i % 2 === 0 && free(h.x + 2.45) ? <Tree key={"t" + i} p={[h.x + 2.45, groundY(h.x + 2.45), -3.6]} s={0.9 + (i % 3) * 0.12} c={i % 3 ? "#5fae3e" : "#4c9a35"} /> : null))}
       {Array.from({length: 13}, (_, i) => {
         const x = -44 + i * 9;
-        return <LampPost key={"l" + i} p={[x, groundY(x) + 0.08, -2.25]} on={lamps} />;
+        return free(x) ? <LampPost key={"l" + i} p={[x, groundY(x) + 0.08, -2.25]} on={lamps} /> : null;
       })}
       {Array.from({length: 22}, (_, i) => {
         const x = -46 + i * 5.3;
-        return <Bush key={"b" + i} p={[x, groundY(x), 3.6 + (i % 3) * 0.6]} s={0.8 + (i % 2) * 0.3} />;
+        return flat && clear ? null : <Bush key={"b" + i} p={[x, groundY(x), 3.6 + (i % 3) * 0.6]} s={0.8 + (i % 2) * 0.3} />;
       })}
       {/* lixeiras do "dominó" na calçada da ladeira */}
       {galo && CANS.map((x, i) => (

@@ -90,7 +90,7 @@ const StreetScene: React.FC<{t: number; target: V3; ext?: number}> = ({t, target
     <SunDisc p={[-40, 45, -110]} r={6} />
     <hemisphereLight args={["#d6ecff", "#a08a5e", 1.2]} />
     <SunLight target={target} dir={[-6, 10, 7]} intensity={2.6} ext={ext} />
-    <Town t={t} galo={false} />
+    <Town t={t} galo={false} flat clear={[3.4, 8.6]} />
   </>
 );
 const SpaceScene: React.FC = () => {
