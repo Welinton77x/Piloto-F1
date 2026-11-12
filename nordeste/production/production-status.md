@@ -8,3 +8,5 @@
 ## Fase final (12/11)
 - Capacete trocado pelo cabelo da referência (aprovado).
 - Render final: out/nordeste.mp4 — 2:18,6, 1080×1920, 4157 frames, loudnorm -15 LUFS.
+
+- 2026-11-12: render final v2 (mascote referência, globo com Brasil, casas, quarto, juazeiro alto) — 4157 frames, 2:18.6.
