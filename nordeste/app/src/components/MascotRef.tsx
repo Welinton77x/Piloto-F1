@@ -111,35 +111,36 @@ export const MascotRef: React.FC<{position?: [number, number, number]; scale?: n
               <Mat c={skin} />
             </mesh>
           ))}
-          {/* capacete amarelo igual ao da referência: cúpula baixa e larga, faixa marrom embaixo,
-              aba fina e larga em volta, pino retangular no topo e uma manchinha escura na lateral */}
-          <mesh position={[0, 0.2, -0.01]} scale={[1.14, 0.78, 1.14]}>
-            <sphereGeometry args={[0.37, 44, 22, 0, Math.PI * 2, 0, Math.PI / 2]} />
-            <meshStandardMaterial color="#f2c014" roughness={0.42} />
-          </mesh>
-          <mesh position={[0, 0.2, -0.01]}>
-            <cylinderGeometry args={[0.425, 0.425, 0.06, 44]} />
-            <Mat c="#3a2416" />
-          </mesh>
-          <mesh position={[0, 0.17, 0.01]}>
-            <cylinderGeometry args={[0.6, 0.6, 0.03, 52]} />
-            <meshStandardMaterial color="#f2c014" roughness={0.42} />
-          </mesh>
-          <RB w={0.12} h={0.07} d={0.2} r={0.025} c="#e0aa08" position={[0, 0.49, -0.01]} />
-          {/* emblema escuro na frente do capacete (detalhe do capacete de obra da referência), colado na cúpula */}
+          {/* capacete de obra igual à foto do usuário, todo azul (sem partes pretas): cúpula alta, três frisos
+              no topo de frente para trás, aba estreita em volta, bico maior na frente e presilhas nas laterais */}
           {(() => {
-            const el = 0.36, az = 0.22; // elevação e giro na cúpula (frente, um pouco à direita)
-            const R = 0.37, sx = 1.14, sy = 0.78, sz = 1.14;
-            const n = new THREE.Vector3(Math.sin(az) * Math.cos(el), Math.sin(el), Math.cos(az) * Math.cos(el));
-            const p0 = new THREE.Vector3(n.x * R * sx, 0.2 + n.y * R * sy, -0.01 + n.z * R * sz);
-            const nn = new THREE.Vector3(n.x / sx, n.y / sy, n.z / sz).normalize();
-            const q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), nn);
+            const HC = "#2257b0", HD = "#1d4c9c";
+            const mat = <meshStandardMaterial color={HC} roughness={0.22} metalness={0.05} />;
             return (
-              <group position={p0.addScaledVector(nn, 0.004)} quaternion={q}>
-                <mesh scale={[1.25, 1, 1]}>
-                  <circleGeometry args={[0.042, 24]} />
-                  <meshStandardMaterial color="#3a2416" roughness={0.6} />
+              <group position={[0, 0.17, -0.01]}>
+                <mesh scale={[1.1, 0.95, 1.16]}>
+                  <sphereGeometry args={[0.37, 44, 22, 0, Math.PI * 2, 0, Math.PI / 2]} />
+                  {mat}
                 </mesh>
+                {[-0.09, 0, 0.09].map((x) => (
+                  <mesh key={x} position={[x, 0, 0]} scale={[0.12, 0.965, 1.17]}>
+                    <sphereGeometry args={[0.37, 28, 16, 0, Math.PI * 2, 0, Math.PI / 2.6]} />
+                    <meshStandardMaterial color={HD} roughness={0.25} />
+                  </mesh>
+                ))}
+                <mesh position={[0, -0.005, 0]} scale={[1.1, 1, 1.16]}>
+                  <cylinderGeometry args={[0.395, 0.405, 0.04, 44]} />
+                  {mat}
+                </mesh>
+                <group position={[0, -0.01, 0.36]} rotation={[0.18, 0, 0]}>
+                  <mesh scale={[1, 1, 0.55]}>
+                    <cylinderGeometry args={[0.36, 0.36, 0.03, 40, 1, false, -Math.PI / 2, Math.PI]} />
+                    {mat}
+                  </mesh>
+                </group>
+                {[-1, 1].map((sd) => (
+                  <RB key={sd} w={0.05} h={0.07} d={0.12} r={0.02} c={HD} position={[sd * 0.43, 0.02, 0.1]} />
+                ))}
               </group>
             );
           })()}
