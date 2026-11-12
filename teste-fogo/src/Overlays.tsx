@@ -216,7 +216,7 @@ export const Cross: React.FC = () => (
 
 
 /** nome da etapa no estilo da referência: letras grandes amarelas, contorno preto grosso, duas linhas, sem faixa */
-export const StageTitle: React.FC<{from: number; to: number; lines: string[]; top?: number}> = ({from, to, lines, top = 250}) => {
+export const StageTitle: React.FC<{from: number; to: number; lines: string[]; top?: number; kicker?: string}> = ({from, to, lines, top = 250, kicker}) => {
   const f = useCurrentFrame();
   if (f < from || f > to) return null;
   const inn = pop(f, from, 12);
@@ -225,6 +225,9 @@ export const StageTitle: React.FC<{from: number; to: number; lines: string[]; to
   const size = Math.min(150, Math.round(1500 / Math.max(6, longest)));
   return (
     <div style={{position: "absolute", top, left: 0, right: 0, display: "flex", flexDirection: "column", alignItems: "center", transform: `scale(${inn * (1 - 0.2 * out)}) rotate(-3deg)`, opacity: 1 - out, transformOrigin: "50% 40%"}}>
+      {kicker && (
+        <div style={{fontFamily: titleFont, fontWeight: 700, fontSize: Math.round(size * 0.55), lineHeight: 1, color: "#ffffff", WebkitTextStroke: `${Math.round(size * 0.09)}px #141414`, paintOrder: "stroke fill", textShadow: "0 8px 0 rgba(0,0,0,0.25)", letterSpacing: 2, marginBottom: 6}}>{kicker}</div>
+      )}
       {lines.map((l, i) => (
         <div key={i} style={{fontFamily: titleFont, fontWeight: 700, fontSize: size, lineHeight: 0.98, color: "#FFD21F", WebkitTextStroke: `${Math.round(size * 0.13)}px #141414`, paintOrder: "stroke fill", textShadow: "0 10px 0 rgba(0,0,0,0.25)", letterSpacing: 1, whiteSpace: "nowrap", transform: `translateX(${i % 2 ? 12 : -8}px)`}}>
           {l}

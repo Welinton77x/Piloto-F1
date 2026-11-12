@@ -223,7 +223,7 @@ const OtherHair: React.FC<{style: string; m: THREE.Material}> = ({style, m}) => 
   );
 };
 
-export const Toy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; look?: ToyLook}> = ({pose, palmRef, look = {}}) => {
+export const Toy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; lPalmRef?: React.Ref<THREE.Object3D>; look?: ToyLook; headExtra?: React.ReactNode}> = ({pose, palmRef, lPalmRef, look = {}, headExtra}) => {
   const m = useToyMats(look);
   const hairGeo = useMemo(makeHair, []);
   const geo = useMemo(
@@ -413,7 +413,7 @@ export const Toy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; loo
               </mesh>
             ))}
           {arm(-1, rShoulder, rElbow, rWrist, palmRef)}
-          {arm(1, lShoulder, lElbow, lWrist)}
+          {arm(1, lShoulder, lElbow, lWrist, lPalmRef)}
           {/* cabeça */}
           <group position={[0, TORSO_TOP + 0.29, 0]} rotation={head} scale={0.875}>
             <mesh scale={[1, 0.96, 0.94]} material={m.skin} castShadow>
@@ -490,6 +490,7 @@ export const Toy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; loo
                 <torusGeometry args={[0.042, 0.009, 8, 24, Math.PI * (0.55 + smile * 0.25)]} />
               </mesh>
             )}
+            {headExtra}
           </group>
         </group>
       </group>
