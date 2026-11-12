@@ -20,6 +20,10 @@ export type MascotPose = {
   sick?: number; // 0-1: rosto esverdeado (passou mal)
   hip?: number; // graus: pernas dobradas para frente no quadril (deitado/sentado)
   legPress?: [number, number]; // graus extras por perna [esquerda, direita]: pisar no pedal
+  lReach?: [number, number, number]; // mascote da referência: ponto onde a mão esquerda deve chegar (IK)
+  rReach?: [number, number, number];
+  rReach2?: [number, number, number]; // segundo alvo: a mão vai e volta entre rReach e rReach2 (rReachK 0-1), sem tremer
+  rReachK?: number;
 };
 
 const col = {

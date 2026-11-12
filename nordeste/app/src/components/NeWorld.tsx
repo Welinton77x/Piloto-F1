@@ -3,7 +3,7 @@
 import React, {useLayoutEffect, useMemo, useRef} from "react";
 import * as THREE from "three";
 import {random} from "remotion";
-import {clamp01, mixHex} from "../lib/anim";
+import {clamp01, mixHex, rad} from "../lib/anim";
 import {poseAt} from "../lib/camera";
 
 export const FACE = 1.5;
@@ -289,8 +289,8 @@ const DryTree: React.FC<{x: number; z: number; s?: number}> = ({x, z, s = 1}) =>
   </group>
 );
 /** juazeiro: árvore verde da caatinga que dá sombra */
-const Juazeiro: React.FC<{x: number; z: number}> = ({x, z}) => (
-  <group position={[x, 0, z]}>
+const Juazeiro: React.FC<{x: number; z: number; s?: number}> = ({x, z, s = 1}) => (
+  <group position={[x, 0, z]} scale={s}>
     <mesh position={[0, 0.8, 0]}>
       <cylinderGeometry args={[0.12, 0.2, 1.6, 10]} />
       <M c={N.trunk} />
@@ -313,6 +313,38 @@ const Taipa: React.FC<{x: number; z: number}> = ({x, z}) => (
     </mesh>
     <B x={[-0.3, 0.3]} y={[0, 1.15]} z={[1.1, 1.14]} c="#5d3a1e" />
     <B x={[0.65, 1.15]} y={[0.8, 1.25]} z={[1.1, 1.14]} c="#3e2a1a" />
+  </group>
+);
+const GABLE = (() => {
+  const sh = new THREE.Shape();
+  sh.moveTo(-1.0, 0);
+  sh.lineTo(1.0, 0);
+  sh.lineTo(0, 0.72);
+  sh.closePath();
+  return new THREE.ExtrudeGeometry(sh, {depth: 2.6, bevelEnabled: false});
+})();
+/** casinha do interior: fachada colorida, telhado de duas águas, porta e janelas (escala para o boneco caber na porta) */
+const Casa: React.FC<{x: number; z: number; c: string; ry?: number; s?: number}> = ({x, z, c, ry = 0, s = 1.7}) => (
+  <group position={[x, 0, z]} rotation={[0, ry, 0]} scale={s}>
+    <B x={[-1.3, 1.3]} y={[0, 1.6]} z={[-1.0, 1.0]} c={c} />
+    <B x={[-1.32, 1.32]} y={[0, 0.18]} z={[-1.02, 1.02]} c="#e8d6bf" />
+    {/* telhado de duas águas (telha) */}
+    {[-1, 1].map((sd) => (
+      <mesh key={sd} position={[0, 1.95, sd * 0.56]} rotation={[sd * 0.62, 0, 0]}>
+        <boxGeometry args={[2.9, 0.09, 1.38]} />
+        <M c="#b5562f" />
+      </mesh>
+    ))}
+    <mesh position={[-1.3, 1.6, 0]} rotation={[0, Math.PI / 2, 0]} geometry={GABLE}>
+      <M c={c} />
+    </mesh>
+    <B x={[-0.3, 0.3]} y={[0.18, 1.2]} z={[1.0, 1.04]} c="#6d4426" />
+    {[-0.85, 0.85].map((wx) => (
+      <group key={wx}>
+        <B x={[wx - 0.25, wx + 0.25]} y={[0.75, 1.2]} z={[1.0, 1.04]} c="#3e5c76" />
+        <B x={[wx - 0.3, wx + 0.3]} y={[0.7, 0.75]} z={[1.0, 1.07]} c="#ffffff" />
+      </group>
+    ))}
   </group>
 );
 /** coqueiro */
@@ -374,6 +406,39 @@ const MAP_S = 0.32;
 const ll = (lon: number, lat: number): [number, number] => [SET.map + (lon + 58) * MAP_S, -(lat + 18) * MAP_S];
 const SA = [[-77, 8], [-72, 11.5], [-62, 10.5], [-55, 6], [-50, 1], [-44, -2.5], [-38, -4], [-35, -6], [-35, -9.5], [-39, -15], [-40.5, -21], [-44.5, -23.5], [-48.5, -26], [-53, -33.5], [-58, -38], [-62, -39], [-65, -42], [-68, -50], [-69, -55], [-74, -51], [-74, -42], [-71.5, -32], [-70.5, -18], [-76, -13], [-81, -5], [-80, -1], [-77.5, 3]];
 const NE = [[-48, -1.5], [-44, -2.5], [-38, -4], [-35, -6], [-35, -9.5], [-39, -15], [-39.7, -18], [-44, -15.5], [-46.5, -13], [-46.5, -9], [-48.5, -5.5]];
+/* ---------- textura do globo (equiretangular; u = (lon + 90 + GLOBE_LON)/360) ---------- */
+const GLOBE_LON = 109;
+const BR = [[-60.7, 5.2], [-57, 2], [-55, 2.5], [-52, 4], [-51, 4.2], [-50, 1.5], [-48.5, -1], [-44, -2.5], [-40, -2.8], [-37, -4.8], [-35, -5.5], [-35, -9], [-37.5, -12], [-39, -15], [-39.5, -18], [-41, -22], [-44, -23], [-48, -25.5], [-48.6, -28.5], [-50.5, -31], [-53.4, -33.7], [-55.5, -30.5], [-57.6, -30.2], [-53.8, -27], [-54.6, -25.6], [-55, -24], [-55.5, -22.5], [-57.9, -22], [-58, -20], [-57.5, -18], [-60, -16], [-60.4, -13.5], [-65, -11.8], [-66.5, -9.8], [-70.5, -11], [-72.5, -10], [-73.9, -7.3], [-70, -4], [-69.5, -1], [-70, 1], [-67, 2], [-64, 4]];
+const AFRICA = [[-17, 21], [-10, 30], [-5, 36], [10, 37], [32, 31], [35, 28], [43, 12], [51, 12], [40, -2], [40, -15], [33, -26], [20, -35], [18, -30], [12, -17], [12, -5], [9, 4], [-8, 4], [-17, 14]];
+const NAMER = [[-80, 8], [-77, 8], [-83, 10], [-87, 15], [-97, 16], [-105, 20], [-117, 32], [-124, 40], [-125, 49], [-140, 60], [-165, 62], [-160, 70], [-100, 72], [-80, 65], [-60, 55], [-66, 45], [-76, 35], [-81, 25], [-82, 30], [-90, 29], [-97, 26], [-97, 20], [-90, 21], [-87, 17], [-83, 15]];
+const EUROPE = [[-10, 36], [-9, 43], [-2, 44], [-5, 48], [5, 52], [10, 55], [5, 60], [15, 70], [30, 70], [40, 65], [40, 45], [28, 41], [20, 40], [12, 44], [15, 38], [-5, 36]];
+const ASIA = [[40, 45], [40, 65], [60, 70], [100, 75], [140, 72], [180, 68], [180, 62], [160, 58], [140, 50], [130, 42], [122, 30], [120, 22], [108, 18], [105, 10], [100, 13], [98, 8], [92, 22], [80, 15], [77, 8], [72, 20], [60, 25], [57, 22], [52, 12], [44, 13], [36, 30], [36, 36]];
+const AUS = [[114, -22], [122, -18], [131, -12], [137, -12], [142, -11], [146, -19], [153, -26], [151, -34], [146, -39], [140, -38], [131, -31], [118, -35], [114, -30]];
+const globeTex = (() => {
+  if (typeof document === "undefined") return null;
+  const W = 2048, H = 1024;
+  const c = document.createElement("canvas");
+  c.width = W; c.height = H;
+  const g = c.getContext("2d")!;
+  g.fillStyle = "#2b7fc0"; g.fillRect(0, 0, W, H);
+  const xy = (lon: number, lat: number): [number, number] => [(((lon + 90 + GLOBE_LON) / 360) % 1 + 1) % 1 * W, ((90 - lat) / 180) * H];
+  const poly = (pts: number[][], fill: string, stroke?: string, lw = 3) => {
+    g.beginPath();
+    pts.forEach(([lo, la], i) => { const [x, y] = xy(lo, la); if (i) g.lineTo(x, y); else g.moveTo(x, y); });
+    g.closePath(); g.fillStyle = fill; g.fill();
+    if (stroke) { g.strokeStyle = stroke; g.lineWidth = lw; g.lineJoin = "round"; g.stroke(); }
+  };
+  // gelo dos polos
+  g.fillStyle = "#eef6fb"; g.fillRect(0, 0, W, H * 0.06); g.fillRect(0, H * 0.93, W, H * 0.07);
+  for (const p of [AFRICA, NAMER, EUROPE, ASIA, AUS]) poly(p, "#5ea64a");
+  poly(SA, "#5ea64a");
+  poly(BR, "#9fd36b", "#ffffff", 4); // Brasil
+  poly(NE, "#ff8a3d", "#ffffff", 3); // Nordeste
+  const tx = new THREE.CanvasTexture(c);
+  tx.colorSpace = THREE.SRGBColorSpace;
+  tx.anisotropy = 4;
+  return tx;
+})();
 const shapeOf = (pts: number[][]) => {
   const sh = new THREE.Shape();
   pts.forEach(([lo, la], i) => {
@@ -492,8 +557,14 @@ export const NeWorld: React.FC<{gf: number}> = ({gf}) => {
           <DryTree x={1.8} z={-2.6} s={1.3} />
           <DryTree x={-5.5} z={-3} s={1.5} />
           <DryTree x={5.5} z={-7} s={1.6} />
-          <Juazeiro x={-4.6} z={-0.4} />
+          <Juazeiro x={-4.6} z={-0.6} s={1.45} />
           <Taipa x={-9} z={-5} />
+          {/* vizinhança: casinhas coloridas do interior ao fundo */}
+          <Casa x={-1.5} z={-13} c="#f2c14e" s={1.5} />
+          <Casa x={5} z={-14.5} c="#7fb7d9" ry={-0.25} s={1.5} />
+          <Casa x={-7} z={-14} c="#ef9a9a" ry={0.2} s={1.5} />
+          <Casa x={10.5} z={-16} c="#f5f1e6" ry={-0.4} s={1.5} />
+          <Casa x={-13} z={-15} c="#a5d6a7" ry={0.35} s={1.5} />
           {/* morros ao fundo */}
           {[[-20, -40, 9], [5, -45, 12], [25, -42, 8]].map(([x, z, r], i) => (
             <mesh key={"mr" + i} position={[x, -r * 0.55, z]} scale={[1.7, 1, 1]}>
@@ -543,7 +614,7 @@ export const NeWorld: React.FC<{gf: number}> = ({gf}) => {
           )}
           <HeatHaze gf={gf} x={0} z={-1} w={14} k={inS("s3", t) ? L(t, W("s3", "interior") - 10, W("s3", "sertão"), 0, 1) : 1} />
           {/* sol enorme */}
-          <mesh position={[-6, 15, -30]}>
+          <mesh position={[-4, 12, -20]}>
             <sphereGeometry args={[3.2, 32, 24]} />
             <meshBasicMaterial color="#fff2a8" fog={false} />
           </mesh>
@@ -564,15 +635,19 @@ export const NeWorld: React.FC<{gf: number}> = ({gf}) => {
       {/* ================= GLOBO (sol a pino) ================= */}
       {set === "globe" && (() => {
         const G = new THREE.Vector3(SET.globe, 4, -2);
-        const sun = new THREE.Vector3(SET.globe - 6.6, 4, -2);
-        const pt = (latDeg: number) => {
-          const la = (latDeg * Math.PI) / 180;
-          return new THREE.Vector3(G.x - Math.cos(la) * 3.02, G.y + Math.sin(la) * 3.02, G.z);
+        const R = 3;
+        // ponto do globo em (lon, lat): a textura foi desenhada com az = lon + GLOBE_LON (o Brasil fica virado para a câmera e o sol)
+        const dirOf = (lon: number, lat: number) => {
+          const a = rad(lon + GLOBE_LON), la = rad(lat);
+          return new THREE.Vector3(Math.cos(la) * Math.sin(a), Math.sin(la), Math.cos(la) * Math.cos(a));
         };
-        const ne = pt(-7), sul = pt(-30);
+        const nDir = dirOf(-39, -7); // o sol fica bem em cima do Nordeste
+        const ne = G.clone().addScaledVector(dirOf(-39, -7), R), sul = G.clone().addScaledVector(dirOf(-51, -30), R);
+        const sun = G.clone().addScaledVector(new THREE.Vector3(nDir.x, 0.05, nDir.z).normalize(), 6.2);
         const k = L(t, W("s2", "raios") - 6, W("s2", "chão") + 10, 0, 1);
+        // raios paralelos (vindos do sol), um chega no Nordeste e outro no Sul
         const beam = (to: THREE.Vector3, w: number, c: string) => {
-          const from = new THREE.Vector3(sun.x + 1.0, to.y, to.z);
+          const from = to.clone().addScaledVector(nDir, 4.2);
           const d = to.clone().sub(from);
           const len = d.length() * k;
           const mid = from.clone().add(d.clone().normalize().multiplyScalar(len / 2));
@@ -584,15 +659,17 @@ export const NeWorld: React.FC<{gf: number}> = ({gf}) => {
             </mesh>
           );
         };
-        const spot = (p: THREE.Vector3, latDeg: number, sx: number, c: string, o: number) => {
-          const la = (latDeg * Math.PI) / 180;
-          const n = new THREE.Vector3(-Math.cos(la), Math.sin(la), 0);
-          const q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), n);
+        // mancha de luz no chão: no Nordeste pequena e forte; no Sul (raio inclinado) esticada e fraca
+        const spot = (lon: number, lat: number, sx: number, c: string, o: number) => {
+          const n = dirOf(lon, lat);
+          const east = new THREE.Vector3(0, 1, 0).cross(n).normalize();
+          const north = n.clone().cross(east).normalize();
+          const q = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(east, north, n));
           return (
-            <group position={p.clone().addScaledVector(n, 0.02)} quaternion={q}>
+            <group position={G.clone().addScaledVector(n, R + 0.03)} quaternion={q}>
               <mesh scale={[1, sx, 1]}>
-                <circleGeometry args={[0.32, 24]} />
-                <meshBasicMaterial color={c} transparent opacity={o * k} />
+                <circleGeometry args={[0.3, 28]} />
+                <meshBasicMaterial color={c} transparent opacity={o * k} depthWrite={false} />
               </mesh>
             </group>
           );
@@ -603,39 +680,30 @@ export const NeWorld: React.FC<{gf: number}> = ({gf}) => {
               <planeGeometry args={[80, 60]} />
               <meshStandardMaterial color="#13284a" />
             </mesh>
-            <mesh position={G} rotation={[0, 0.9, 0]}>
-              <sphereGeometry args={[3, 48, 32]} />
-              <meshStandardMaterial color="#2e86c1" roughness={0.5} />
+            {/* Terra com os continentes; o Brasil em destaque e o Nordeste em laranja */}
+            <mesh position={G}>
+              <sphereGeometry args={[R, 64, 40]} />
+              <meshStandardMaterial map={globeTex} roughness={0.55} />
             </mesh>
-            {/* continentes simplificados */}
-            {[[-15, 0.9, 0.9], [10, 0.75, 0.7], [-35, 0.6, 0.5], [35, 0.7, 0.8]].map(([lat, w, h], i) => {
-              const p = pt(lat);
-              return (
-                <mesh key={"ct" + i} position={p.clone().add(new THREE.Vector3(0.05, 0, 0))} scale={[0.3, h, w]}>
-                  <sphereGeometry args={[1, 16, 12]} />
-                  <meshStandardMaterial color={N.land} roughness={0.7} />
-                </mesh>
-              );
-            })}
             {/* linha do Equador */}
-            <mesh position={G} rotation={[0, 0, 0]}>
-              <torusGeometry args={[3.04, 0.035, 8, 80]} />
+            <mesh position={G} rotation={[Math.PI / 2, 0, 0]}>
+              <torusGeometry args={[R + 0.03, 0.03, 8, 96]} />
               <meshBasicMaterial color="#ff5252" />
             </mesh>
-            <mesh position={new THREE.Vector3(G.x, G.y, G.z)} rotation={[Math.PI / 2, 0, 0]}>
-              <torusGeometry args={[3.04, 0.035, 8, 80]} />
-              <meshBasicMaterial color="#ff5252" />
-            </mesh>
-            {/* sol e raios: no Nordeste chegam retos (mancha pequena e forte), no Sul inclinados (mancha grande e fraca) */}
             <mesh position={sun}>
-              <sphereGeometry args={[1.1, 28, 20]} />
+              <sphereGeometry args={[1.0, 28, 20]} />
               <meshBasicMaterial color="#ffd54f" />
             </mesh>
-            {beam(ne, 0.3, "#fff176")}
-            {beam(sul, 0.3, "#fff9c4")}
-            {spot(ne, -7, 1.0, "#ffeb3b", 0.95)}
-            {spot(sul, -30, 1.9, "#fff59d", 0.5)}
-            <pointLight position={[SET.globe - 6, 6, 6]} intensity={2} distance={30} />
+            <mesh position={sun}>
+              <sphereGeometry args={[1.35, 28, 20]} />
+              <meshBasicMaterial color="#ffd54f" transparent opacity={0.25} depthWrite={false} />
+            </mesh>
+            {beam(ne, 0.28, "#fff176")}
+            {beam(sul, 0.28, "#fff9c4")}
+            {spot(-39, -7, 1.0, "#fff176", 0.95)}
+            {spot(-51, -30, 2.0, "#fff9c4", 0.6)}
+            <pointLight position={sun} intensity={2.2} distance={30} />
+            <ambientLight intensity={0.25} />
           </group>
         );
       })()}
@@ -703,19 +771,53 @@ export const NeWorld: React.FC<{gf: number}> = ({gf}) => {
           {Array.from({length: 14}).map((_, i) => {
             const ph = ((gf * 0.014 + i / 14) % 1);
             return (
-              <mesh key={"cw" + i} position={[SET.city - 8 + (random("cwx" + i)) * 16, 0.1 + ph * 3, -2 + random("cwz" + i) * 4]} rotation={[0, 0, Math.sin(gf * 0.1 + i) * 0.3]}>
+              <mesh key={"cw" + i} position={[SET.city - 8 + (random("cwx" + i)) * 16, 0.1 + ph * 3, -4.2 + random("cwz" + i) * 2.8]} rotation={[0, 0, Math.sin(gf * 0.1 + i) * 0.3]}>
                 <planeGeometry args={[1.3, 0.1]} />
                 <meshBasicMaterial color="#ff8a50" transparent opacity={0.4 * cityHeat * Math.sin(ph * Math.PI)} depthWrite={false} side={THREE.DoubleSide} />
               </mesh>
             );
           })}
-          {/* cama do boneco na calçada da casa (corte) */}
+          {/* quarto do boneco (casa em corte): chão de madeira, parede do fundo com janela aberta para a cidade quente,
+              parede lateral, criado-mudo com abajur, cortina; ele fica deitado na cama, dentro de casa */}
+          <group position={[SET.city, 0, 0]}>
+            <B x={[-2.9, 2.9]} y={[0, 0.06]} z={[0.4, 4.2]} c="#a1714f" />
+            {Array.from({length: 9}).map((_, i) => <B key={"tb" + i} x={[-2.9, 2.9]} y={[0.06, 0.065]} z={[0.4 + i * 0.42, 0.42 + i * 0.42]} c="#8a5d3f" />)}
+            {/* parede do fundo com vão da janela */}
+            <B x={[-2.9, 2.9]} y={[0, 1.15]} z={[0.25, 0.45]} c="#e9dcc9" />
+            <B x={[-2.9, 2.9]} y={[2.35, 2.9]} z={[0.25, 0.45]} c="#e9dcc9" />
+            <B x={[-2.9, -0.4]} y={[1.15, 2.35]} z={[0.25, 0.45]} c="#e9dcc9" />
+            <B x={[1.6, 2.9]} y={[1.15, 2.35]} z={[0.25, 0.45]} c="#e9dcc9" />
+            {/* moldura e cortinas */}
+            <B x={[-0.45, 1.65]} y={[1.1, 1.17]} z={[0.45, 0.55]} c="#ffffff" />
+            <B x={[-0.45, 1.65]} y={[2.33, 2.4]} z={[0.45, 0.55]} c="#ffffff" />
+            {[-0.62, 1.82].map((cx, i) => (
+              <B key={"ct" + i} x={[cx - 0.2, cx + 0.2]} y={[0.9, 2.55]} z={[0.47, 0.55]} c="#c95f4f" />
+            ))}
+            {/* parede lateral esquerda */}
+            <B x={[-3.1, -2.9]} y={[0, 2.9]} z={[0.25, 4.2]} c="#dccab3" />
+            {/* rodapé */}
+            <B x={[-2.9, 2.9]} y={[0.06, 0.16]} z={[0.45, 0.5]} c="#7a5236" />
+            {/* quadro na parede */}
+            <B x={[-2.2, -1.3]} y={[1.5, 2.1]} z={[0.45, 0.5]} c="#6d4c41" />
+            <B x={[-2.12, -1.38]} y={[1.58, 2.02]} z={[0.5, 0.52]} c="#ffcc80" />
+          </group>
+          {/* cama (agora no tamanho do boneco alto) */}
           <group position={[SET.city, 0, 2]}>
-            <B x={[-1.4, 1.4]} y={[0, 0.02]} z={[-1.6, 1.4]} c="#d7ccc8" />
-            <B x={[-1.1, 1.1]} y={[0.02, 0.45]} z={[-0.55, 0.55]} c="#8d6e63" />
-            <B x={[-1.05, 1.05]} y={[0.45, 0.62]} z={[-0.5, 0.5]} c="#eceff1" />
-            <B x={[-1.05, -0.65]} y={[0.62, 0.74]} z={[-0.4, 0.4]} c="#ffffff" />
-            <B x={[-1.1, -1.0]} y={[0.02, 1.1]} z={[-0.55, 0.55]} c="#6d4c41" />
+            <B x={[-1.45, 1.45]} y={[0.06, 0.45]} z={[-0.6, 0.6]} c="#8d6e63" />
+            <B x={[-1.4, 1.4]} y={[0.45, 0.62]} z={[-0.55, 0.55]} c="#eceff1" />
+            <B x={[-1.35, -0.9]} y={[0.62, 0.74]} z={[-0.42, 0.42]} c="#ffffff" />
+            <B x={[-1.55, -1.45]} y={[0.06, 1.2]} z={[-0.6, 0.6]} c="#6d4c41" />
+            <B x={[0.1, 1.4]} y={[0.6, 0.66]} z={[-0.56, 0.56]} c="#5c8fd6" />
+          </group>
+          {/* criado-mudo com abajur aceso (luz quente) */}
+          <group position={[SET.city - 2.25, 0, 1.4]}>
+            <B x={[-0.35, 0.35]} y={[0.06, 0.7]} z={[-0.3, 0.3]} c="#795548" />
+            <B x={[-0.04, 0.04]} y={[0.7, 1.05]} z={[-0.04, 0.04]} c="#5d4037" />
+            <mesh position={[0, 1.15, 0]}>
+              <cylinderGeometry args={[0.13, 0.22, 0.25, 18, 1, true]} />
+              <meshStandardMaterial color="#ffe0a3" emissive="#ffcc66" emissiveIntensity={0.9} side={THREE.DoubleSide} />
+            </mesh>
+            <pointLight position={[0, 1.1, 0.2]} intensity={1.4} distance={5} color="#ffcf8a" />
           </group>
           <mesh position={[SET.city + 9, 13, -30]}>
             <sphereGeometry args={[1.8, 28, 20]} />
@@ -741,7 +843,7 @@ export const NeWorld: React.FC<{gf: number}> = ({gf}) => {
             </mesh>
           </group>
           {/* ventilador de pé, girando, com linhas de vento */}
-          <group position={[SET.room - 1.2, 0.05, 0.2]} rotation={[0, 0.6, 0]}>
+          <group position={[SET.room - 0.75, 0.05, 0.3]} rotation={[0, 0.9, 0]} scale={1.25}>
             <mesh position={[0, 0.03, 0]}>
               <cylinderGeometry args={[0.35, 0.4, 0.06, 24]} />
               <M c="#eceff1" />

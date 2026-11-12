@@ -8,16 +8,17 @@ import type {RefLook} from "./components/MascotRef";
 import type {MascotPose} from "./components/Mascot";
 
 const P = (p: Partial<MascotPose>): MascotPose => ({emotion: "happy", talk: 0, lArm: [4, 12], rArm: [4, 12], umbrella: "none", umbrellaTilt: 0, jump: 0, shiver: 0, walking: false, ...p});
+const HY = 2.16, SY = 1.72;
 const CASES: {az: number; pose: MascotPose; look: RefLook; label: string; r?: number; y?: number}[] = [
-  {az: 15, pose: P({emotion: "sick", rArm: [-150, -30], lArm: [-10, 25]}), look: {hot: 1, tongue: true}, label: "close (como no vídeo)", r: 4.4, y: 1.3},
-  {az: 0, pose: P({emotion: "sick", rArm: [-150, -30], lArm: [-10, 25]}), look: {hot: 1, tongue: true}, label: "calor"},
-  {az: 40, pose: P({emotion: "happy"}), look: {}, label: "3/4", r: 4.4, y: 1.3},
-  {az: 90, pose: P({emotion: "happy"}), look: {}, label: "lado", r: 4.4, y: 1.3},
-  {az: 160, pose: P({emotion: "happy"}), look: {}, label: "costas", r: 4.4, y: 1.3},
-  {az: 0, pose: P({emotion: "curious", lArm: [-80, -40], rArm: [-80, -40]}), look: {}, label: "lápis"},
-  {az: 0, pose: P({emotion: "joy", jump: 0.35, rArm: [-10, 160], lArm: [-10, 70]}), look: {}, label: "pulo"},
+  {az: 0, pose: P({emotion: "sick", rArm: [-10, 25], lArm: [-10, 25]}), look: {hot: 1, tongue: true, rReach: [0.36, HY - 0.05, 0.42], lReach: [-0.3, SY + 0.02, 0.32]}, label: "abana"},
+  {az: 35, pose: P({emotion: "happy", rArm: [4, 12], lArm: [4, 12]}), look: {}, label: "3/4"},
+  {az: 90, pose: P({emotion: "happy", rArm: [4, 12], lArm: [4, 12]}), look: {}, label: "lado"},
+  {az: 8, pose: P({emotion: "relieved", rArm: [-25, 8]}), look: {bottle: 0.6, drink: 1}, label: "bebendo", r: 4.6, y: 1.7},
+  {az: 50, pose: P({emotion: "relieved", rArm: [-25, 8]}), look: {bottle: 0.6, drink: 1}, label: "bebendo 3/4", r: 4.6, y: 1.7},
+  {az: 0, pose: P({emotion: "sick", lArm: [-95, 28]}), look: {rReach: [0.15, HY + 0.14, 0.45]}, label: "testa", r: 4.6, y: 1.7},
+  {az: 160, pose: P({emotion: "happy"}), look: {}, label: "costas"},
 ];
-const Cam: React.FC<{az: number; r?: number; y?: number}> = ({az, r = 6.2, y = 1.05}) => {
+const Cam: React.FC<{az: number; r?: number; y?: number}> = ({az, r = 8.5, y = 1.3}) => {
   const camera = useThree((s) => s.camera);
   const a = (az * Math.PI) / 180;
   camera.position.set(Math.sin(a) * r, y + 0.25, Math.cos(a) * r);

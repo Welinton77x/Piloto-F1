@@ -3,6 +3,7 @@
 // ao aterrissar, deitar na cama, beber água inclinando a garrafa, suor que aumenta com o calor.
 import type {MascotPose} from "../components/Mascot";
 import type {RefLook} from "../components/MascotRef";
+import {HEAD_Y, SH_Y} from "../components/MascotRef";
 import {clamp01, easeInOut} from "./anim";
 import {SET, W, end, failing, inS, setAt, start} from "./story";
 
@@ -16,7 +17,7 @@ const COAST: V3 = [9.6, 0.06, 1.0];
 const SHADE: V3 = [-4.2, 0.06, 0.6];
 const WET_SIDE: V3 = [-0.1, 0.06, 0.7];
 const DRY: V3 = [1.55, 0.06, 1.35];
-const BED: V3 = [SET.city + 0.8, 0.62 + 0.2, 2.0];
+const BED: V3 = [SET.city + 1.15, 0.62 + 0.27, 2.0];
 const ROOM: V3 = [SET.room + 0.55, 0.05, 0.9];
 
 const lerp3 = (a: V3, b: V3, k: number): V3 => [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k];
@@ -57,7 +58,7 @@ export const mascotLook = (t: number): Look => {
   if (inS("s1", t)) return {at: HOME, hot: 1, tongue: t < W("s1", "Se") - 4, sweat: 1, rHand: t >= W("s1", "sol") - 6 ? "point" : "open"};
   if (inS("s2", t)) return {at: HOME, hot: 1, sweat: 1};
   if (inS("s3", t)) {
-    const w = walk(t, W("s3", "Então") - 4, W("s3", "interior") + 16, COAST, HOME);
+    const w = walk(t, W("s3", "Então") - 4, W("s3", "interior") + 40, COAST, HOME);
     const k = clamp01((t - W("s3", "Então")) / 50);
     return {at: w.at, ry: w.ry, hot: 0.25 + 0.75 * k, sweat: 0.2 + 0.8 * k, tongue: k > 0.9};
   }
@@ -76,7 +77,10 @@ export const mascotLook = (t: number): Look => {
     const drinking = t >= d0 && t < d1;
     const level = t < d0 ? 1 : t < d1 ? 1 - 0.7 * clamp01((t - d0) / (d1 - d0)) : 0.3;
     const inShade = t >= W("s9", "sol") + 20;
-    return {at: w.at, ry: w.ry, hot: inShade ? 0.3 : 0.8, sweat: inShade ? 0.2 : 0.8, bottle: t < W("s9", "foge") ? level : 0, bottleTilt: drinking ? 75 * Math.sin(clamp01((t - d0) / (d1 - d0)) * Math.PI) : 0, rHand: t >= W("s9", "idosos") - 6 && t < W("s9", "alertas") ? "point" : undefined};
+    // gole: sobe a garrafa em ~12 frames, segura na boca, desce em ~12 frames (curva suave)
+    const ss = (x: number) => x * x * (3 - 2 * x);
+    const drink = drinking ? ss(clamp01((t - d0) / 12)) * ss(clamp01((d1 - t) / 12)) : 0;
+    return {at: w.at, ry: w.ry, hot: inShade ? 0.3 : 0.8, sweat: inShade ? 0.2 : 0.8, bottle: level, drink, lHand: t >= W("s9", "idosos") - 6 && t < W("s9", "alertas") ? "point" : undefined};
   }
   if (inS("s10", t)) {
     const p = W("s10", "Parabéns");
@@ -93,13 +97,18 @@ export const mascotPose = (t: number): MascotPose => {
   const set = setAt(t);
   const fan = (): void => {
     // se abanando com a mão aberta perto do rosto + punho fechado no ombro (como na referência)
-    p.rArm = [-150 + Math.sin(t * 0.7) * 14, -38];
-    p.lArm = [-95, 28];
+    // mão aberta abanando do lado do rosto e punho fechado no ombro (IK do mascote novo)
+    p.rReach = [0.3, HEAD_Y - 0.05, 0.42];
+    p.rReach2 = [0.42, HEAD_Y - 0.02, 0.4];
+    p.rReachK = 0.5 + 0.5 * Math.sin(t * 0.7);
+    p.lReach = [-0.3, SH_Y + 0.02, 0.32];
   };
   if (set === "city") {
     p.emotion = "sick";
     p.sick = 0.15;
-    p.rArm = [-150 + Math.sin(t * 0.6) * 14, -30]; // se abana deitado
+    p.rReach = [0.3, HEAD_Y - 0.05, 0.42]; // se abana deitado
+    p.rReach2 = [0.42, HEAD_Y - 0.02, 0.4];
+    p.rReachK = 0.5 + 0.5 * Math.sin(t * 0.6);
     p.lArm = [-10, 50];
     return p;
   }
@@ -116,7 +125,9 @@ export const mascotPose = (t: number): MascotPose => {
     } else {
       p.emotion = "sick";
       p.sick = 0.1;
-      p.rArm = [-160, -25]; // passa a mão na testa suada
+      p.rReach = [0.03, HEAD_Y + 0.14, 0.44];
+      p.rReach2 = [0.27, HEAD_Y + 0.12, 0.42];
+      p.rReachK = 0.5 + 0.5 * Math.sin(t * 0.25); // passa a mão na testa suada
     }
     return p;
   }
@@ -126,7 +137,7 @@ export const mascotPose = (t: number): MascotPose => {
     if (t >= W("s1", "sol") - 6) {
       p.emotion = "surprised";
       p.rArm = [-170, 12]; // aponta pro sol
-      p.lArm = [-95, 28];
+      p.lReach = [-0.3, SH_Y + 0.02, 0.32];
     } else fan();
     return p;
   }
@@ -136,7 +147,7 @@ export const mascotPose = (t: number): MascotPose => {
     return p;
   }
   if (inS("s3", t)) {
-    const f0 = W("s3", "Então") - 4, f1 = W("s3", "interior") + 16;
+    const f0 = W("s3", "Então") - 4, f1 = W("s3", "interior") + 40;
     if (t < f0) {
       p.emotion = "relieved"; // na brisa do mar: braços abertos
       p.lArm = [-15, 70 + Math.sin(t * 0.1) * 6];
@@ -177,23 +188,26 @@ export const mascotPose = (t: number): MascotPose => {
     p.emotion = "sick";
     p.sick = 0.2;
     p.shiver = 0.3;
-    p.rArm = [-160 + Math.sin(t * 0.25) * 20, -30]; // enxuga a testa
-    p.lArm = [-95, 28];
+    p.rReach = [0.03, HEAD_Y + 0.14, 0.44];
+      p.rReach2 = [0.27, HEAD_Y + 0.12, 0.42];
+      p.rReachK = 0.5 + 0.5 * Math.sin(t * 0.25); // enxuga a testa
+    p.lReach = [-0.3, SH_Y + 0.02, 0.32];
     return p;
   }
   if (inS("s9", t)) {
     const d0 = W("s9", "bebe") - 6, d1 = W("s9", "sede") + 10;
     const wf0 = W("s9", "foge") - 4, wf1 = W("s9", "sol") + 20;
     if (t >= d0 && t < d1) {
+      // o braço até a boca é calculado no MascotRef (look.drink); aqui só a expressão
       const k = Math.sin(clamp01((t - d0) / (d1 - d0)) * Math.PI);
-      p.rArm = [-80 - 70 * k, -10 - 18 * k]; // leva a garrafa até a boca
+      p.rArm = [-25, 8];
       p.emotion = k > 0.5 ? "relieved" : "happy";
     } else if (t >= wf0 && t < wf1) {
       p.walking = true;
       p.lArm = [Math.sin(t * 0.45) * 28, 10];
       p.rArm = [-Math.sin(t * 0.45) * 28, 10];
     } else if (t >= W("s9", "idosos") - 6 && t < W("s9", "alertas")) {
-      p.rArm = [-80, 20]; // aponta: cuida dos idosos e das crianças
+      p.lArm = [-80, 20]; // aponta com a mão livre (a direita segura a garrafa): cuida dos idosos e das crianças
       p.emotion = "happy";
     } else if (t >= W("s9", "alertas") - 4) {
       p.emotion = "grin";
