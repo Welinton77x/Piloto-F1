@@ -26,7 +26,7 @@ const useToyMats = (L: ToyLook) =>
       shirt: sm(L.shirt ?? "#ffcd2e", 0.6),
       shirtDark: sm("#e7a816", 0.6),
       pants: sm(L.pants ?? "#2f55b0", 0.65),
-      hair: sm(L.hair ?? "#3b2416", 0.45),
+      hair: sm(L.hair ?? "#3b2416", 0.45, {side: THREE.DoubleSide}),
       shoe: sm(L.shoe ?? "#f4f4f2", 0.45),
       sole: sm(L.sole ?? "#f08a1c", 0.5),
       eye: sm("#0c0c10", 0.12, {metalness: 0.1}),
@@ -45,16 +45,79 @@ const useToyMats = (L: ToyLook) =>
 const HIP = 0.72;
 const TORSO_BOT = 0.7;
 const TORSO_TOP = 1.415;
-const HR = 0.34; // raio do cabelo
-const HT = Math.acos(0.135 / HR); // borda do cabelo na altura da testa (logo acima das sobrancelhas)
 const HIPX = 0.125;
 const SHX = 0.36;
 const SHY = 1.325;
 const THIGH = 0.3;
 const SHIN = 0.29;
 
+
+/* linha do cabelo (altura no espaço da cabeça) em função do ângulo em volta da cabeça (0 = frente, ±π = nuca) */
+const HAIR_R = 0.345;
+const HAIR_SC: [number, number, number] = [1.05, 0.93, 1.02];
+const sstep = (a: number, b: number, x: number) => {
+  const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
+  return t * t * (3 - 2 * t);
+};
+const RING_Y = 0.15; // altura do rolo de cabelo (acima das sobrancelhas e das orelhas)
+const ringR = () => {
+  const yy = RING_Y / HAIR_SC[1];
+  return Math.sqrt(HAIR_R * HAIR_R - yy * yy);
+};
+/** borda de baixo do cabelo de trás (altura), conforme o ângulo em volta da cabeça (|a| de ~1,9 até π) */
+const backEdge = (a: number) => {
+  const k = sstep(1.9, 2.6, Math.abs(a));
+  return 0.05 + (-0.11 - 0.05) * k + 0.014 * Math.sin(a * 6) * k;
+};
+const HEAD_R = 0.32;
+const HEAD_SC: [number, number, number] = [1, 0.96, 0.94];
+/** ponto na pele da cabeça (um tiquinho pra fora) */
+const onHead = (a: number, y: number, out = 1.018): THREE.Vector3 => {
+  const yu = y / HEAD_SC[1];
+  const r = Math.sqrt(Math.max(0, HEAD_R * HEAD_R - yu * yu));
+  return new THREE.Vector3(r * Math.sin(a) * HEAD_SC[0] * out, y * out, r * Math.cos(a) * HEAD_SC[2] * out);
+};
+const makeHair = () => {
+  // cuia baixa e lisa em cima
+  const cap = new THREE.SphereGeometry(HAIR_R, 64, 24, 0, Math.PI * 2, 0, Math.acos(RING_Y / HAIR_SC[1] / HAIR_R));
+  cap.scale(...HAIR_SC);
+  // rolo grosso em volta da cabeça toda
+  const ring = new THREE.TorusGeometry(ringR(), 0.064, 18, 72);
+  ring.rotateX(Math.PI / 2);
+  ring.scale(HAIR_SC[0], 1, HAIR_SC[2]);
+  ring.translate(0, RING_Y, 0);
+  // cabelo de trás: camada colada na cabeça, do rolo até a borda ondulada
+  const NA = 64;
+  const NY = 10;
+  const a0 = 1.85;
+  const verts: number[] = [];
+  const index: number[] = [];
+  for (let i = 0; i <= NA; i++) {
+    const a = a0 + (i / NA) * (Math.PI * 2 - 2 * a0);
+    const yb = backEdge(a);
+    for (let j = 0; j <= NY; j++) {
+      const y = lerpN(RING_Y + 0.02, yb, j / NY);
+      const v = onHead(a, y);
+      verts.push(v.x, v.y, v.z);
+    }
+  }
+  for (let i = 0; i < NA; i++)
+    for (let j = 0; j < NY; j++) {
+      const p = i * (NY + 1) + j;
+      const q = (i + 1) * (NY + 1) + j;
+      index.push(p, p + 1, q, q, p + 1, q + 1);
+    }
+  const back = new THREE.BufferGeometry();
+  back.setAttribute("position", new THREE.Float32BufferAttribute(verts, 3));
+  back.setIndex(index);
+  back.computeVertexNormals();
+  return {shell: cap, rim: ring, edge: back};
+};
+const lerpN = (a: number, b: number, t: number) => a + (b - a) * t;
+
 export const Toy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; look?: ToyLook}> = ({pose, palmRef, look = {}}) => {
   const m = useToyMats(look);
+  const hairGeo = useMemo(makeHair, []);
   const geo = useMemo(
     () => ({
       torso: new RoundedBoxGeometry(0.53, TORSO_TOP - TORSO_BOT, 0.37, 5, 0.11),
@@ -166,19 +229,10 @@ export const Toy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; loo
                 <sphereGeometry args={[0.075, 16, 12]} />
               </mesh>
             ))}
-            {/* cabelo em cuia: calota cheia inclinada pra trás (alto na testa, desce até a nuca) com borda grossa */}
-            <group position={[0, 0.0, -0.015]} rotation={[-0.12, 0, 0]} scale={[1.06, 0.97, 1.07]}>
-              <mesh material={m.hair} castShadow>
-                <sphereGeometry args={[HR, 40, 22, 0, Math.PI * 2, 0, HT]} />
-              </mesh>
-              <mesh position={[0, HR * Math.cos(HT), 0]} rotation={[Math.PI / 2, 0, 0]} material={m.hair} castShadow>
-                <torusGeometry args={[HR * Math.sin(HT), 0.068, 16, 48]} />
-              </mesh>
-            </group>
-            {/* cabelo de trás: cobre a nuca, termina logo atrás das orelhas */}
-            <mesh position={[0, 0.0, -0.01]} scale={[1.03, 0.98, 1.0]} material={m.hair} castShadow>
-              <sphereGeometry args={[0.333, 36, 24, Math.PI + 0.16, Math.PI - 0.32, 0, 2.0]} />
-            </mesh>
+            {/* cabelo: uma peça lisa só, com a borda grossa e arredondada seguindo a linha do cabelo */}
+            <mesh geometry={hairGeo.shell} material={m.hair} castShadow />
+            <mesh geometry={hairGeo.rim} material={m.hair} castShadow />
+            <mesh geometry={hairGeo.edge} material={m.hair} castShadow />
             {hairLift > 0.3 &&
               [[-0.12, 0.2], [0.05, -0.15], [0.16, 0.3], [-0.05, 0.5]].map(([x, r], i) => (
                 <mesh key={i} position={[x, 0.33, -0.02 + i * 0.03]} rotation={[0.2 * i - 0.3, 0, r]} scale={hairLift} material={m.hair}>
