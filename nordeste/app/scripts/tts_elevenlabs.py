@@ -1,6 +1,6 @@
-"""Narração do vídeo 5 (kit 72h) com ElevenLabs, voz Liam + tempos por palavra.
+"""Narração do vídeo 6 (calor no Nordeste) com ElevenLabs, voz Liam + tempos por palavra.
 Uso (uma vez; cobra créditos a cada execução):
-    ELEVENLABS_API_KEY=... python kit72h/app/scripts/tts_elevenlabs.py
+    ELEVENLABS_API_KEY=... python nordeste/app/scripts/tts_elevenlabs.py
 Lê src/data/scene-plan.ts, escreve public/vo/sN.mp3 e src/data/timing.json.
 Roteiro v5 aprovado: speed 1,08 para caber em ~2:45."""
 import base64, json, os, re, subprocess, urllib.error, urllib.request
@@ -14,7 +14,7 @@ SETTINGS = {"stability": 0.45, "similarity_boost": 0.8, "style": 0.4, "use_speak
 
 src = (ROOT / "src/data/scene-plan.ts").read_text(encoding="utf-8")
 items = re.findall(r'voKey: "(s\d+)".*?narration: "((?:[^"\\]|\\.)*)"', src, flags=re.S)
-assert len(items) == 8, len(items)
+assert len(items) == 10, len(items)
 # TTS_ONLY="s11" regenera só essas cenas e mantém as demais (economiza créditos)
 ONLY = [x for x in os.environ.get("TTS_ONLY", "").replace(",", " ").split() if x]
 
