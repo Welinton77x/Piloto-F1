@@ -13,6 +13,8 @@ export type ToyLook = {
   hair?: string;
   shoe?: string;
   sole?: string;
+  backpack?: string; // mochila nas costas (cor)
+  jelly?: number; // 0..1 coberto de gelatina de morango
 };
 
 const sm = (color: string, rough = 0.55, extra: Partial<THREE.MeshStandardMaterialParameters> = {}) =>
@@ -36,8 +38,12 @@ const useToyMats = (L: ToyLook) =>
       tongue: sm("#e2606e", 0.45),
       blush: sm("#f3a0a6", 0.6),
       bag: sm("#a88094", 0.7),
+      pack: sm(L.backpack ?? "#2f6fd6", 0.5),
+      packDark: sm(new THREE.Color(L.backpack ?? "#2f6fd6").multiplyScalar(0.75).getStyle(), 0.5),
+      strap: sm("#4a5260", 0.6),
+      jelly: sm("#e8303f", 0.15, {transparent: true, opacity: 0.85, metalness: 0.05}),
     }),
-    [L.skin, L.shirt, L.pants, L.hair, L.shoe, L.sole],
+    [L.skin, L.shirt, L.pants, L.hair, L.shoe, L.sole, L.backpack],
   );
 
 /* proporções medidas no boneco de referência (altura total ≈ 2,0):
@@ -122,6 +128,10 @@ export const Toy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; loo
     () => ({
       torso: new RoundedBoxGeometry(0.53, TORSO_TOP - TORSO_BOT, 0.37, 5, 0.11),
       shoe: new RoundedBoxGeometry(0.2, 0.12, 0.34, 4, 0.055),
+      pack: new RoundedBoxGeometry(0.47, 0.6, 0.22, 4, 0.085),
+      pocket: new RoundedBoxGeometry(0.34, 0.2, 0.07, 3, 0.03),
+      strapF: new RoundedBoxGeometry(0.065, 0.6, 0.03, 2, 0.012),
+      strapT: new RoundedBoxGeometry(0.065, 0.03, 0.42, 2, 0.012),
       sole: new RoundedBoxGeometry(0.21, 0.035, 0.35, 3, 0.015),
     }),
     [],
@@ -216,6 +226,28 @@ export const Toy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; loo
           <mesh position={[0, TORSO_TOP - 0.01, 0.02]} rotation={[Math.PI / 2, 0, 0]} material={m.shirtDark}>
             <torusGeometry args={[0.11, 0.026, 8, 20]} />
           </mesh>
+          {look.backpack && (
+            <>
+              {/* mochila nas costas + alças passando pela frente */}
+              <mesh position={[0, 1.06, -0.3]} geometry={geo.pack} material={m.pack} castShadow />
+              <mesh position={[0, 0.9, -0.425]} geometry={geo.pocket} material={m.packDark} castShadow />
+              <mesh position={[0, 1.37, -0.29]} rotation={[0, Math.PI / 2, 0]} material={m.packDark}>
+                <torusGeometry args={[0.05, 0.014, 8, 16, Math.PI]} />
+              </mesh>
+              {[-1, 1].map((sd) => (
+                <group key={sd}>
+                  <mesh position={[0.14 * sd, 1.1, 0.197]} geometry={geo.strapF} material={m.strap} castShadow />
+                  <mesh position={[0.14 * sd, TORSO_TOP + 0.005, -0.02]} geometry={geo.strapT} material={m.strap} />
+                </group>
+              ))}
+            </>
+          )}
+          {(look.jelly ?? 0) > 0.01 &&
+            [[-0.15, 1.2, 0.19, 0.09], [0.12, 0.95, 0.19, 0.11], [0.2, 1.3, 0.17, 0.07], [-0.05, 0.82, 0.19, 0.08], [0.0, 1.05, 0.2, 0.06]].map(([x, y, z, r], i) => (
+              <mesh key={"j" + i} position={[x, y, z]} scale={[(look.jelly ?? 0) * 1, (look.jelly ?? 0) * 0.8, (look.jelly ?? 0) * 0.5]} material={m.jelly}>
+                <sphereGeometry args={[r, 14, 10]} />
+              </mesh>
+            ))}
           {arm(-1, rShoulder, rElbow, rWrist, palmRef)}
           {arm(1, lShoulder, lElbow, lWrist)}
           {/* cabeça */}

@@ -49,7 +49,7 @@ export const ToyPreview: React.FC = () => {
           <Lights />
           {row.map((r, i) => (
             <group key={i} position={[r.x, 0, 0]}>
-              <Toy pose={{...r.pose, rotY: r.rotY}} />
+              <Toy pose={{...r.pose, rotY: r.rotY}} look={i === 3 || i === 2 ? {backpack: "#2f6fd6"} : {}} />
             </group>
           ))}
         </ThreeCanvas>
