@@ -11,7 +11,7 @@ import {REWINDS, W, heat, imagineAmount, skyDark, start} from "./lib/story";
 import {FOV, poseAt} from "./lib/camera";
 import {track} from "./lib/track";
 import {clamp01, mixHex} from "./lib/anim";
-import {SFX, musicVolume, rainVolume} from "./lib/audio";
+import {SFX, musicVolume} from "./lib/audio";
 
 // fontes locais (Montserrat 800/900), sem depender de rede no render
 const fontHandle = delayRender("fonts");
@@ -86,9 +86,11 @@ const World: React.FC = () => {
 
 // efeitos pontuais amarrados às palavras (frames globais)
 const SFX_AT: [number, string, number][] = [
+  [start("s1") + 4, "calor.wav", 0.4],
   [W("s1", "sol"), "pop.wav", 0.3],
   [W("s2", "raios"), "whoosh.wav", 0.3],
   [W("s3", "Então") - 4, "steps.wav", 0.35],
+  [W("s3", "interior") + 30, "calor.wav", 0.35],
   [W("s4", "seca") - 4, "steps.wav", 0.3],
   [W("s4", "seca") + 18, "sizzle.wav", 0.35],
   [W("s4", "seca") + 18, "ohno.wav", 0.4],
@@ -97,10 +99,18 @@ const SFX_AT: [number, string, number][] = [
   [W("s7", "subir"), "whoosh.wav", 0.3],
   [W("s7", "desce"), "whoosh.wav", 0.3],
   [W("s7", "calorão") - 10, "ohno.wav", 0.35],
+  [W("s7", "calorão") + 4, "calor.wav", 0.4],
   [start("s8"), "fan.wav", 0.3],
+  [start("s8") + 20, "calor.wav", 0.35],
+  [W("s8", "suor"), "enxuga.wav", 0.4],
+  [W("s8", "suor") + 10, "drip.wav", 0.25],
   [W("s9", "bebe") - 4, "gulp.wav", 0.45],
+  [W("s9", "sede") + 8, "alivio.wav", 0.35],
   [W("s9", "foge") - 4, "steps.wav", 0.35],
+  [W("s9", "sol") + 34, "alivio.wav", 0.4],
   [W("s10", "Parabéns"), "cheer.wav", 0.5],
+  [W("s10", "Parabéns"), "confete.wav", 0.45],
+  [W("s10", "Parabéns") + 4, "brilho.wav", 0.35],
   [W("s10", "Parabéns") + 22, "hop.wav", 0.3],
   [W("s10", "Parabéns") + 48, "hop.wav", 0.3],
 ];
@@ -141,6 +151,5 @@ export const Main: React.FC<{audioOnly?: boolean}> = ({audioOnly}) => (
       </React.Fragment>
     ))}
     <Audio src={staticFile("sfx/music.wav")} loop volume={(f) => musicVolume(f)} />
-    <Audio src={staticFile("sfx/cicadas.wav")} loop volume={(f) => rainVolume(f)} />
   </AbsoluteFill>
 );
