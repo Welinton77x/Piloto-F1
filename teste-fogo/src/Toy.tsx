@@ -14,6 +14,7 @@ export type ToyLook = {
   shoe?: string;
   sole?: string;
   backpack?: string; // mochila nas costas (cor)
+  hoodie?: boolean; // casaco com capuz, manga comprida e cordinhas pretas
   jelly?: number; // 0..1 coberto de gelatina de morango
 };
 
@@ -41,6 +42,7 @@ const useToyMats = (L: ToyLook) =>
       pack: sm(L.backpack ?? "#2f6fd6", 0.5),
       packDark: sm(new THREE.Color(L.backpack ?? "#2f6fd6").multiplyScalar(0.75).getStyle(), 0.5),
       strap: sm("#4a5260", 0.6),
+      cord: sm("#141414", 0.45),
       jelly: sm("#e8303f", 0.15, {transparent: true, opacity: 0.85, metalness: 0.05}),
     }),
     [L.skin, L.shirt, L.pants, L.hair, L.shoe, L.sole, L.backpack],
@@ -131,6 +133,10 @@ export const Toy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; loo
       pack: new RoundedBoxGeometry(0.47, 0.6, 0.22, 4, 0.085),
       pocket: new RoundedBoxGeometry(0.34, 0.2, 0.07, 3, 0.03),
       strapF: new RoundedBoxGeometry(0.065, 0.6, 0.03, 2, 0.012),
+      hoodie: new RoundedBoxGeometry(0.58, TORSO_TOP - TORSO_BOT + 0.02, 0.41, 5, 0.13),
+      hem: new RoundedBoxGeometry(0.585, 0.09, 0.415, 3, 0.04),
+      kpocket: new RoundedBoxGeometry(0.38, 0.17, 0.04, 3, 0.03),
+      hoodBack: new RoundedBoxGeometry(0.4, 0.2, 0.12, 3, 0.06),
       strapT: new RoundedBoxGeometry(0.065, 0.03, 0.42, 2, 0.012),
       sole: new RoundedBoxGeometry(0.21, 0.035, 0.35, 3, 0.015),
     }),
@@ -167,18 +173,39 @@ export const Toy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; loo
 
   const arm = (side: 1 | -1, shoulder: [number, number, number], elbow: number, wrist: [number, number, number], ref?: React.Ref<THREE.Object3D>) => (
     <group position={[SHX * side, SHY, 0]} rotation={shoulder}>
-      {/* manga curta da camiseta */}
-      <mesh position={[0, -0.07, 0]} material={m.shirt} castShadow>
-        <capsuleGeometry args={[0.112, 0.08, 6, 14]} />
-      </mesh>
-      {/* braço */}
-      <mesh position={[0, -0.14, 0]} material={m.skin} castShadow>
-        <capsuleGeometry args={[0.09, 0.16, 6, 14]} />
-      </mesh>
-      <group position={[0, -0.26, 0]} rotation={[elbow, 0, 0]}>
-        <mesh position={[0, -0.11, 0]} material={m.skin} castShadow>
-          <capsuleGeometry args={[0.088, 0.16, 6, 14]} />
+      {look.hoodie ? (
+        /* manga comprida do casaco (fofinha) */
+        <mesh position={[0, -0.12, 0]} material={m.shirt} castShadow>
+          <capsuleGeometry args={[0.112, 0.17, 6, 14]} />
         </mesh>
+      ) : (
+        <>
+          {/* manga curta da camiseta */}
+          <mesh position={[0, -0.07, 0]} material={m.shirt} castShadow>
+            <capsuleGeometry args={[0.112, 0.08, 6, 14]} />
+          </mesh>
+          {/* braço */}
+          <mesh position={[0, -0.14, 0]} material={m.skin} castShadow>
+            <capsuleGeometry args={[0.09, 0.16, 6, 14]} />
+          </mesh>
+        </>
+      )}
+      <group position={[0, -0.26, 0]} rotation={[elbow, 0, 0]}>
+        {look.hoodie ? (
+          <>
+            <mesh position={[0, -0.1, 0]} material={m.shirt} castShadow>
+              <capsuleGeometry args={[0.106, 0.14, 6, 14]} />
+            </mesh>
+            {/* punho */}
+            <mesh position={[0, -0.215, 0]} material={m.shirtDark} castShadow>
+              <capsuleGeometry args={[0.1, 0.03, 6, 14]} />
+            </mesh>
+          </>
+        ) : (
+          <mesh position={[0, -0.11, 0]} material={m.skin} castShadow>
+            <capsuleGeometry args={[0.088, 0.16, 6, 14]} />
+          </mesh>
+        )}
         <group position={[0, -0.25, 0]} rotation={wrist}>
           {/* mão de bolinha */}
           <mesh position={[0, -0.045, 0]} material={m.skin} castShadow>
@@ -221,11 +248,42 @@ export const Toy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; loo
       {/* tronco: gira em volta do quadril */}
       <group position={[0, HIP, 0]} rotation={torso}>
         <group position={[0, -HIP, 0]}>
-          <mesh position={[0, (TORSO_BOT + TORSO_TOP) / 2 + breathe * 0.004, 0]} scale={[1, 1 + breathe * 0.008, 1]} geometry={geo.torso} material={m.shirt} castShadow receiveShadow />
-          {/* gola */}
-          <mesh position={[0, TORSO_TOP - 0.01, 0.02]} rotation={[Math.PI / 2, 0, 0]} material={m.shirtDark}>
-            <torusGeometry args={[0.11, 0.026, 8, 20]} />
-          </mesh>
+          {look.hoodie ? (
+            <>
+              {/* casaco amarelo com capuz, bolso canguru, barra e cordinhas pretas */}
+              <mesh position={[0, (TORSO_BOT + TORSO_TOP) / 2 + breathe * 0.004, 0]} scale={[1, 1 + breathe * 0.008, 1]} geometry={geo.hoodie} material={m.shirt} castShadow receiveShadow />
+              <mesh position={[0, TORSO_BOT + 0.03, 0]} geometry={geo.hem} material={m.shirtDark} castShadow />
+              <mesh position={[0, 0.9, 0.2]} geometry={geo.kpocket} material={m.shirtDark} castShadow />
+              {/* gola do capuz */}
+              <mesh position={[0, TORSO_TOP + 0.005, -0.01]} rotation={[-Math.PI / 2, 0, 0]} material={m.shirt} castShadow>
+                <torusGeometry args={[0.17, 0.07, 10, 28, Math.PI]} />
+              </mesh>
+              <mesh position={[0, TORSO_TOP - 0.005, 0.03]} rotation={[Math.PI / 2, 0, 0]} material={m.shirtDark}>
+                <torusGeometry args={[0.13, 0.03, 8, 24]} />
+              </mesh>
+              {/* capuz dobrado nas costas */}
+              <mesh position={[0, TORSO_TOP - 0.08, -0.215]} rotation={[0.25, 0, 0]} geometry={geo.hoodBack} material={m.shirt} castShadow />
+              {/* cordinhas pretas */}
+              {[-1, 1].map((sd) => (
+                <group key={sd} position={[0.055 * sd, TORSO_TOP - 0.03, 0.215]} rotation={[0.08, 0, 0.04 * sd]}>
+                  <mesh position={[0, -0.1, 0]} material={m.cord}>
+                    <capsuleGeometry args={[0.013, 0.17, 4, 8]} />
+                  </mesh>
+                  <mesh position={[0, -0.2, 0]} material={m.cord}>
+                    <capsuleGeometry args={[0.02, 0.025, 4, 8]} />
+                  </mesh>
+                </group>
+              ))}
+            </>
+          ) : (
+            <>
+              <mesh position={[0, (TORSO_BOT + TORSO_TOP) / 2 + breathe * 0.004, 0]} scale={[1, 1 + breathe * 0.008, 1]} geometry={geo.torso} material={m.shirt} castShadow receiveShadow />
+              {/* gola */}
+              <mesh position={[0, TORSO_TOP - 0.01, 0.02]} rotation={[Math.PI / 2, 0, 0]} material={m.shirtDark}>
+                <torusGeometry args={[0.11, 0.026, 8, 20]} />
+              </mesh>
+            </>
+          )}
           {look.backpack && (
             <>
               {/* mochila nas costas + alças passando pela frente */}
@@ -236,8 +294,8 @@ export const Toy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; loo
               </mesh>
               {[-1, 1].map((sd) => (
                 <group key={sd}>
-                  <mesh position={[0.14 * sd, 1.1, 0.197]} geometry={geo.strapF} material={m.strap} castShadow />
-                  <mesh position={[0.14 * sd, TORSO_TOP + 0.005, -0.02]} geometry={geo.strapT} material={m.strap} />
+                  <mesh position={[0.15 * sd, 1.1, look.hoodie ? 0.214 : 0.197]} geometry={geo.strapF} material={m.strap} castShadow />
+                  <mesh position={[0.15 * sd, TORSO_TOP + (look.hoodie ? 0.02 : 0.005), -0.02]} geometry={geo.strapT} material={m.strap} />
                 </group>
               ))}
             </>

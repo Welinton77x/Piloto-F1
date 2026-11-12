@@ -26,8 +26,8 @@ const at = (i: number, txt: string, n = 0) => {
 export const TOTAL_ESCOLA = F(words[words.length - 1].e + 1.6);
 
 /* ---------- personagens ---------- */
-const KID: ToyLook = {backpack: "#2f6fd6"};
-const KID_HOME: ToyLook = {};
+const KID: ToyLook = {hoodie: true, backpack: "#2f6fd6"};
+const KID_HOME: ToyLook = {hoodie: true};
 const KLOOKS: ToyLook[] = [
   {shirt: "#e74c3c", pants: "#2c3e50", hair: "#1a1a1a"},
   {shirt: "#3498db", pants: "#34495e", hair: "#7a3a1a", skin: "#c68a5a"},
