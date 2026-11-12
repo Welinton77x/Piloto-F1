@@ -40,21 +40,26 @@ const useToyMats = (L: ToyLook) =>
     [L.skin, L.shirt, L.pants, L.hair, L.shoe, L.sole],
   );
 
-const HIP = 0.78;
+/* proporções medidas no boneco de referência (altura total ≈ 2,0):
+   tênis 0–0,13 · pernas até 0,70 · tronco 0,70–1,415 · cabeça (com cabelo) 1,445–2,0 */
+const HIP = 0.72;
+const TORSO_BOT = 0.7;
+const TORSO_TOP = 1.415;
 const HR = 0.34; // raio do cabelo
-const HT = 1.5; // até onde o cabelo desce (ângulo a partir do topo)
-const HIPX = 0.12;
-const SHX = 0.33;
-const SHY = 1.3;
+const HT = Math.acos(0.135 / HR); // borda do cabelo na altura da testa (logo acima das sobrancelhas)
+const HIPX = 0.125;
+const SHX = 0.36;
+const SHY = 1.325;
+const THIGH = 0.3;
+const SHIN = 0.29;
 
 export const Toy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; look?: ToyLook}> = ({pose, palmRef, look = {}}) => {
   const m = useToyMats(look);
   const geo = useMemo(
     () => ({
-      torso: new RoundedBoxGeometry(0.56, 0.54, 0.36, 5, 0.1),
-      waist: new RoundedBoxGeometry(0.52, 0.18, 0.33, 4, 0.07),
-      shoe: new RoundedBoxGeometry(0.17, 0.11, 0.3, 4, 0.05),
-      sole: new RoundedBoxGeometry(0.18, 0.035, 0.31, 3, 0.015),
+      torso: new RoundedBoxGeometry(0.53, TORSO_TOP - TORSO_BOT, 0.37, 5, 0.11),
+      shoe: new RoundedBoxGeometry(0.2, 0.12, 0.34, 4, 0.055),
+      sole: new RoundedBoxGeometry(0.21, 0.035, 0.35, 3, 0.015),
     }),
     [],
   );
@@ -90,23 +95,23 @@ export const Toy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; loo
   const arm = (side: 1 | -1, shoulder: [number, number, number], elbow: number, wrist: [number, number, number], ref?: React.Ref<THREE.Object3D>) => (
     <group position={[SHX * side, SHY, 0]} rotation={shoulder}>
       {/* manga curta da camiseta */}
-      <mesh position={[0, -0.08, 0]} material={m.shirt} castShadow>
-        <capsuleGeometry args={[0.1, 0.08, 6, 14]} />
+      <mesh position={[0, -0.07, 0]} material={m.shirt} castShadow>
+        <capsuleGeometry args={[0.112, 0.08, 6, 14]} />
       </mesh>
       {/* braço */}
-      <mesh position={[0, -0.16, 0]} material={m.skin} castShadow>
-        <capsuleGeometry args={[0.076, 0.2, 6, 14]} />
+      <mesh position={[0, -0.14, 0]} material={m.skin} castShadow>
+        <capsuleGeometry args={[0.09, 0.16, 6, 14]} />
       </mesh>
-      <group position={[0, -0.3, 0]} rotation={[elbow, 0, 0]}>
-        <mesh position={[0, -0.12, 0]} material={m.skin} castShadow>
-          <capsuleGeometry args={[0.074, 0.2, 6, 14]} />
+      <group position={[0, -0.26, 0]} rotation={[elbow, 0, 0]}>
+        <mesh position={[0, -0.11, 0]} material={m.skin} castShadow>
+          <capsuleGeometry args={[0.088, 0.16, 6, 14]} />
         </mesh>
-        <group position={[0, -0.28, 0]} rotation={wrist}>
+        <group position={[0, -0.25, 0]} rotation={wrist}>
           {/* mão de bolinha */}
-          <mesh position={[0, -0.03, 0]} material={m.skin} castShadow>
-            <sphereGeometry args={[0.082, 18, 14]} />
+          <mesh position={[0, -0.045, 0]} material={m.skin} castShadow>
+            <sphereGeometry args={[0.095, 18, 14]} />
           </mesh>
-          <object3D ref={ref} position={[0, -0.045, 0.08]} />
+          <object3D ref={ref} position={[0, -0.06, 0.09]} />
         </group>
       </group>
     </group>
@@ -125,16 +130,16 @@ export const Toy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; loo
         const foot = -(hipRot + knee) * (walkAmt > 0 ? 0.7 : 0);
         return (
           <group key={sd} position={[HIPX * sd, HIP, 0]} rotation={[hipRot, 0, 0]}>
-            <mesh position={[0, -0.17, 0]} material={m.pants} castShadow receiveShadow>
-              <capsuleGeometry args={[0.1, 0.3, 6, 14]} />
+            <mesh position={[0, -THIGH / 2, 0]} material={m.pants} castShadow receiveShadow>
+              <capsuleGeometry args={[0.116, THIGH - 0.06, 6, 14]} />
             </mesh>
-            <group position={[0, -0.36, 0]} rotation={[knee, 0, 0]}>
-              <mesh position={[0, -0.15, 0]} material={m.pants} castShadow receiveShadow>
-                <capsuleGeometry args={[0.095, 0.26, 6, 14]} />
+            <group position={[0, -THIGH, 0]} rotation={[knee, 0, 0]}>
+              <mesh position={[0, -SHIN / 2, 0]} material={m.pants} castShadow receiveShadow>
+                <capsuleGeometry args={[0.112, SHIN - 0.08, 6, 14]} />
               </mesh>
-              <group position={[0, -0.33, 0]} rotation={[foot, 0, 0]}>
-                <mesh position={[0, -0.035, 0.05]} geometry={geo.shoe} material={m.shoe} castShadow />
-                <mesh position={[0, -0.09, 0.05]} geometry={geo.sole} material={m.sole} />
+              <group position={[0, -SHIN, 0]} rotation={[foot, 0, 0]}>
+                <mesh position={[0, -0.055, 0.05]} geometry={geo.shoe} material={m.shoe} castShadow />
+                <mesh position={[0, -0.112, 0.05]} geometry={geo.sole} material={m.sole} />
               </group>
             </group>
           </group>
@@ -143,16 +148,15 @@ export const Toy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; loo
       {/* tronco: gira em volta do quadril */}
       <group position={[0, HIP, 0]} rotation={torso}>
         <group position={[0, -HIP, 0]}>
-          <mesh position={[0, 0.84, 0]} geometry={geo.waist} material={m.pants} castShadow />
-          <mesh position={[0, 1.1 + breathe * 0.004, 0]} scale={[1, 1 + breathe * 0.008, 1]} geometry={geo.torso} material={m.shirt} castShadow receiveShadow />
+          <mesh position={[0, (TORSO_BOT + TORSO_TOP) / 2 + breathe * 0.004, 0]} scale={[1, 1 + breathe * 0.008, 1]} geometry={geo.torso} material={m.shirt} castShadow receiveShadow />
           {/* gola */}
-          <mesh position={[0, 1.37, 0]} rotation={[Math.PI / 2, 0, 0]} material={m.shirtDark}>
-            <torusGeometry args={[0.1, 0.025, 8, 20]} />
+          <mesh position={[0, TORSO_TOP - 0.01, 0.02]} rotation={[Math.PI / 2, 0, 0]} material={m.shirtDark}>
+            <torusGeometry args={[0.11, 0.026, 8, 20]} />
           </mesh>
           {arm(-1, rShoulder, rElbow, rWrist, palmRef)}
           {arm(1, lShoulder, lElbow, lWrist)}
           {/* cabeça */}
-          <group position={[0, 1.74, 0]} rotation={head} scale={1.08}>
+          <group position={[0, TORSO_TOP + 0.29, 0]} rotation={head} scale={0.875}>
             <mesh scale={[1, 0.96, 0.94]} material={m.skin} castShadow>
               <sphereGeometry args={[0.32, 40, 30]} />
             </mesh>
@@ -163,14 +167,18 @@ export const Toy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; loo
               </mesh>
             ))}
             {/* cabelo em cuia: calota cheia inclinada pra trás (alto na testa, desce até a nuca) com borda grossa */}
-            <group position={[0, 0.02, -0.01]} rotation={[-0.32, 0, 0]} scale={[1.03, 1.0, 1.05]}>
+            <group position={[0, 0.0, -0.015]} rotation={[-0.12, 0, 0]} scale={[1.06, 0.97, 1.07]}>
               <mesh material={m.hair} castShadow>
                 <sphereGeometry args={[HR, 40, 22, 0, Math.PI * 2, 0, HT]} />
               </mesh>
               <mesh position={[0, HR * Math.cos(HT), 0]} rotation={[Math.PI / 2, 0, 0]} material={m.hair} castShadow>
-                <torusGeometry args={[HR * Math.sin(HT), 0.055, 16, 48]} />
+                <torusGeometry args={[HR * Math.sin(HT), 0.068, 16, 48]} />
               </mesh>
             </group>
+            {/* cabelo de trás: cobre a nuca, termina logo atrás das orelhas */}
+            <mesh position={[0, 0.0, -0.01]} scale={[1.03, 0.98, 1.0]} material={m.hair} castShadow>
+              <sphereGeometry args={[0.333, 36, 24, Math.PI + 0.16, Math.PI - 0.32, 0, 2.0]} />
+            </mesh>
             {hairLift > 0.3 &&
               [[-0.12, 0.2], [0.05, -0.15], [0.16, 0.3], [-0.05, 0.5]].map(([x, r], i) => (
                 <mesh key={i} position={[x, 0.33, -0.02 + i * 0.03]} rotation={[0.2 * i - 0.3, 0, r]} scale={hairLift} material={m.hair}>
