@@ -11,10 +11,12 @@ import {VideoGalo, TOTAL_GALO} from "./VideoGalo";
 import {VideoPombo, TOTAL_POMBO} from "./VideoPombo";
 import {ToyPreview} from "./ToyPreview";
 import {VideoEscola, TOTAL_ESCOLA} from "./VideoEscola";
+import {VideoMiojo, TOTAL_MIOJO} from "./VideoMiojo";
 
 export const Root: React.FC = () => (
   <>
     <Composition id="TesteFogo" component={Video} durationInFrames={TOTAL} fps={30} width={1080} height={1920} />
+    <Composition id="Miojo" component={VideoMiojo} durationInFrames={TOTAL_MIOJO} fps={30} width={1080} height={1920} />
     <Composition id="Escola" component={VideoEscola} durationInFrames={TOTAL_ESCOLA} fps={30} width={1080} height={1920} />
     <Composition id="ToyPreview" component={ToyPreview} durationInFrames={3} fps={30} width={2000} height={700} />
     <Composition id="Pombo" component={VideoPombo} durationInFrames={TOTAL_POMBO} fps={30} width={1080} height={1920} />
