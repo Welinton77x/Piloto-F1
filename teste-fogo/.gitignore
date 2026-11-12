@@ -7,3 +7,4 @@ out/*_stt.json
 out/*.wav
 out/vozes/
 out/sotaque/
+out/*.png
