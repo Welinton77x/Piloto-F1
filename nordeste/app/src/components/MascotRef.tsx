@@ -9,7 +9,7 @@ import {Face, Mat, RB} from "./Mascot";
 import type {MascotPose} from "./Mascot";
 import {mixHex, rad} from "../lib/anim";
 
-export type RefLook = {hot?: number; tongue?: boolean; sweat?: number; backpack?: boolean; lHand?: "fist" | "open" | "point"; rHand?: "fist" | "open" | "point"};
+export type RefLook = {bottle?: number; bottleTilt?: number; hot?: number; tongue?: boolean; sweat?: number; backpack?: boolean; lHand?: "fist" | "open" | "point"; rHand?: "fist" | "open" | "point"};
 
 const C = {
   skin: "#e9b98f", skinD: "#d9a27a", hair: "#4a3022", hairD: "#3a251a",
@@ -39,12 +39,33 @@ const Hand: React.FC<{kind?: "fist" | "open" | "point"; skin: string}> = ({kind 
   </group>
 );
 
-const Arm: React.FC<{side: -1 | 1; rot: [number, number]; hand?: "fist" | "open" | "point"; skin: string}> = ({side, rot, hand, skin}) => (
+const Arm: React.FC<{side: -1 | 1; rot: [number, number]; hand?: "fist" | "open" | "point"; skin: string; children?: React.ReactNode}> = ({side, rot, hand, skin, children}) => (
   <group position={[side * 0.42, SH_Y, 0]} rotation={[rad(rot[0]), 0, rad(side * rot[1])]}>
     {/* manga inteira do blusão (braço gordinho) e punho */}
     <RB w={0.21} h={0.5} d={0.22} r={0.1} c={C.hoodie} position={[0, -0.24, 0]} />
     <RB w={0.2} h={0.06} d={0.21} r={0.03} c={C.hoodieD} position={[0, -0.48, 0]} />
     <Hand kind={hand} skin={skin} />
+    {children && <group position={[0, -0.6, 0]}>{children}</group>}
+  </group>
+);
+
+/** garrafa d'água na mão (fica sempre de pé em relação ao mundo, só inclina para beber) */
+const Bottle: React.FC<{rot: [number, number]; side: -1 | 1; tilt: number; level: number}> = ({rot, side, tilt, level}) => (
+  <group rotation={new THREE.Euler(-rad(rot[0]), 0, -rad(side * rot[1]), "ZYX")}>
+    <group rotation={[0, 0, rad(-side * tilt)]} position={[0, 0.02, 0.06]}>
+      <mesh position={[0, 0.08, 0]}>
+        <cylinderGeometry args={[0.06, 0.06, 0.26, 18]} />
+        <meshStandardMaterial color="#bfe9ff" transparent opacity={0.55} roughness={0.1} />
+      </mesh>
+      <mesh position={[0, -0.05 + 0.13 * level, 0]}>
+        <cylinderGeometry args={[0.055, 0.055, Math.max(0.005, 0.26 * level), 18]} />
+        <meshStandardMaterial color="#4fc3f7" transparent opacity={0.8} roughness={0.1} />
+      </mesh>
+      <mesh position={[0, 0.23, 0]}>
+        <cylinderGeometry args={[0.03, 0.03, 0.05, 12]} />
+        <meshStandardMaterial color="#1565c0" />
+      </mesh>
+    </group>
   </group>
 );
 
@@ -101,7 +122,7 @@ export const MascotRef: React.FC<{position?: [number, number, number]; scale?: n
           )}
         </group>
         <Arm side={-1} rot={pose.lArm} hand={look.lHand} skin={skin} />
-        <Arm side={1} rot={pose.rArm} hand={look.rHand} skin={skin} />
+        <Arm side={1} rot={pose.rArm} hand={look.rHand} skin={skin}>{(look.bottle ?? 0) > 0 && <Bottle rot={pose.rArm} side={1} tilt={look.bottleTilt ?? 0} level={look.bottle ?? 1} />}</Arm>
         {/* cabeça grande e arredondada */}
         <group position={[0, HEAD_Y + breath * 0.5, 0]} rotation={[0, 0, rad(headTilt)]}>
           <RB w={0.74} h={0.68} d={0.64} r={0.26} c={skin} />
@@ -145,7 +166,7 @@ export const MascotRef: React.FC<{position?: [number, number, number]; scale?: n
             );
           })()}
           {/* cabelo aparecendo pouco por baixo (costeletas e nuca) */}
-          {[-1, 1].map((s2) => <RB key={"sb" + s2} w={0.05} h={0.16} d={0.22} r={0.025} c={C.hair} position={[s2 * 0.38, 0.08, -0.08]} />)}
+          {[-1, 1].map((s2) => <RB key={"sb" + s2} w={0.04} h={0.09} d={0.1} r={0.02} c={C.hair} position={[s2 * 0.375, 0.13, -0.13]} />)}
           <mesh position={[0, 0.06, -0.2]} scale={[1.0, 0.6, 0.55]}>
             <sphereGeometry args={[0.37, 28, 16]} />
             <Mat c={C.hair} />

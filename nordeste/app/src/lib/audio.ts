@@ -1,6 +1,6 @@
 import {VO_OFFSET, timed} from "../data/scenes";
 import {clamp01} from "./anim";
-import {rain} from "./story";
+import {setAt} from "./story";
 
 // efeito sintetizado (public/sfx) para cada pista do plano; null = sem som
 export const SFX = (id: string): string | null => {
@@ -27,4 +27,4 @@ export const musicVolume = (f: number) => {
   return (speaking(f) ? 0.07 : 0.14) * fadeIn * fadeOut;
 };
 
-export const rainVolume = (f: number) => 0.07 * rain(f); // vídeo 5: temporal (baixo, pedido do usuário)
+export const rainVolume = (f: number) => (setAt(f) === "sertao" ? 0.06 : 0); // vídeo 6: cigarras do sertão, bem baixinho

@@ -4,10 +4,10 @@ import * as THREE from "three";
 import {ThreeCanvas} from "@remotion/three";
 import {useThree} from "@react-three/fiber";
 import {VO_OFFSET, config, finalCut, hasVO, sceneAt, timed, wordLocal} from "./data/scenes";
-import {KitWorld} from "./components/KitWorld";
+import {NeWorld} from "./components/NeWorld";
 import {Post} from "./components/Post";
 import {Overlay} from "./components/Overlay";
-import {ITEMS, REWINDS, W, heat, imagineAmount, itemAt, skyDark, start} from "./lib/story";
+import {REWINDS, W, heat, imagineAmount, skyDark, start} from "./lib/story";
 import {FOV, poseAt} from "./lib/camera";
 import {track} from "./lib/track";
 import {clamp01, mixHex} from "./lib/anim";
@@ -63,7 +63,7 @@ export const Scene3D: React.FC<{at?: number; fixed?: FixedPose; sunny?: boolean;
   return (
     <ThreeCanvas width={width} height={height} shadows={{type: THREE.PCFSoftShadowMap}} camera={{fov: FOV, near: 0.1, far: 400, position: [0, 2, 40]}}>
       <CamRig at={at} fixed={fixed} />
-      <KitWorld gf={gf} />
+      <NeWorld gf={gf} />
       <Post focus={poseAt(gf).pos.distanceTo(poseAt(gf).target)} />
       {/* círculos vermelhos removidos a pedido do usuário */}
       {children}
@@ -86,19 +86,23 @@ const World: React.FC = () => {
 
 // efeitos pontuais amarrados às palavras (frames globais)
 const SFX_AT: [number, string, number][] = [
-  [start("s2"), "thunder.wav", 0.4],
-  [W("s2", "energia") - 2, "thud.wav", 0.4],
-  [W("s2", "romper"), "splash.wav", 0.3],
-  [W("s5", "lanterna"), "tick.wav", 0.5],
-  [W("s5", "rádio"), "crinkle.wav", 0.3],
-  [W("s7", "mochila"), "whoosh.wav", 0.35],
-  [W("s8", "Parabéns"), "pop.wav", 0.35],
-  // sons do mascote: susto, pulinhos de comemoração a cada item, passos e a comemoração final
-  [W("s2", "energia") - 4, "ohno.wav", 0.45],
-  [W("s2", "Terceira") - 10, "ohno.wav", 0.3],
-  ...ITEMS.map((_, i) => [itemAt(i) + 6, "thud.wav", 0.18] as [number, string, number]),
-  [W("s7", "pegar") - 6, "steps.wav", 0.4],
-  [W("s8", "Parabéns") + 2, "cheer.wav", 0.5],
+  [W("s1", "sol"), "pop.wav", 0.3],
+  [W("s2", "raios"), "whoosh.wav", 0.3],
+  [W("s3", "Então") - 4, "steps.wav", 0.35],
+  [W("s4", "seca") - 4, "steps.wav", 0.3],
+  [W("s4", "seca") + 18, "sizzle.wav", 0.35],
+  [W("s4", "seca") + 18, "ohno.wav", 0.4],
+  [start("s5"), "whoosh.wav", 0.25],
+  [W("s6", "água") - 4, "bubble.wav", 0.3],
+  [W("s7", "subir"), "whoosh.wav", 0.3],
+  [W("s7", "desce"), "whoosh.wav", 0.3],
+  [W("s7", "calorão") - 10, "ohno.wav", 0.35],
+  [start("s8"), "fan.wav", 0.3],
+  [W("s9", "bebe") - 4, "gulp.wav", 0.45],
+  [W("s9", "foge") - 4, "steps.wav", 0.35],
+  [W("s10", "Parabéns"), "cheer.wav", 0.5],
+  [W("s10", "Parabéns") + 22, "hop.wav", 0.3],
+  [W("s10", "Parabéns") + 48, "hop.wav", 0.3],
 ];
 
 export const Main: React.FC<{audioOnly?: boolean}> = ({audioOnly}) => (
@@ -137,6 +141,6 @@ export const Main: React.FC<{audioOnly?: boolean}> = ({audioOnly}) => (
       </React.Fragment>
     ))}
     <Audio src={staticFile("sfx/music.wav")} loop volume={(f) => musicVolume(f)} />
-    <Audio src={staticFile("sfx/rain.wav")} loop volume={(f) => rainVolume(f)} />
+    <Audio src={staticFile("sfx/cicadas.wav")} loop volume={(f) => rainVolume(f)} />
   </AbsoluteFill>
 );

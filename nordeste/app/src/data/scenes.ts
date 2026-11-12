@@ -11,7 +11,7 @@ type Timing = Record<string, {duration: number; words: VoWord[]}>;
 const timing = timingJson as unknown as Timing;
 
 export const VO_OFFSET = 8; // ~0,25 s
-export const TAIL = 12; // pausa curta entre cenas (vídeo 5: manter até 2:45)
+export const TAIL = 20; // pausa entre cenas
 export const END_HOLD = 45; // respiro final do vídeo (1,5 s)
 
 export type TimedScene = ScenePlan & {k: number; voWords?: VoWord[]; voSeconds?: number; plannedDuration: number};

@@ -4,7 +4,6 @@ import {Easing, interpolate} from "remotion";
 import type {CamKey} from "../data/scene-plan";
 import {config, sceneAt} from "../data/scenes";
 import {rad} from "./anim";
-import {CARRY, ITEMS, W, itemAt, start} from "./story";
 
 export const FOV = 24;
 
@@ -31,20 +30,11 @@ export const poseAt = (gf: number): Pose => {
   const orbit = dir * (f / Math.max(1, s.durationInFrames)) * 7 + Math.sin(gf / 55) * 2.2;
   const az = rad(g((k) => k.az) + orbit);
   const el = rad(g((k) => k.el) + Math.sin(gf / 70) * 1.5);
-  // zoom quando o mascote pega cada item (aproxima, depois volta)
-  let punch = 0;
-  for (let i = 0; i < ITEMS.length; i++) {
-    const x = (gf - (itemAt(i) - CARRY)) / (CARRY + 26);
-    if (x > 0 && x < 1) punch = Math.max(punch, Math.sin(x * Math.PI));
-  }
-  const d = g((k) => k.dist) * (1 - 0.05 * (f / Math.max(1, s.durationInFrames)) + 0.015 * Math.sin(gf / 40)) * (1 - 0.1 * punch);
+  const d = g((k) => k.dist) * (1 - 0.05 * (f / Math.max(1, s.durationInFrames)) + 0.015 * Math.sin(gf / 40));
   const tx = mapX(g((k) => k.target[0])); // vídeo 5: cenário fixo (casa em corte)
   const ty = mapY(g((k) => k.target[1])) + Math.sin(gf / 47) * 0.03;
   const tz = g((k) => k.target[2]);
-  // tremida: poste caindo e relâmpagos no temporal
-  const pf = gf - (W("s2", "energia") + 6);
-  const storm = gf >= start("s2") && gf < start("s8");
-  const shake = (pf >= 0 && pf < 18 ? 0.12 * Math.exp(-pf * 0.18) : 0) + (storm && (gf % 97 < 3 || gf % 151 < 2) ? 0.03 : 0);
+  const shake = 0;
   const sx = shake * Math.sin(gf * 2.3), sy = shake * Math.cos(gf * 3.1);
   const pos = new THREE.Vector3(tx + sx + d * Math.sin(az) * Math.cos(el), ty + sy + d * Math.sin(el), tz + d * Math.cos(az) * Math.cos(el));
   return {pos, target: new THREE.Vector3(tx + sx, ty + sy, tz)};
