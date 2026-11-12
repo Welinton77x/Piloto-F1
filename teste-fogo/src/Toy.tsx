@@ -15,6 +15,7 @@ export type ToyLook = {
   sole?: string;
   backpack?: string; // mochila nas costas (cor)
   hoodie?: boolean; // casaco com capuz, manga comprida e cordinhas pretas
+  hairStyle?: "bowl" | "spiky" | "curly" | "ponytail" | "pigtails" | "long" | "bun" | "buzz";
   jelly?: number; // 0..1 coberto de gelatina de morango
 };
 
@@ -29,6 +30,7 @@ const useToyMats = (L: ToyLook) =>
       shirt: sm(L.shirt ?? "#ffcd2e", 0.6),
       shirtDark: sm("#e7a816", 0.6),
       pants: sm(L.pants ?? "#2f55b0", 0.65),
+      pantsHem: sm(new THREE.Color(L.pants ?? "#2f55b0").multiplyScalar(0.8).getStyle(), 0.65),
       hair: sm(L.hair ?? "#3b2416", 0.45, {side: THREE.DoubleSide}),
       shoe: sm(L.shoe ?? "#f4f4f2", 0.45),
       sole: sm(L.sole ?? "#f08a1c", 0.5),
@@ -57,6 +59,7 @@ const HIPX = 0.125;
 const SHX = 0.36;
 const SHY = 1.325;
 const THIGH = 0.3;
+const PANT_R = 0.118;
 const SHIN = 0.29;
 
 
@@ -122,6 +125,103 @@ const makeHair = () => {
   return {shell: cap, rim: ring, edge: back};
 };
 const lerpN = (a: number, b: number, t: number) => a + (b - a) * t;
+
+/* ---------- outros cabelos (para os figurantes): touca lisa + detalhes ---------- */
+const capGeo = (() => {
+  let g: THREE.SphereGeometry | null = null;
+  return () => {
+    if (!g) {
+      g = new THREE.SphereGeometry(0.335, 40, 24, 0, Math.PI * 2, 0, 1.28);
+      g.rotateX(-0.42);
+      g.scale(1.03, 0.98, 1.03);
+    }
+    return g;
+  };
+})();
+const fib = (n: number, minY: number) =>
+  Array.from({length: n}, (_, i) => {
+    const y = 1 - (i / (n - 1)) * (1 - minY);
+    const r = Math.sqrt(1 - y * y);
+    const a = i * 2.39996;
+    return [Math.cos(a) * r, y, Math.sin(a) * r] as [number, number, number];
+  });
+const OtherHair: React.FC<{style: string; m: THREE.Material}> = ({style, m}) => {
+  const cap = <mesh geometry={capGeo()} material={m} castShadow />;
+  if (style === "buzz") return cap;
+  if (style === "spiky")
+    return (
+      <>
+        {cap}
+        {fib(11, 0.45).map(([x, y, z], i) => (
+          <mesh key={i} position={[x * 0.31, y * 0.31 + 0.02, z * 0.31 - 0.02]} quaternion={new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), new THREE.Vector3(x, y + 0.4, z).normalize())} material={m} castShadow>
+            <coneGeometry args={[0.065, 0.17, 12]} />
+          </mesh>
+        ))}
+      </>
+    );
+  if (style === "curly")
+    return (
+      <>
+        {cap}
+        {fib(26, -0.15).filter(([, , z], i) => !(z > 0.55 && i > 6)).map(([x, y, z], i) => (
+          <mesh key={i} position={[x * 0.34, y * 0.33 + 0.03, z * 0.33 - 0.03]} material={m} castShadow>
+            <sphereGeometry args={[0.095, 14, 10]} />
+          </mesh>
+        ))}
+      </>
+    );
+  if (style === "bun")
+    return (
+      <>
+        {cap}
+        <mesh position={[0, 0.33, -0.1]} material={m} castShadow>
+          <sphereGeometry args={[0.13, 18, 14]} />
+        </mesh>
+      </>
+    );
+  if (style === "ponytail")
+    return (
+      <>
+        {cap}
+        <mesh position={[0, 0.12, -0.33]} rotation={[Math.PI / 2, 0, 0]} material={sm("#ff5c8a", 0.5)}>
+          <torusGeometry args={[0.05, 0.02, 8, 16]} />
+        </mesh>
+        <mesh position={[0, -0.05, -0.4]} rotation={[0.35, 0, 0]} material={m} castShadow>
+          <capsuleGeometry args={[0.075, 0.24, 8, 14]} />
+        </mesh>
+      </>
+    );
+  if (style === "pigtails")
+    return (
+      <>
+        {cap}
+        {[-1, 1].map((sd) => (
+          <group key={sd} position={[0.33 * sd, 0.02, -0.08]}>
+            <mesh position={[0.06 * sd, -0.08, 0]} rotation={[0, 0, 0.35 * sd]} material={m} castShadow>
+              <capsuleGeometry args={[0.07, 0.16, 8, 14]} />
+            </mesh>
+            <mesh rotation={[0, 0, Math.PI / 2]} material={sm("#ff5c8a", 0.5)}>
+              <torusGeometry args={[0.045, 0.018, 8, 16]} />
+            </mesh>
+          </group>
+        ))}
+      </>
+    );
+  // long
+  return (
+    <>
+      {cap}
+      <mesh position={[0, -0.12, -0.22]} material={m} castShadow>
+        <capsuleGeometry args={[0.2, 0.32, 10, 20]} />
+      </mesh>
+      {[-1, 1].map((sd) => (
+        <mesh key={sd} position={[0.27 * sd, -0.1, -0.06]} material={m} castShadow>
+          <capsuleGeometry args={[0.08, 0.3, 8, 14]} />
+        </mesh>
+      ))}
+    </>
+  );
+};
 
 export const Toy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; look?: ToyLook}> = ({pose, palmRef, look = {}}) => {
   const m = useToyMats(look);
@@ -230,12 +330,18 @@ export const Toy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; loo
         const foot = -(hipRot + knee) * (walkAmt > 0 ? 0.7 : 0);
         return (
           <group key={sd} position={[HIPX * sd, HIP, 0]} rotation={[hipRot, 0, 0]}>
-            <mesh position={[0, -THIGH / 2, 0]} material={m.pants} castShadow receiveShadow>
-              <capsuleGeometry args={[0.116, THIGH - 0.06, 6, 14]} />
+            <mesh position={[0, -THIGH / 2 + 0.03, 0]} material={m.pants} castShadow receiveShadow>
+              <cylinderGeometry args={[PANT_R, PANT_R, THIGH + 0.06, 24]} />
             </mesh>
             <group position={[0, -THIGH, 0]} rotation={[knee, 0, 0]}>
-              <mesh position={[0, -SHIN / 2, 0]} material={m.pants} castShadow receiveShadow>
-                <capsuleGeometry args={[0.112, SHIN - 0.08, 6, 14]} />
+              <mesh material={m.pants} castShadow>
+                <sphereGeometry args={[PANT_R, 24, 16]} />
+              </mesh>
+              <mesh position={[0, -SHIN / 2 + 0.01, 0]} material={m.pants} castShadow receiveShadow>
+                <cylinderGeometry args={[PANT_R, PANT_R + 0.004, SHIN - 0.02, 24]} />
+              </mesh>
+              <mesh position={[0, -SHIN + 0.035, 0]} material={m.pantsHem} castShadow>
+                <cylinderGeometry args={[PANT_R + 0.008, PANT_R + 0.008, 0.045, 24]} />
               </mesh>
               <group position={[0, -SHIN, 0]} rotation={[foot, 0, 0]}>
                 <mesh position={[0, -0.055, 0.05]} geometry={geo.shoe} material={m.shoe} castShadow />
@@ -320,9 +426,15 @@ export const Toy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; loo
               </mesh>
             ))}
             {/* cabelo: uma peça lisa só, com a borda grossa e arredondada seguindo a linha do cabelo */}
-            <mesh geometry={hairGeo.shell} material={m.hair} castShadow />
-            <mesh geometry={hairGeo.rim} material={m.hair} castShadow />
-            <mesh geometry={hairGeo.edge} material={m.hair} castShadow />
+            {(look.hairStyle ?? "bowl") === "bowl" ? (
+              <>
+                <mesh geometry={hairGeo.shell} material={m.hair} castShadow />
+                <mesh geometry={hairGeo.rim} material={m.hair} castShadow />
+                <mesh geometry={hairGeo.edge} material={m.hair} castShadow />
+              </>
+            ) : (
+              <OtherHair style={look.hairStyle!} m={m.hair} />
+            )}
             {hairLift > 0.3 &&
               [[-0.12, 0.2], [0.05, -0.15], [0.16, 0.3], [-0.05, 0.5]].map(([x, r], i) => (
                 <mesh key={i} position={[x, 0.33, -0.02 + i * 0.03]} rotation={[0.2 * i - 0.3, 0, r]} scale={hairLift} material={m.hair}>

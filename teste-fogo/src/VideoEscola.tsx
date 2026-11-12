@@ -29,16 +29,16 @@ export const TOTAL_ESCOLA = F(words[words.length - 1].e + 1.6);
 const KID: ToyLook = {hoodie: true, backpack: "#2f6fd6"};
 const KID_HOME: ToyLook = {hoodie: true};
 const KLOOKS: ToyLook[] = [
-  {shirt: "#e74c3c", pants: "#2c3e50", hair: "#1a1a1a"},
-  {shirt: "#3498db", pants: "#34495e", hair: "#7a3a1a", skin: "#c68a5a"},
-  {shirt: "#2ecc71", pants: "#2c2c34", hair: "#3b2416"},
-  {shirt: "#9b59b6", pants: "#1f6fb2", hair: "#d9b56a", skin: "#f5d0b0"},
-  {shirt: "#ff6f91", pants: "#2c3e50", hair: "#1a1a1a", skin: "#8d5a3a"},
-  {shirt: "#1abc9c", pants: "#34495e", hair: "#3b2416"},
-  {shirt: "#f39c12", pants: "#2c2c34", hair: "#7a3a1a", skin: "#e0a878"},
-  {shirt: "#5dade2", pants: "#1f6fb2", hair: "#1a1a1a", skin: "#c68a5a"},
-  {shirt: "#e67e22", pants: "#2c3e50", hair: "#d9b56a"},
-  {shirt: "#c0392b", pants: "#34495e", hair: "#3b2416", skin: "#a8714a"},
+  {shirt: "#e74c3c", pants: "#2c3e50", hair: "#1a1a1a", hairStyle: "spiky"},
+  {shirt: "#3498db", pants: "#34495e", hair: "#2a170d", skin: "#c68a5a", hairStyle: "curly"},
+  {shirt: "#ff6f91", pants: "#2c2c34", hair: "#7a3a1a", hairStyle: "ponytail"},
+  {shirt: "#9b59b6", pants: "#1f6fb2", hair: "#d9b56a", skin: "#f5d0b0", hairStyle: "pigtails"},
+  {shirt: "#2ecc71", pants: "#2c3e50", hair: "#1a1a1a", skin: "#8d5a3a", hairStyle: "buzz"},
+  {shirt: "#1abc9c", pants: "#34495e", hair: "#5a3418", hairStyle: "long"},
+  {shirt: "#f39c12", pants: "#2c2c34", hair: "#1a1a1a", skin: "#e0a878", hairStyle: "bun"},
+  {shirt: "#5dade2", pants: "#1f6fb2", hair: "#c46a2a", hairStyle: "spiky"},
+  {shirt: "#e67e22", pants: "#2c3e50", hair: "#2a170d", skin: "#a8714a", hairStyle: "curly"},
+  {shirt: "#c0392b", pants: "#34495e", hair: "#d9b56a", hairStyle: "long"},
 ];
 const blinkCurve = (f: number) => clamp(1 - Math.abs(((f + 20) % 97) - 3) / 3);
 const idle = (f: number, extra: Pose = {}): Pose => ({breathe: Math.sin((f / FPS) * 2.4), blink: blinkCurve(f), ...extra});

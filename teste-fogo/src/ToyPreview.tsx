@@ -56,6 +56,24 @@ export const ToyPreview: React.FC = () => {
       </AbsoluteFill>
     );
   }
+  if (f === 2) {
+    const styles = ["spiky", "curly", "ponytail", "pigtails", "buzz", "long", "bun"] as const;
+    const hairs = ["#1a1a1a", "#2a170d", "#7a3a1a", "#d9b56a", "#1a1a1a", "#5a3418", "#1a1a1a"];
+    const shirts = ["#e74c3c", "#3498db", "#ff6f91", "#9b59b6", "#2ecc71", "#1abc9c", "#f39c12"];
+    return (
+      <AbsoluteFill>
+        <ThreeCanvas width={2000} height={700} shadows gl={{antialias: true}} dpr={1}>
+          <Cam pos={[0, 1.4, 9.6]} look={[0, 1.1, 0]} fov={30} />
+          <Lights />
+          {styles.map((st, i) => (
+            <group key={i} position={[(i - 3) * 1.5, 0, 0]} rotation={[0, i % 2 ? 0.5 : -0.5, 0]}>
+              <Toy pose={{...base, smile: 0.8}} look={{hairStyle: st, hair: hairs[i], shirt: shirts[i]}} />
+            </group>
+          ))}
+        </ThreeCanvas>
+      </AbsoluteFill>
+    );
+  }
   const faces: Pose[] = [
     {...base, smile: 1},
     {...base, eyeWide: 1, mouthOpen: 0.9, brow: 1},
