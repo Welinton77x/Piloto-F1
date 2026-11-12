@@ -111,18 +111,28 @@ export const MascotRef: React.FC<{position?: [number, number, number]; scale?: n
               <Mat c={skin} />
             </mesh>
           ))}
-          {/* cabelo em cuia: cúpula lisa cobrindo o topo, franja reta acima das sobrancelhas, laterais até as orelhas */}
-          <mesh position={[0, 0.17, -0.01]} scale={[1.1, 0.98, 1.1]}>
+          {/* capacete amarelo de obra (como na imagem do usuário): cúpula, frisos no topo, aba em volta e faixa escura */}
+          <mesh position={[0, 0.19, -0.01]} scale={[1.12, 0.95, 1.12]}>
             <sphereGeometry args={[0.37, 40, 20, 0, Math.PI * 2, 0, Math.PI / 2]} />
-            <Mat c={C.hair} />
+            <meshStandardMaterial color="#f6c21c" roughness={0.35} />
           </mesh>
-          <mesh position={[0, 0.17, -0.01]} rotation={[Math.PI / 2, 0, 0]} scale={[1.1, 1.1, 1]}>
-            <torusGeometry args={[0.37, 0.022, 10, 40]} />
-            <Mat c={C.hairD} />
+          <mesh position={[0, 0.19, -0.01]}>
+            <cylinderGeometry args={[0.415, 0.415, 0.05, 40]} />
+            <Mat c="#3b2a1e" />
           </mesh>
-          {[-1, 1].map((s2) => <RB key={"sb" + s2} w={0.05} h={0.2} d={0.24} r={0.025} c={C.hair} position={[s2 * 0.38, 0.09, -0.1]} />)}
-          {/* nuca coberta, arredondada */}
-          <mesh position={[0, 0.08, -0.2]} scale={[1.02, 0.75, 0.55]}>
+          {/* aba larga, um pouco maior na frente */}
+          <mesh position={[0, 0.16, 0.03]} scale={[1, 1, 1.08]}>
+            <cylinderGeometry args={[0.55, 0.55, 0.035, 48]} />
+            <meshStandardMaterial color="#f6c21c" roughness={0.35} />
+          </mesh>
+          {/* friso central no topo, da frente para trás (deitado sobre a cúpula) */}
+          <mesh position={[0, 0.19, -0.01]} scale={[0.2, 1.0, 1.16]}>
+            <sphereGeometry args={[0.37, 24, 16, 0, Math.PI * 2, 0, Math.PI / 2]} />
+            <meshStandardMaterial color="#e3ae0a" roughness={0.35} />
+          </mesh>
+          {/* cabelo aparecendo pouco por baixo (costeletas e nuca) */}
+          {[-1, 1].map((s2) => <RB key={"sb" + s2} w={0.05} h={0.16} d={0.22} r={0.025} c={C.hair} position={[s2 * 0.38, 0.08, -0.08]} />)}
+          <mesh position={[0, 0.06, -0.2]} scale={[1.0, 0.6, 0.55]}>
             <sphereGeometry args={[0.37, 28, 16]} />
             <Mat c={C.hair} />
           </mesh>
