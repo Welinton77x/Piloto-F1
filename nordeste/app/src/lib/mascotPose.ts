@@ -14,7 +14,7 @@ export type Look = RefLook & {at?: V3; ry?: number; rx?: number; rz?: number; du
 
 const HOME: V3 = [0, 0.06, 0.6];
 const COAST: V3 = [9.6, 0.06, 1.0];
-const SHADE: V3 = [-4.2, 0.06, 0.6];
+const SHADE: V3 = [-5.5, 0.06, 0.5];
 const WET_SIDE: V3 = [-0.1, 0.06, 0.7];
 const DRY: V3 = [1.55, 0.06, 1.35];
 const BED: V3 = [SET.city + 1.15, 0.62 + 0.27, 2.0];
@@ -73,10 +73,10 @@ export const mascotLook = (t: number): Look => {
   if (inS("s7", t)) return {at: HOME, hot: 1, sweat: 1, tongue: true};
   if (inS("s9", t)) {
     const d0 = W("s9", "bebe") - 6, d1 = W("s9", "sede") + 10;
-    const w = walk(t, W("s9", "foge") - 4, W("s9", "sol") + 20, HOME, SHADE);
+    const w = walk(t, W("s9", "foge") - 4, W("s9", "sol") + 34, HOME, SHADE);
     const drinking = t >= d0 && t < d1;
     const level = t < d0 ? 1 : t < d1 ? 1 - 0.7 * clamp01((t - d0) / (d1 - d0)) : 0.3;
-    const inShade = t >= W("s9", "sol") + 20;
+    const inShade = t >= W("s9", "sol") + 34;
     // gole: sobe a garrafa em ~12 frames, segura na boca, desce em ~12 frames (curva suave)
     const ss = (x: number) => x * x * (3 - 2 * x);
     const drink = drinking ? ss(clamp01((t - d0) / 12)) * ss(clamp01((d1 - t) / 12)) : 0;
@@ -196,7 +196,7 @@ export const mascotPose = (t: number): MascotPose => {
   }
   if (inS("s9", t)) {
     const d0 = W("s9", "bebe") - 6, d1 = W("s9", "sede") + 10;
-    const wf0 = W("s9", "foge") - 4, wf1 = W("s9", "sol") + 20;
+    const wf0 = W("s9", "foge") - 4, wf1 = W("s9", "sol") + 34;
     if (t >= d0 && t < d1) {
       // o braço até a boca é calculado no MascotRef (look.drink); aqui só a expressão
       const k = Math.sin(clamp01((t - d0) / (d1 - d0)) * Math.PI);

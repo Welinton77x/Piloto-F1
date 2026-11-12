@@ -291,12 +291,24 @@ const DryTree: React.FC<{x: number; z: number; s?: number}> = ({x, z, s = 1}) =>
 /** juazeiro: árvore verde da caatinga que dá sombra */
 const Juazeiro: React.FC<{x: number; z: number; s?: number}> = ({x, z, s = 1}) => (
   <group position={[x, 0, z]} scale={s}>
-    <mesh position={[0, 0.8, 0]}>
-      <cylinderGeometry args={[0.12, 0.2, 1.6, 10]} />
+    {/* tronco alto e galhos abertos: a copa fica bem acima da cabeça do boneco (até quando ele pula) */}
+    <mesh position={[0, 1.6, 0]}>
+      <cylinderGeometry args={[0.2, 0.32, 3.2, 12]} />
       <M c={N.trunk} />
     </mesh>
-    {[[0, 2.0, 0, 1.25], [0.8, 1.75, 0.3, 0.8], [-0.8, 1.8, -0.2, 0.85], [0.2, 2.4, -0.4, 0.8]].map(([dx, y, dz, r], k) => (
-      <mesh key={k} position={[dx, y, dz]} scale={[1, 0.7, 1]}>
+    {[[-0.7, 0.5], [0.8, -0.4], [0.2, 0.9]].map(([dx, dz], k) => {
+      const dir = new THREE.Vector3(dx, 1.4, dz).normalize();
+      const q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir);
+      return (
+        <mesh key={"g" + k} position={[dx * 0.45, 3.0 + 0.45 * 0.9, dz * 0.45]} quaternion={q}>
+          <cylinderGeometry args={[0.08, 0.13, 1.1, 8]} />
+          <M c={N.trunk} />
+        </mesh>
+      );
+    })}
+    {/* copa larga e achatada, como um guarda-sol */}
+    {[[0, 4.15, 0, 1.9], [1.3, 4.0, 0.5, 1.3], [-1.3, 4.05, 0.3, 1.35], [0.3, 4.1, -1.2, 1.3], [-0.4, 4.0, 1.3, 1.25], [0.2, 4.6, 0.1, 1.2]].map(([dx, y, dz, r], k) => (
+      <mesh key={k} position={[dx, y, dz]} scale={[1, 0.55, 1]}>
         <sphereGeometry args={[r, 24, 16]} />
         <M c={k % 2 ? "#4a9a3f" : N.juaz} />
       </mesh>
@@ -548,16 +560,16 @@ export const NeWorld: React.FC<{gf: number}> = ({gf}) => {
             })}
           {/* rachaduras espalhadas e pedrinhas */}
           {[[-3, 2], [2.5, 3], [-6, -1], [4, -2], [-1, 5], [6, 1.5], [-8, 3]].map(([x, z], i) => <Cracks key={"cr" + i} x={x} z={z} r={1.1} />)}
-          <Rocks spots={[[-2.6, 0.06, 1.2], [3.2, 0.06, 2.1], [-5, 0.06, 2.6], [1.4, 0.06, -2.2]]} />
+          <Rocks spots={[[-2.6, 0.06, 1.2], [3.2, 0.06, 2.1], [-9, 0.06, 2.8], [1.4, 0.06, -2.2]]} />
           {/* vegetação da caatinga */}
           <Cactus x={-2.4} z={-1.8} s={1.1} />
           <Cactus x={3.4} z={-4.5} s={1.4} />
           <Cactus x={-7} z={-6} s={1.6} />
           <Cactus x={6.5} z={-2} s={0.9} />
           <DryTree x={1.8} z={-2.6} s={1.3} />
-          <DryTree x={-5.5} z={-3} s={1.5} />
+          <DryTree x={-0.4} z={-5.2} s={1.5} />
           <DryTree x={5.5} z={-7} s={1.6} />
-          <Juazeiro x={-4.6} z={-0.6} s={1.45} />
+          <Juazeiro x={-6.4} z={-1.3} />
           <Taipa x={-9} z={-5} />
           {/* vizinhança: casinhas coloridas do interior ao fundo */}
           <Casa x={-1.5} z={-13} c="#f2c14e" s={1.5} />
@@ -624,8 +636,8 @@ export const NeWorld: React.FC<{gf: number}> = ({gf}) => {
           </mesh>
           {/* sombra da copa do juazeiro (onde ele se esconde do sol) */}
           {shadeK && (
-            <mesh position={[-4.4, 0.075, 0.2]} rotation={[-Math.PI / 2, 0, 0]}>
-              <circleGeometry args={[1.5, 32]} />
+            <mesh position={[-6.1, 0.075, -0.5]} rotation={[-Math.PI / 2, 0, 0]} scale={[1.15, 1, 1]}>
+              <circleGeometry args={[2.1, 40]} />
               <meshBasicMaterial color="#000000" transparent opacity={0.18} depthWrite={false} />
             </mesh>
           )}
