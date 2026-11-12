@@ -126,6 +126,23 @@ export const MascotRef: React.FC<{position?: [number, number, number]; scale?: n
             <meshStandardMaterial color="#f2c014" roughness={0.42} />
           </mesh>
           <RB w={0.12} h={0.07} d={0.2} r={0.025} c="#e0aa08" position={[0, 0.49, -0.01]} />
+          {/* emblema escuro na frente do capacete (detalhe do capacete de obra da referência), colado na cúpula */}
+          {(() => {
+            const el = 0.36, az = 0.22; // elevação e giro na cúpula (frente, um pouco à direita)
+            const R = 0.37, sx = 1.14, sy = 0.78, sz = 1.14;
+            const n = new THREE.Vector3(Math.sin(az) * Math.cos(el), Math.sin(el), Math.cos(az) * Math.cos(el));
+            const p0 = new THREE.Vector3(n.x * R * sx, 0.2 + n.y * R * sy, -0.01 + n.z * R * sz);
+            const nn = new THREE.Vector3(n.x / sx, n.y / sy, n.z / sz).normalize();
+            const q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), nn);
+            return (
+              <group position={p0.addScaledVector(nn, 0.004)} quaternion={q}>
+                <mesh scale={[1.25, 1, 1]}>
+                  <circleGeometry args={[0.042, 24]} />
+                  <meshStandardMaterial color="#3a2416" roughness={0.6} />
+                </mesh>
+              </group>
+            );
+          })()}
           {/* cabelo aparecendo pouco por baixo (costeletas e nuca) */}
           {[-1, 1].map((s2) => <RB key={"sb" + s2} w={0.05} h={0.16} d={0.22} r={0.025} c={C.hair} position={[s2 * 0.38, 0.08, -0.08]} />)}
           <mesh position={[0, 0.06, -0.2]} scale={[1.0, 0.6, 0.55]}>
