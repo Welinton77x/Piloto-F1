@@ -24,6 +24,7 @@ export type ToyLook = {
   flare?: boolean; // calça jeans pantalona
   lashes?: boolean; // cílios
   lips?: string; // cor da boca
+  apron?: boolean; // avental branco de cozinheiro por cima da roupa
 };
 
 const sm = (color: string, rough = 0.55, extra: Partial<THREE.MeshStandardMaterialParameters> = {}) =>
@@ -61,6 +62,8 @@ const useToyMats = (L: ToyLook) =>
       lips: sm(L.lips ?? "#3a1510", 0.45),
       veil: sm("#ffffff", 0.3, {transparent: true, opacity: 0.38, side: THREE.DoubleSide, depthWrite: false}),
       silver: sm("#dfe3ea", 0.2, {metalness: 0.7}),
+      apron: sm("#f8f8f5", 0.55, {side: THREE.DoubleSide}),
+      apronDark: sm("#e6e6e0", 0.6),
     }),
     [L.skin, L.shirt, L.pants, L.hair, L.shoe, L.sole, L.backpack, L.lips, L.hairStyle],
   );
@@ -392,6 +395,71 @@ const laceTex = (() => {
   };
 })();
 
+/* ---------- avental: faixa que acompanha o contorno arredondado do tronco ---------- */
+const apronGeo = (() => {
+  let g: {skirt: THREE.BufferGeometry; hem: THREE.BufferGeometry; belt: THREE.BufferGeometry} | null = null;
+  return () => {
+    if (g) return g;
+    const hx = 0.29;
+    const hz = 0.205;
+    const r = 0.13;
+    const F = hx - r; // trecho reto da frente
+    const C = (Math.PI / 2) * r; // canto arredondado
+    const S = 2 * (hz - r); // lateral reta
+    /** ponto do contorno a uma distância s do meio da frente (s>0 vai pro lado +x), afastado pad pra fora */
+    const pt = (s: number, pad: number): [number, number] => {
+      const sg = s < 0 ? -1 : 1;
+      let a = Math.abs(s);
+      if (a <= F) return [sg * a, hz + pad];
+      a -= F;
+      if (a <= C) {
+        const th = a / r;
+        return [sg * (F + (r + pad) * Math.sin(th)), hz - r + (r + pad) * Math.cos(th)];
+      }
+      a -= C;
+      if (a <= S) return [sg * (hx + pad), hz - r - a];
+      a -= S;
+      if (a <= C) {
+        const th = a / r;
+        return [sg * (F + (r + pad) * Math.cos(th)), -(hz - r) - (r + pad) * Math.sin(th)];
+      }
+      a -= C;
+      return [sg * Math.max(0, F - a), -(hz + pad)];
+    };
+    const strip = (s0: number, s1: number, y0: number, y1: number, pad0: number, pad1: number, ns: number, ny: number) => {
+      const pos: number[] = [];
+      const idx: number[] = [];
+      for (let i = 0; i <= ns; i++)
+        for (let j = 0; j <= ny; j++) {
+          const k = j / ny;
+          const [x, z] = pt(lerpN(s0, s1, i / ns), lerpN(pad0, pad1, k));
+          pos.push(x, lerpN(y0, y1, k), z);
+        }
+      for (let i = 0; i < ns; i++)
+        for (let j = 0; j < ny; j++) {
+          const a = i * (ny + 1) + j;
+          const b = (i + 1) * (ny + 1) + j;
+          idx.push(a, b, a + 1, b, b + 1, a + 1);
+        }
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
+      geo.setIndex(idx);
+      geo.computeVertexNormals();
+      return geo;
+    };
+    const W = F + C + 0.06; // até um pouquinho depois dos cantos
+    const skirt = strip(-W, W, 0.97, 0.5, 0.018, 0.05, 40, 6);
+    const hem = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(Array.from({length: 33}, (_, i) => {
+      const [x, z] = pt(lerpN(-W, W, i / 32), 0.05);
+      return new THREE.Vector3(x, 0.5, z);
+    })), 64, 0.013, 8, false);
+    const P = F + C + S + C + F;
+    const belt = strip(-P, P, 0.995, 0.935, 0.024, 0.024, 72, 1);
+    g = {skirt, hem, belt};
+    return g;
+  };
+})();
+
 export const Toy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; lPalmRef?: React.Ref<THREE.Object3D>; look?: ToyLook; headExtra?: React.ReactNode}> = ({pose, palmRef, lPalmRef, look = {}, headExtra}) => {
   const m = useToyMats(look);
   const hairGeo = useMemo(makeHair, []);
@@ -436,6 +504,8 @@ export const Toy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; lPa
         sk.translate(0, 0.475, 0);
         return sk;
       })(),
+      bib: new RoundedBoxGeometry(0.34, 0.4, 0.03, 3, 0.012),
+      apronPocket: new RoundedBoxGeometry(0.22, 0.13, 0.02, 2, 0.008),
       collarFlap: (() => {
         const sh = new THREE.Shape();
         sh.moveTo(0, 0);
@@ -593,8 +663,8 @@ export const Toy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; lPa
               </mesh>
               {/* capuz dobrado nas costas */}
               <mesh position={[0, TORSO_TOP - 0.08, -0.215]} rotation={[0.25, 0, 0]} geometry={geo.hoodBack} material={m.shirt} castShadow />
-              {/* cordinhas pretas */}
-              {[-1, 1].map((sd) => (
+              {/* cordinhas pretas (ficam por baixo do avental quando ele está de avental) */}
+              {!look.apron && [-1, 1].map((sd) => (
                 <group key={sd} position={[0.055 * sd, TORSO_TOP - 0.03, 0.215]} rotation={[0.08, 0, 0.04 * sd]}>
                   <mesh position={[0, -0.1, 0]} material={m.cord}>
                     <capsuleGeometry args={[0.013, 0.17, 4, 8]} />
@@ -677,6 +747,36 @@ export const Toy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; lPa
                   </mesh>
                 </>
               )}
+            </>
+          )}
+          {look.apron && (
+            <>
+              {/* avental branco: peitilho, saia, bolso, alças do pescoço, faixa e laço atrás */}
+              <mesh position={[0, 1.15, 0.243]} geometry={geo.bib} material={m.apron} castShadow />
+              <mesh geometry={apronGeo().skirt} material={m.apron} castShadow receiveShadow />
+              <mesh geometry={apronGeo().hem} material={m.apron} />
+              <mesh geometry={apronGeo().belt} material={m.apron} castShadow />
+              <mesh position={[0, 0.74, 0.268]} rotation={[-0.035, 0, 0]} geometry={geo.apronPocket} material={m.apronDark} />
+              {[-1, 1].map((sd) => (
+                <mesh key={sd} position={[0.135 * sd, 1.385, 0.2]} rotation={[-0.55, 0, 0.12 * sd]} material={m.apron}>
+                  <capsuleGeometry args={[0.018, 0.1, 4, 8]} />
+                </mesh>
+              ))}
+              <group position={[0, 0.965, -0.238]}>
+                {[-1, 1].map((sd) => (
+                  <mesh key={sd} position={[0.07 * sd, 0, 0]} rotation={[0, 0, (Math.PI / 2) * sd]} material={m.apron}>
+                    <coneGeometry args={[0.055, 0.12, 4]} />
+                  </mesh>
+                ))}
+                <mesh material={m.apron}>
+                  <sphereGeometry args={[0.03, 10, 8]} />
+                </mesh>
+                {[-1, 1].map((sd) => (
+                  <mesh key={"t" + sd} position={[0.035 * sd, -0.1, 0]} rotation={[0, 0, 0.2 * sd]} material={m.apron}>
+                    <capsuleGeometry args={[0.014, 0.14, 4, 8]} />
+                  </mesh>
+                ))}
+              </group>
             </>
           )}
           {look.backpack && (

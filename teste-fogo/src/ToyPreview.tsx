@@ -5,6 +5,7 @@ import {ThreeCanvas} from "@remotion/three";
 import {useThree} from "@react-three/fiber";
 import {Toy} from "./Toy";
 import {HER_CASUAL, HER_BRIDE, GROOM, Bouquet} from "./Sets10";
+import {ChefHat, Shades} from "./Sets11";
 import type {Pose} from "./Boy";
 
 /* Folha de apresentação do boneco novo (quadro 0: corpo inteiro; quadro 1: expressões) */
@@ -53,6 +54,47 @@ export const ToyPreview: React.FC = () => {
               <Toy pose={{...r.pose, rotY: r.rotY}} look={i === 3 || i === 2 ? {hoodie: true, backpack: "#2f6fd6"} : {hoodie: true}} />
             </group>
           ))}
+        </ThreeCanvas>
+      </AbsoluteFill>
+    );
+  }
+  if (f === 5 || f === 6) {
+    /* quadro 5: o cozinheiro de corpo inteiro (chapéu, avental branco, óculos escuro); quadro 6: rosto de perto */
+    const CHEF = {hoodie: true, apron: true};
+    const extra = (
+      <>
+        <ChefHat />
+        <Shades />
+      </>
+    );
+    const crossed: Pose = {rShoulder: [-1.15, 0, 0.6], rElbow: -1.45, lShoulder: [-1.05, 0, -0.6], lElbow: -1.45};
+    const row: {x: number; rotY: number; pose: Pose}[] = [
+      {x: -3.6, rotY: 0, pose: {...base, smile: 0.7}},
+      {x: -1.8, rotY: 0.6, pose: {...base, ...crossed, smile: 0.9, brow: -0.3}},
+      {x: 0, rotY: Math.PI / 2, pose: {...base}},
+      {x: 1.8, rotY: Math.PI, pose: {...base}},
+      {x: 3.6, rotY: -0.45, pose: {...base, smile: 1, mouthOpen: 0.4, rShoulder: [-2.6, 0, -0.4], rElbow: -0.3, lShoulder: [-0.4, 0, 0.3], lElbow: -1.0}},
+    ];
+    const faces = f === 6;
+    return (
+      <AbsoluteFill>
+        <ThreeCanvas width={2000} height={700} shadows gl={{antialias: true}} dpr={1}>
+          {faces ? <Cam pos={[0, 1.8, 3.6]} look={[0, 1.72, 0]} fov={26} /> : <Cam pos={[0, 1.25, 9.6]} look={[0, 1.12, 0]} fov={30} />}
+          <Lights />
+          {faces
+            ? [
+                {x: -0.75, rotY: 0, pose: {...base, smile: 0.8} as Pose},
+                {x: 0.75, rotY: 0.65, pose: {...base, smile: 1, brow: 0.8, mouthOpen: 0.35} as Pose},
+              ].map((r, i) => (
+                <group key={i} position={[r.x, 0, 0]}>
+                  <Toy pose={{...r.pose, rotY: r.rotY}} look={CHEF} headExtra={extra} />
+                </group>
+              ))
+            : row.map((r, i) => (
+                <group key={i} position={[r.x, 0, 0]}>
+                  <Toy pose={{...r.pose, rotY: r.rotY}} look={CHEF} headExtra={extra} />
+                </group>
+              ))}
         </ThreeCanvas>
       </AbsoluteFill>
     );
