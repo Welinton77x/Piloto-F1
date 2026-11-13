@@ -9,11 +9,10 @@ import {Post} from "./Post";
 import {physics} from "./Physics";
 import {fontFamily} from "./Video";
 import {Sky, SunDisc, SunLight, Clouds, V3} from "./Sets5";
-import {Pigeon} from "./Sets6";
 import {Dino} from "./Sets7";
 import {Cow, Pot, Noodles, MilkGlass, Planet, PLANET_R} from "./Sets8";
 import {Dog, Alien, Rocket, MoonSet, Crater, Helmet, Dust} from "./Sets9";
-import {HER_BRIDE, GROOM, Bouquet, ARCH_P, PARTY, WeddingVenue, WeddingChair, CHAIR_SEAT, RoundTable, Cake, BuffetTable, MagicStage, MagicianHat, Cape, Wand, Puff, Satellite, Tornado} from "./Sets10";
+import {HER_BRIDE, GROOM, Bouquet, PARTY, WeddingChair, CHAIR_SEAT, RoundTable, Cake, BuffetTable, MagicStage, MagicianHat, Cape, Wand, Puff, Satellite, Tornado, WeddingPigeon, Church, CHURCH_PLAT, Hall, HALL, HallParty, Debris} from "./Sets10";
 import {Captions, StageTitle, Chip, Sparkles, Confetti, Sticker, Wd, clean} from "./Overlays";
 import {FPS, clamp, lerp, ramp, pop, easeInOut, easeOut, rng} from "./util";
 import W from "./timingCasa.json";
@@ -104,7 +103,7 @@ const GUESTS: ToyLook[] = [
 const SEATS: [number, number, number][] = (() => {
   const out: [number, number, number][] = [];
   let k = 0;
-  for (const z of [-0.6, 0.6, 1.8, 3.0, 4.2])
+  for (const z of [-0.6, 0.6, 1.8, 3.0, 4.2, 5.4, 6.6])
     for (const sd of [-1, 1])
       for (const x of [1.15, 1.85, 2.55]) {
         if ((k * 7) % 5 !== 3) out.push([x * sd, z, k % GUESTS.length]);
@@ -146,11 +145,40 @@ const OutdoorLights: React.FC<{target: V3; ext?: number}> = ({target, ext = 7}) 
     <SunLight target={target} dir={[-5, 9, 7]} intensity={2.4} ext={ext} />
   </>
 );
-const Venue: React.FC<{t: number; target: V3; party?: boolean; ceremony?: boolean}> = ({t, target, party = true, ceremony = true}) => (
+/** cerimônia: igreja grande; festa: salão (com o buraco no teto depois que o buquê passa) */
+const Venue: React.FC<{f: number; t: number; target: V3; party?: boolean; ceremony?: boolean}> = ({f, t, target, party = true}) =>
+  party ? <HallScene f={f} t={t} target={target} /> : <ChurchScene t={t} target={target} />;
+const ChurchScene: React.FC<{t: number; target: V3}> = ({t, target}) => (
   <>
-    <OutdoorLights target={target} />
-    <WeddingVenue t={t} party={party} ceremony={ceremony} />
-    <Clouds t={t} />
+    <color attach="background" args={["#f3ead9"]} />
+    <hemisphereLight args={["#fff1dc", "#8a6a4a", 0.95]} />
+    <SunLight target={target} dir={[5, 9, 4]} intensity={1.6} ext={7} />
+    {[0.5, 5.5, 10.5].map((z) => (
+      <pointLight key={z} position={[0, 5.8, z]} intensity={7} distance={12} decay={1.6} color="#ffe2b0" />
+    ))}
+    <pointLight position={[0, 3.5, -3.0]} intensity={5} distance={8} decay={1.6} color="#fff0d8" />
+    <Church t={t} />
+  </>
+);
+const HOLE_AT: [number, number] = [13.96, -0.92];
+const HallScene: React.FC<{f: number; t: number; target: V3}> = ({f, t, target}) => (
+  <>
+    <Sky top="#1b2a6b" bottom="#4a6fb0" />
+    <hemisphereLight args={["#fff1dc", "#7a5a3a", 0.95]} />
+    <SunLight target={target} dir={[3, 9, 4]} intensity={1.3} ext={7} />
+    {(
+      [
+        [PARTY[0], PARTY[2] + 1.0],
+        [PARTY[0] - 3.8, PARTY[2] + 5.0],
+        [PARTY[0] + 3.8, PARTY[2] + 5.0],
+        [PARTY[0] - 3.8, PARTY[2] - 4.2],
+        [PARTY[0] + 3.8, PARTY[2] - 4.2],
+      ] as [number, number][]
+    ).map(([x, z], i) => (
+      <pointLight key={i} position={[x, HALL.h - 1.3, z]} intensity={5} distance={9} decay={1.6} color="#ffe2b0" />
+    ))}
+    <Hall t={t} hole={f >= THROW + 8 ? 1 : 0} holeAt={HOLE_AT} />
+    <HallParty />
   </>
 );
 const SpaceScene: React.FC = () => {
@@ -183,7 +211,7 @@ const MoonScene: React.FC<{t: number}> = ({t}) => (
 /* =================== abertura: no altar =================== */
 const GROOM_A: V3 = [-0.55, 0, -2.25];
 const BRIDE_A: V3 = [0.55, 0, -2.25];
-const PRIEST_P: V3 = [0, 0, -3.4];
+const PRIEST_P: V3 = [0, CHURCH_PLAT, -3.5];
 const Altar: React.FC<{f: number; t: number; groom?: Pose; bride?: Pose; bouquet?: boolean; priest?: {jaw?: number; headYaw?: number; headTilt?: number; arms?: number}}> = ({f, t, groom = {}, bride = {}, bouquet = true, priest = {}}) => (
   <>
     <Dino p={{pos: PRIEST_P, rotY: 0, priest: true, t, blink: blinkCurve(f + 41), tail: 0.3, ...priest}} s={0.85} />
@@ -197,7 +225,7 @@ const S0: React.FC<ShotProps> = ({f, a, t}) => {
   return (
     <>
       <Cam pos={[lerp(0.3, 0.15, k), lerp(1.9, 1.7, k), lerp(5.6, 3.6, easeInOut(k))]} look={[0, 1.45, -2.6]} fov={50} f={f} a={a} />
-      <Venue t={t} target={[0, 0, -1]} party={false} />
+      <Venue f={f} t={t} target={[0, 0, -1]} party={false} />
       <Altar f={f} t={t} priest={{jaw: talk(f, 6, 90) * 0.6}} />
       <SeatedGuests f={f} t={t} />
     </>
@@ -209,7 +237,7 @@ const S1: React.FC<ShotProps> = ({f, a, t}) => {
   return (
     <>
       <Cam pos={[-0.55, 1.62, lerp(-0.45, -0.7, clamp((f - a) / 80))]} look={[0.5, 1.55, -2.25]} fov={40} f={f} a={a} />
-      <Venue t={t} target={[0, 0, -2]} party={false} />
+      <Venue f={f} t={t} target={[0, 0, -2]} party={false} />
       <Altar f={f} t={t} bride={{head: [0, 0.55 * look, 0.12 * look], brow: 0.9 * look, smile: 1, pupil: [-0.6 * look, 0]}} />
     </>
   );
@@ -222,7 +250,7 @@ const dogZ = (f: number) => (f < RUN ? lerp(6.5, 1.0, clamp((f - L(1)) / (RUN - 
 const S2: React.FC<ShotProps> = ({f, a, t}) => (
   <>
     <Cam pos={[0.45, 0.95, dogZ(f) - 2.4]} look={[0, 0.6, dogZ(f) + 0.3]} fov={48} f={f} a={a} />
-    <Venue t={t} target={[0, 0, dogZ(f)]} party={false} />
+    <Venue f={f} t={t} target={[0, 0, dogZ(f)]} party={false} />
     <Altar f={f} t={t} />
     <SeatedGuests f={f} t={t} look={1} />
     <Dog d={{pos: [0, 0, dogZ(f)], rotY: Math.PI, walk: 1, run: 0.8, bowtie: true, pillow: 1, t, tail: 1, mouth: 0.15, tongue: 0.6, blink: blinkCurve(f + 5), head: [0.1, 0, 0]}} />
@@ -233,7 +261,7 @@ const S3: React.FC<ShotProps> = ({f, a, t}) => {
   return (
     <>
       <Cam pos={[0.35, 1.3, dogZ(f) + 2.0]} look={[0.25, 1.15, -2.2]} fov={44} f={f} a={a} />
-      <Venue t={t} target={[0, 0, dogZ(f)]} party={false} />
+      <Venue f={f} t={t} target={[0, 0, dogZ(f)]} party={false} />
       <Altar f={f} t={t} bride={{...CLASP, head: [0, 0.3, 0.1], smile: 1, blink: aww > 0.5 ? 0.85 : 0}} bouquet={false} />
       <SeatedGuests f={f} t={t} react={aww} look={1} />
       <Dog d={{pos: [0, 0, dogZ(f)], rotY: Math.PI, walk: 1, run: 0.8, bowtie: true, pillow: 1, t, tail: 1, mouth: 0.15, tongue: 0.6, blink: blinkCurve(f + 5)}} />
@@ -244,7 +272,7 @@ const S3: React.FC<ShotProps> = ({f, a, t}) => {
 const SHOCK_CUT = at(2, "correndo") + 2;
 const S4: React.FC<ShotProps> = ({f, a, t}) => {
   const land = clamp((f - (POMBO - 8)) / 12);
-  const pPos: V3 = f < RUN + 4 ? arc([2.5, 2.5, -0.2], [0.3, 0, 0.0], easeOut(land), 0.4) : arc([0.3, 0, 0.0], [-1.0, 3.2, -3.0], clamp((f - RUN - 4) / 26), 0.6);
+  const pPos: V3 = f < RUN + 4 ? arc([2.5, 2.5, 0.6], [0.35, 0, 0.35], easeOut(land), 0.4) : arc([0.35, 0, 0.35], [2.2, 3.6, -0.6], clamp((f - RUN - 4) / 26), 0.6);
   const dz = lerp(1.0, -1.2, clamp((f - RUN) / 30));
   const dx = lerp(0, -1.0, clamp((f - RUN) / 30));
   const flying = f >= RUN + 4;
@@ -252,11 +280,11 @@ const S4: React.FC<ShotProps> = ({f, a, t}) => {
   const shock = ramp(f, RUN, RUN + 5);
   return (
     <>
-      {f < SHOCK_CUT ? <Cam pos={[-0.65, 1.15, -1.7]} look={[0.1, 0.55, 1.0]} fov={50} f={f} a={a} /> : <Cam pos={[-0.55, 1.62, -0.5]} look={[0.5, 1.5, -2.25]} fov={40} f={f} a={SHOCK_CUT} />}
-      <Venue t={t} target={[0, 0, 0]} party={false} />
+      {f < SHOCK_CUT ? <Cam pos={[0.0, 1.05, -2.0]} look={[0.2, 0.5, 0.9]} fov={50} f={f} a={a} /> : <Cam pos={[-0.55, 1.62, -0.5]} look={[0.5, 1.5, -2.25]} fov={40} f={f} a={SHOCK_CUT} />}
+      <Venue f={f} t={t} target={[0, 0, 0]} party={false} />
       <Altar f={f} t={t} bride={{...(shock > 0.5 ? CHEEKS : HOLD), eyeWide: shock, mouthOpen: 0.6 * shock, brow: shock, smile: 1 - shock}} bouquet={shock < 0.5} groom={{eyeWide: shock, mouthOpen: 0.4 * shock, brow: shock}} />
       <SeatedGuests f={f} t={t} react={shock} look={1} />
-      <Pigeon p={{pos: pPos, rotY: flying ? Math.PI + 0.4 : -0.6, flap: f < POMBO + 2 || flying ? 1 : 0, flapPh: t * 30, t, rings: flying, peck: !flying && f > POMBO + 6 ? 0.5 * Math.abs(Math.sin(t * 6)) : 0}} s={2.2} />
+      <WeddingPigeon p={{pos: pPos, rotY: flying ? 1.2 : f < POMBO ? -1.4 : Math.PI - 0.6, flap: f < POMBO + 2 || flying ? 1 : 0, t, rings: flying, blink: blinkCurve(f + 3), peck: !flying && f > POMBO + 6 ? 0.6 * Math.abs(Math.sin(t * 6)) : 0}} s={1.5} />
       <Dog d={{pos: [dx, 0, dz], rotY: Math.PI + (f >= RUN ? 0.4 : 0), walk: 1, run: f >= RUN ? 3 : 0.0001, bowtie: true, pillow: f < RUN + 2 ? 1 : 0, t, tail: 1, mouth: f >= RUN ? 0.4 : 0.1, tongue: f >= RUN ? 1 : 0, head: [f >= RUN - 6 && f < RUN ? -0.3 : 0, 0, 0]}} />
       {f >= RUN + 2 && pk < 1 && (
         <group position={arc([0, 0.85, 1.0], [0.6, 0.02, 1.6], pk, 0.6)} rotation={[pk * 5, 0, pk * 2]}>
@@ -269,21 +297,40 @@ const S4: React.FC<ShotProps> = ({f, a, t}) => {
     </>
   );
 };
-/* "...e agora quem tá noivo é o pombo!" — os pombos casando no arco */
+/* "...e agora quem tá noivo é o pombo!" — os pombos casando no pedestal de flores; o padre abençoa */
+const PEDESTAL: V3 = [0, 0, -2.35];
+const Pedestal: React.FC = () => (
+  <group position={PEDESTAL}>
+    <mesh position={[0, 0.5, 0]}>
+      <cylinderGeometry args={[0.16, 0.2, 1.0, 20]} />
+      <meshStandardMaterial color="#fbf8f2" roughness={0.5} />
+    </mesh>
+    <mesh position={[0, 1.02, 0]}>
+      <cylinderGeometry args={[0.32, 0.3, 0.05, 24]} />
+      <meshStandardMaterial color="#fbf8f2" roughness={0.5} />
+    </mesh>
+    {Array.from({length: 10}, (_, i) => {
+      const a = (i / 10) * Math.PI * 2;
+      return (
+        <mesh key={i} position={[Math.cos(a) * 0.3, 1.02, Math.sin(a) * 0.3]}>
+          <sphereGeometry args={[0.06, 10, 8]} />
+          <meshStandardMaterial color={["#ffb3c6", "#ffffff", "#ffd1dc"][i % 3]} roughness={0.55} />
+        </mesh>
+      );
+    })}
+  </group>
+);
 const S5: React.FC<ShotProps> = ({f, a, t}) => {
   const k = clamp((f - a) / 80);
+  const coo = Math.abs(Math.sin(t * 5));
   return (
     <>
-      <Cam pos={[lerp(0.2, 0.3, k), 2.2, lerp(-0.6, -1.0, k)]} look={[0.1, 2.0, -3.2]} fov={44} f={f} a={a} />
-      <Venue t={t} target={[0, 0, -2]} party={false} />
-      <Altar f={f} t={t} bride={{...CROSSED, brow: -0.7, smile: 0.1, head: [-0.25, 0.4, 0.1]}} bouquet={false} groom={{...SHRUG, brow: 0.8, mouthOpen: 0.2, head: [-0.2, 0.3, 0]}} priest={{headTilt: -0.35, jaw: 0.4 * Math.abs(Math.sin(t * 6)) * ramp(f, a + 20, a + 30)}} />
-      <Pigeon p={{pos: [-0.28, 1.38, -3.0], rotY: 0.35, hat: true, rings: true, chest: 0.6, t, blink: blinkCurve(f), bob: Math.sin(t * 5) * 0.5}} s={1.6} />
-      <Pigeon p={{pos: [0.28, 1.38, -3.0], rotY: -0.35, veil: true, t, blink: blinkCurve(f + 9), bob: Math.sin(t * 5 + 1) * 0.5}} s={1.5} />
-      {/* poleiro: um galhinho com flores entre os dois pilares */}
-      <mesh position={[0, 1.36, -3.0]} rotation={[0, 0, Math.PI / 2]}>
-        <cylinderGeometry args={[0.03, 0.03, 2.3, 8]} />
-        <meshStandardMaterial color="#8a5a2b" roughness={0.8} />
-      </mesh>
+      <Cam pos={[lerp(0.15, 0.25, k), 1.85, lerp(0.35, 0.0, k)]} look={[0.05, 1.5, -2.6]} fov={46} f={f} a={a} />
+      <Venue f={f} t={t} target={[0, 0, -2]} party={false} />
+      <Altar f={f} t={t} bride={{...CROSSED, brow: -0.7, smile: 0.1, head: [-0.1, 0.45, 0.1]}} bouquet={false} groom={{...SHRUG, brow: 0.8, mouthOpen: 0.2, head: [-0.1, -0.35, 0]}} priest={{arms: 0.8 + 0.1 * Math.sin(t * 4), jaw: 0.35 * coo * ramp(f, a + 14, a + 22), headTilt: -0.2}} />
+      <Pedestal />
+      <WeddingPigeon p={{pos: [PEDESTAL[0] - 0.13, 1.045, PEDESTAL[2]], rotY: 0.25, hat: true, rings: true, chest: 0.5, t, blink: blinkCurve(f), bob: 1}} s={1.25} />
+      <WeddingPigeon p={{pos: [PEDESTAL[0] + 0.13, 1.045, PEDESTAL[2]], rotY: -0.25, veil: true, t, blink: blinkCurve(f + 9), bob: 1}} s={1.15} />
     </>
   );
 };
@@ -338,7 +385,7 @@ const S6: React.FC<ShotProps> = ({f, a, t}) => {
   return (
     <>
       <Cam pos={[PARTY[0] + lerp(0.8, 0.5, k), 2.6, PARTY[2] + lerp(5.4, 4.6, k)]} look={[PARTY[0], 0.9, PARTY[2] + 0.2]} fov={46} f={f} a={a} />
-      <Venue t={t} target={PARTY} ceremony={false} />
+      <Venue f={f} t={t} target={PARTY} ceremony={false} />
       <Dancers f={f} t={t} />
       <PartyGuests f={f} t={t} />
     </>
@@ -351,7 +398,7 @@ const S7: React.FC<ShotProps> = ({f, a, t}) => {
   return (
     <>
       <Cam pos={[C_D[0] + (Math.sin(spinAng(f)) - 0.85 * Math.cos(spinAng(f))) * 2.1, 1.9, C_D[2] + (Math.cos(spinAng(f)) + 0.85 * Math.sin(spinAng(f))) * 2.1]} look={[C_D[0], 1.0, C_D[2]]} fov={44} f={f} a={a} />
-      <Venue t={t} target={PARTY} ceremony={false} />
+      <Venue f={f} t={t} target={PARTY} ceremony={false} />
       <Dancers f={f} t={t} bride={{torso: [0, 0, wob], eyeWide: slip, mouthOpen: 0.5 * slip, brow: slip, smile: 1 - 0.5 * slip}} groom={{torso: [0, 0, -wob], eyeWide: slip, mouthOpen: 0.4 * slip, brow: slip}} />
       <PartyGuests f={f} t={t} />
     </>
@@ -361,7 +408,7 @@ const S7: React.FC<ShotProps> = ({f, a, t}) => {
 const S8: React.FC<ShotProps> = ({f, a, t}) => (
   <>
     <Cam pos={[PARTY[0], 2.2, PARTY[2] + 3.2]} look={[PARTY[0], 1.0, PARTY[2] + 0.2]} fov={46} f={f} a={a} />
-    <Venue t={t} target={PARTY} ceremony={false} />
+    <Venue f={f} t={t} target={PARTY} ceremony={false} />
     <Dancers f={f} t={t} bride={{eyeWide: 0.6, mouthOpen: 0.6, brow: 0.8, head: [-0.2, 0, 0]}} groom={{eyeWide: 0.8, mouthOpen: 0.5, brow: 1}} />
     <Tornado p={[C_D[0], 0, C_D[2]]} k={0.35 * ramp(f, a, a + 50)} t={t} h={2.4} />
     <PartyGuests f={f} t={t} react={ramp(f, a + 20, a + 40)} />
@@ -376,9 +423,7 @@ const S9: React.FC<ShotProps> = ({f, a, t}) => {
   return (
     <>
       <Cam pos={[PARTY[0] + 0.5, 2.6, PARTY[2] + 8.5]} look={[PARTY[0], 2.3, PARTY[2]]} fov={52} f={f} a={a} />
-      <OutdoorLights target={PARTY} ext={9} />
-      <WeddingVenue t={t} ceremony={false} />
-      <Clouds t={t} />
+      <Venue f={f} t={t} target={PARTY} ceremony={false} />
       <Tornado p={[C_D[0], 0, C_D[2]]} k={0.35 + 0.65 * k} t={t} h={5} />
       <Dancers f={f} t={t} lift={lift} bride={{eyeWide: 0.4, mouthOpen: 0.7, blink: 0.9, smile: 1, head: [-0.3, 0, 0]}} groom={{eyeWide: 1, mouthOpen: 0.6, brow: 1}} />
       {Array.from({length: items}, (_, i) => {
@@ -425,7 +470,7 @@ const Ladies: React.FC<{f: number; up?: number; look?: number}> = ({f, up = 0, l
 const S10: React.FC<ShotProps> = ({f, a, t}) => (
   <>
     <Cam pos={[BRIDE_T[0] + 0.6, 1.55, BRIDE_T[2] + 3.4]} look={[BRIDE_T[0], 1.2, BRIDE_T[2] - 1]} fov={48} f={f} a={a} />
-    <Venue t={t} target={PARTY} ceremony={false} />
+    <Venue f={f} t={t} target={PARTY} ceremony={false} />
     <Toy pose={{...idle(f), pos: BRIDE_T, rotY: 0, ...HOLD, smile: 1, brow: 0.3}} look={HER_BRIDE} />
     <BouquetFront pos={BRIDE_T} rotY={0} />
     <Ladies f={f} up={ramp(f, a + 20, a + 30)} />
@@ -439,7 +484,7 @@ const S11: React.FC<ShotProps> = ({f, a, t}) => {
   return (
     <>
       <Cam pos={[BRIDE_T[0] - 0.4, 1.5, BRIDE_T[2] + 2.5]} look={[BRIDE_T[0], 1.4, BRIDE_T[2] - 0.5]} fov={46} f={f} a={a} />
-      <Venue t={t} target={PARTY} ceremony={false} />
+      <Venue f={f} t={t} target={PARTY} ceremony={false} />
       <Toy pose={{...idle(f), pos: BRIDE_T, rotY: 0.2, rShoulder: [lerp(-0.62, -1.6 + 1.4 * Math.sin(ang), wind), 0, lerp(0.38, -0.3, wind)], rElbow: lerp(-1.05, -0.2, wind), lShoulder: [-0.3, 0, 0.15], lElbow: -1.5, brow: -0.6, smile: 0.7, head: [0.05, 0, 0.08]}} look={HER_BRIDE} palmRef={palm} />
       <InHand palm={palm}>
         <Bouquet p={[0, -0.02, 0.0]} r={[Math.PI, 0, 0]} s={1.1} />
@@ -458,7 +503,7 @@ const S12: React.FC<ShotProps> = ({f, a, t}) => {
   return (
     <>
       <Cam pos={[BRIDE_T[0] + 1.2, 0.9, BRIDE_T[2] + 3.2]} look={[BRIDE_T[0] - 0.2, lerp(1.6, 3.2, k), BRIDE_T[2] - 1]} fov={52} f={f} a={a} />
-      <Venue t={t} target={PARTY} ceremony={false} />
+      <Venue f={f} t={t} target={PARTY} ceremony={false} />
       <Toy pose={{...idle(f), pos: BRIDE_T, rotY: 0.2, ...pose, lShoulder: [-0.3, 0, 0.15], lElbow: -1.5, brow: -0.3, smile: 1, mouthOpen: f >= THROW ? 0.4 : 0}} look={HER_BRIDE} />
       {f >= THROW && k < 1 && (
         <>
@@ -476,6 +521,7 @@ const S12: React.FC<ShotProps> = ({f, a, t}) => {
         </>
       )}
       <Ladies f={f} up={1 - ramp(f, THROW + 4, THROW + 14)} look={ramp(f, THROW, THROW + 8)} />
+      <Debris p={[HOLE_AT[0], HALL.h, HOLE_AT[1]]} k={(f - THROW - 8) / 30} />
     </>
   );
 };
@@ -518,7 +564,7 @@ const S13: React.FC<ShotProps> = ({f, a, t}) => {
 const S14: React.FC<ShotProps> = ({f, a, t}) => (
   <>
     <Cam pos={[BRIDE_T[0] + 0.3, 1.5, BRIDE_T[2] + 2.9]} look={[BRIDE_T[0], 1.25, BRIDE_T[2] - 1]} fov={48} f={f} a={a} />
-    <Venue t={t} target={PARTY} ceremony={false} />
+    <Venue f={f} t={t} target={PARTY} ceremony={false} />
     <Toy pose={{...idle(f), pos: BRIDE_T, rotY: 0, rShoulder: [-1.8, 0, 0.45], rElbow: -2.0, lShoulder: [-0.3, 0, 0.15], lElbow: -1.2, blink: 0.85, smile: 1, mouthOpen: 0.2 + 0.15 * Math.abs(Math.sin(t * 9)), brow: 0.8, head: [0.15, 0, 0.1 * Math.sin(t * 6)]}} look={HER_BRIDE} />
     {LADIES.map(([x, z, ry], i) => (
       <group key={i}>
@@ -545,7 +591,7 @@ const LINE = (k: number): V3 => [BUFFET_P[0] + 0.15 * Math.sin(k), 0, BUFFET_P[2
 const LEITE = at(8, "copo");
 const BuffetScene: React.FC<{f: number; t: number; cow?: Partial<React.ComponentProps<typeof Cow>["c"]>; palmRef?: React.Ref<THREE.Object3D>; groomPose?: Pose; bridePose?: Pose; lineN?: number; turn?: number}> = ({f, t, cow = {}, palmRef, groomPose = {}, bridePose = {}, lineN = 4, turn = 0}) => (
   <>
-    <Venue t={t} target={BUFFET_P} ceremony={false} />
+    <Venue f={f} t={t} target={BUFFET_P} ceremony={false} />
     <BuffetTable p={BUFFET_P} />
     <Pot p={[BUFFET_P[0] - 0.05, 0.72, BUFFET_P[2] + 0.05]} s={0.8}>
       <Noodles p={[0, 0.62, 0]} s={0.8} strands={5} t={t} />
@@ -632,7 +678,7 @@ const S19: React.FC<ShotProps> = ({f, a, t}) => {
   return (
     <>
       <Cam pos={[STAGE_P[0] + 3.8, 1.7, STAGE_P[2] + 1.9]} look={[STAGE_P[0] + 0.3, 1.3, STAGE_P[2] + 1.45]} fov={56} f={f} a={a} />
-      <Venue t={t} target={STAGE_P} ceremony={false} />
+      <Venue f={f} t={t} target={STAGE_P} ceremony={false} />
       <MagicStage p={STAGE_P} />
       <Magician f={f} t={t} />
       <Toy pose={{...idle(f), pos: BRIDE_M, rotY: Math.PI - 0.55, rShoulder: [-1.0, 0, 0.3 + 0.25 * clap], rElbow: -1.3, lShoulder: [-1.0, 0, -0.3 - 0.25 * clap], lElbow: -1.3, smile: 1, eyeWide: 0.4, head: [0, -0.4, 0]}} look={HER_BRIDE} />
@@ -646,7 +692,7 @@ const S20: React.FC<ShotProps> = ({f, a, t}) => {
   return (
     <>
       <Cam pos={[STAGE_P[0] + 0.2, 1.55, STAGE_P[2] + 3.4]} look={[STAGE_P[0], 1.35, STAGE_P[2]]} fov={46} f={f} a={a} />
-      <Venue t={t} target={STAGE_P} ceremony={false} />
+      <Venue f={f} t={t} target={STAGE_P} ceremony={false} />
       <MagicStage p={STAGE_P} />
       <Magician f={f} t={t} wave={ramp(f, a + 20, a + 30)} palmRef={palm} />
       <InHand palm={palm}>
@@ -665,7 +711,7 @@ const S21: React.FC<ShotProps> = ({f, a, t}) => {
   return (
     <>
       {reverse ? <Cam pos={[BRIDE_M[0] + 0.1, 1.62, BRIDE_M[2] - 1.35]} look={[BRIDE_M[0], 1.5, BRIDE_M[2]]} fov={42} f={f} a={SUMIR + 16} /> : <Cam pos={[STAGE_P[0] + 0.2, 1.55, STAGE_P[2] + 3.4]} look={[STAGE_P[0], 1.35, STAGE_P[2]]} fov={46} f={f} a={a} punch={0} />}
-      <Venue t={t} target={STAGE_P} ceremony={false} />
+      <Venue f={f} t={t} target={STAGE_P} ceremony={false} />
       <MagicStage p={STAGE_P} />
       <Magician f={f} t={t} wave={1} palmRef={palm} />
       <InHand palm={palm}>
@@ -719,14 +765,14 @@ const S23: React.FC<ShotProps> = ({f, a, t}) => {
     <>
       <Cam pos={[PARTY[0] + lerp(0.0, 0.2, k), 1.7, PARTY[2] + lerp(5.0, 4.5, k)]} look={[PARTY[0], 1.2, PARTY[2] - 0.2]} fov={50} f={f} a={a} />
       <RoundTable p={[PARTY[0] + 1.3, 0, PARTY[2] + 0.2]} />
-      <Venue t={t} target={PARTY} ceremony={false} />
+      <Venue f={f} t={t} target={PARTY} ceremony={false} />
       <Toy pose={{...idle(f), pos: [PARTY[0], 0, PARTY[2] + 1.2], rotY: 0, ...CROSSED, brow: lerp(-0.6, 0.6, lookUp), smile: 0.4, head: [-0.5 * lookUp, 0, 0], legLift: 0, rShoulder: CROSSED.rShoulder, torso: [0, 0, 0.03 * Math.sin(t * 10)]}} look={HER_BRIDE} />
       <mesh position={[PARTY[0] + 0.12, 0.02 + tap * 0.1, PARTY[2] + 1.35]} visible={false}>
         <boxGeometry args={[0.1, 0.1, 0.1]} />
       </mesh>
       <Dog d={{pos: [PARTY[0] - 1.25, 0, PARTY[2] + 0.7], rotY: 0.3, bowtie: true, t, tail: 1, mouth: 0.2, tongue: 0.8, blink: blinkCurve(f + 5)}} s={0.9} />
-      <Pigeon p={{pos: [PARTY[0] + 1.1, 0.68, PARTY[2] + 0.3], rotY: 0.3, hat: true, rings: true, chest: 0.5, t, bob: Math.sin(t * 5) * 0.5}} s={1.5} />
-      <Pigeon p={{pos: [PARTY[0] + 1.55, 0.68, PARTY[2] + 0.25], rotY: -0.2, veil: true, t, bob: Math.sin(t * 5 + 1) * 0.5}} s={1.4} />
+      <WeddingPigeon p={{pos: [PARTY[0] + 1.12, 0.675, PARTY[2] + 0.3], rotY: 0.3, hat: true, rings: true, chest: 0.5, t, bob: 1, blink: blinkCurve(f)}} s={1.3} />
+      <WeddingPigeon p={{pos: [PARTY[0] + 1.5, 0.675, PARTY[2] + 0.25], rotY: -0.2, veil: true, t, bob: 1, blink: blinkCurve(f + 9)}} s={1.2} />
       <Dino p={{pos: [PARTY[0] - 1.9, 0, PARTY[2] - 1.4], rotY: 0.4, priest: true, t, arms: 0.5 + 0.3 * Math.sin(t * 4), jaw: 0.3, blink: blinkCurve(f + 41)}} s={0.8} />
       <Cow c={{pos: [PARTY[0] + 2.0, 0, PARTY[2] - 1.3], rotY: -0.4, arms: "up", armK: 0.6 + 0.2 * Math.sin(t * 4), chef: true, apron: true, t, mouth: 0.4, blink: blinkCurve(f + 3)}} />
       <PartyGuests f={f} t={t} react={0.3} />

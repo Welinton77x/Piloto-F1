@@ -8,7 +8,7 @@ import {canvasTex, rng, woodTex} from "./util";
 /* ===== Casamento: noiva, noivo e objetos ===== */
 
 /** a noiva (feita a partir da foto: cabelo preto liso comprido repartido no meio, pele morena) */
-const HER_BASE: ToyLook = {skin: "#b8846a", hair: "#141114", hairStyle: "straight", lashes: true, lips: "#a4505a"};
+const HER_BASE: ToyLook = {skin: "#dfac80", hair: "#141114", hairStyle: "straight", lashes: true, lips: "#a4505a"};
 export const HER_CASUAL: ToyLook = {...HER_BASE, polo: true, shirt: "#6a4c3a", pants: "#4a72a8", flare: true, shoe: "#efe3cf", sole: "#9a6a44"};
 export const HER_BRIDE: ToyLook = {...HER_BASE, dress: true, veil: true, shirt: "#fbfaf6"};
 /** o noivo (o boneco do canal) de terno */
@@ -491,6 +491,539 @@ export const Tornado: React.FC<{p: V3; k: number; t: number; h?: number}> = ({p,
         return (
           <mesh key={i} position={[0.15 * Math.sin(t * 3 + i), y, 0.15 * Math.cos(t * 3 + i)]} rotation={[Math.PI / 2, 0, t * (8 - u * 4) + i]} material={mats[i % 3]}>
             <torusGeometry args={[r, 0.06 + 0.12 * u, 6, 32, Math.PI * 1.4]} />
+          </mesh>
+        );
+      })}
+    </group>
+  );
+};
+
+/* ===================== pombos de casamento (lisinhos, no estilo dos bonecos) ===================== */
+export type WPigeonP = {pos?: V3; rotY?: number; flap?: number; t?: number; hat?: boolean; veil?: boolean; rings?: boolean; blink?: number; bob?: number; peck?: number; chest?: number};
+export const WeddingPigeon: React.FC<{p: WPigeonP; s?: number}> = ({p, s = 1}) => {
+  const {pos = [0, 0, 0], rotY = 0, flap = 0, t = 0, hat = false, veil = false, rings = false, blink = 0, bob = 0, peck = 0, chest = 0} = p;
+  const body = sm("#9aa3b2", 0.55);
+  const dark = sm("#6f7786", 0.55);
+  const neck = sm("#7a6bb0", 0.35, {emissive: "#2a1f55", emissiveIntensity: 0.25});
+  const neck2 = sm("#5fae94", 0.35, {emissive: "#123a2c", emissiveIntensity: 0.25});
+  const eye = sm("#0c0c10", 0.1);
+  const white = sm("#ffffff", 0.2);
+  const pink = sm("#f08aa0", 0.5);
+  const fa = flap > 0 ? flap * (0.5 + 0.5 * Math.sin(t * 40)) : 0;
+  const eyeY = Math.max(0.1, 1 - blink);
+  return (
+    <group position={pos} rotation={[0, rotY, 0]} scale={s}>
+      {/* perninhas */}
+      {[-1, 1].map((sd) => (
+        <group key={sd} position={[0.055 * sd, 0, 0.02]}>
+          <mesh position={[0, 0.05, 0]} material={pink}>
+            <cylinderGeometry args={[0.012, 0.012, 0.1, 8]} />
+          </mesh>
+          {[-0.5, 0, 0.5].map((a) => (
+            <mesh key={a} position={[Math.sin(a) * 0.03, 0.008, Math.cos(a) * 0.03]} rotation={[Math.PI / 2, 0, -a]} material={pink}>
+              <capsuleGeometry args={[0.009, 0.04, 4, 6]} />
+            </mesh>
+          ))}
+        </group>
+      ))}
+      <group position={[0, 0.22 + 0.01 * Math.sin(t * 6) * bob, 0]} rotation={[-0.15 + 0.4 * peck, 0, 0]}>
+        {/* corpo, peito furta-cor */}
+        <mesh scale={[0.16, 0.15, 0.22]} material={body} castShadow>
+          <sphereGeometry args={[1, 24, 18]} />
+        </mesh>
+        <mesh position={[0, 0.06, 0.1]} scale={[0.125 * (1 + 0.25 * chest), 0.13 * (1 + 0.25 * chest), 0.11 * (1 + 0.25 * chest)]} material={neck} castShadow>
+          <sphereGeometry args={[1, 20, 14]} />
+        </mesh>
+        <mesh position={[0, 0.12, 0.12]} scale={[0.095, 0.08, 0.085]} material={neck2}>
+          <sphereGeometry args={[1, 18, 12]} />
+        </mesh>
+        {/* asas */}
+        {[-1, 1].map((sd) => (
+          <group key={sd} position={[0.13 * sd, 0.04, 0.0]} rotation={[0, 0, sd * (0.1 + 1.3 * fa)]}>
+            <mesh position={[0.015 * sd, -0.02, -0.04]} scale={[0.04, 0.1, 0.18]} material={dark} castShadow>
+              <sphereGeometry args={[1, 16, 12]} />
+            </mesh>
+            {[0, 1].map((k) => (
+              <mesh key={k} position={[0.045 * sd, -0.03 - k * 0.03, -0.09 - k * 0.025]} rotation={[0.3, 0, 0]} scale={[0.008, 0.012, 0.06]} material={sm("#2a2c33", 0.5)}>
+                <sphereGeometry args={[1, 8, 6]} />
+              </mesh>
+            ))}
+          </group>
+        ))}
+        {/* rabo */}
+        <mesh position={[0, 0.0, -0.24]} rotation={[0.3, 0, 0]} scale={[0.08, 0.018, 0.1]} material={dark} castShadow>
+          <sphereGeometry args={[1, 14, 10]} />
+        </mesh>
+        {/* alianças no pescoço */}
+        {rings &&
+          [-1, 1].map((sd) => (
+            <mesh key={"r" + sd} position={[0.03 * sd, 0.02, 0.2]} rotation={[0.2, 0.5 * sd, 0]} material={sm("#ffcc33", 0.2, {metalness: 0.8, emissive: "#5a3a00", emissiveIntensity: 0.5})}>
+              <torusGeometry args={[0.045, 0.012, 8, 20]} />
+            </mesh>
+          ))}
+        {/* cabeça */}
+        <group position={[0, 0.17 - 0.1 * peck, 0.15 + 0.06 * peck]}>
+          <mesh scale={[0.085, 0.085, 0.09]} material={sm("#b4bcc8", 0.5)} castShadow>
+            <sphereGeometry args={[1, 20, 16]} />
+          </mesh>
+          <mesh position={[0, -0.012, 0.1]} rotation={[Math.PI / 2 - 0.15, 0, 0]} material={sm("#3a3a44", 0.4)}>
+            <coneGeometry args={[0.016, 0.055, 10]} />
+          </mesh>
+          <mesh position={[0, 0.006, 0.083]} scale={[0.02, 0.012, 0.014]} material={sm("#f2f2ee", 0.6)}>
+            <sphereGeometry args={[1, 10, 8]} />
+          </mesh>
+          {[-1, 1].map((sd) => (
+            <group key={sd} position={[0.045 * sd, 0.02, 0.065]} rotation={[0, 0.45 * sd, 0]} scale={[1, eyeY, 1]}>
+              <mesh scale={[0.022, 0.026, 0.012]} material={eye}>
+                <sphereGeometry args={[1, 12, 10]} />
+              </mesh>
+              <mesh position={[0.007, 0.01, 0.01]} scale={0.006} material={white}>
+                <sphereGeometry args={[1, 6, 4]} />
+              </mesh>
+            </group>
+          ))}
+          {[-1, 1].map((sd) => (
+            <mesh key={"c" + sd} position={[0.06 * sd, -0.02, 0.055]} rotation={[0, 0.7 * sd, 0]} scale={[0.016, 0.01, 0.006]} material={sm("#f3a0a6", 0.6)}>
+              <sphereGeometry args={[1, 8, 6]} />
+            </mesh>
+          ))}
+          {hat && (
+            <group position={[0, 0.075, -0.01]} rotation={[-0.15, 0, 0.15]}>
+              <mesh material={sm("#15161d", 0.4)} castShadow>
+                <cylinderGeometry args={[0.08, 0.08, 0.008, 20]} />
+              </mesh>
+              <mesh position={[0, 0.05, 0]} material={sm("#15161d", 0.4)} castShadow>
+                <cylinderGeometry args={[0.048, 0.05, 0.095, 20]} />
+              </mesh>
+              <mesh position={[0, 0.016, 0]} material={sm("#e8414f", 0.5)}>
+                <cylinderGeometry args={[0.051, 0.051, 0.018, 20]} />
+              </mesh>
+            </group>
+          )}
+          {veil && (
+            <group>
+              <mesh position={[0, -0.06, -0.08]} material={sm("#ffffff", 0.3, {transparent: true, opacity: 0.5, side: THREE.DoubleSide, depthWrite: false})}>
+                <cylinderGeometry args={[0.04, 0.14, 0.24, 20, 1, true, 2.1, Math.PI * 2 - 4.2]} />
+              </mesh>
+              {[-1, 0, 1].map((k) => (
+                <mesh key={k} position={[0.03 * k, 0.075, -0.01]} material={sm(k ? "#ffd1dc" : "#ffffff", 0.5)}>
+                  <sphereGeometry args={[0.02, 10, 8]} />
+                </mesh>
+              ))}
+            </group>
+          )}
+        </group>
+      </group>
+    </group>
+  );
+};
+
+/* ===================== igreja bem grande (cerimônia) ===================== */
+const pisoIgrejaTex = () =>
+  canvasTex("piso-igreja", 512, 512, (c) => {
+    for (let i = 0; i < 8; i++)
+      for (let j = 0; j < 8; j++) {
+        c.fillStyle = (i + j) % 2 ? "#e9dfcc" : "#d6c7ab";
+        c.fillRect(i * 64, j * 64, 64, 64);
+      }
+  }, [10, 18]);
+const vitralTex = (seed: number) =>
+  canvasTex("vitral-" + seed, 256, 512, (c, r) => {
+    const cols = ["#e8414f", "#3a86ff", "#ffd21f", "#2ecc71", "#9b59b6", "#ff8a5c", "#5ccfff"];
+    for (let i = 0; i < 8; i++)
+      for (let j = 0; j < 16; j++) {
+        c.fillStyle = cols[Math.floor(r() * cols.length)];
+        c.fillRect(i * 32, j * 32, 32, 32);
+      }
+    c.strokeStyle = "#2a2a30";
+    c.lineWidth = 5;
+    for (let i = 0; i <= 8; i++) {
+      c.beginPath();
+      c.moveTo(i * 32, 0);
+      c.lineTo(i * 32, 512);
+      c.stroke();
+    }
+    for (let j = 0; j <= 16; j++) {
+      c.beginPath();
+      c.moveTo(0, j * 32);
+      c.lineTo(256, j * 32);
+      c.stroke();
+    }
+  });
+const rosaceaTex = () =>
+  canvasTex("rosacea", 512, 512, (c) => {
+    c.fillStyle = "#1b2a6b";
+    c.fillRect(0, 0, 512, 512);
+    const cols = ["#e8414f", "#ffd21f", "#3a86ff", "#2ecc71", "#ff8a5c", "#9b59b6"];
+    for (let ring = 4; ring >= 1; ring--) {
+      const n = ring * 6;
+      for (let i = 0; i < n; i++) {
+        const a0 = (i / n) * Math.PI * 2;
+        const a1 = ((i + 1) / n) * Math.PI * 2;
+        c.fillStyle = cols[(i + ring) % cols.length];
+        c.beginPath();
+        c.moveTo(256, 256);
+        c.arc(256, 256, ring * 62, a0, a1);
+        c.closePath();
+        c.fill();
+        c.strokeStyle = "#2a2a30";
+        c.lineWidth = 4;
+        c.stroke();
+      }
+    }
+    c.fillStyle = "#fff3b0";
+    c.beginPath();
+    c.arc(256, 256, 40, 0, Math.PI * 2);
+    c.fill();
+  });
+export const CH = {x: 5, z0: -6.6, z1: 12.5, wall: 6.5};
+export const CHURCH_PLAT = 0.3; // altura do altar
+/** banco de igreja (os convidados olham pra -z) */
+const Pew: React.FC<{p: V3; w: number}> = ({p, w}) => {
+  const wood = sm("#8a5a33", 0.55);
+  return (
+    <group position={p}>
+      <mesh position={[0, 0.275, 0]} geometry={rbox(w, 0.06, 0.48, 0.02)} material={wood} castShadow receiveShadow />
+      <mesh position={[0, 0.62, 0.24]} rotation={[-0.08, 0, 0]} geometry={rbox(w, 0.6, 0.06, 0.02)} material={wood} castShadow />
+      {[-1, 1].map((sd) => (
+        <mesh key={sd} position={[(w / 2) * sd, 0.42, 0.04]} geometry={rbox(0.07, 0.84, 0.56, 0.03)} material={sm("#74482a", 0.55)} castShadow />
+      ))}
+    </group>
+  );
+};
+export const Church: React.FC<{t: number}> = ({t}) => {
+  const {x: X, z0, z1, wall} = CH;
+  const L = z1 - z0;
+  const zc = (z0 + z1) / 2;
+  const wallM = sm("#f3ead9", 0.85);
+  const stone = sm("#e6dcc8", 0.75);
+  const gold = sm("#e3b33b", 0.3, {metalness: 0.6});
+  const vault = useMemo(() => {
+    const g = new THREE.CylinderGeometry(X, X, L, 40, 1, true, Math.PI / 2, Math.PI);
+    g.rotateX(Math.PI / 2);
+    return g;
+  }, [X, L]);
+  const cols = [-3.6, -0.4, 2.8, 6.0, 9.2];
+  const rows = [-0.6, 0.6, 1.8, 3.0, 4.2, 5.4, 6.6, 7.8];
+  return (
+    <group>
+      {/* piso */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, zc]} material={new THREE.MeshStandardMaterial({map: pisoIgrejaTex(), roughness: 0.35})} receiveShadow>
+        <planeGeometry args={[2 * X, L]} />
+      </mesh>
+      {/* paredes */}
+      {[-1, 1].map((sd) => (
+        <mesh key={sd} position={[(X + 0.1) * sd, wall / 2, zc]} material={wallM} receiveShadow>
+          <boxGeometry args={[0.2, wall, L]} />
+        </mesh>
+      ))}
+      <mesh position={[0, (wall + X) / 2, z0 - 0.1]} material={wallM} receiveShadow>
+        <boxGeometry args={[2 * X + 0.4, wall + X, 0.2]} />
+      </mesh>
+      <mesh position={[0, (wall + X) / 2, z1 + 0.1]} material={wallM}>
+        <boxGeometry args={[2 * X + 0.4, wall + X, 0.2]} />
+      </mesh>
+      {/* abóbada */}
+      <mesh position={[0, wall, zc]} geometry={vault} material={sm("#f7f0e2", 0.85, {side: THREE.DoubleSide})} />
+      {cols.map((z) => (
+        <mesh key={"arco" + z} position={[0, wall, z]} material={stone}>
+          <torusGeometry args={[X - 0.05, 0.12, 8, 40, Math.PI]} />
+        </mesh>
+      ))}
+      {/* colunas */}
+      {[-1, 1].map((sd) =>
+        cols.map((z) => (
+          <group key={`${sd}${z}`} position={[(X - 0.55) * sd, 0, z]}>
+            <mesh position={[0, wall / 2, 0]} material={stone} castShadow>
+              <cylinderGeometry args={[0.32, 0.32, wall, 20]} />
+            </mesh>
+            <mesh position={[0, 0.15, 0]} material={stone}>
+              <cylinderGeometry args={[0.45, 0.48, 0.3, 20]} />
+            </mesh>
+            <mesh position={[0, wall - 0.15, 0]} material={gold}>
+              <cylinderGeometry args={[0.45, 0.34, 0.3, 20]} />
+            </mesh>
+          </group>
+        )),
+      )}
+      {/* vitrais nas laterais */}
+      {[-1, 1].map((sd) =>
+        cols.slice(0, -1).map((z, i) => (
+          <group key={`v${sd}${z}`} position={[(X - 0.005) * sd, 3.3, z + 1.6]} rotation={[0, -sd * Math.PI / 2, 0]}>
+            <mesh material={new THREE.MeshStandardMaterial({map: vitralTex(i + (sd > 0 ? 10 : 0)), emissive: "#ffffff", emissiveMap: vitralTex(i + (sd > 0 ? 10 : 0)), emissiveIntensity: 0.9, roughness: 0.4})}>
+              <planeGeometry args={[1.3, 3.0]} />
+            </mesh>
+            <mesh position={[0, 1.5, 0]} material={new THREE.MeshStandardMaterial({map: vitralTex(i + 20), emissive: "#ffffff", emissiveMap: vitralTex(i + 20), emissiveIntensity: 0.9})}>
+              <circleGeometry args={[0.65, 24, 0, Math.PI]} />
+            </mesh>
+            <mesh position={[0, 0.2, 0.01]} material={stone}>
+              <torusGeometry args={[0.7, 0.05, 6, 20, Math.PI]} />
+            </mesh>
+          </group>
+        )),
+      )}
+      {/* rosácea atrás do altar */}
+      <group position={[0, 7.3, z0 + 0.02]}>
+        <mesh material={new THREE.MeshStandardMaterial({map: rosaceaTex(), emissive: "#ffffff", emissiveMap: rosaceaTex(), emissiveIntensity: 1.0})}>
+          <circleGeometry args={[2.0, 48]} />
+        </mesh>
+        <mesh position={[0, 0, 0.02]} material={stone}>
+          <torusGeometry args={[2.05, 0.12, 8, 48]} />
+        </mesh>
+      </group>
+      {/* altar: plataforma, degrau, mesa, velas, flores */}
+      <mesh position={[0, CHURCH_PLAT / 2, (z0 - 2.9) / 2]} material={stone} receiveShadow castShadow>
+        <boxGeometry args={[2 * X, CHURCH_PLAT, -2.9 - z0]} />
+      </mesh>
+      <mesh position={[0, CHURCH_PLAT / 4, -2.72]} material={stone} receiveShadow>
+        <boxGeometry args={[7, CHURCH_PLAT / 2, 0.36]} />
+      </mesh>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, CHURCH_PLAT + 0.005, -4.4]} material={sm("#b3122d", 0.8)} receiveShadow>
+        <planeGeometry args={[3.2, 3.0]} />
+      </mesh>
+      <group position={[0, CHURCH_PLAT, -5.3]}>
+        <mesh position={[0, 0.45, 0]} geometry={rbox(2.2, 0.9, 0.8, 0.03)} material={sm("#fbf8f2", 0.7)} castShadow receiveShadow />
+        <mesh position={[0, 0.7, 0.405]} material={gold}>
+          <boxGeometry args={[2.2, 0.06, 0.01]} />
+        </mesh>
+        {[-0.8, -0.5, 0.5, 0.8].map((x) => (
+          <group key={x} position={[x, 0.9, 0]}>
+            <mesh position={[0, 0.18, 0]} material={sm("#fffaf0", 0.5)}>
+              <cylinderGeometry args={[0.04, 0.04, 0.36, 12]} />
+            </mesh>
+            <mesh position={[0, 0.41, 0]} material={sm("#ffd36b", 0.3, {emissive: "#ffb020", emissiveIntensity: 2.5})}>
+              <sphereGeometry args={[0.035, 10, 8]} />
+            </mesh>
+          </group>
+        ))}
+        {[-0.15, 0, 0.15].map((x, i) => (
+          <mesh key={i} position={[x, 1.0 + (i === 1 ? 0.06 : 0), 0]} material={sm(["#ffb3c6", "#ffffff", "#ffd1dc"][i], 0.55)}>
+            <sphereGeometry args={[0.12, 14, 10]} />
+          </mesh>
+        ))}
+      </group>
+      <FlowerArch p={[0, CHURCH_PLAT, -4.1]} />
+      {/* tapete vermelho do corredor */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.006, (-2.55 + z1) / 2]} material={sm("#b3122d", 0.85)} receiveShadow>
+        <planeGeometry args={[1.3, z1 + 2.55]} />
+      </mesh>
+      {/* bancos + lacinhos */}
+      {[-1, 1].map((sd) =>
+        rows.map((z) => (
+          <group key={`${sd}${z}`}>
+            <Pew p={[1.95 * sd, 0, z]} w={2.55} />
+            <group position={[0.7 * sd, 0.75, z + 0.2]}>
+              {[-1, 1].map((k) => (
+                <mesh key={k} position={[0, 0, 0.05 * k]} rotation={[(Math.PI / 2) * k, 0, 0]} material={sm("#ffffff", 0.5)}>
+                  <coneGeometry args={[0.06, 0.13, 4]} />
+                </mesh>
+              ))}
+              <mesh position={[0, -0.05, 0]} material={sm("#ffb3c6", 0.5)}>
+                <sphereGeometry args={[0.07, 12, 10]} />
+              </mesh>
+            </group>
+          </group>
+        )),
+      )}
+      {/* lustres */}
+      {[0.5, 5.5, 10.5].map((z) => (
+        <group key={"l" + z} position={[0, 6.2, z]}>
+          <mesh position={[0, 2.0, 0]} material={gold}>
+            <cylinderGeometry args={[0.02, 0.02, 4.0, 6]} />
+          </mesh>
+          <mesh rotation={[Math.PI / 2, 0, 0]} material={gold}>
+            <torusGeometry args={[0.8, 0.05, 8, 32]} />
+          </mesh>
+          {Array.from({length: 10}, (_, i) => {
+            const a = (i / 10) * Math.PI * 2;
+            return (
+              <mesh key={i} position={[Math.cos(a) * 0.8, 0.12, Math.sin(a) * 0.8]} material={sm("#fff3c4", 0.3, {emissive: "#ffd36b", emissiveIntensity: 2})}>
+                <sphereGeometry args={[0.07, 10, 8]} />
+              </mesh>
+            );
+          })}
+        </group>
+      ))}
+      {/* portas grandes no fundo */}
+      <group position={[0, 0, z1 - 0.005]} rotation={[0, Math.PI, 0]}>
+        {[-1, 1].map((sd) => (
+          <mesh key={sd} position={[0.85 * sd, 2.0, 0]} geometry={rbox(1.6, 4.0, 0.1, 0.03)} material={sm("#7a4a28", 0.6)} />
+        ))}
+        <mesh position={[0, 4.0, 0]} material={sm("#7a4a28", 0.6)}>
+          <circleGeometry args={[1.7, 24, 0, Math.PI]} />
+        </mesh>
+      </group>
+    </group>
+  );
+};
+
+/* ===================== salão de festas (depois do casamento) ===================== */
+export const HALL = {x0: 7.5, x1: 20.5, z0: -8.6, z1: 10, h: 5.2};
+const parquetTex = () => woodTex("parquet-salao", [190, 140, 95], 12, [6, 7]);
+const cortinaTex = () =>
+  canvasTex("cortina-salao", 128, 256, (c) => {
+    const g = c.createLinearGradient(0, 0, 128, 0);
+    for (let i = 0; i <= 8; i++) g.addColorStop(i / 8, i % 2 ? "#8a1d36" : "#b3284a");
+    c.fillStyle = g;
+    c.fillRect(0, 0, 128, 256);
+  });
+export const Hall: React.FC<{t: number; hole?: number; holeAt?: [number, number]}> = ({t, hole = 0, holeAt = [PARTY[0], PARTY[2] - 0.8]}) => {
+  const {x0, x1, z0, z1, h} = HALL;
+  const W = x1 - x0;
+  const D = z1 - z0;
+  const cx = (x0 + x1) / 2;
+  const cz = (z0 + z1) / 2;
+  const wallM = sm("#f6ead7", 0.85);
+  const lower = sm("#d9c3a0", 0.7);
+  const gold = sm("#e3b33b", 0.3, {metalness: 0.6});
+  const ceiling = useMemo(() => {
+    const sh = new THREE.Shape();
+    sh.moveTo(-W / 2, -D / 2);
+    sh.lineTo(W / 2, -D / 2);
+    sh.lineTo(W / 2, D / 2);
+    sh.lineTo(-W / 2, D / 2);
+    sh.closePath();
+    if (hole > 0.01) {
+      const hp = new THREE.Path();
+      const r = 1.1 * hole;
+      const hx = holeAt[0] - cx;
+      const hz = -(holeAt[1] - cz);
+      for (let i = 0; i <= 12; i++) {
+        const a = (i / 12) * Math.PI * 2;
+        const rr = r * (0.8 + 0.25 * Math.sin(i * 2.7));
+        if (i === 0) hp.moveTo(hx + Math.cos(a) * rr, hz + Math.sin(a) * rr);
+        else hp.lineTo(hx + Math.cos(a) * rr, hz + Math.sin(a) * rr);
+      }
+      sh.holes.push(hp);
+    }
+    const g = new THREE.ShapeGeometry(sh);
+    g.rotateX(Math.PI / 2);
+    return g;
+  }, [W, D, hole > 0.01 ? Math.round(hole * 10) : 0]);
+  return (
+    <group>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[cx, 0, cz]} material={new THREE.MeshStandardMaterial({map: parquetTex(), roughness: 0.4})} receiveShadow>
+        <planeGeometry args={[W, D]} />
+      </mesh>
+      {/* paredes com barrado, cortinas e arandelas */}
+      {(
+        [
+          [cx, z0 - 0.1, W + 0.4, 0],
+          [cx, z1 + 0.1, W + 0.4, 0],
+          [x0 - 0.1, cz, D, Math.PI / 2],
+          [x1 + 0.1, cz, D, Math.PI / 2],
+        ] as [number, number, number, number][]
+      ).map(([x, z, w, ry], i) => (
+        <group key={i} position={[x, 0, z]} rotation={[0, ry, 0]}>
+          <mesh position={[0, h / 2, 0]} material={wallM} receiveShadow>
+            <boxGeometry args={[w, h, 0.2]} />
+          </mesh>
+          {[-1, 1].map((sd) => (
+            <mesh key={sd} position={[0, 0.55, 0.11 * sd]} material={lower}>
+              <boxGeometry args={[w, 1.1, 0.02]} />
+            </mesh>
+          ))}
+          {[-1, 1].map((sd) => (
+            <mesh key={"g" + sd} position={[0, 1.12, 0.12 * sd]} material={gold}>
+              <boxGeometry args={[w, 0.05, 0.02]} />
+            </mesh>
+          ))}
+        </group>
+      ))}
+      {/* cortinas nas paredes do fundo e laterais */}
+      {Array.from({length: 6}, (_, i) => x0 + 1.2 + i * 2.1).map((x) => (
+        <mesh key={"cf" + x} position={[x, h / 2 + 0.2, z0 + 0.06]} material={new THREE.MeshStandardMaterial({map: cortinaTex(), roughness: 0.8})}>
+          <planeGeometry args={[0.8, h - 0.6]} />
+        </mesh>
+      ))}
+      {[-1, 1].map((sd) =>
+        Array.from({length: 7}, (_, i) => z0 + 1.6 + i * 2.6).map((z) => (
+          <group key={`a${sd}${z}`} position={[sd < 0 ? x0 + 0.06 : x1 - 0.06, 0, z]} rotation={[0, sd < 0 ? Math.PI / 2 : -Math.PI / 2, 0]}>
+            <mesh position={[0, h / 2 + 0.2, 0]} material={new THREE.MeshStandardMaterial({map: cortinaTex(), roughness: 0.8})}>
+              <planeGeometry args={[0.8, h - 0.6]} />
+            </mesh>
+            <mesh position={[1.3, 2.6, 0.05]} material={sm("#fff3c4", 0.3, {emissive: "#ffd36b", emissiveIntensity: 1.8})}>
+              <sphereGeometry args={[0.1, 12, 10]} />
+            </mesh>
+          </group>
+        )),
+      )}
+      {/* teto (com buraco quando o buquê passa) */}
+      <mesh position={[cx, h, cz]} geometry={ceiling} material={sm("#fbf7ee", 0.9, {side: THREE.DoubleSide})} />
+      {/* lustres de cristal */}
+      {(
+        [
+          [PARTY[0], PARTY[2] + 1.0],
+          [PARTY[0] - 3.8, PARTY[2] + 5.0],
+          [PARTY[0] + 3.8, PARTY[2] + 5.0],
+          [PARTY[0] - 3.8, PARTY[2] - 4.2],
+          [PARTY[0] + 3.8, PARTY[2] - 4.2],
+        ] as [number, number][]
+      ).map(([x, z], i) => (
+        <group key={"lu" + i} position={[x, h - 1.0, z]}>
+          <mesh position={[0, 0.5, 0]} material={gold}>
+            <cylinderGeometry args={[0.02, 0.02, 1.0, 6]} />
+          </mesh>
+          {[0.55, 0.35].map((r, k) => (
+            <group key={k} position={[0, -k * 0.28, 0]}>
+              <mesh rotation={[Math.PI / 2, 0, 0]} material={gold}>
+                <torusGeometry args={[r, 0.03, 8, 28]} />
+              </mesh>
+              {Array.from({length: 8 - k * 2}, (_, j) => {
+                const a = (j / (8 - k * 2)) * Math.PI * 2 + t * 0.2;
+                return (
+                  <group key={j}>
+                    <mesh position={[Math.cos(a) * r, 0.08, Math.sin(a) * r]} material={sm("#fff3c4", 0.3, {emissive: "#ffd36b", emissiveIntensity: 2})}>
+                      <sphereGeometry args={[0.05, 10, 8]} />
+                    </mesh>
+                    <mesh position={[Math.cos(a) * r, -0.12, Math.sin(a) * r]} material={sm("#dff3ff", 0.05, {metalness: 0.3})}>
+                      <octahedronGeometry args={[0.04, 0]} />
+                    </mesh>
+                  </group>
+                );
+              })}
+            </group>
+          ))}
+        </group>
+      ))}
+    </group>
+  );
+};
+/** pista de dança + mesas + bolo dentro do salão */
+export const HallParty: React.FC = () => (
+  <group position={PARTY}>
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.012, 0]} material={new THREE.MeshStandardMaterial({map: pistaTex(), roughness: 0.08, metalness: 0.15})} receiveShadow>
+      <circleGeometry args={[2.7, 48]} />
+    </mesh>
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.014, 0]} material={sm("#e3b33b", 0.3, {metalness: 0.6})}>
+      <ringGeometry args={[2.7, 2.82, 48]} />
+    </mesh>
+    {(
+      [
+        [-4.2, 2.6],
+        [4.2, 2.6],
+        [-4.4, -1.2],
+        [4.6, -0.6],
+        [-3.4, 6.2],
+        [3.4, 6.2],
+      ] as [number, number][]
+    ).map(([x, z], i) => (
+      <RoundTable key={i} p={[x, 0, z]} />
+    ))}
+    <CakeTable p={[4.2, 0, -3.4]} />
+  </group>
+);
+/** caquinhos do teto caindo */
+export const Debris: React.FC<{p: V3; k: number}> = ({p, k}) => {
+  if (k <= 0 || k >= 1) return null;
+  return (
+    <group position={p}>
+      {Array.from({length: 12}, (_, i) => {
+        const a = i * 2.4;
+        const r = 0.3 + 0.5 * ((i * 37) % 10) / 10;
+        return (
+          <mesh key={i} position={[Math.cos(a) * r * (1 + k), -k * k * 5 * (0.6 + 0.4 * (i % 3) / 2), Math.sin(a) * r * (1 + k)]} rotation={[k * 8 + i, k * 5, i]} material={sm("#fbf7ee", 0.8)}>
+            <boxGeometry args={[0.18, 0.04, 0.12]} />
           </mesh>
         );
       })}
