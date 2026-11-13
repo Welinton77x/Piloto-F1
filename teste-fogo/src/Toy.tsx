@@ -15,8 +15,15 @@ export type ToyLook = {
   sole?: string;
   backpack?: string; // mochila nas costas (cor)
   hoodie?: boolean; // casaco com capuz, manga comprida e cordinhas pretas
-  hairStyle?: "bowl" | "spiky" | "curly" | "ponytail" | "pigtails" | "long" | "bun" | "buzz";
+  hairStyle?: "bowl" | "spiky" | "curly" | "ponytail" | "pigtails" | "long" | "bun" | "buzz" | "straight";
   jelly?: number; // 0..1 coberto de gelatina de morango
+  suit?: boolean; // terno de noivo (paletó preto, camisa branca, gravata borboleta)
+  dress?: boolean; // vestido de noiva (corpete + saia longa até o chão)
+  veil?: boolean; // véu + tiara
+  polo?: boolean; // camisa polo de gola branca (roupa da foto)
+  flare?: boolean; // calça jeans pantalona
+  lashes?: boolean; // cílios
+  lips?: string; // cor da boca
 };
 
 const sm = (color: string, rough = 0.55, extra: Partial<THREE.MeshStandardMaterialParameters> = {}) =>
@@ -31,7 +38,7 @@ const useToyMats = (L: ToyLook) =>
       shirtDark: sm("#e7a816", 0.6),
       pants: sm(L.pants ?? "#2f55b0", 0.65),
       pantsHem: sm(new THREE.Color(L.pants ?? "#2f55b0").multiplyScalar(0.8).getStyle(), 0.65),
-      hair: sm(L.hair ?? "#3b2416", 0.45, {side: THREE.DoubleSide}),
+      hair: sm(L.hair ?? "#3b2416", L.hairStyle === "straight" ? 0.32 : 0.45, {side: THREE.DoubleSide}),
       shoe: sm(L.shoe ?? "#f4f4f2", 0.45),
       sole: sm(L.sole ?? "#f08a1c", 0.5),
       eye: sm("#0c0c10", 0.12, {metalness: 0.1}),
@@ -46,8 +53,16 @@ const useToyMats = (L: ToyLook) =>
       strap: sm("#4a5260", 0.6),
       cord: sm("#141414", 0.45),
       jelly: sm("#e8303f", 0.15, {transparent: true, opacity: 0.85, metalness: 0.05}),
+      cuffWhite: sm("#f7f7f4", 0.5),
+      lapel: sm(new THREE.Color(L.shirt ?? "#1d1f27").multiplyScalar(0.7).getStyle(), 0.45),
+      satin: sm("#fbfaf6", 0.35),
+      lace: sm("#f1efe9", 0.6),
+      pearl: sm("#fffaf0", 0.2, {metalness: 0.2}),
+      lips: sm(L.lips ?? "#3a1510", 0.45),
+      veil: sm("#ffffff", 0.3, {transparent: true, opacity: 0.38, side: THREE.DoubleSide, depthWrite: false}),
+      silver: sm("#dfe3ea", 0.2, {metalness: 0.7}),
     }),
-    [L.skin, L.shirt, L.pants, L.hair, L.shoe, L.sole, L.backpack],
+    [L.skin, L.shirt, L.pants, L.hair, L.shoe, L.sole, L.backpack, L.lips, L.hairStyle],
   );
 
 /* proporções medidas no boneco de referência (altura total ≈ 2,0):
@@ -223,6 +238,160 @@ const OtherHair: React.FC<{style: string; m: THREE.Material}> = ({style, m}) => 
   );
 };
 
+/* ---------- cabelo liso comprido, repartido no meio (a noiva) ---------- */
+const straightHair = (() => {
+  let g: {parts: THREE.BufferGeometry[]; rims: THREE.BufferGeometry[]; part: THREE.BufferGeometry} | null = null;
+  return () => {
+    if (g) return g;
+    const R = 0.355;
+    const FACE = 0.62; // meia-abertura do rosto (rad)
+    const T0 = 0.98; // linha do cabelo na testa
+    const T1 = 1.78; // até o queixo
+    const SX = 1.03;
+    const SY = 0.97;
+    const yTop = R * Math.cos(T1) * SY;
+    const yEnd = -0.74;
+    const CHEST = 0.27; // na frente do peito
+    const BACK = -0.31; // atrás das costas
+    const top = new THREE.SphereGeometry(R, 56, 16, 0, Math.PI * 2, 0, T0);
+    top.scale(SX, SY, 1);
+    const sides = new THREE.SphereGeometry(R, 56, 14, Math.PI / 2 + FACE, Math.PI * 2 - 2 * FACE, T0, T1 - T0);
+    sides.scale(SX, SY, 1);
+    /** ponto da cortina de cabelo: ângulo a (0 = frente), altura y */
+    const curtain = (a: number, y: number) => {
+      const k = Math.min(1, Math.max(0, (yTop - y) / (yTop - yEnd)));
+      const r = 0.358 + 0.075 * Math.min(1, k * 2.2);
+      let x = r * Math.sin(a);
+      let z = r * Math.cos(a);
+      const below = Math.min(1, Math.max(0, (yTop - 0.2 - y) / 0.2));
+      if (z > 0) z = Math.min(z, lerpN(z, CHEST, below));
+      else z = Math.max(z, lerpN(z, BACK, below));
+      x *= 1 - 0.06 * k;
+      return new THREE.Vector3(x, y, z);
+    };
+    const panel = (a0: number, a1: number, na: number) => {
+      const NY = 14;
+      const pos: number[] = [];
+      const idx: number[] = [];
+      for (let i = 0; i <= na; i++)
+        for (let j = 0; j <= NY; j++) {
+          const v = curtain(lerpN(a0, a1, i / na), lerpN(yTop + 0.004, yEnd, j / NY));
+          pos.push(v.x, v.y, v.z);
+        }
+      for (let i = 0; i < na; i++)
+        for (let j = 0; j < NY; j++) {
+          const p = i * (NY + 1) + j;
+          const q = (i + 1) * (NY + 1) + j;
+          idx.push(p, p + 1, q, q, p + 1, q + 1);
+        }
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
+      geo.setIndex(idx);
+      geo.computeVertexNormals();
+      return geo;
+    };
+    const LOCK = 1.25;
+    const BK = 1.95;
+    const back = panel(BK, Math.PI * 2 - BK, 40);
+    const lockR = panel(FACE, LOCK, 10);
+    const lockL = panel(Math.PI * 2 - LOCK, Math.PI * 2 - FACE, 10);
+    // bordas arredondadas (dão "espessura" ao cabelo)
+    const tube = (pts: THREE.Vector3[], r = 0.03) => new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 48, r, 8, false);
+    const onSphere = (a: number, th: number) => new THREE.Vector3(R * Math.sin(th) * Math.sin(a) * SX, R * Math.cos(th) * SY, R * Math.sin(th) * Math.cos(a));
+    const edgeDown = (a: number) => [
+      ...Array.from({length: 6}, (_, i) => onSphere(a, lerpN(T0 - 0.05, T1, i / 5))),
+      ...Array.from({length: 8}, (_, i) => curtain(a, lerpN(yTop - 0.02, yEnd, (i + 1) / 8))),
+    ];
+    const bottom = (a0: number, a1: number, n: number) => Array.from({length: n + 1}, (_, i) => curtain(lerpN(a0, a1, i / n), yEnd));
+    const rims = [
+      tube(edgeDown(FACE)),
+      tube(edgeDown(-FACE)),
+      tube(bottom(FACE, LOCK, 6)),
+      tube(bottom(-LOCK, -FACE, 6)),
+      tube(bottom(BK, Math.PI * 2 - BK, 24)),
+      tube(Array.from({length: 9}, (_, i) => curtain(LOCK, lerpN(yTop, yEnd, i / 8)))),
+      tube(Array.from({length: 9}, (_, i) => curtain(-LOCK, lerpN(yTop, yEnd, i / 8)))),
+      tube(Array.from({length: 9}, (_, i) => curtain(BK, lerpN(yTop, yEnd, i / 8)))),
+      tube(Array.from({length: 9}, (_, i) => curtain(-BK, lerpN(yTop, yEnd, i / 8)))),
+      // linha da testa (sobe um pouquinho no meio: risca no meio)
+      tube(Array.from({length: 13}, (_, i) => {
+        const a = lerpN(-FACE, FACE, i / 12);
+        return onSphere(a, T0 - 0.02 - 0.16 * Math.exp(-(a * a) / 0.02));
+      }), 0.028),
+    ];
+    // risca no meio (pele aparecendo)
+    const part = new THREE.BufferGeometry();
+    g = {parts: [top, sides, back, lockR, lockL], rims, part};
+    return g;
+  };
+})();
+const StraightHair: React.FC<{m: THREE.Material; skin: THREE.Material}> = ({m, skin}) => {
+  const g = straightHair();
+  return (
+    <>
+      {g.parts.map((geo, i) => (
+        <mesh key={i} geometry={geo} material={m} castShadow />
+      ))}
+      {g.rims.map((geo, i) => (
+        <mesh key={"r" + i} geometry={geo} material={m} castShadow />
+      ))}
+    </>
+  );
+};
+
+/* ---------- textura do logo da camisa polo (rabisco bege genérico) ---------- */
+const logoTex = (() => {
+  let t: THREE.CanvasTexture | null = null;
+  return () => {
+    if (t) return t;
+    const c = document.createElement("canvas");
+    c.width = c.height = 256;
+    const x = c.getContext("2d")!;
+    x.clearRect(0, 0, 256, 256);
+    x.strokeStyle = "#d9b38c";
+    x.lineWidth = 16;
+    x.lineCap = "round";
+    x.beginPath();
+    x.moveTo(60, 170);
+    x.bezierCurveTo(20, 60, 200, 30, 190, 110);
+    x.bezierCurveTo(180, 190, 80, 200, 110, 120);
+    x.bezierCurveTo(130, 70, 230, 150, 200, 210);
+    x.stroke();
+    t = new THREE.CanvasTexture(c);
+    t.colorSpace = THREE.SRGBColorSpace;
+    return t;
+  };
+})();
+const laceTex = (() => {
+  let t: THREE.CanvasTexture | null = null;
+  return () => {
+    if (t) return t;
+    const c = document.createElement("canvas");
+    c.width = c.height = 256;
+    const x = c.getContext("2d")!;
+    x.fillStyle = "#fbfaf6";
+    x.fillRect(0, 0, 256, 256);
+    x.strokeStyle = "#e3ded3";
+    x.lineWidth = 3;
+    for (let i = 0; i < 4; i++)
+      for (let j = 0; j < 4; j++) {
+        const cx = 32 + i * 64 + (j % 2) * 32;
+        const cy = 32 + j * 64;
+        for (let k = 0; k < 5; k++) {
+          const a = (k / 5) * Math.PI * 2;
+          x.beginPath();
+          x.ellipse(cx + Math.cos(a) * 9, cy + Math.sin(a) * 9, 8, 4, a, 0, Math.PI * 2);
+          x.stroke();
+        }
+      }
+    t = new THREE.CanvasTexture(c);
+    t.colorSpace = THREE.SRGBColorSpace;
+    t.wrapS = t.wrapT = THREE.RepeatWrapping;
+    t.repeat.set(6, 2);
+    return t;
+  };
+})();
+
 export const Toy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; lPalmRef?: React.Ref<THREE.Object3D>; look?: ToyLook; headExtra?: React.ReactNode}> = ({pose, palmRef, lPalmRef, look = {}, headExtra}) => {
   const m = useToyMats(look);
   const hairGeo = useMemo(makeHair, []);
@@ -239,6 +408,42 @@ export const Toy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; lPa
       hoodBack: new RoundedBoxGeometry(0.4, 0.2, 0.12, 3, 0.06),
       strapT: new RoundedBoxGeometry(0.065, 0.03, 0.42, 2, 0.012),
       sole: new RoundedBoxGeometry(0.21, 0.035, 0.35, 3, 0.015),
+      shirtV: (() => {
+        const sh = new THREE.Shape();
+        sh.moveTo(-0.11, TORSO_TOP - 0.01);
+        sh.lineTo(0.11, TORSO_TOP - 0.01);
+        sh.lineTo(0, 1.04);
+        sh.closePath();
+        return new THREE.ShapeGeometry(sh);
+      })(),
+      lapel: new RoundedBoxGeometry(0.06, 0.34, 0.02, 2, 0.008),
+      bodice: new RoundedBoxGeometry(0.5, 0.44, 0.35, 4, 0.1),
+      chest: new RoundedBoxGeometry(0.47, 0.18, 0.31, 4, 0.08),
+      skirt: (() => {
+        const sk = new THREE.CylinderGeometry(0.25, 0.84, 0.95, 64, 6, true);
+        const pos = sk.attributes.position as THREE.BufferAttribute;
+        for (let i = 0; i < pos.count; i++) {
+          const x = pos.getX(i);
+          const z = pos.getZ(i);
+          const y = pos.getY(i);
+          const k = (0.475 - y) / 0.95; // 0 em cima .. 1 embaixo
+          const a = Math.atan2(x, z);
+          const w = 1 + 0.035 * k * Math.sin(a * 12);
+          pos.setX(i, x * w);
+          pos.setZ(i, z * w);
+        }
+        sk.computeVertexNormals();
+        sk.translate(0, 0.475, 0);
+        return sk;
+      })(),
+      collarFlap: (() => {
+        const sh = new THREE.Shape();
+        sh.moveTo(0, 0);
+        sh.lineTo(0.13, -0.02);
+        sh.quadraticCurveTo(0.12, -0.11, 0.03, -0.12);
+        sh.closePath();
+        return new THREE.ShapeGeometry(sh);
+      })(),
     }),
     [],
   );
@@ -273,7 +478,7 @@ export const Toy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; lPa
 
   const arm = (side: 1 | -1, shoulder: [number, number, number], elbow: number, wrist: [number, number, number], ref?: React.Ref<THREE.Object3D>) => (
     <group position={[SHX * side, SHY, 0]} rotation={shoulder}>
-      {look.hoodie ? (
+      {look.hoodie || look.suit ? (
         /* manga comprida do casaco (fofinha) */
         <mesh position={[0, -0.12, 0]} material={m.shirt} castShadow>
           <capsuleGeometry args={[0.112, 0.17, 6, 14]} />
@@ -281,9 +486,14 @@ export const Toy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; lPa
       ) : (
         <>
           {/* manga curta da camiseta */}
-          <mesh position={[0, -0.07, 0]} material={m.shirt} castShadow>
-            <capsuleGeometry args={[0.112, 0.08, 6, 14]} />
+          <mesh position={[0, -0.07, 0]} material={look.dress ? m.satin : m.shirt} castShadow>
+            <capsuleGeometry args={[0.112, look.dress ? 0.02 : 0.08, 6, 14]} />
           </mesh>
+          {look.polo && (
+            <mesh position={[0, -0.185, 0]} rotation={[Math.PI / 2, 0, 0]} material={m.cuffWhite}>
+              <torusGeometry args={[0.1, 0.02, 8, 20]} />
+            </mesh>
+          )}
           {/* braço */}
           <mesh position={[0, -0.14, 0]} material={m.skin} castShadow>
             <capsuleGeometry args={[0.09, 0.16, 6, 14]} />
@@ -291,13 +501,13 @@ export const Toy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; lPa
         </>
       )}
       <group position={[0, -0.26, 0]} rotation={[elbow, 0, 0]}>
-        {look.hoodie ? (
+        {look.hoodie || look.suit ? (
           <>
             <mesh position={[0, -0.1, 0]} material={m.shirt} castShadow>
               <capsuleGeometry args={[0.106, 0.14, 6, 14]} />
             </mesh>
             {/* punho */}
-            <mesh position={[0, -0.215, 0]} material={m.shirtDark} castShadow>
+            <mesh position={[0, -0.215, 0]} material={look.suit ? m.cuffWhite : m.shirtDark} castShadow>
               <capsuleGeometry args={[0.1, 0.03, 6, 14]} />
             </mesh>
           </>
@@ -319,8 +529,22 @@ export const Toy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; lPa
 
   return (
     <group position={[pos[0], pos[1] + 0.022 * walkAmt * (Math.cos(2 * walk) - 1), pos[2]]} rotation={[0, rotY, 0]} scale={[1 + squash * 0.5, 1 - squash, 1 + squash * 0.5]}>
+      {/* vestido de noiva: saia longa até o chão (fica no quadril, não gira com o tronco) */}
+      {look.dress && (
+        <>
+          <mesh geometry={geo.skirt} material={m.lace} castShadow receiveShadow>
+            <meshStandardMaterial attach="material" map={laceTex()} roughness={0.55} side={THREE.DoubleSide} />
+          </mesh>
+          <mesh position={[0, 0.03, 0]} rotation={[Math.PI / 2, 0, 0]} material={m.satin} castShadow>
+            <torusGeometry args={[0.845, 0.04, 10, 64]} />
+          </mesh>
+          <mesh position={[0, 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]} material={m.lace}>
+            <circleGeometry args={[0.84, 48]} />
+          </mesh>
+        </>
+      )}
       {/* pernas: calça azul, tênis branco com sola laranja */}
-      {[-1, 1].map((sd) => {
+      {!look.dress && [-1, 1].map((sd) => {
         const ph = walk + (sd > 0 ? 0 : Math.PI);
         const A = 0.38 * walkAmt;
         const thigh = Math.sin(ph) * A;
@@ -338,10 +562,10 @@ export const Toy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; lPa
                 <sphereGeometry args={[PANT_R, 24, 16]} />
               </mesh>
               <mesh position={[0, -SHIN / 2 + 0.01, 0]} material={m.pants} castShadow receiveShadow>
-                <cylinderGeometry args={[PANT_R, PANT_R + 0.004, SHIN - 0.02, 24]} />
+                <cylinderGeometry args={[PANT_R, PANT_R + (look.flare ? 0.035 : 0.004), SHIN - 0.02, 24]} />
               </mesh>
               <mesh position={[0, -SHIN + 0.035, 0]} material={m.pantsHem} castShadow>
-                <cylinderGeometry args={[PANT_R + 0.008, PANT_R + 0.008, 0.045, 24]} />
+                <cylinderGeometry args={[PANT_R + (look.flare ? 0.04 : 0.008), PANT_R + (look.flare ? 0.042 : 0.008), 0.045, 24]} />
               </mesh>
               <group position={[0, -SHIN, 0]} rotation={[foot, 0, 0]}>
                 <mesh position={[0, -0.055, 0.05]} geometry={geo.shoe} material={m.shoe} castShadow />
@@ -381,13 +605,78 @@ export const Toy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; lPa
                 </group>
               ))}
             </>
+          ) : look.suit ? (
+            <>
+              {/* paletó preto, camisa branca em V, lapelas, gravata borboleta, flor na lapela */}
+              <mesh position={[0, (TORSO_BOT + TORSO_TOP) / 2 + breathe * 0.004, 0]} scale={[1, 1 + breathe * 0.008, 1]} geometry={geo.hoodie} material={m.shirt} castShadow receiveShadow />
+              <mesh position={[0, TORSO_BOT + 0.03, 0]} geometry={geo.hem} material={m.lapel} castShadow />
+              <mesh position={[0, 0, 0.207]} geometry={geo.shirtV} material={m.cuffWhite} />
+              {[-1, 1].map((sd) => (
+                <mesh key={sd} position={[0.07 * sd, 1.22, 0.209]} rotation={[0, 0, 0.3 * sd]} geometry={geo.lapel} material={m.lapel} castShadow />
+              ))}
+              <mesh position={[0, TORSO_TOP - 0.005, 0.0]} rotation={[Math.PI / 2, 0, 0]} material={m.cuffWhite}>
+                <torusGeometry args={[0.12, 0.028, 8, 20]} />
+              </mesh>
+              <group position={[0, TORSO_TOP - 0.045, 0.215]}>
+                {[-1, 1].map((sd) => (
+                  <mesh key={sd} position={[0.035 * sd, 0, 0]} rotation={[0, 0, (Math.PI / 2) * sd]} material={m.cord}>
+                    <coneGeometry args={[0.032, 0.06, 4]} />
+                  </mesh>
+                ))}
+                <mesh material={m.cord}>
+                  <sphereGeometry args={[0.018, 10, 8]} />
+                </mesh>
+              </group>
+              {[0.98, 0.86].map((y) => (
+                <mesh key={y} position={[0, y, 0.205]} material={m.cord}>
+                  <sphereGeometry args={[0.014, 10, 8]} />
+                </mesh>
+              ))}
+              <group position={[0.17, 1.24, 0.215]}>
+                <mesh material={sm("#e8414f", 0.5)}>
+                  <sphereGeometry args={[0.03, 12, 10]} />
+                </mesh>
+                <mesh position={[0.015, -0.035, -0.005]} rotation={[0, 0, -0.5]} scale={[0.6, 1.4, 0.4]} material={sm("#3f9a35", 0.6)}>
+                  <sphereGeometry args={[0.02, 10, 8]} />
+                </mesh>
+              </group>
+            </>
+          ) : look.dress ? (
+            <>
+              {/* corpete branco com faixa de pérolas; ombros de fora */}
+              <mesh position={[0, 1.33, 0]} geometry={geo.chest} material={m.skin} castShadow />
+              <mesh position={[0, 1.09 + breathe * 0.003, 0]} geometry={geo.bodice} material={m.satin} castShadow receiveShadow />
+              {[-1, 1].map((sd) => (
+                <mesh key={sd} position={[0.1 * sd, 1.29, 0.13]} scale={[1, 0.7, 0.75]} material={m.satin} castShadow>
+                  <sphereGeometry args={[0.105, 18, 14]} />
+                </mesh>
+              ))}
+              <mesh position={[0, 0.9, 0]} rotation={[Math.PI / 2, 0, 0]} scale={[1, 0.72, 1]} material={m.pearl}>
+                <torusGeometry args={[0.245, 0.028, 10, 40]} />
+              </mesh>
+              {Array.from({length: 7}, (_, i) => (
+                <mesh key={"p" + i} position={[(i - 3) * 0.045, 1.24 - Math.abs(i - 3) * 0.008, 0.175]} material={m.pearl}>
+                  <sphereGeometry args={[0.013, 8, 6]} />
+                </mesh>
+              ))}
+            </>
           ) : (
             <>
               <mesh position={[0, (TORSO_BOT + TORSO_TOP) / 2 + breathe * 0.004, 0]} scale={[1, 1 + breathe * 0.008, 1]} geometry={geo.torso} material={m.shirt} castShadow receiveShadow />
               {/* gola */}
-              <mesh position={[0, TORSO_TOP - 0.01, 0.02]} rotation={[Math.PI / 2, 0, 0]} material={m.shirtDark}>
+              <mesh position={[0, TORSO_TOP - 0.01, 0.02]} rotation={[Math.PI / 2, 0, 0]} material={look.polo ? m.cuffWhite : m.shirtDark}>
                 <torusGeometry args={[0.11, 0.026, 8, 20]} />
               </mesh>
+              {look.polo && (
+                <>
+                  {[-1, 1].map((sd) => (
+                    <mesh key={sd} position={[0.012 * sd, TORSO_TOP - 0.02, 0.19]} rotation={[-0.25, 0, 0]} scale={[sd, 1, 1]} geometry={geo.collarFlap} material={m.cuffWhite} />
+                  ))}
+                  <mesh position={[0, 0.98, 0.187]} material={sm("#ffffff", 0.6, {map: logoTex(), transparent: true})}>
+                    <planeGeometry args={[0.3, 0.3]} />
+                  </mesh>
+                </>
+              )}
             </>
           )}
           {look.backpack && (
@@ -433,7 +722,7 @@ export const Toy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; lPa
                 <mesh geometry={hairGeo.edge} material={m.hair} castShadow />
               </>
             ) : (
-              <OtherHair style={look.hairStyle!} m={m.hair} />
+              look.hairStyle === "straight" ? <StraightHair m={m.hair} skin={m.skin} /> : <OtherHair style={look.hairStyle!} m={m.hair} />
             )}
             {hairLift > 0.3 &&
               [[-0.12, 0.2], [0.05, -0.15], [0.16, 0.3], [-0.05, 0.5]].map(([x, r], i) => (
@@ -443,7 +732,7 @@ export const Toy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; lPa
               ))}
             {/* sobrancelhas grossas */}
             {[-1, 1].map((sd) => (
-              <mesh key={sd} position={[0.115 * sd, 0.062 + browUp, 0.285]} rotation={[-0.3, 0.3 * sd, Math.PI / 2 - browRot * sd]} material={m.brow}>
+              <mesh key={sd} position={[0.115 * sd, 0.062 + browUp, 0.285]} rotation={[-0.3, 0.3 * sd, Math.PI / 2 - browRot * sd]} scale={look.lashes ? [0.7, 1, 0.7] : 1} material={m.brow}>
                 <capsuleGeometry args={[0.022, 0.065, 4, 10]} />
               </mesh>
             ))}
@@ -453,6 +742,12 @@ export const Toy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; lPa
                 <mesh scale={[0.052, 0.062, 0.024]} material={m.eye}>
                   <sphereGeometry args={[1, 20, 14]} />
                 </mesh>
+                {look.lashes &&
+                  [0, 1].map((k) => (
+                    <mesh key={k} position={[(0.036 + k * 0.014) * sd, 0.048 - k * 0.014, 0.008]} rotation={[0, 0, -sd * (0.75 + k * 0.35)]} material={m.eye}>
+                      <capsuleGeometry args={[0.0075, 0.03, 4, 6]} />
+                    </mesh>
+                  ))}
                 <mesh position={[0.018, 0.024, 0.02]} scale={0.015} material={m.white}>
                   <sphereGeometry args={[1, 10, 8]} />
                 </mesh>
@@ -486,9 +781,28 @@ export const Toy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; lPa
                 </mesh>
               </group>
             ) : (
-              <mesh position={[0, -0.125, 0.282]} rotation={[0.15, 0, Math.PI + (Math.PI - Math.PI * (0.55 + smile * 0.25)) / 2]} material={m.mouth}>
+              <mesh position={[0, -0.125, 0.282]} rotation={[0.15, 0, Math.PI + (Math.PI - Math.PI * (0.55 + smile * 0.25)) / 2]} material={look.lips ? m.lips : m.mouth}>
                 <torusGeometry args={[0.042, 0.009, 8, 24, Math.PI * (0.55 + smile * 0.25)]} />
               </mesh>
+            )}
+            {look.veil && (
+              <group>
+                {/* tiara de pérolas em cima do cabelo */}
+                {Array.from({length: 9}, (_, i) => {
+                  const a = -0.95 + (i / 8) * 1.9;
+                  const th = 0.62;
+                  const r = 0.36;
+                  return (
+                    <mesh key={i} position={[r * Math.sin(th) * Math.sin(a) * 1.03, r * Math.cos(th) * 0.97 + (i === 4 ? 0.035 : 0.012), r * Math.sin(th) * Math.cos(a)]} material={i === 4 ? m.silver : m.pearl}>
+                      <sphereGeometry args={[i === 4 ? 0.034 : 0.022, 10, 8]} />
+                    </mesh>
+                  );
+                })}
+                {/* véu caindo pelas costas até o chão */}
+                <mesh position={[0, -0.84, -0.14]} material={m.veil}>
+                  <cylinderGeometry args={[0.3, 0.92, 2.3, 40, 1, true, 2.05, Math.PI * 2 - 4.1]} />
+                </mesh>
+              </group>
             )}
             {headExtra}
           </group>

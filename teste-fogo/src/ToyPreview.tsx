@@ -4,6 +4,7 @@ import {AbsoluteFill, useCurrentFrame} from "remotion";
 import {ThreeCanvas} from "@remotion/three";
 import {useThree} from "@react-three/fiber";
 import {Toy} from "./Toy";
+import {HER_CASUAL, HER_BRIDE, GROOM, Bouquet} from "./Sets10";
 import type {Pose} from "./Boy";
 
 /* Folha de apresentação do boneco novo (quadro 0: corpo inteiro; quadro 1: expressões) */
@@ -52,6 +53,47 @@ export const ToyPreview: React.FC = () => {
               <Toy pose={{...r.pose, rotY: r.rotY}} look={i === 3 || i === 2 ? {hoodie: true, backpack: "#2f6fd6"} : {hoodie: true}} />
             </group>
           ))}
+        </ThreeCanvas>
+      </AbsoluteFill>
+    );
+  }
+  if (f === 3 || f === 4) {
+    /* quadro 3: corpo inteiro (ela com a roupa da foto, de noiva, e o noivo); quadro 4: rostos */
+    const hold: Pose = {rShoulder: [-0.62, 0, 0.38], rElbow: -1.05, lShoulder: [-0.62, 0, -0.38], lElbow: -1.05};
+    const row: {x: number; rotY: number; look: typeof HER_CASUAL; pose: Pose; bq?: boolean}[] = [
+      {x: -4.4, rotY: 0.0, look: HER_CASUAL, pose: {...base, smile: 0.7}},
+      {x: -2.7, rotY: 0.55, look: HER_CASUAL, pose: {...base, smile: 0.7, rShoulder: [-1.8, 0, 0.35], rElbow: -1.9} as Pose},
+      {x: -0.85, rotY: 0.0, look: HER_BRIDE, pose: {...base, ...hold, smile: 0.9}, bq: true},
+      {x: 1.05, rotY: Math.PI * 0.82, look: HER_BRIDE, pose: {...base, ...hold, smile: 0.9}, bq: true},
+      {x: 2.85, rotY: 0.0, look: GROOM, pose: {...base, smile: 0.8}},
+      {x: 4.45, rotY: -0.5, look: GROOM, pose: {...base, smile: 1, rShoulder: [-1.2, 0, -0.1], rElbow: -0.4}},
+    ];
+    const faces = f === 4;
+    return (
+      <AbsoluteFill>
+        <ThreeCanvas width={2000} height={700} shadows gl={{antialias: true}} dpr={1}>
+          {faces ? <Cam pos={[0, 1.72, 4.2]} look={[0, 1.62, 0]} fov={26} /> : <Cam pos={[0, 1.15, 9.6]} look={[0, 1.0, 0]} fov={30} />}
+          <Lights />
+          {faces
+            ? [
+                {x: -1.0, rotY: 0, look: HER_CASUAL},
+                {x: 0, rotY: 0.6, look: HER_CASUAL},
+                {x: 1.0, rotY: -0.25, look: GROOM},
+              ].map((r, i) => (
+                <group key={i} position={[r.x, 0, 0]}>
+                  <Toy pose={{...base, smile: 0.8, rotY: r.rotY}} look={r.look} />
+                </group>
+              ))
+            : row.map((r, i) => (
+                <group key={i} position={[r.x, 0, 0]}>
+                  <Toy pose={{...r.pose, rotY: r.rotY}} look={r.look} />
+                  {r.bq && (
+                    <group rotation={[0, r.rotY, 0]}>
+                      <Bouquet p={[0, 0.86, 0.36]} r={[0.35, 0, 0]} s={1.15} />
+                    </group>
+                  )}
+                </group>
+              ))}
         </ThreeCanvas>
       </AbsoluteFill>
     );
