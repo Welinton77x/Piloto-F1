@@ -615,10 +615,10 @@ const ufoRing = (f: number, i: number, n: number, k: number): V3 => {
 };
 const S27: React.FC<ShotProps> = ({f, a, t}) => {
   const k = easeOut(clamp((f - a) / 50));
-  const ufo: V3 = [lerp(12, 8.2, k), 2.6, lerp(-4, -0.8, k)];
+  const ufo: V3 = [lerp(10.5, 7.6, k), 2.4, lerp(-2.5, 0.2, k)];
   return (
     <>
-      <Cam pos={[8.6, 3.0, 4.4]} look={[7.4, 2.0, -0.4]} fov={46} f={f} a={a} />
+      <Cam pos={[8.0, 2.9, 6.6]} look={[6.6, 1.7, 0.4]} fov={52} f={f} a={a} />
       <SpaceScene />
       <Planet t={t} queue={0} n={0} spin={t * 0.1} />
       <FloatingKitchen t={t} />
