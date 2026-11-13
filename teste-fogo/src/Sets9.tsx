@@ -522,10 +522,14 @@ export type DogP = {
   lean?: number;
   head?: V3;
   t?: number;
+  walk?: number; // >0: em pé andando (fase da passada = t)
+  run?: number; // velocidade da passada (1 andando, 3 correndo)
+  bowtie?: boolean;
+  pillow?: number; // almofada das alianças nas costas (1 = presa, 0 = sem)
 };
 const capTex = () => textTex("bone-seguranca", 256, 64, "#1f2a44", [{t: "SEGURANÇA", size: 40, color: "#ffd21f", y: 34}]);
 export const Dog: React.FC<{d: DogP; s?: number}> = ({d, s = 1}) => {
-  const {pos = [0, 0, 0], rotY = 0, legs = "down", legK = 1, glasses = false, cap = false, headset = false, controller = false, play = 0, mouth = 0, tongue = 0, blink = 0, tail = 1, lean = 0, head = [0, 0, 0], t = 0} = d;
+  const {pos = [0, 0, 0], rotY = 0, legs = "down", legK = 1, glasses = false, cap = false, headset = false, controller = false, play = 0, mouth = 0, tongue = 0, blink = 0, tail = 1, lean = 0, head = [0, 0, 0], t = 0, walk = 0, run = 1, bowtie = false, pillow = 0} = d;
   const fur = sm("#e0a456", 0.6);
   const cream = sm("#fbe6c4", 0.6);
   const ear = sm("#8a5a2b", 0.6);
@@ -550,52 +554,9 @@ export const Dog: React.FC<{d: DogP; s?: number}> = ({d, s = 1}) => {
         return [-0.2, 0, 0];
     }
   };
-  return (
-    <group position={pos} rotation={[0, rotY, 0]} scale={s}>
-      <group rotation={[-lean, 0, 0]}>
-        {/* corpo sentado */}
-        <mesh position={[0, 0.42, -0.02]} rotation={[-0.15, 0, 0]} scale={[0.3, 0.38, 0.28]} material={fur} castShadow receiveShadow>
-          <sphereGeometry args={[1, 28, 20]} />
-        </mesh>
-        <mesh position={[0, 0.42, 0.2]} rotation={[-0.15, 0, 0]} scale={[0.19, 0.27, 0.1]} material={cream}>
-          <sphereGeometry args={[1, 20, 14]} />
-        </mesh>
-        {/* coxas e patas de trás */}
-        {[-1, 1].map((sd) => (
-          <group key={sd}>
-            <mesh position={[0.22 * sd, 0.19, 0.02]} scale={[0.13, 0.16, 0.2]} material={fur} castShadow>
-              <sphereGeometry args={[1, 18, 14]} />
-            </mesh>
-            <mesh position={[0.2 * sd, 0.05, 0.2]} scale={[0.09, 0.055, 0.13]} material={cream} castShadow>
-              <sphereGeometry args={[1, 14, 10]} />
-            </mesh>
-          </group>
-        ))}
-        {/* rabo */}
-        <mesh position={[0, 0.22, -0.3]} rotation={[-0.9, 0, 0.5 * tail * Math.sin(t * 14)]} material={fur} castShadow>
-          <capsuleGeometry args={[0.04, 0.24, 6, 10]} />
-        </mesh>
-        {/* coleira */}
-        <mesh position={[0, 0.74, 0.03]} rotation={[Math.PI / 2 - 0.15, 0, 0]} material={sm("#e8412c", 0.5)}>
-          <torusGeometry args={[0.16, 0.03, 8, 24]} />
-        </mesh>
-        <mesh position={[0, 0.69, 0.2]} material={sm("#e3b33b", 0.25, {metalness: 0.6})}>
-          <sphereGeometry args={[0.035, 12, 10]} />
-        </mesh>
-        {/* patas da frente */}
-        {[-1, 1].map((sd) => (
-          <group key={"f" + sd} position={[0.13 * sd, 0.62, 0.13]} rotation={legRot(sd)}>
-            <mesh position={[0, -0.21, 0]} material={fur} castShadow>
-              <capsuleGeometry args={[0.068, 0.36, 6, 12]} />
-            </mesh>
-            <mesh position={[0, -0.47, 0.015]} scale={[1, 0.75, 1.15]} material={cream} castShadow>
-              <sphereGeometry args={[0.082, 14, 10]} />
-            </mesh>
-          </group>
-        ))}
-        {controller && <Controller p={[0, 0.47, 0.6]} r={[-0.5, 0, 0]} s={1.05} />}
-        {/* cabeça */}
-        <group position={[0, 0.98, 0.06]} rotation={head}>
+  const headAt = (hp: V3) => (
+    <>
+        <group position={hp} rotation={head}>
           <mesh scale={[1.05, 0.95, 0.95]} material={fur} castShadow>
             <sphereGeometry args={[0.27, 32, 24]} />
           </mesh>
@@ -694,6 +655,120 @@ export const Dog: React.FC<{d: DogP; s?: number}> = ({d, s = 1}) => {
             </group>
           )}
         </group>
+      {bowtie && (
+        <group position={[hp[0], hp[1] - 0.26, hp[2] + 0.17]}>
+          {[-1, 1].map((sd) => (
+            <mesh key={sd} position={[0.05 * sd, 0, 0]} rotation={[0, 0, (Math.PI / 2) * sd]} material={sm(BLACK, 0.4)}>
+              <coneGeometry args={[0.045, 0.09, 4]} />
+            </mesh>
+          ))}
+          <mesh material={sm(BLACK, 0.4)}>
+            <sphereGeometry args={[0.025, 10, 8]} />
+          </mesh>
+        </group>
+      )}
+    </>
+  );
+  if (walk > 0) {
+    /* em pé, andando de quatro (olhando pra +z) */
+    const ph = t * 9 * run;
+    const sw = (k: number) => 0.55 * Math.sin(ph + k) * Math.min(1, walk);
+    const bob = 0.03 * Math.abs(Math.sin(ph)) * Math.min(1, walk);
+    return (
+      <group position={pos} rotation={[0, rotY, 0]} scale={s}>
+        <group position={[0, bob, 0]}>
+          <mesh position={[0, 0.55, 0]} scale={[0.27, 0.27, 0.42]} material={fur} castShadow receiveShadow>
+            <sphereGeometry args={[1, 28, 20]} />
+          </mesh>
+          <mesh position={[0, 0.47, 0.08]} scale={[0.18, 0.15, 0.3]} material={cream}>
+            <sphereGeometry args={[1, 20, 14]} />
+          </mesh>
+          {(
+            [
+              [0.15, 0.32, 0, 0],
+              [-0.15, 0.32, Math.PI, 0],
+              [0.15, -0.3, Math.PI, 1],
+              [-0.15, -0.3, 0, 1],
+            ] as [number, number, number, number][]
+          ).map(([x, z, k, back], i) => (
+            <group key={i} position={[x, 0.45, z]} rotation={[sw(k), 0, 0]}>
+              <mesh position={[0, -0.2, 0]} material={fur} castShadow>
+                <capsuleGeometry args={[back ? 0.075 : 0.065, 0.28, 6, 10]} />
+              </mesh>
+              <mesh position={[0, -0.42, 0.04]} scale={[1, 0.7, 1.25]} material={cream} castShadow>
+                <sphereGeometry args={[0.075, 12, 10]} />
+              </mesh>
+            </group>
+          ))}
+          <mesh position={[0, 0.72, -0.42]} rotation={[-0.6, 0, 0.5 * tail * Math.sin(t * 16)]} material={fur} castShadow>
+            <capsuleGeometry args={[0.04, 0.24, 6, 10]} />
+          </mesh>
+          <mesh position={[0, 0.74, 0.3]} rotation={[Math.PI / 2 - 0.9, 0, 0]} material={sm("#e8412c", 0.5)}>
+            <torusGeometry args={[0.15, 0.028, 8, 24]} />
+          </mesh>
+          {pillow > 0.01 && (
+            <group position={[0, 0.84, -0.02]} scale={pillow}>
+              <mesh geometry={rbox(0.36, 0.09, 0.3, 0.04)} material={sm("#fbf6ee", 0.6)} castShadow />
+              {[-1, 1].map((sd) => (
+                <mesh key={sd} position={[0.06 * sd, 0.065, 0]} rotation={[Math.PI / 2 - 0.5, 0, 0.3 * sd]} material={sm("#ffcc33", 0.2, {metalness: 0.8, emissive: "#5a3a00", emissiveIntensity: 0.5})}>
+                  <torusGeometry args={[0.045, 0.012, 8, 20]} />
+                </mesh>
+              ))}
+              <mesh position={[0, -0.02, 0]} rotation={[0, 0, Math.PI / 2]} material={sm("#d9c6a0", 0.6)}>
+                <torusGeometry args={[0.27, 0.012, 6, 30]} />
+              </mesh>
+            </group>
+          )}
+          {headAt([0, 0.9, 0.45])}
+        </group>
+      </group>
+    );
+  }
+  return (
+    <group position={pos} rotation={[0, rotY, 0]} scale={s}>
+      <group rotation={[-lean, 0, 0]}>
+        {/* corpo sentado */}
+        <mesh position={[0, 0.42, -0.02]} rotation={[-0.15, 0, 0]} scale={[0.3, 0.38, 0.28]} material={fur} castShadow receiveShadow>
+          <sphereGeometry args={[1, 28, 20]} />
+        </mesh>
+        <mesh position={[0, 0.42, 0.2]} rotation={[-0.15, 0, 0]} scale={[0.19, 0.27, 0.1]} material={cream}>
+          <sphereGeometry args={[1, 20, 14]} />
+        </mesh>
+        {/* coxas e patas de trás */}
+        {[-1, 1].map((sd) => (
+          <group key={sd}>
+            <mesh position={[0.22 * sd, 0.19, 0.02]} scale={[0.13, 0.16, 0.2]} material={fur} castShadow>
+              <sphereGeometry args={[1, 18, 14]} />
+            </mesh>
+            <mesh position={[0.2 * sd, 0.05, 0.2]} scale={[0.09, 0.055, 0.13]} material={cream} castShadow>
+              <sphereGeometry args={[1, 14, 10]} />
+            </mesh>
+          </group>
+        ))}
+        {/* rabo */}
+        <mesh position={[0, 0.22, -0.3]} rotation={[-0.9, 0, 0.5 * tail * Math.sin(t * 14)]} material={fur} castShadow>
+          <capsuleGeometry args={[0.04, 0.24, 6, 10]} />
+        </mesh>
+        {/* coleira */}
+        <mesh position={[0, 0.74, 0.03]} rotation={[Math.PI / 2 - 0.15, 0, 0]} material={sm("#e8412c", 0.5)}>
+          <torusGeometry args={[0.16, 0.03, 8, 24]} />
+        </mesh>
+        <mesh position={[0, 0.69, 0.2]} material={sm("#e3b33b", 0.25, {metalness: 0.6})}>
+          <sphereGeometry args={[0.035, 12, 10]} />
+        </mesh>
+        {/* patas da frente */}
+        {[-1, 1].map((sd) => (
+          <group key={"f" + sd} position={[0.13 * sd, 0.62, 0.13]} rotation={legRot(sd)}>
+            <mesh position={[0, -0.21, 0]} material={fur} castShadow>
+              <capsuleGeometry args={[0.068, 0.36, 6, 12]} />
+            </mesh>
+            <mesh position={[0, -0.47, 0.015]} scale={[1, 0.75, 1.15]} material={cream} castShadow>
+              <sphereGeometry args={[0.082, 14, 10]} />
+            </mesh>
+          </group>
+        ))}
+        {controller && <Controller p={[0, 0.47, 0.6]} r={[-0.5, 0, 0]} s={1.05} />}
+        {headAt([0, 0.98, 0.06])}
       </group>
     </group>
   );

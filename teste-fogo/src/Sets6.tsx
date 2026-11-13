@@ -34,9 +34,12 @@ export type PPose = {
   glow?: number; // olhos brilhando no escuro
   wingFwd?: number; // asas cruzadas na frente
   t?: number;
+  hat?: boolean; // cartolinha de noivo
+  veil?: boolean; // veuzinho de noiva
+  rings?: boolean; // alianças no pescoço
 };
 export const Pigeon: React.FC<{p: PPose; s?: number}> = ({p, s = 1}) => {
-  const {pos = [0, 0, 0], rotY = 0, peck = 0, flap = 0, flapPh = 0, blink = 0, headYaw = 0, headTilt = 0, bob = 0, sit = 0, chest = 0, glow = 0, wingFwd = 0} = p;
+  const {pos = [0, 0, 0], rotY = 0, peck = 0, flap = 0, flapPh = 0, blink = 0, headYaw = 0, headTilt = 0, bob = 0, sit = 0, chest = 0, glow = 0, wingFwd = 0, hat = false, veil = false, rings = false} = p;
   const body = lp("#8f97a5", 0.8);
   const head = lp("#a1a9b6", 0.8);
   const neckA = lp("#3f8a6a", 0.35, 0.45);
@@ -119,7 +122,36 @@ export const Pigeon: React.FC<{p: PPose; s?: number}> = ({p, s = 1}) => {
               </mesh>
             </group>
           ))}
+          {hat && (
+            <group position={[0, 0.065, -0.005]} rotation={[-0.15, 0, 0.12]}>
+              <mesh position={[0, 0.0, 0]} material={lp("#15161d", 0.4)}>
+                <cylinderGeometry args={[0.075, 0.075, 0.008, 18]} />
+              </mesh>
+              <mesh position={[0, 0.045, 0]} material={lp("#15161d", 0.4)}>
+                <cylinderGeometry args={[0.045, 0.048, 0.085, 18]} />
+              </mesh>
+              <mesh position={[0, 0.014, 0]} material={lp("#e8414f", 0.5)}>
+                <cylinderGeometry args={[0.049, 0.049, 0.016, 18]} />
+              </mesh>
+            </group>
+          )}
+          {veil && (
+            <group>
+              <mesh position={[0, -0.04, -0.07]} material={new THREE.MeshStandardMaterial({color: "#ffffff", transparent: true, opacity: 0.55, side: THREE.DoubleSide, depthWrite: false})}>
+                <cylinderGeometry args={[0.035, 0.12, 0.2, 18, 1, true, 2.2, Math.PI * 2 - 4.4]} />
+              </mesh>
+              <mesh position={[0, 0.06, -0.02]} material={lp("#ffb3c6", 0.5)}>
+                <sphereGeometry args={[0.022, 10, 8]} />
+              </mesh>
+            </group>
+          )}
         </group>
+        {rings &&
+          [-1, 1].map((sd) => (
+            <mesh key={"anel" + sd} position={[0.02 * sd, 0.045, 0.16]} rotation={[0.3, 0.5 * sd, 0]} material={new THREE.MeshStandardMaterial({color: "#ffcc33", metalness: 0.8, roughness: 0.2, emissive: "#5a3a00", emissiveIntensity: 0.4})}>
+              <torusGeometry args={[0.035, 0.01, 8, 20]} />
+            </mesh>
+          ))}
       </group>
     </group>
   );

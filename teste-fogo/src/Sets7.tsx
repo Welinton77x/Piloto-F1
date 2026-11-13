@@ -328,9 +328,10 @@ export type DinoPose = {
   sneeze?: number;
   pupil?: [number, number];
   t?: number;
+  priest?: boolean; // batina preta, gola branca, estola dourada e livro
 };
 export const Dino: React.FC<{p: DinoPose; s?: number}> = ({p, s = 1}) => {
-  const {pos = [0, 0, 0], rotY = 0, jaw = 0, blink = 0, headTilt = 0, headYaw = 0, arms = 0, sit = 0, tail = 0, glasses = false, backpack = false, sneeze = 0, pupil = [0, 0], t = 0} = p;
+  const {pos = [0, 0, 0], rotY = 0, jaw = 0, blink = 0, headTilt = 0, headYaw = 0, arms = 0, sit = 0, tail = 0, glasses = false, backpack = false, sneeze = 0, pupil = [0, 0], t = 0, priest = false} = p;
   const skin = sm("#6cc24a", 0.55);
   const belly = sm("#dff2a8", 0.6);
   const spike = sm("#ff9f40", 0.5);
@@ -385,6 +386,44 @@ export const Dino: React.FC<{p: DinoPose; s?: number}> = ({p, s = 1}) => {
             </mesh>
           </group>
         ))}
+        {/* roupa de padre */}
+        {priest && (
+          <group>
+            <mesh position={[0, 0.52, 0]} scale={[0.635, 0.79, 0.585]} material={sm("#1c1c24", 0.6)} castShadow>
+              <sphereGeometry args={[1, 28, 22]} />
+            </mesh>
+            <mesh position={[0, 1.12, 0.04]} rotation={[Math.PI / 2 - 0.25, 0, 0]} material={sm("#ffffff", 0.4)}>
+              <torusGeometry args={[0.27, 0.04, 10, 28]} />
+            </mesh>
+            <mesh position={[0, 1.08, 0.33]} rotation={[-0.4, 0, 0]} material={sm("#ffffff", 0.4)}>
+              <boxGeometry args={[0.1, 0.07, 0.02]} />
+            </mesh>
+            {[-1, 1].map((sd) => {
+              const a = new THREE.Vector3(0.1 * sd, 1.08, 0.36);
+              const b = new THREE.Vector3(0.16 * sd, 0.22, 0.56);
+              const m = a.clone().add(b).multiplyScalar(0.5);
+              const d = b.clone().sub(a);
+              const q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.clone().normalize());
+              return (
+                <mesh key={sd} position={[m.x, m.y + 0.0, m.z + 0.06]} quaternion={q} scale={[1, 1, 0.4]} material={sm("#f2d16b", 0.4)}>
+                  <capsuleGeometry args={[0.05, d.length(), 6, 10]} />
+                </mesh>
+              );
+            })}
+            {/* livro nas mãozinhas */}
+            <group position={[0, 0.66, 0.66]} rotation={[-0.9, 0, 0]}>
+              <mesh material={sm("#3a1d12", 0.5)} castShadow>
+                <boxGeometry args={[0.34, 0.05, 0.26]} />
+              </mesh>
+              <mesh position={[0, 0.0, 0.0]} material={sm("#fbf6e8", 0.8)}>
+                <boxGeometry args={[0.32, 0.035, 0.24]} />
+              </mesh>
+              <mesh position={[0.05, -0.04, 0.08]} material={sm("#e8414f", 0.5)}>
+                <boxGeometry args={[0.02, 0.06, 0.1]} />
+              </mesh>
+            </group>
+          </group>
+        )}
         {/* mochila */}
         {backpack && (
           <group position={[0, 0.7, -0.5]}>
