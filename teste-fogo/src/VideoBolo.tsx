@@ -171,7 +171,7 @@ const S1: React.FC<ShotProps> = ({f, a, t}) => {
   }, a, f);
   return (
     <>
-      <Cam pos={[0.25, 1.78, lerp(0.75, 0.55, clamp((f - a) / 80))]} look={[0.2, 1.7, -1.55]} fov={38} f={f} a={a} punch={4} />
+      <Cam pos={[0.25, 1.8, lerp(1.15, 0.9, clamp((f - a) / 80))]} look={[0.2, 1.68, -1.55]} fov={40} f={f} a={a} punch={4} />
       <KitchenScene t={t} />
       <Props f={f} t={t} />
       <Chef f={f} pose={pose} shades={put} glint={ramp(f, OCULOS + 6, OCULOS + 10) * (1 - ramp(f, OCULOS + 14, OCULOS + 22))} />
@@ -234,7 +234,7 @@ const S6: React.FC<ShotProps> = ({f, a, t}) => {
   const pose = physics("b6" + a, (fr) => ({...idle(fr), pos: BOY, rotY: -0.6, torso: [0, 0, shiver(fr / FPS, frozenK(fr))], rShoulder: [-1.0, 0, 0.6], rElbow: -1.5, lShoulder: [-1.0, 0, -0.6], lElbow: -1.5, eyeWide: 0.8 * fz, mouthOpen: 0.3 * fz, brow: 0.8 * fz}), a, f);
   return (
     <>
-      <Cam pos={[-0.3, 1.9, 3.3]} look={[-0.8, 1.25, -1.6]} fov={52} f={f} a={a} />
+      <Cam pos={[-0.25, 1.95, 3.9]} look={[-0.55, 1.25, -1.6]} fov={52} f={f} a={a} />
       <KitchenScene t={t} frozen={fz} />
       <Props f={f} t={t} fridge={{love: 1, open, t}} />
       <ColdMist p={[FRIDGE_P[0] + 0.2, 0, FRIDGE_P[2] + 0.55]} k={open} t={t} dir={[0.75, 0, 0.6]} />
@@ -296,7 +296,7 @@ const S10: React.FC<ShotProps> = ({f, a, t}) => {
   const walking = f < PINGUIM;
   return (
     <>
-      <Cam pos={[-0.4, 1.35, 2.9]} look={[-0.6, 0.95, -0.2]} fov={48} f={f} a={a} />
+      <Cam pos={[-0.25, 1.55, 3.9]} look={[-0.55, 1.0, -0.3]} fov={48} f={f} a={a} />
       <KitchenScene t={t} frozen={1} flour={1} />
       <Props f={f} t={t} sack={false} />
       <FlourSnowman p={BOY} t={t} shiver={0.6} />
@@ -306,7 +306,7 @@ const S10: React.FC<ShotProps> = ({f, a, t}) => {
 };
 const S11: React.FC<ShotProps> = ({f, a, t}) => (
   <>
-    <Cam pos={[-0.2, 1.5, 2.5]} look={[-0.4, 1.1, -0.6]} fov={48} f={f} a={a} />
+    <Cam pos={[-0.15, 1.6, 3.5]} look={[-0.4, 1.1, -0.6]} fov={48} f={f} a={a} />
     <KitchenScene t={t} frozen={1} flour={1} />
     <Props f={f} t={t} sack={false} />
     <FlourSnowman p={BOY} rotY={-0.4} t={t} shiver={0.6} />
@@ -472,7 +472,7 @@ const S19: React.FC<ShotProps> = ({f, a, t}) => {
   const rise = backOut(ramp(f, VIDA - 4, VIDA + 10));
   return (
     <>
-      <Cam pos={[BATTER_P[0] + 0.25, 1.45, BATTER_P[2] + 1.35]} look={[BATTER_P[0], 1.2, BATTER_P[2]]} fov={44} f={f} a={a} />
+      <Cam pos={[BATTER_P[0] + 0.25, 1.55, BATTER_P[2] + 1.9]} look={[BATTER_P[0], 1.25, BATTER_P[2]]} fov={44} f={f} a={a} />
       <KitchenScene t={t} />
       <Props f={f} t={t} sack={false} eggs={false} batter={<Batter b={{pos: [0, 0.05, 0], rise, dance: ramp(f, VIDA + 8, VIDA + 16), t, blink: blinkCurve(f + 13), mouth: 0.4, s: 1.15, arms: "down"}} />} />
       <Band f={f} t={t} />
@@ -501,7 +501,7 @@ const S20: React.FC<ShotProps> = ({f, a, t}) => (
 );
 const S21: React.FC<ShotProps> = ({f, a, t}) => (
   <>
-    <Cam pos={[PODIUM_P[0] + 0.2, 1.75, PODIUM_P[2] + 3.4]} look={[PODIUM_P[0], 1.25, PODIUM_P[2]]} fov={48} f={f} a={a} />
+    <Cam pos={[PODIUM_P[0] + 0.25, 2.55, PODIUM_P[2] + 3.6]} look={[PODIUM_P[0], 1.35, PODIUM_P[2]]} fov={48} f={f} a={a} />
     <KitchenScene t={t} />
     <Props f={f} t={t} sack={false} eggs={false} batterBowl={false} />
     <MayorOnPodium f={f} t={t} arms="up" mouth={0.5} />
@@ -538,7 +538,6 @@ const S24: React.FC<ShotProps> = ({f, a, t}) => {
       <Cam pos={[OVEN_P[0] - 0.3, 1.25, OVEN_P[2] + 2.1]} look={[OVEN_P[0], 0.85, OVEN_P[2]]} fov={44} f={f} a={a} />
       <KitchenScene t={t} />
       <Props f={f} t={t} sack={false} eggs={false} batterBowl={false} oven={{mood: 1, rage: 1, heat, shake: heat}} />
-      <Puff p={[OVEN_P[0], 1.1, OVEN_P[2]]} k={((f - a) % 30) / 30} color="#d8d8d8" />
     </>
   );
 };
@@ -702,8 +701,8 @@ const S32: React.FC<ShotProps> = ({f, a, t}) => {
       <Props f={f} t={t} sack={false} eggs={false} batterBowl={false} fridge={{love: 1, t}} />
       <MayorOnPodium f={f} t={t} arms="up" crown={1} mouth={0.4} />
       <Chef f={f} pose={pose} />
-      <Penguin p={[ISLAND[0] + 0.6, 0, ISLAND[2] + 1.25]} rotY={-0.3} t={t} dance={1} blink={blinkCurve(f + 7)} />
-      <Alien a={{pos: [ISLAND[0] + 1.6, 0, ISLAND[2] + 0.8], rotY: -0.6, offer: 0.4, t, mouth: 0.3}} s={0.85} />
+      <Penguin p={[ISLAND[0] + 1.05, 0, ISLAND[2] + 0.8]} rotY={-0.4} t={t} dance={1} blink={blinkCurve(f + 7)} />
+      <Alien a={{pos: [ISLAND[0] + 1.75, 0, ISLAND[2] + 0.2], rotY: -0.6, offer: 0.4, t, mouth: 0.3}} s={0.85} />
       {chickData.slice(0, 8).map((c, i) => (
         <Chick key={i} c={{pos: [ISLAND[0] - 1.0 + i * 0.27, ISLAND_TOP, ISLAND[2] + 0.35], rotY: 0.2 * Math.sin(i), t: t + i, jump: 0.08 * Math.abs(Math.sin(t * 8 + i)), flap: 1, peep: Math.abs(Math.sin(t * 9 + i)), s: c.s}} />
       ))}
@@ -715,7 +714,7 @@ const S33: React.FC<ShotProps> = ({f, a, t}) => {
   const pose = physics("b33" + a, (fr) => ({...idle(fr), pos: BOY, rotY: 0, rShoulder: [-0.5, 0, 0.3], rElbow: -0.9, lShoulder: [-0.5, 0, -0.3], lElbow: -0.9, head: [0.45, 0, 0], smile: 0, brow: 0.2, mouthOpen: 0, blink: 0.35}), a, f);
   return (
     <>
-      <Cam pos={[ISLAND[0] + 0.1, 1.65, ISLAND[2] + 1.0]} look={[ISLAND[0], 1.2, ISLAND[2] - 0.3]} fov={44} f={f} a={a} />
+      <Cam pos={[ISLAND[0] + 0.1, 1.85, ISLAND[2] + 1.75]} look={[ISLAND[0], 1.3, ISLAND[2] - 0.5]} fov={46} f={f} a={a} />
       <KitchenScene t={t} space />
       <Props f={f} t={t} sack={false} eggs={false} batterBowl={false} />
       <group position={[ISLAND[0], ISLAND_TOP, ISLAND[2] - 0.05]}>
@@ -948,14 +947,20 @@ export const VideoBolo: React.FC = () => {
 
       {/* ---------- áudio ---------- */}
       <Audio src={staticFile("vozbolo.mp3")} />
-      <Audio src={staticFile("trilha-galo.mp3")} volume={(fr) => MUSIC * clamp(fr / 12) * (1 - ramp(fr, TOTAL_BOLO - 20, TOTAL_BOLO))} />
+      <Audio src={staticFile("trilha-galo.mp3")} volume={(fr) => MUSIC * clamp(fr / 12) * (1 - ramp(fr, TOTAL_BOLO - 20, TOTAL_BOLO)) * (1 - 0.7 * ramp(fr, MUSICA, MUSICA + 10) * (1 - ramp(fr, L(11) - 10, L(11))))} />
       {cuts.map((c) => (
         <SND key={"w" + c} src="sfx7/whoosh.mp3" from={c - 3} dur={25} v={FX * 0.18} />
       ))}
       {titles.map((b) => (
         <SND key={"b" + b} src="sfx7/boing.mp3" from={b + 3} dur={32} v={FX * 0.75} />
       ))}
+      <SND src="sfx13/growl.mp3" from={8} dur={60} v={FX * 0.45} />
       <SND src="sfx10/plim.mp3" from={OCULOS + 6} dur={30} v={FX * 0.7} />
+      <SND src="sfx13/peeps.mp3" from={HATCH} dur={L(8) + 20 - HATCH} v={FX * 0.5} loop />
+      <SND src="sfx13/pagode.mp3" from={MUSICA + 2} dur={L(11) - MUSICA} v={FX * 0.5} loop />
+      <SND src="sfx13/growl.mp3" from={FORNO2} dur={60} v={FX * 0.6} />
+      <SND src="sfx13/ufo.mp3" from={VEM - 4} dur={NEGOCIA - VEM + 4} v={FX * 0.5} loop />
+      <SND src="sfx13/growl.mp3" from={MEDO - 8} dur={40} v={FX * 0.45} />
       <SND src="sfx12/kiss.mp3" from={LOVE} dur={36} v={FX * 0.6} />
       <SND src="sfx11/wind.mp3" from={OPEN} dur={L(4) - OPEN} v={FX * 0.5} />
       <SND src="sfx9/crack.mp3" from={FREEZE} dur={40} v={FX * 0.5} />
