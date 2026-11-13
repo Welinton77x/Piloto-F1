@@ -1,4 +1,4 @@
-# Roteiro — "Se você quiser fazer um bolo, mas está com medo" (~2min30) · reação em cadeia bem fora do contexto
+# Roteiro — "Se você quiser fazer um bolo, mas está com medo" (~2min30) · reação em cadeia SEM SENTIDO NENHUM
 
 Mesmo formato do miojo: "Se você quiser X, primeiro você precisa Y" → cada solução cria um problema mais absurdo →
 cada etapa ganha um nome pomposo (letras amarelas grandes com contorno preto) → "Parabéns!" → final em loop.
@@ -7,29 +7,23 @@ Participação especial: o alienígena (GTA). Voz da **Will**, animada. Legenda 
 
 | # | Narração | Cena | Na tela |
 |---|----------|------|---------|
-| 1 | Se você quiser fazer um **bolo**, mas está com **medo**… primeiro você precisa colocar um **óculos escuro**. Assim o **forno** não vê o medo nos seus olhos. | Cozinha; o forno tem carinha brava com olhos vermelhos brilhando; o menino tremendo coloca o óculos devagar e faz pose de durão | — |
+| 1 | Se você quiser fazer um **bolo**, mas está com **medo**… primeiro você precisa colocar um **óculos escuro**. Assim o **forno** não vê o medo nos seus olhos. | Cozinha; o forno tem carinha brava com olhos vermelhos; o menino tremendo coloca o óculos devagar e faz pose de durão | — |
 | 2 | Esse… é o **disfarce culinário**. | Menino de braços cruzados, o forno desconfiado | DISFARCE CULINÁRIO |
-| 3 | Mas na hora de abrir a **farinha**, você treme tanto que o saco **explode**… e a cozinha vira **inverno**. | "PUF!" — nuvem de farinha; tudo branco, nevando dentro da cozinha; o menino todo branco, só o óculos preto aparecendo | — |
-| 4 | Essa… é a **nevasca de trigo**. | O menino vira um boneco de neve de farinha, com o chapéu e o óculos | NEVASCA DE TRIGO |
-| 5 | Os **ovos** ficam com frio, ficam com medo… e **chocam na hora** pra se esquentar! | Os ovos na tigela tremem de frio, racham e saem pintinhos piando, correndo pela bancada | — |
-| 6 | Esse… é o **pânico galináceo**. | Pintinhos correndo em círculo, o menino segurando a cabeça | PÂNICO GALINÁCEO |
-| 7 | Agora você tem **vinte pintinhos** na cozinha. Então você ensina todo mundo a fazer bolo. | Pintinhos enfileirados de chapeuzinho de cozinheiro; o menino com um batedor apontando pra um quadro "BOLO 101" | — |
-| 8 | Eles aprendem tão rápido… que abrem uma **confeitaria**… e viram os **seus chefes**. | Fachada "CONFEITARIA PIU-PIU"; os pintinhos de chapéu gigante dando ordens; o menino lavando uma pilha enorme de louça | — |
-| 9 | Essa… é a **hierarquia emplumada**. | Pintinho chefe apontando a pilha de louça; menino triste | HIERARQUIA EMPLUMADA |
-| 10 | Você pede um **aumento**… e eles te pagam em **milho**. | Pintinho entrega uma espiga de milho num envelope; o menino olha pra câmera | "SALÁRIO: 1 MILHO" |
-| 11 | Aí chega a maior encomenda da história: um bolo do **tamanho de um prédio**. Ele não cabe em forno nenhum… então os pintinhos assam dentro de um **vulcão**. | Os pintinhos de capacete empurrando a forma gigante pra dentro de um vulcão fumegando; o menino de luva térmica | — |
-| 12 | Essa… é a **confeitaria vulcânica**. | O vulcão soltando fumaça com cheiro de chocolate | CONFEITARIA VULCÂNICA |
-| 13 | O vulcão esquenta tanto que o bolo cresce, cresce… e sai **flutuando pro espaço**. | O bolo gigante sai da cratera e sobe pro céu feito balão | — |
-| 14 | Lá em cima, os cientistas acham que é um **planeta novo**… e batizam de **Planeta Brigadeiro**. | No espaço, o bolo girando do lado da Terra com anel de granulado; cientista de jaleco no telescópio | "PLANETA BRIGADEIRO" |
-| 15 | Essa… é a **astronomia confeiteira**. | O bolo-planeta com granulado em volta, igual anel de Saturno | ASTRONOMIA CONFEITEIRA |
-| 16 | Só que os **alienígenas** sentem o cheiro do outro lado da galáxia… e vêm de **disco voador** comer o planeta. | Discos voadores chegando; o alienígena e os amigos com garfos gigantes comendo o bolo | — |
-| 17 | Essa… é a **invasão da sobremesa**. | Alienígena com a boca cheia de bolo, fazendo joinha | INVASÃO DA SOBREMESA |
-| 18 | Eles amam tanto o bolo que querem conhecer o confeiteiro… e te **levam no disco voador**. | Raio de luz do disco voador puxando o menino pra cima, com o chapéu e o óculos | — |
-| 19 | Essa… é a **abdução gourmet**. | Menino flutuando dentro do raio, ainda segurando o batedor | ABDUÇÃO GOURMET |
-| 20 | Agora você é o **confeiteiro oficial da galáxia**… e a primeira encomenda é o bolo de **casamento do alienígena**. | Nave por dentro; o alienígena de gravata borboleta e uma alienígena de véu mostrando um desenho de bolo de 50 andares | — |
-| 21 | **Parabéns!** Você virou boneco de neve, chocou vinte ovos, virou funcionário de pintinho, assou um bolo num vulcão, criou um planeta… e foi abduzido por alienígenas. | Confete; figurinhas de cada etapa | PARABÉNS! |
-| 22 | E agora você precisa fazer um bolo pra **mil alienígenas**… mas e se você estiver com **medo**? | O menino olha pra fila infinita de alienígenas, engole seco e procura o óculos escuro → volta pro começo (loop) | — |
+| 3 | Mas o forno acha o óculos tão bonito… que **rouba ele de você**. Agora o forno tá estiloso, posta foto todo dia… e já tem **um milhão de seguidores**. | O forno usando o óculos, tirando selfie com um celular; corações e curtidas subindo; o menino sem óculos, de boca aberta | "1.000.000 SEGUIDORES" |
+| 4 | Esse… é o **forno influencer**. | O forno fazendo pose; flashes de câmera | FORNO INFLUENCER |
+| 5 | Sem o óculos, você treme tanto que o saco de **farinha explode**… e começa a **nevar dentro da cozinha**. Do nada, aparece um **pinguim** pedindo a **senha do wi-fi**. | "PUF!" — tudo branco, nevando; o menino vira um boneco de neve de farinha; um pinguim entra com um celular na mão | "QUAL A SENHA DO WI-FI?" |
+| 6 | Essa… é a **nevasca de trigo**. | O pinguim e o menino-boneco-de-neve se olhando | NEVASCA DE TRIGO |
+| 7 | Os **ovos** ficam com frio, **chocam na hora**… e os pintinhos montam uma **banda de pagode** em cima da pia. | Os ovos tremem, racham; pintinhos com pandeiro, cavaquinho e microfone fazendo show na pia, com luzinha colorida | — |
+| 8 | Esse… é o **pagode galináceo**. | Pintinhos dançando, o pinguim curtindo o show | PAGODE GALINÁCEO |
+| 9 | A **massa do bolo** escuta o pagode, **ganha vida**, sai dançando… se candidata a **prefeita**… e **ganha**. | A massa sai da tigela com carinha e bracinhos, rebolando; depois aparece num palanque com faixa de "PREFEITA" e a cozinha comemorando | "ELEITA!" |
+| 10 | Essa… é a **democracia de massa**. | A massa acenando de cima do palanque, confete | DEMOCRACIA DE MASSA |
+| 11 | A primeira lei da prefeita: **forno não pode usar óculos**. O forno fica tão bravo que esquenta, esquenta… vira um **foguete** e decola levando a **cozinha inteira pro espaço**. | O forno soltando fumaça, sai fogo por baixo; a cozinha inteira decola com todo mundo dentro, passando pelas nuvens | — |
+| 12 | Essa… é a **cozinha interplanetária**. | A cozinha flutuando no espaço do lado da Terra, com a pia e os pintinhos boiando | COZINHA INTERPLANETÁRIA |
+| 13 | Lá em cima, os **alienígenas** sentem cheiro de bolo cru… e vêm atacar de **disco voador**. Mas a prefeita **negocia**… e vira **presidente da galáxia**. | Discos voadores cercando a cozinha; a massa aperta a mão do alienígena; o alienígena coloca uma coroa nela | — |
+| 14 | Essa… é a **diplomacia de chocolate**. | A massa acenando como presidente, os alienígenas aplaudindo | DIPLOMACIA DE CHOCOLATE |
+| 15 | **Parabéns!** Você perdeu o óculos pro forno, virou boneco de neve, empresariou uma banda de pintinhos, elegeu uma massa de bolo, mandou a cozinha pro espaço… e o bolo? **Nem começou**. | Confete; figurinhas de cada etapa; no fim, o menino olhando pra tigela vazia | PARABÉNS! |
+| 16 | E agora, pra fazer esse bolo de uma vez por todas, você precisa de **coragem**… mas e se você estiver com **medo**? | O menino olha pro forno de novo, engole seco e procura outro óculos escuro → volta pro começo (loop) | — |
 
-Efeitos: forno rosnando, explosão de farinha, vento de nevasca, "tremidinha" dos ovos, casca rachando, piados, apito de
-professor, louça batendo, sininho da confeitaria, borbulho do vulcão, "fiuuu" do bolo subindo, "plim" do telescópio,
-discos voadores, mastigação alienígena, raio de abdução, confete e um "boing" em cada nome — tudo baixinho atrás da voz.
+Efeitos: forno rosnando, clique de selfie, explosão de farinha, vento de nevasca, passinhos de pinguim, casca rachando,
+piados, pagode baixinho (pandeiro e cavaquinho), multidão comemorando, fogo de foguete, discos voadores, confete e um
+"boing" em cada nome — tudo baixinho atrás da voz.
