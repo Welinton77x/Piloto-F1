@@ -11,7 +11,7 @@ import {Sky, SunDisc, SunLight, Town, V3, LampPost} from "./Sets5";
 import {Pot, Noodles} from "./Sets8";
 import {Phone} from "./Sets12";
 import {Shades} from "./Sets11";
-import {Bathroom, ElectricShower, Sparks, Bolt, SteamJet, Poraque, PoraqueP, Aquarium, Tucano, ShowerCap, TowelShoulder, AstroHelmet, PlainCar, Dam, SHOWER_P, WINDOW_B} from "./Sets14";
+import {Bathroom, ElectricShower, Sparks, Bolt, SteamJet, Poraque, PoraqueP, Aquarium, Tucano, ShowerCap, TowelShoulder, AstroHelmet, EvaHelmet, EvaGear, PlainCar, Dam, SHOWER_P, WINDOW_B} from "./Sets14";
 import {Captions, StageTitle, Confetti, Sticker, Wd, clean} from "./Overlays";
 import {FPS, clamp, lerp, ramp, pop, easeInOut, easeOut} from "./util";
 import W from "./timingChuveiro.json";
@@ -27,7 +27,7 @@ const at = (i: number, txt: string, n = 0) => {
 export const TOTAL_CHUV = F(words[words.length - 1].e + 0.8);
 
 const BOYL: ToyLook = {hoodie: true};
-const ASTRO: ToyLook = {shirt: "#f4f4f2", pants: "#f4f4f2", shoe: "#c9ced6", sole: "#8c919b", backpack: "#e6e6e6"};
+const ASTRO: ToyLook = {shirt: "#f4f4f2", pants: "#f4f4f2", shoe: "#f4f4f2", sole: "#c9ced6"};
 const PEOPLE: ToyLook[] = [
   {shirt: "#ff6fb1", pants: "#2b2e3b", hairStyle: "ponytail", hair: "#5a2a14", lashes: true, lips: "#d4486a"},
   {shirt: "#2ecc71", pants: "#f4f4f2", hairStyle: "curly", hair: "#1a1a1a", skin: "#a8714a"},
@@ -227,7 +227,22 @@ const S6: React.FC<ShotProps> = ({f, a, t}) => {
 /* =================== 3 — Paulista travada, o tucano guarda =================== */
 const ENTAO4 = at(4, "entao");
 const TUCANO4 = at(4, "tucano");
-const TUC: V3 = [FX + 0.9, 0.08, 2.0];
+const TUC: V3 = [FX + 1.58, 0.98, 2.1];
+const TS = 0.45; // tucano no tamanho de verdade
+const Podium: React.FC = () => (
+  <group position={[TUC[0], 0.08, TUC[2]]}>
+    <mesh position={[0, 0.45, 0]}>
+      <cylinderGeometry args={[0.32, 0.36, 0.9, 20]} />
+      <meshStandardMaterial color="#f4f4f2" roughness={0.6} />
+    </mesh>
+    {[0.25, 0.55].map((y) => (
+      <mesh key={y} position={[0, y, 0]}>
+        <cylinderGeometry args={[0.345, 0.35, 0.1, 20]} />
+        <meshStandardMaterial color="#e8414f" roughness={0.6} />
+      </mesh>
+    ))}
+  </group>
+);
 const POST: V3 = [FX + 1.9, 0.08, 2.25];
 const Jam: React.FC<{t: number}> = ({t}) => (
   <>
@@ -249,35 +264,42 @@ const S7: React.FC<ShotProps> = ({f, a, t}) => (
     ))}
   </>
 );
-const tucIn = (f: number): V3 => [lerp(FX - 3.5, TUC[0], easeOut(ramp(f, ENTAO4, TUCANO4 - 2))), TUC[1], TUC[2]];
+const tucIn = (f: number): V3 => {
+  const k = easeOut(ramp(f, ENTAO4, TUCANO4 - 2));
+  return [lerp(FX - 2.5, TUC[0], k), TUC[1] + 1.6 * Math.sin(k * Math.PI) * (1 - k) + 1.2 * (1 - k), TUC[2]];
+};
 const S8: React.FC<ShotProps> = ({f, a, t}) => {
   const p = tucIn(f);
   const walking = f < TUCANO4 - 2;
   return (
     <>
-      <Cam pos={[FX + 0.6, 1.7, 6.6]} look={[FX + 0.5, 1.3, 1.5]} fov={52} f={f} a={a} />
+      <Cam pos={[FX + 0.9, 1.9, 6.2]} look={[FX + 1.2, 1.25, 2.1]} fov={52} f={f} a={a} />
       <StreetScene t={t} />
       <Jam t={t} />
       <LampPost p={POST} on />
-      <Tucano p={{pos: [p[0], p[1] + (walking ? 0.05 * Math.abs(Math.sin(t * 10)) : 0), p[2]], rotY: walking ? Math.PI / 2 : 0.2, t, blink: blinkCurve(f + 3), s: 1.6, whistle: 1}} />
+      <Podium />
+      <Tucano p={{pos: p, rotY: walking ? Math.PI / 2 : 0.2, t, blink: blinkCurve(f + 3), s: TS, whistle: 0, flap: walking ? 1 : 0}} />
     </>
   );
 };
 /* "O tucano apita com tanta força... que o bico bate no poste... e apaga a luz da cidade inteira." */
 const APITA = at(5, "apita");
+const grabK = (f: number) => ramp(f, APITA - 16, APITA - 8) * (1 - ramp(f, APITA + 2, APITA + 10));
+const whistleK = (f: number) => ramp(f, APITA - 9, APITA - 2) * (1 - ramp(f, at(5, "poste") - 12, at(5, "poste") - 6));
 const POSTE5 = at(5, "poste");
 const E5 = at(5, "e", 0);
 const S9: React.FC<ShotProps> = ({f, a, t}) => {
-  const swing = easeInOut(ramp(f, POSTE5 - 10, POSTE5));
+  const swing = easeInOut(ramp(f, POSTE5 - 6, POSTE5));
   const hit = f >= POSTE5 && f < POSTE5 + 14;
   return (
     <>
-      <Cam pos={[FX + 1.2, 2.2, 7.4]} look={[FX + 1.3, 2.0, 2.0]} fov={52} f={f} a={a} />
+      <Cam pos={[FX + 1.3, 1.75, 5.0]} look={[FX + 1.6, 1.35, 2.1]} fov={50} f={f} a={a} />
       <StreetScene t={t} />
       <Jam t={t} />
       <LampPost p={POST} on />
-      <Tucano p={{pos: TUC, rotY: lerp(0.2, 1.35, swing), t, blink: hit ? 1 : blinkCurve(f + 3), s: 1.6, whistle: 1, flap: f >= APITA && f < POSTE5 - 8 ? 1 : 0, beakTilt: hit ? -0.3 : 0}} />
-      <Sparks p={[POST[0] - 0.05, 2.15, POST[2]]} k={hit ? 1 : 0} t={t} size={2} />
+      <Podium />
+      <Tucano p={{pos: TUC, rotY: lerp(0.2, 1.35, swing), t, blink: hit ? 1 : blinkCurve(f + 3), s: TS, whistle: whistleK(f), grab: grabK(f), flap: f >= APITA + 6 && f < POSTE5 - 14 ? 0.6 : 0, beakTilt: hit ? -0.3 : 0}} />
+      <Sparks p={[POST[0] - 0.05, 1.6, POST[2]]} k={hit ? 1 : 0} t={t} size={1.2} />
     </>
   );
 };
@@ -285,21 +307,23 @@ const S10: React.FC<ShotProps> = ({f, a, t}) => {
   const out = f >= a + 6;
   return (
     <>
-      <Cam pos={[FX + 0.5, 3.0, 11]} look={[FX, 1.6, 0]} fov={58} f={f} a={a} />
+      <Cam pos={[FX + 1.2, 2.2, 6.4]} look={[FX + 1.2, 1.7, 1.5]} fov={56} f={f} a={a} />
       <StreetScene t={t} dark={out ? 1 : 0} />
       <Jam t={t} />
       <LampPost p={POST} on={!out} />
-      <Tucano p={{pos: TUC, rotY: 1.35, t, blink: 0, s: 1.6, whistle: 1, glowEyes: out ? 1 : 0}} />
+      <Podium />
+      <Tucano p={{pos: TUC, rotY: 1.35, t, blink: 0, s: TS, whistle: 0, glowEyes: out ? 1 : 0}} />
     </>
   );
 };
 /* título: BLECAUTE BICUDO — só os olhinhos brilhando */
 const S11: React.FC<ShotProps> = ({f, a, t}) => (
   <>
-    <Cam pos={[FX + 0.9, 2.1, 5.0]} look={[FX + 0.9, 2.0, 2.0]} fov={50} f={f} a={a} />
+    <Cam pos={[FX + 1.55, 1.7, 3.3]} look={[TUC[0], 1.5, TUC[2]]} fov={44} f={f} a={a} />
     <StreetScene t={t} dark={1} />
     <LampPost p={POST} on={false} />
-    <Tucano p={{pos: TUC, rotY: 0.1, t, blink: blinkCurve(f + 3) * 0.8, s: 1.6, whistle: 1, glowEyes: 1}} />
+    <Podium />
+    <Tucano p={{pos: TUC, rotY: 0.1, t, blink: blinkCurve(f + 3) * 0.8, s: TS, whistle: 0, glowEyes: 1}} />
   </>
 );
 
@@ -408,7 +432,8 @@ const S19: React.FC<ShotProps> = ({f, a, t}) => {
       <BathScene t={t} steam={0.3} />
       <ElectricShower t={t} spark={1} heat={0.4} />
       <SteamJet p={[SHOWER_P[0], SHOWER_P[1] - 0.05, SHOWER_P[2] + 0.2]} k={0.35} t={t} spread={0.4} />
-      <Toy pose={{...idle(f), pos: BOY_SH, rotY: 0.15 + (ff ? 0.3 * Math.sin(t * 20) : 0), rShoulder: [-0.4, 0, -0.5 + (ff ? 0.4 * Math.sin(t * 25) : 0)], lShoulder: [-0.4, 0, 0.5], smile: 0.6, brow: -0.2}} look={ASTRO} headExtra={<AstroHelmet fog={ff ? 0.4 : 0.1} />} />
+      <Toy pose={{...idle(f), pos: BOY_SH, rotY: 0.15 + (ff ? 0.3 * Math.sin(t * 20) : 0), rShoulder: [-0.4, 0, -0.5 + (ff ? 0.4 * Math.sin(t * 25) : 0)], lShoulder: [-0.4, 0, 0.5], smile: 0.6, brow: -0.2}} look={ASTRO} headExtra={<EvaHelmet />} />
+      <EvaGear pos={BOY_SH} rotY={0.15 + (ff ? 0.3 * Math.sin(t * 20) : 0)} t={t} />
     </>
   );
 };
@@ -422,20 +447,23 @@ const S20: React.FC<ShotProps> = ({f, a, t}) => {
       <Cam pos={[-0.2, 1.7, 3.0]} look={[-0.6, 1.5, -1.0]} fov={54} f={f} a={a} />
       <BathScene t={t} steam={0.5} />
       <ElectricShower t={t} />
-      <Toy pose={{...idle(f), pos: [-0.5, 0, -0.6], rotY: 0.15, ...ARMS_UP, smile: 1, mouthOpen: 0.4, heat: 0.6, hairLift: 1}} look={ASTRO} headExtra={off ? undefined : <AstroHelmet fog={0.7} />} />
+      <Toy pose={{...idle(f), pos: [-0.5, 0, -0.6], rotY: 0.15, ...ARMS_UP, smile: 1, mouthOpen: 0.4, heat: 0.6, hairLift: 1}} look={ASTRO} headExtra={off ? undefined : <EvaHelmet visor={0.5} />} />
+      <EvaGear pos={[-0.5, 0, -0.6]} rotY={0.15} t={t} />
       {off && <SteamJet p={[-0.5, 2.4, -0.6]} k={1 - ramp(f, a + 14, a + 60)} t={t} spread={0.3} h={1} />}
     </>
   );
 };
 const S21: React.FC<ShotProps> = ({f, a, t}) => {
   const peek = easeOut(ramp(f, a + 6, a + 22));
+  const py = lerp(1.25, 1.66, peek);
   return (
     <>
       <Cam pos={[0.35, 2.15, 1.5]} look={[WINDOW_B[0], WINDOW_B[1] - 0.15, WINDOW_B[2]]} fov={44} f={f} a={a} />
       <BathScene t={t} dark={1} />
       <ElectricShower t={t} />
-      <Poraque p={{pos: [WINDOW_B[0], lerp(0.6, 1.45, peek), WINDOW_B[2] + 0.45], rotY: 0, t, blink: blinkCurve(f + 17), s: 1.3, smile: 1, helmet: true, look: [0, -0.2], glow: 0.15, wiggle: 0.5}} />
-      <Sparks p={[WINDOW_B[0] + 0.2, lerp(0.6, 1.45, peek) + 0.95, WINDOW_B[2] + 0.75]} k={Math.sin(t * 5) > 0.6 ? 1 : 0} t={t} />
+      <Poraque p={{pos: [WINDOW_B[0], py, WINDOW_B[2] - 0.62], rotY: 0, t, blink: blinkCurve(f + 17), s: 1.0, smile: 1, helmet: true, look: [0, -0.2], glow: 0.15, wiggle: 0.3}} />
+      <pointLight position={[WINDOW_B[0], 2.4, WINDOW_B[2] - 0.2]} intensity={2.5} distance={2} decay={1.5} color="#fff2a0" />
+      <Sparks p={[WINDOW_B[0] + 0.16, py + 0.75, WINDOW_B[2] - 0.2]} k={Math.sin(t * 5) > 0.6 ? 1 : 0} t={t} />
     </>
   );
 };
@@ -502,38 +530,40 @@ const Ono: React.FC<{from: number; to: number; text: string; x: number; y: numbe
 };
 /** número grande */
 const BigNum: React.FC<{from: number; to: number; text: string; y?: number; size?: number}> = ({from, to, text, y = 330, size = 130}) => <Ono from={from} to={to} text={text} x={540} y={y} size={size} color="#ffffff" rot={-3} />;
-/** mapa: São Paulo → Itaipu */
+/** mapa do Brasil: São Paulo → Itaipu */
+const BR: [number, number][] = [[-73.9, -7.3], [-70, -4], [-69.9, 1.7], [-64, 2], [-60, 4.5], [-60, 5.2], [-56, 2], [-51.6, 4.3], [-50, 1.8], [-48, -1.4], [-44.5, -2.6], [-41, -2.9], [-38, -3.7], [-35.2, -5.5], [-34.8, -7.5], [-35.3, -9.5], [-37.5, -12], [-39, -14.8], [-39.2, -17.7], [-40.7, -21.5], [-42, -23], [-44.6, -23.3], [-47, -24.5], [-48.5, -26.2], [-48.6, -28.5], [-50, -30.5], [-52, -32.5], [-53.4, -33.7], [-53.6, -31.8], [-55.6, -30.8], [-57.6, -30.2], [-56, -28], [-54.6, -25.6], [-54.3, -24], [-55.5, -23.9], [-57.8, -22.1], [-58, -20], [-57.5, -18], [-60.2, -16.3], [-60.4, -13.8], [-62, -12.8], [-65, -11.8], [-65.3, -9.8], [-68, -10.7], [-70.6, -11], [-72.5, -9.5]];
+const proj = (lon: number, lat: number): [number, number] => [100 + (lon + 75) * 22, 330 + (6 - lat) * 22];
 const MapBR: React.FC<{from: number; to: number}> = ({from, to}) => {
   const f = useCurrentFrame();
   if (f < from || f > to) return null;
-  const k = easeInOut(ramp(f, from + 4, to - 6));
-  const A = [720, 930];
-  const B = [330, 850];
-  const px = lerp(A[0], B[0], k);
-  const py = lerp(A[1], B[1], k) - 140 * Math.sin(k * Math.PI);
+  const k = easeInOut(ramp(f, from + 6, to - 6));
+  const A = proj(-46.6, -23.5);
+  const B = proj(-54.6, -25.4);
+  const C: [number, number] = [(A[0] + B[0]) / 2, Math.min(A[1], B[1]) - 120];
+  const qx = (1 - k) * (1 - k) * A[0] + 2 * (1 - k) * k * C[0] + k * k * B[0];
+  const qy = (1 - k) * (1 - k) * A[1] + 2 * (1 - k) * k * C[1] + k * k * B[1];
+  const d = BR.map(([lo, la], i) => `${i ? "L" : "M"} ${proj(lo, la)[0].toFixed(0)} ${proj(lo, la)[1].toFixed(0)}`).join(" ") + " Z";
+  const label = (txt: string, p: [number, number], dx: number) => (
+    <div style={{position: "absolute", left: p[0] + dx, top: p[1] - 120, transform: "translateX(-50%)", background: "#ffffff", border: "5px solid #101018", fontFamily, fontWeight: 900, fontSize: 36, padding: "4px 14px", whiteSpace: "nowrap"}}>{txt}</div>
+  );
   return (
     <AbsoluteFill style={{background: "#7fc8ff"}}>
       <svg width={1080} height={1920}>
-        <path d="M 150 700 C 300 520, 650 480, 900 620 C 1010 700, 1000 980, 950 1180 C 880 1420, 700 1560, 520 1500 C 330 1440, 180 1320, 140 1100 C 110 950, 100 820, 150 700 Z" fill="#7ed957" stroke="#4c9a35" strokeWidth={10} />
-        {[[300, 820], [520, 760], [700, 900], [420, 1260], [800, 1300]].map(([x, y], i) => (
-          <g key={i} transform={`translate(${x},${y})`}>
-            <path d="M -30 30 L 0 -40 L 30 30 Z" fill="#4c9a35" />
-          </g>
-        ))}
-        <path d={`M ${A[0]} ${A[1]} Q ${(A[0] + B[0]) / 2} ${(A[1] + B[1]) / 2 - 280} ${B[0]} ${B[1]}`} fill="none" stroke="#ffffff" strokeWidth={10} strokeDasharray="30 22" opacity={0.9} />
+        <path d={d} fill="#7ed957" stroke="#3f8f2c" strokeWidth={8} strokeLinejoin="round" />
+        <path d={`M ${A[0]} ${A[1]} Q ${C[0]} ${C[1]} ${B[0]} ${B[1]}`} fill="none" stroke="#ffffff" strokeWidth={9} strokeDasharray="26 18" />
         {[A, B].map(([x, y], i) => (
-          <g key={"p" + i} transform={`translate(${x},${y})`}>
-            <circle r={22} fill="#e8262d" stroke="#101018" strokeWidth={6} />
-            <rect x={-10} y={18} width={20} height={50} fill="#101018" />
+          <g key={i} transform={`translate(${x},${y})`}>
+            <path d="M 0 0 C -22 -30, -26 -60, 0 -66 C 26 -60, 22 -30, 0 0 Z" fill="#e8262d" stroke="#101018" strokeWidth={5} />
+            <circle cy={-46} r={9} fill="#ffffff" />
           </g>
         ))}
-        <circle cx={px} cy={py} r={34} fill="#ffe14a" stroke="#101018" strokeWidth={6} />
+        <g transform={`translate(${qx},${qy})`}>
+          <circle r={30} fill="#ffe14a" stroke="#101018" strokeWidth={6} />
+          <text y={12} textAnchor="middle" fontSize={34}>⚡</text>
+        </g>
       </svg>
-      {[["SÃO PAULO", A], ["ITAIPU", B]].map(([n, p]) => (
-        <div key={n as string} style={{position: "absolute", left: (p as number[])[0], top: (p as number[])[1] + 110, transform: "translateX(-50%)", background: "#ffffff", border: "6px solid #101018", fontFamily, fontWeight: 900, fontSize: 44, padding: "6px 20px"}}>
-          {n as string}
-        </div>
-      ))}
+      {label("SÃO PAULO", A, 40)}
+      {label("ITAIPU", B, -40)}
     </AbsoluteFill>
   );
 };
@@ -580,7 +610,6 @@ const FollowCard: React.FC<{from: number; to: number; tap: number}> = ({from, to
 
 /* ======================= vídeo ======================= */
 const FXV = 0.3;
-const MUSIC = 0.11;
 const SND: React.FC<{src: string; from: number; dur?: number; v: number; loop?: boolean}> = ({src, from, dur = 60, v, loop}) => (
   <Sequence from={Math.max(0, from)} durationInFrames={dur}>
     <Audio src={staticFile(src)} volume={v} loop={loop} />
@@ -604,6 +633,7 @@ export const VideoChuveiro: React.FC = () => {
       <StageTitle from={L(6) + 4} to={L(7) - 3} lines={["BLECAUTE", "BICUDO"]} />
       <StageTitle from={L(8) + 4} to={L(9) - 3} lines={["ENGUIA", "PÚBLICA"]} />
 
+      <Ono from={4} to={at(0, "mas") + 4} text="?" x={440} y={330} size={200} color="#ffd21f" rot={8} />
       <Ono from={CHOQUE0 - 2} to={CHOQUE0 + 24} text="ZZZT!" x={540} y={420} />
       <Tag from={at(0, "chuveiro") - 2} to={ENTAO0 - 2} text="CHUVEIRO NERVOSO" x={330} y={560} />
       <Tag from={PORAQUE0 - 2} to={L(1) - 2} text="PORAQUÊ" x={760} y={900} />
@@ -613,13 +643,13 @@ export const VideoChuveiro: React.FC = () => {
       <Tag from={at(3, "fila") - 2} to={L(4) - 3} text="FILA DO MIOJO" x={540} y={760} />
       <Tag from={at(4, "avenida") - 2} to={ENTAO4 - 2} text="AVENIDA PAULISTA" x={540} y={560} />
       <Ono from={at(4, "trava")} to={ENTAO4 - 2} text="BIIIII!" x={540} y={400} size={120} color="#ffffff" />
-      <Tag from={TUCANO4 - 2} to={L(5) - 2} text="TUCANO" x={420} y={700} />
+      <Tag from={TUCANO4 - 2} to={L(5) - 2} text="TUCANO" x={560} y={640} />
       <Ono from={APITA} to={APITA + 26} text="PRIIII!" x={540} y={400} size={120} color="#ffffff" />
       <Ono from={POSTE5} to={POSTE5 + 26} text="PLÉC!" x={600} y={560} size={150} />
       <Ono from={E5 + 10} to={L(6) - 2} text="cri cri…" x={540} y={560} size={90} color="#ffffff" rot={0} />
       <Tag from={ILUMINA - 2} to={L(8) - 2} text="ILUMINAÇÃO PÚBLICA" x={540} y={560} />
       <Tag from={at(9, "influencer") - 2} to={E9 - 2} text="INFLUENCER DE ENERGIA" x={540} y={600} />
-      <BigNum from={E9 + 6} to={ITAIPU - 3} text="1.000 KM" y={420} size={150} />
+      <BigNum from={E9 + 6} to={ITAIPU - 3} text="1.000 KM" y={250} size={130} />
       <Tag from={ITAIPU} to={L(10) - 2} text="ITAIPU" x={540} y={560} />
       <Ono from={at(10, "choque") - 2} to={at(10, "choque") + 22} text="ZZZT!" x={540} y={420} />
       <Tag from={CAPACETE - 2} to={ROUPA - 4} text="CAPACETE" x={560} y={520} />
@@ -655,7 +685,6 @@ export const VideoChuveiro: React.FC = () => {
 
       {/* ---------- áudio ---------- */}
       <Audio src={staticFile("vozchuveiro.mp3")} />
-      <Audio src={staticFile("trilha-galo.mp3")} volume={(fr) => MUSIC * clamp(fr / 12) * (1 - ramp(fr, TOTAL_CHUV - 20, TOTAL_CHUV))} />
       {cuts.map((c) => (
         <SND key={"w" + c} src="sfx7/whoosh.mp3" from={c - 3} dur={25} v={FXV * 0.18} />
       ))}

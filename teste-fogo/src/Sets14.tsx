@@ -33,9 +33,21 @@ export const Bathroom: React.FC<{steam?: number; dark?: number}> = ({steam = 0, 
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} material={tm("piso-banheiro", azulejoTex("#8fa8c8", "#c9d6e6"), 0.4)} receiveShadow>
         <planeGeometry args={[W, 6]} />
       </mesh>
-      <mesh position={[0, h / 2, z0 - 0.1]} material={wall} receiveShadow>
-        <boxGeometry args={[W, h, 0.2]} />
-      </mesh>
+      {/* parede do fundo com o vão da janela */}
+      {(() => {
+        const wx0 = WINDOW_B[0] - 0.36, wx1 = WINDOW_B[0] + 0.36, wy0 = WINDOW_B[1] - 0.26, wy1 = WINDOW_B[1] + 0.26;
+        const parts: [number, number, number, number][] = [
+          [x0, wx0, 0, h],
+          [wx1, x1, 0, h],
+          [wx0, wx1, 0, wy0],
+          [wx0, wx1, wy1, h],
+        ];
+        return parts.map(([a0, a1, b0, b1], i) => (
+          <mesh key={"pw" + i} position={[(a0 + a1) / 2, (b0 + b1) / 2, z0 - 0.1]} material={wall} receiveShadow>
+            <boxGeometry args={[a1 - a0, b1 - b0, 0.2]} />
+          </mesh>
+        ));
+      })()}
       {[-1, 1].map((sd) => (
         <mesh key={sd} position={[(W / 2 + 0.1) * sd, h / 2, z0 + 3]} material={wall} receiveShadow>
           <boxGeometry args={[0.2, h, 6]} />
@@ -62,9 +74,15 @@ export const Bathroom: React.FC<{steam?: number; dark?: number}> = ({steam = 0, 
       <mesh position={[1.45, 1.75, -2.17]} geometry={rbox(0.7, 0.9, 0.04, 0.05)} material={sm("#cfeaf7", 0.08, {emissive: "#9fd8ff", emissiveIntensity: 0.25})} />
       {/* janelinha (onde o poraquê espia no fim) */}
       <group position={[WINDOW_B[0], WINDOW_B[1], WINDOW_B[2]]}>
-        <mesh geometry={rbox(0.85, 0.65, 0.06, 0.03)} material={sm("#ffffff", 0.5)} />
-        <mesh position={[0, 0, 0.035]} material={sm(dark > 0.5 ? "#16204a" : "#9fd8ff", 0.2, {emissive: dark > 0.5 ? "#16204a" : "#bfe6ff", emissiveIntensity: 0.4})}>
+        {[[0, 0.3, 0.85, 0.07], [0, -0.3, 0.85, 0.07], [-0.4, 0, 0.07, 0.65], [0.4, 0, 0.07, 0.65], [0, 0, 0.04, 0.55]].map(([x, y, w, hh], i) => (
+          <mesh key={i} position={[x, y, 0.02]} geometry={rbox(w, hh, 0.08, 0.02)} material={sm("#ffffff", 0.5)} />
+        ))}
+        <mesh position={[0, 0, 0.035]} material={sm("#bfe6ff", 0.05, {transparent: true, opacity: 0.18, depthWrite: false})}>
           <planeGeometry args={[0.72, 0.52]} />
+        </mesh>
+        {/* lá fora: céu atrás da janela */}
+        <mesh position={[0, 0, -1.6]} material={sm(dark > 0.5 ? "#101a44" : "#9fd8ff", 0.9, {emissive: dark > 0.5 ? "#101a44" : "#bfe6ff", emissiveIntensity: 0.6})}>
+          <planeGeometry args={[4, 3]} />
         </mesh>
       </group>
       {/* vaso */}
@@ -308,9 +326,10 @@ export const Aquarium: React.FC<{p: V3; rotY?: number; t?: number; spin?: number
 );
 
 /* ---------- tucano guarda de trânsito (frente = +z) ---------- */
-export type TucanoP = {pos?: V3; rotY?: number; t?: number; blink?: number; whistle?: number; flap?: number; peck?: number; s?: number; glowEyes?: number; beakTilt?: number};
+export type TucanoP = {pos?: V3; rotY?: number; t?: number; blink?: number; whistle?: number; flap?: number; peck?: number; s?: number; glowEyes?: number; beakTilt?: number; grab?: number};
 export const Tucano: React.FC<{p: TucanoP}> = ({p}) => {
-  const {pos = [0, 0, 0], rotY = 0, t = 0, blink = 0, whistle = 0, flap = 0, peck = 0, s = 1, glowEyes = 0, beakTilt = 0} = p;
+  const {pos = [0, 0, 0], rotY = 0, t = 0, blink = 0, whistle = 0, flap = 0, peck = 0, s = 1, glowEyes = 0, beakTilt = 0, grab = 0} = p;
+  const wp: V3 = [lerp(0, 0.07, whistle), lerp(0.02, 0.36, whistle), lerp(0.36, 0.4, whistle)];
   const black = sm("#15161d", 0.5);
   const fa = flap * (0.5 + 0.5 * Math.sin(t * 30));
   const eyeY = Math.max(0.1, 1 - blink);
@@ -335,7 +354,7 @@ export const Tucano: React.FC<{p: TucanoP}> = ({p}) => {
         </mesh>
         {/* asas */}
         {[-1, 1].map((sd) => (
-          <group key={sd} position={[0.3 * sd, 0.08, -0.02]} rotation={[0, 0, sd * (0.15 + 1.2 * fa)]}>
+          <group key={sd} position={[0.3 * sd, 0.08, -0.02]} rotation={[sd < 0 ? -1.3 * grab : 0, 0, sd * (0.15 + 1.2 * fa) + (sd < 0 ? 0.5 * grab : 0)]}>
             <mesh position={[0.04 * sd, -0.15, 0]} scale={[0.07, 0.3, 0.2]} material={black} castShadow>
               <sphereGeometry args={[1, 14, 10]} />
             </mesh>
@@ -374,14 +393,6 @@ export const Tucano: React.FC<{p: TucanoP}> = ({p}) => {
             <mesh position={[0, 0, 0.56]} scale={[0.03, 0.025, 0.04]} material={black}>
               <sphereGeometry args={[1, 8, 6]} />
             </mesh>
-            {/* apito */}
-            {whistle > 0.01 && (
-              <group position={[0.0, -0.08, 0.05]} rotation={[-0.25, 0, 0]}>
-                <mesh rotation={[Math.PI / 2, 0, 0]} material={sm("#c9ced6", 0.25, {metalness: 0.7})}>
-                  <cylinderGeometry args={[0.025, 0.03, 0.1, 10]} />
-                </mesh>
-              </group>
-            )}
           </group>
           {/* quepe de guarda */}
           <group position={[0, 0.17, -0.02]} rotation={[-0.12, 0, 0]}>
@@ -396,6 +407,21 @@ export const Tucano: React.FC<{p: TucanoP}> = ({p}) => {
               <sphereGeometry args={[0.025, 8, 6]} />
             </mesh>
           </group>
+        </group>
+        {/* cordinha no pescoço + apito (pendurado no peito ou na boca) */}
+        <mesh position={[0, 0.34, 0.03]} rotation={[Math.PI / 2 - 0.25, 0, 0]} material={sm("#e8414f", 0.6)}>
+          <torusGeometry args={[0.19, 0.012, 6, 24]} />
+        </mesh>
+        <mesh material={sm("#e8414f", 0.6)}>
+          <tubeGeometry args={[new THREE.CatmullRomCurve3([new THREE.Vector3(0, 0.3, 0.21), new THREE.Vector3((wp[0]) * 0.5, (0.3 + wp[1]) / 2 - 0.04, (0.21 + wp[2]) / 2 + 0.04), new THREE.Vector3(wp[0], wp[1] + 0.02, wp[2] - 0.03)]), 10, 0.01, 5, false]} />
+        </mesh>
+        <group position={wp} rotation={[whistle > 0.5 ? -0.2 : 0.3, 0, 0]}>
+          <mesh rotation={[Math.PI / 2, 0, 0]} material={sm("#c9ced6", 0.25, {metalness: 0.75})}>
+            <cylinderGeometry args={[0.03, 0.035, 0.11, 10]} />
+          </mesh>
+          <mesh position={[0, 0.03, -0.01]} material={sm("#c9ced6", 0.25, {metalness: 0.75})}>
+            <sphereGeometry args={[0.04, 10, 8]} />
+          </mesh>
         </group>
         {/* colete refletivo */}
         <mesh position={[0, -0.05, 0.02]} scale={[0.335, 0.2, 0.315]} material={sm("#c6ff3a", 0.5, {emissive: "#8fd14f", emissiveIntensity: 0.2})}>
@@ -509,6 +535,60 @@ export const Dam: React.FC<{t: number}> = ({t}) => (
           <boxGeometry args={[2.4, 0.12, 0.12]} />
         </mesh>
       </group>
+    ))}
+  </group>
+);
+/** capacete de astronauta tipo traje espacial (casco branco + viseira dourada espelhada) — espaço da cabeça */
+export const EvaHelmet: React.FC<{visor?: number}> = ({visor = 1}) => (
+  <group position={[0, 0.02, 0]}>
+    <mesh material={sm("#f4f4f2", 0.35)} castShadow>
+      <sphereGeometry args={[0.52, 32, 24]} />
+    </mesh>
+    {/* abertura da frente com viseira dourada */}
+    <mesh position={[0, 0.02, 0.1]} rotation={[0, 0, 0]} scale={[0.92, 0.82, 0.92]} material={sm("#d4a017", 0.08, {metalness: 0.9, emissive: "#7a5a10", emissiveIntensity: 0.35 * visor, transparent: visor < 1, opacity: 0.35 + 0.65 * visor})}>
+      <sphereGeometry args={[0.5, 28, 18, Math.PI * 0.12, Math.PI * 0.76, Math.PI * 0.22, Math.PI * 0.5]} />
+    </mesh>
+    {/* lanternas laterais */}
+    {[-1, 1].map((sd) => (
+      <group key={sd} position={[0.42 * sd, 0.22, 0.18]}>
+        <mesh geometry={rbox(0.1, 0.1, 0.16, 0.03)} material={sm("#c9ced6", 0.4)} />
+        <mesh position={[0, 0, 0.085]} material={sm("#fff6c8", 0.2, {emissive: "#ffe9a0", emissiveIntensity: 1})}>
+          <circleGeometry args={[0.035, 12]} />
+        </mesh>
+      </group>
+    ))}
+    {/* anel do pescoço */}
+    <mesh position={[0, -0.44, 0]} rotation={[Math.PI / 2, 0, 0]} material={sm("#8c919b", 0.3, {metalness: 0.6})}>
+      <torusGeometry args={[0.36, 0.07, 10, 28]} />
+    </mesh>
+  </group>
+);
+/** equipamento do traje (painel no peito, mochila de suporte de vida, faixas) — no espaço do corpo (pos/rotY do boneco) */
+export const EvaGear: React.FC<{pos: V3; rotY: number; t?: number}> = ({pos, rotY, t = 0}) => (
+  <group position={pos} rotation={[0, rotY, 0]}>
+    {/* painel de controle no peito */}
+    <mesh position={[0, 1.12, 0.3]} geometry={rbox(0.4, 0.22, 0.14, 0.03)} material={sm("#e6e6e6", 0.4)} castShadow />
+    {[-0.12, -0.04, 0.04, 0.12].map((x, i) => (
+      <mesh key={i} position={[x, 1.14, 0.375]} material={sm(["#e8414f", "#3a86ff", "#ffd21f", "#2ecc71"][i], 0.3, {emissive: ["#e8414f", "#3a86ff", "#ffd21f", "#2ecc71"][i], emissiveIntensity: 0.4 + 0.4 * Math.abs(Math.sin(t * 3 + i))})}>
+        <cylinderGeometry args={[0.022, 0.022, 0.02, 10]} />
+      </mesh>
+    ))}
+    {/* mangueiras do painel */}
+    {[-1, 1].map((sd) => (
+      <mesh key={sd} position={[0.17 * sd, 1.0, 0.27]} rotation={[0.3, 0, 0]} material={sm("#c9ced6", 0.4)}>
+        <torusGeometry args={[0.07, 0.018, 6, 12, Math.PI]} />
+      </mesh>
+    ))}
+    {/* mochila grande de suporte de vida */}
+    <mesh position={[0, 1.15, -0.36]} geometry={rbox(0.62, 0.72, 0.3, 0.06)} material={sm("#f4f4f2", 0.4)} castShadow />
+    <mesh position={[0, 1.42, -0.36]} geometry={rbox(0.5, 0.14, 0.32, 0.04)} material={sm("#d9d9d9", 0.4)} />
+    {/* faixas e emblemas genéricos nos braços/peito */}
+    <mesh position={[-0.13, 1.3, 0.24]} material={sm("#2e5bd0", 0.4)}>
+      <circleGeometry args={[0.05, 16]} />
+    </mesh>
+    {/* botas brancas grossas */}
+    {[-1, 1].map((sd) => (
+      <mesh key={"bt" + sd} position={[0.125 * sd, 0.08, 0.05]} geometry={rbox(0.24, 0.17, 0.38, 0.06)} material={sm("#f4f4f2", 0.4)} castShadow />
     ))}
   </group>
 );
