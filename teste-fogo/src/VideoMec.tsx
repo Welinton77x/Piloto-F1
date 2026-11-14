@@ -229,7 +229,7 @@ const SIP = at(2, "cafe") + 6;
 const AGITADO = at(2, "agitado");
 const DEP = at(2, "sai");
 const BUZINA = at(2, "buzinando");
-const BOY5: V3 = [-5.55, 0, -0.15];
+const BOY5: V3 = [-5.75, 0, 0.9];
 /** posição do carro correndo (x) */
 const carX = (f: number) => {
   if (f < DEP) return CAR0[0];
@@ -239,15 +239,15 @@ const carX = (f: number) => {
 const S5: React.FC<ShotProps> = ({f, a, t}) => {
   const palm = useRef<THREE.Object3D>(null);
   const sip = ramp(f, SIP - 4, SIP + 4) * (1 - ramp(f, SIP + 22, SIP + 30));
-  const boy = physics("b5" + a, (fr) => ({...idle(fr), pos: BOY5, rotY: -Math.PI / 2 + 0.25, ...OFFER_LOW, smile: 0.7, head: [0.2, 0, 0]}), a, f);
+  const boy = physics("b5" + a, (fr) => ({...idle(fr), pos: BOY5, rotY: Math.PI / 2 - 0.3, lShoulder: [-0.25, 0, 0.85], lElbow: -0.2, rShoulder: [-0.2, 0, 0.1], rElbow: -0.3, smile: 0.7, head: [0.1, -0.5, 0], pupil: [-0.8, 0]}), a, f);
   return (
     <>
-      <Cam pos={[-5.5, 1.6, 5.3]} look={[-6.45, 1.0, -0.3]} fov={46} f={f} a={a} />
+      <Cam pos={[-1.8, 1.6, 2.6]} look={[-5.9, 1.0, 0.25]} fov={48} f={f} a={a} />
       <StreetScene t={t} target={[-7.5, 1, 0.3]} ext={5} />
       <CarOnRoad x={CAR0[0]} z={CAR0[2]} c={{t, sleepy: 0.45 * (1 - sip), mood: 1 - sip, mouth: 0.5 * sip, smile: sip}} />
-      <Boy pose={boy} palmRef={palm} />
+      <Boy pose={boy} lPalmRef={palm} />
       <InHand palm={palm}>
-        <group rotation={[0, 0, -0.9 * sip]}>
+        <group rotation={[0, 0, 0.9 * sip]}>
           <Cup p={[0, -0.04, 0.06]} s={1.5} />
         </group>
       </InHand>
@@ -801,7 +801,7 @@ const S33: React.FC<ShotProps> = ({f, a, t}) => {
 /* "E agora, lá da oficina, o seu pai liga..." — o celular toca */
 const LIGA = at(17, "liga");
 const EPEDE = at(17, "e", 1);
-const BOY34: V3 = [TRX + 1.6, 0, 3.3];
+const BOY34: V3 = [TRX + 1.6, 0, 5.2];
 const S34: React.FC<ShotProps> = ({f, a, t}) => {
   const palm = useRef<THREE.Object3D>(null);
   const boy = physics("b34" + a, (fr) => {
@@ -811,7 +811,7 @@ const S34: React.FC<ShotProps> = ({f, a, t}) => {
   const ring = f < LIGA - 6 ? 1 : 0;
   return (
     <>
-      <Cam pos={[TRX + 2.2, 2.0, 8.8]} look={[TRX + 1.2, 2.4, 0.6]} fov={55} f={f} a={a} />
+      <Cam pos={[TRX + 2.0, 1.9, 9.6]} look={[TRX + 1.2, 2.0, 0]} fov={55} f={f} a={a} />
       <StreetT t={t} />
       <CarRobot p={[TRX - 0.8, 0, -1.0]} rotY={0.2} t={t} mic dance={1} mouth={0.2 + 0.6 * Math.abs(Math.sin(t * 7))} s={RS} />
       <Boy pose={boy} palmRef={palm} mohawk />
@@ -826,11 +826,11 @@ const S35: React.FC<ShotProps> = ({f, a, t}) => {
   const palm = useRef<THREE.Object3D>(null);
   const boy = physics("b35" + a, (fr) => {
     const lk = ramp(fr, at(17, "carro") - 8, at(17, "carro"));
-    return {...idle(fr), pos: BOY34, rotY: -0.25, ...PHONE_EAR, eyeWide: lerp(0.3, 1, lk), brow: lerp(0.3, 1, lk), mouthOpen: 0.1 + 0.2 * lk, smile: 0, head: [0, 0.7 * lk, 0.05], pupil: [0.8 * lk, 0.3]};
+    return {...idle(fr), pos: BOY34, rotY: -0.25, ...PHONE_EAR, eyeWide: lerp(0.3, 1, lk), brow: lerp(0.3, 1, lk), mouthOpen: 0.1 + 0.2 * lk, smile: 0, head: [-0.3 * lk, -0.7 * lk, 0.05], pupil: [-0.8 * lk, 0.6 * lk]};
   }, a, f);
   return (
     <>
-      <Cam pos={[TRX + 1.5, 2.0, 6.4]} look={[TRX + 1.3, 1.9, 0.6]} fov={44} f={f} a={a} punch={4} />
+      <Cam pos={[TRX + 2.0, 2.0, 8.6]} look={[TRX + 1.6, 1.8, 5.2]} fov={44} f={f} a={a} punch={4} />
       <StreetT t={t} />
       <CarRobot p={[TRX - 0.8, 0, -1.0]} rotY={0.2} t={t} mic dance={1} mouth={0.2 + 0.6 * Math.abs(Math.sin(t * 7))} s={RS} />
       <Boy pose={boy} palmRef={palm} mohawk />
