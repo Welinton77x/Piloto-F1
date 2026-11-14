@@ -526,10 +526,53 @@ export type DogP = {
   run?: number; // velocidade da passada (1 andando, 3 correndo)
   bowtie?: boolean;
   pillow?: number; // almofada das alianças nas costas (1 = presa, 0 = sem)
+  detective?: boolean; // chapéu xadrez de detetive + sobretudo bege
+  lupa?: boolean; // lupa na pata da frente direita (sentado)
+  scarf?: boolean; // cachecol azul-claro e branco (no lugar da coleira)
+  mouthItem?: React.ReactNode; // algo preso na boca (espaço da cabeça)
+  sniff?: number; // focinho farejando
 };
+const xadrezTex = () =>
+  canvasTex("chapeu-xadrez", 128, 128, (c) => {
+    c.fillStyle = "#8a6a44";
+    c.fillRect(0, 0, 128, 128);
+    c.fillStyle = "rgba(60,40,20,0.55)";
+    for (let i = 0; i < 128; i += 32) {
+      c.fillRect(i, 0, 12, 128);
+      c.fillRect(0, i, 128, 12);
+    }
+    c.fillStyle = "rgba(230,200,150,0.35)";
+    for (let i = 20; i < 128; i += 32) {
+      c.fillRect(i, 0, 3, 128);
+      c.fillRect(0, i, 128, 3);
+    }
+  });
+const cachecolTex = () =>
+  canvasTex("cachecol-arg", 64, 64, (c) => {
+    for (let i = 0; i < 4; i++) {
+      c.fillStyle = i % 2 ? "#ffffff" : "#74b9e8";
+      c.fillRect(i * 16, 0, 16, 64);
+    }
+  });
+/** lupa (cabo para baixo, lente para cima) */
+export const Lupa: React.FC<{p?: V3; r?: V3; s?: number}> = ({p = [0, 0, 0], r = [0, 0, 0], s = 1}) => (
+  <group position={p} rotation={r} scale={s}>
+    <mesh position={[0, -0.12, 0]} material={sm("#5a3a22", 0.5)}>
+      <cylinderGeometry args={[0.022, 0.026, 0.2, 10]} />
+    </mesh>
+    <mesh position={[0, 0.06, 0]} material={sm("#c9a227", 0.25, {metalness: 0.7})}>
+      <torusGeometry args={[0.1, 0.018, 10, 28]} />
+    </mesh>
+    <mesh position={[0, 0.06, 0]} material={sm("#cfefff", 0.05, {transparent: true, opacity: 0.35, metalness: 0.3})}>
+      <circleGeometry args={[0.1, 28]} />
+    </mesh>
+  </group>
+);
 const capTex = () => textTex("bone-seguranca", 256, 64, "#1f2a44", [{t: "SEGURANÇA", size: 40, color: "#ffd21f", y: 34}]);
 export const Dog: React.FC<{d: DogP; s?: number}> = ({d, s = 1}) => {
-  const {pos = [0, 0, 0], rotY = 0, legs = "down", legK = 1, glasses = false, cap = false, headset = false, controller = false, play = 0, mouth = 0, tongue = 0, blink = 0, tail = 1, lean = 0, head = [0, 0, 0], t = 0, walk = 0, run = 1, bowtie = false, pillow = 0} = d;
+  const {pos = [0, 0, 0], rotY = 0, legs = "down", legK = 1, glasses = false, cap = false, headset = false, controller = false, play = 0, mouth = 0, tongue = 0, blink = 0, tail = 1, lean = 0, head = [0, 0, 0], t = 0, walk = 0, run = 1, bowtie = false, pillow = 0, detective = false, lupa = false, scarf = false, mouthItem = null, sniff = 0} = d;
+  const coat = sm("#c9a46a", 0.75, {side: THREE.DoubleSide});
+  const sn = 1 + 0.18 * sniff * Math.abs(Math.sin(t * 28));
   const fur = sm("#e0a456", 0.6);
   const cream = sm("#fbe6c4", 0.6);
   const ear = sm("#8a5a2b", 0.6);
@@ -568,7 +611,7 @@ export const Dog: React.FC<{d: DogP; s?: number}> = ({d, s = 1}) => {
           <mesh position={[0, -0.08, 0.21]} scale={[0.16, 0.115, 0.13]} material={cream} castShadow>
             <sphereGeometry args={[1, 20, 14]} />
           </mesh>
-          <mesh position={[0, -0.03, 0.33]} scale={[0.058, 0.042, 0.04]} material={eye}>
+          <mesh position={[0, -0.03, 0.33]} scale={[0.058 * sn, 0.042 * sn, 0.04]} material={eye}>
             <sphereGeometry args={[1, 14, 10]} />
           </mesh>
           <mesh position={[0.015, -0.015, 0.36]} scale={0.012} material={shine}>
@@ -630,6 +673,28 @@ export const Dog: React.FC<{d: DogP; s?: number}> = ({d, s = 1}) => {
               </mesh>
             </group>
           )}
+          {/* chapéu de detetive (xadrez, com aba na frente e atrás e abas de orelha amarradas) */}
+          {detective && (
+            <group position={[0, 0.13, -0.01]} rotation={[-0.08, 0, 0]}>
+              <mesh scale={[1.1, 0.78, 1.1]} material={texMat("chapeu-xadrez", xadrezTex(), 0.7)} castShadow>
+                <sphereGeometry args={[0.255, 28, 14, 0, Math.PI * 2, 0, Math.PI / 2]} />
+              </mesh>
+              {[-1, 1].map((sd) => (
+                <mesh key={"aba" + sd} position={[0, 0.0, 0.25 * sd]} rotation={[0.18 * sd, sd > 0 ? 0 : Math.PI, 0]} scale={[1, 1, 0.75]} material={texMat("chapeu-xadrez", xadrezTex(), 0.7)} castShadow>
+                  <cylinderGeometry args={[0.14, 0.14, 0.02, 20, 1, false, -Math.PI / 2, Math.PI]} />
+                </mesh>
+              ))}
+              <mesh position={[0, 0.2, 0]} material={sm("#5a3a22", 0.6)}>
+                <sphereGeometry args={[0.03, 10, 8]} />
+              </mesh>
+              {[-1, 1].map((sd) => (
+                <mesh key={"lac" + sd} position={[0.035 * sd, 0.2, 0]} rotation={[0, 0, (Math.PI / 2) * sd]} material={sm("#5a3a22", 0.6)}>
+                  <coneGeometry args={[0.028, 0.06, 6]} />
+                </mesh>
+              ))}
+            </group>
+          )}
+          {mouthItem && <group position={[0, -0.15, 0.32]}>{mouthItem}</group>}
           {/* fone de gamer */}
           {headset && (
             <group>
@@ -683,6 +748,11 @@ export const Dog: React.FC<{d: DogP; s?: number}> = ({d, s = 1}) => {
           <mesh position={[0, 0.47, 0.08]} scale={[0.18, 0.15, 0.3]} material={cream}>
             <sphereGeometry args={[1, 20, 14]} />
           </mesh>
+          {detective && (
+            <mesh position={[0, 0.56, -0.02]} scale={[0.3, 0.3, 0.45]} material={coat} castShadow>
+              <sphereGeometry args={[1, 28, 16, 0, Math.PI * 2, 0, Math.PI * 0.58]} />
+            </mesh>
+          )}
           {(
             [
               [0.15, 0.32, 0, 0],
@@ -749,13 +819,40 @@ export const Dog: React.FC<{d: DogP; s?: number}> = ({d, s = 1}) => {
         <mesh position={[0, 0.22, -0.3]} rotation={[-0.9, 0, 0.5 * tail * Math.sin(t * 14)]} material={fur} castShadow>
           <capsuleGeometry args={[0.04, 0.24, 6, 10]} />
         </mesh>
-        {/* coleira */}
-        <mesh position={[0, 0.74, 0.03]} rotation={[Math.PI / 2 - 0.15, 0, 0]} material={sm("#e8412c", 0.5)}>
-          <torusGeometry args={[0.16, 0.03, 8, 24]} />
-        </mesh>
-        <mesh position={[0, 0.69, 0.2]} material={sm("#e3b33b", 0.25, {metalness: 0.6})}>
-          <sphereGeometry args={[0.035, 12, 10]} />
-        </mesh>
+        {/* sobretudo de detetive (aberto na frente) */}
+        {detective && (
+          <group>
+            <mesh position={[0, 0.44, -0.03]} rotation={[-0.15, 0, 0]} scale={[0.33, 0.4, 0.31]} material={coat} castShadow>
+              <sphereGeometry args={[1, 28, 20, Math.PI / 2 + 0.55, Math.PI * 2 - 1.1, 0.25, Math.PI * 0.72]} />
+            </mesh>
+            {[-1, 1].map((sd) => (
+              <mesh key={"lap" + sd} position={[0.12 * sd, 0.62, 0.2]} rotation={[-0.3, 0.4 * sd, 0.35 * sd]} geometry={rbox(0.09, 0.2, 0.025, 0.01)} material={coat} />
+            ))}
+            {[0.52, 0.4].map((y) => (
+              <mesh key={"bt" + y} position={[0.13, y, 0.26]} material={sm("#5a3a22", 0.5)}>
+                <sphereGeometry args={[0.018, 8, 6]} />
+              </mesh>
+            ))}
+          </group>
+        )}
+        {/* coleira (ou cachecol) */}
+        {scarf ? (
+          <group>
+            <mesh position={[0, 0.74, 0.03]} rotation={[Math.PI / 2 - 0.15, 0, 0]} material={texMat("cachecol-arg", cachecolTex(), 0.8)}>
+              <torusGeometry args={[0.17, 0.05, 10, 28]} />
+            </mesh>
+            <mesh position={[0.09, 0.56, 0.2]} rotation={[0.15, 0, 0.12]} geometry={rbox(0.09, 0.3, 0.035, 0.015)} material={texMat("cachecol-arg", cachecolTex(), 0.8)} />
+          </group>
+        ) : (
+          <>
+            <mesh position={[0, 0.74, 0.03]} rotation={[Math.PI / 2 - 0.15, 0, 0]} material={sm("#e8412c", 0.5)}>
+              <torusGeometry args={[0.16, 0.03, 8, 24]} />
+            </mesh>
+            <mesh position={[0, 0.69, 0.2]} material={sm("#e3b33b", 0.25, {metalness: 0.6})}>
+              <sphereGeometry args={[0.035, 12, 10]} />
+            </mesh>
+          </>
+        )}
         {/* patas da frente */}
         {[-1, 1].map((sd) => (
           <group key={"f" + sd} position={[0.13 * sd, 0.62, 0.13]} rotation={legRot(sd)}>
@@ -765,6 +862,7 @@ export const Dog: React.FC<{d: DogP; s?: number}> = ({d, s = 1}) => {
             <mesh position={[0, -0.47, 0.015]} scale={[1, 0.75, 1.15]} material={cream} castShadow>
               <sphereGeometry args={[0.082, 14, 10]} />
             </mesh>
+            {lupa && sd > 0 && <Lupa p={[0, -0.5, 0.1]} r={[-Math.PI / 2 + 0.2, 0, 0]} s={1.2} />}
           </group>
         ))}
         {controller && <Controller p={[0, 0.47, 0.6]} r={[-0.5, 0, 0]} s={1.05} />}

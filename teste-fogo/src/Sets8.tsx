@@ -332,12 +332,13 @@ export type CowP = {
   apron?: boolean;
   miojoHat?: boolean;
   happy?: number; // olhos de estrelinha / bochecha
+  glasses?: boolean;
   brow?: number;
   lean?: number;
   t?: number;
 };
 export const Cow: React.FC<{c: CowP; s?: number; palmRef?: React.Ref<THREE.Object3D>}> = ({c, s = 1, palmRef}) => {
-  const {pos = [0, 0, 0], rotY = 0, blink = 0, mouth = 0, headTilt = 0, headYaw = 0, arms = "down", armK = 1, walk = 0, walkAmt = 0, chef = false, apron = false, miojoHat = false, happy = 0, brow = 0, lean = 0, t = 0} = c;
+  const {pos = [0, 0, 0], rotY = 0, blink = 0, mouth = 0, headTilt = 0, headYaw = 0, arms = "down", armK = 1, walk = 0, walkAmt = 0, chef = false, apron = false, miojoHat = false, happy = 0, brow = 0, lean = 0, t = 0, glasses = false} = c;
   const white = sm("#fbfbf6", 0.55);
   const spot = sm("#26262a", 0.5);
   const pink = sm("#f6a8b8", 0.5);
@@ -452,6 +453,18 @@ export const Cow: React.FC<{c: CowP; s?: number; palmRef?: React.Ref<THREE.Objec
               )}
             </group>
           ))}
+          {glasses && (
+            <group position={[0, 0.08, 0.285]}>
+              {[-1, 1].map((sd) => (
+                <mesh key={"g" + sd} position={[0.14 * sd, 0, 0]} material={sm("#1d1f27", 0.3)}>
+                  <torusGeometry args={[0.08, 0.012, 8, 24]} />
+                </mesh>
+              ))}
+              <mesh material={sm("#1d1f27", 0.3)}>
+                <boxGeometry args={[0.12, 0.016, 0.016]} />
+              </mesh>
+            </group>
+          )}
           {/* sobrancelhas (só quando brava/desconfiada) */}
           {brow !== 0 &&
             [-1, 1].map((sd) => (

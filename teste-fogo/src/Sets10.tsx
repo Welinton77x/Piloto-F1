@@ -499,9 +499,9 @@ export const Tornado: React.FC<{p: V3; k: number; t: number; h?: number}> = ({p,
 };
 
 /* ===================== pombos de casamento (lisinhos, no estilo dos bonecos) ===================== */
-export type WPigeonP = {pos?: V3; rotY?: number; flap?: number; t?: number; hat?: boolean; veil?: boolean; rings?: boolean; blink?: number; bob?: number; peck?: number; chest?: number};
+export type WPigeonP = {pos?: V3; rotY?: number; flap?: number; t?: number; hat?: boolean; veil?: boolean; rings?: boolean; blink?: number; bob?: number; peck?: number; chest?: number; glasses?: boolean};
 export const WeddingPigeon: React.FC<{p: WPigeonP; s?: number}> = ({p, s = 1}) => {
-  const {pos = [0, 0, 0], rotY = 0, flap = 0, t = 0, hat = false, veil = false, rings = false, blink = 0, bob = 0, peck = 0, chest = 0} = p;
+  const {pos = [0, 0, 0], rotY = 0, flap = 0, t = 0, hat = false, veil = false, rings = false, blink = 0, bob = 0, peck = 0, chest = 0, glasses = false} = p;
   const body = sm("#9aa3b2", 0.55);
   const dark = sm("#6f7786", 0.55);
   const neck = sm("#7a6bb0", 0.35, {emissive: "#2a1f55", emissiveIntensity: 0.25});
@@ -587,6 +587,18 @@ export const WeddingPigeon: React.FC<{p: WPigeonP; s?: number}> = ({p, s = 1}) =
               <sphereGeometry args={[1, 8, 6]} />
             </mesh>
           ))}
+          {glasses && (
+            <group position={[0, 0.02, 0.08]}>
+              {[-1, 1].map((sd) => (
+                <mesh key={"g" + sd} position={[0.045 * sd, 0, 0]} rotation={[0, 0.3 * sd, 0]} material={sm("#1d1f27", 0.3)}>
+                  <torusGeometry args={[0.03, 0.005, 6, 18]} />
+                </mesh>
+              ))}
+              <mesh position={[0, 0, 0.008]} material={sm("#1d1f27", 0.3)}>
+                <boxGeometry args={[0.035, 0.006, 0.006]} />
+              </mesh>
+            </group>
+          )}
           {hat && (
             <group position={[0, 0.075, -0.01]} rotation={[-0.15, 0, 0.15]}>
               <mesh material={sm("#15161d", 0.4)} castShadow>
