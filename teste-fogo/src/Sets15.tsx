@@ -192,7 +192,7 @@ const calTex = () =>
     c.fillText("SEGUNDA", 128, 56);
     c.fillStyle = "#101018";
     c.font = "bold 170px sans-serif";
-    c.fillText("13", 128, 260);
+    c.fillText("22", 128, 260);
   });
 export const Calendar: React.FC<{p: V3; r?: V3; s?: number}> = ({p, r = [0, 0, 0], s = 1}) => (
   <group position={p} rotation={r} scale={s}>
