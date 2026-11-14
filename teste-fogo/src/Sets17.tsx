@@ -66,23 +66,22 @@ export const Tamandua: React.FC<{p: V3; rotY?: number; s?: number; c?: TamP}> = 
   tipLocal.applyEuler(new THREE.Euler(pitch, headYaw, 0, "YXZ"));
   const tip: V3 = [neck[0] + tipLocal.x, neck[1] + tipLocal.y, neck[2] + tipLocal.z];
   return (
-    <group position={p} rotation={[0, rotY, lie * 1.35]} scale={s}>
+    <group position={p} rotation={[0, rotY, 0]} scale={s}>
+      <group rotation={[0, 0, lie * 1.35]}>
       <group position={[0, bob - lie * 0.22, 0]}>
         {/* corpo */}
         <mesh position={[0, 0.78, 0]} scale={[0.34 * bS, 0.36 * bS, 0.72]} material={fur} castShadow receiveShadow>
           <sphereGeometry args={[1, 28, 20]} />
         </mesh>
-        {/* faixa preta com borda branca, do peito pras costas */}
-        {[-1, 1].map((sd) => (
-          <group key={sd} position={[0.27 * sd * bS, 0.85, 0.25]} rotation={[0.75, 0.3 * sd, 0]}>
-            <mesh scale={[0.1, 0.12, 0.5]} material={white}>
-              <sphereGeometry args={[1, 14, 10]} />
-            </mesh>
-            <mesh position={[0.02 * sd, 0, 0]} scale={[0.1, 0.07, 0.48]} material={black}>
-              <sphereGeometry args={[1, 14, 10]} />
-            </mesh>
-          </group>
-        ))}
+        {/* faixa preta com borda branca, em diagonal no ombro */}
+        <group position={[0, 0.8, 0.3]} rotation={[-0.75, 0, 0]} scale={[bS, bS * 1.05, 1]}>
+          <mesh position={[0, 0, -0.035]} material={white}>
+            <torusGeometry args={[0.315, 0.04, 8, 32]} />
+          </mesh>
+          <mesh material={black}>
+            <torusGeometry args={[0.32, 0.045, 8, 32]} />
+          </mesh>
+        </group>
         {/* rabo peludo enorme (leque) */}
         <mesh position={[0, 0.82, -0.95]} rotation={[-0.35 + 0.05 * Math.sin(t * 3), 0, 0]} scale={[0.09, 0.42, 0.62]} material={fur} castShadow>
           <sphereGeometry args={[1, 18, 14]} />
@@ -116,7 +115,7 @@ export const Tamandua: React.FC<{p: V3; rotY?: number; s?: number; c?: TamP}> = 
             <sphereGeometry args={[1, 18, 14]} />
           </mesh>
           <mesh position={[0, -0.05, 0.5]} rotation={[Math.PI / 2 - 0.1, 0, 0]} material={furL} castShadow>
-            <cylinderGeometry args={[0.16, 0.05, 0.85, 16]} />
+            <cylinderGeometry args={[0.05, 0.16, 0.85, 16]} />
           </mesh>
           <mesh position={[0, -0.1, 0.92]} scale={[0.055 * sniffW, 0.045 * sniffW, 0.04]} material={black}>
             <sphereGeometry args={[1, 10, 8]} />
@@ -147,9 +146,10 @@ export const Tamandua: React.FC<{p: V3; rotY?: number; s?: number; c?: TamP}> = 
           </mesh>
         )}
       </group>
+      </group>
       {/* risquinhos de Wi-Fi */}
       {wifi > 0.01 && (
-        <group position={[0, 1.55, 0]} scale={wifi * (1 + 0.05 * Math.sin(t * 6))}>
+        <group position={[0, 1.55 - lie * 0.75, 0]} scale={wifi * (1 + 0.05 * Math.sin(t * 6))}>
           {[0.12, 0.25, 0.38].map((r, i) => (
             <mesh key={r} position={[0, -0.12, 0]} rotation={[0, 0, Math.PI / 4]}>
               <torusGeometry args={[r, 0.035, 8, 24, Math.PI / 2]} />

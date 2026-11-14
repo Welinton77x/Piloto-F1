@@ -37,7 +37,7 @@ const NOIVA: ToyLook = {dress: true, veil: true, hairStyle: "long", hair: "#5a3a
 const GOLEIRO: ToyLook = {shirt: "#ff8a1f", pants: "#101018", hairStyle: "spiky", hair: "#101018"};
 const PILOTO: ToyLook = {shirt: "#ffffff", pants: "#1f2a44", hairStyle: "buzz", hair: "#3a2a1a"};
 const JUIZ: ToyLook = {shirt: "#101018", pants: "#101018", hairStyle: "bald", shoe: "#101018"};
-const TECNICO: ToyLook = {polo: true, shirt: "#2e86de", pants: "#3a3f4a", hairStyle: "straight", hair: "#101018"};
+const TECNICO: ToyLook = {polo: true, shirt: "#2e86de", pants: "#3a3f4a", hairStyle: "buzz", hair: "#101018"};
 const ASTRO: ToyLook = {shirt: "#f4f4f2", pants: "#f4f4f2", shoe: "#f4f4f2", sole: "#c9ced6"};
 const MUMIA: ToyLook = {skin: "#e9e2cf", shirt: "#efe8d4", pants: "#efe8d4", plaid: "#cfc6ae", hairStyle: "bald", shoe: "#e9e2cf", sole: "#cfc6ae"};
 const CROWD_LOOKS: ToyLook[] = [
@@ -191,7 +191,7 @@ const ITEMS: Item[] = [
   it(1, "meias", 0, [0.9, 0.05, 0.9], "sock"),
   it(1, "dever", 0, [-0.8, 0.03, 1.0], "dever"),
   it(1, "videogame", 0, [1.3, 0.06, 0.1], "game"),
-  it(1, "vo", 0, [-1.6, 0, 0.2], "vo"),
+  it(1, "vo", 0, [-0.95, 0, 0.85], "vo"),
   it(1, "peixinho", 0, [1.7, 0.75, -0.9], "fish"),
   it(1, "wifi", 0, [-1.5, 0.95, -1.4], "wifi"),
 ];
@@ -268,7 +268,7 @@ const ENTAO0 = at(0, "entao");
 const TAMANDUA0 = at(0, "tamandua");
 const S0: React.FC<ShotProps> = ({f, a, t}) => (
   <>
-    <Cam pos={[0, 1.75, 4.6]} look={[0, 1.0, -0.4]} fov={52} f={f} a={a} />
+    <Cam pos={[0, 1.9, 5.8]} look={[0, 1.05, -0.4]} fov={54} f={f} a={a} />
     <RoomLights />
     <Room />
     <Mess n={90} w={5} d={4} />
@@ -294,7 +294,7 @@ const S1: React.FC<ShotProps> = ({f, a, t}) => {
   const nGone = ITEMS.filter((x) => suckK(f, x.w) > 0.3).length;
   return (
     <>
-      <Cam pos={[0, 2.3, 4.3]} look={[0, 0.7, -0.2]} fov={56} f={f} a={a} />
+      <Cam pos={[0, 2.5, 5.2]} look={[0, 0.7, -0.2]} fov={58} f={f} a={a} />
       <RoomLights />
       <Room />
       <Mess n={90} w={5} d={4} hide={clamp(nGone / ITEMS.length)} />
@@ -347,7 +347,7 @@ const S3: React.FC<ShotProps> = ({f, a, t}) => {
       <RoomLights />
       <Room rug={rug} door={door} roof={roof} />
       <Tamandua p={TAM3} rotY={yaw} c={{t, belly: 1, sniff: 0.4, blink: blinkCurve(f + 9), tongue}} />
-      {f < VIZINHO3 + 30 && (
+      {f >= VIZINHO3 - 10 && f < VIZINHO3 + 30 && (
         <group position={vizP} scale={1 - 0.8 * vz} rotation={[0.6 * vz, 0, 0.3 * vz]}>
           <Toy pose={{...idle(f), pos: [0, -0.6, 0], rotY: 0, eyeWide: 1, mouthOpen: 0.7, ...ARMS_UP}} look={VIZ} headExtra={<ShowerCap />} />
           <Duck p={[0.4, 0.7, 0.3]} s={0.35} t={t} />
@@ -361,10 +361,10 @@ const SENHA = at(4, "senha");
 const PODCAST = at(4, "podcast");
 const S4: React.FC<ShotProps> = ({f, a, t}) => (
   <>
-    <Cam pos={[0.2, 1.5, 3.2]} look={[0, 1.0, -0.2]} fov={50} f={f} a={a} />
+    <Cam pos={[0, 1.7, 4.3]} look={[0, 1.0, -0.4]} fov={52} f={f} a={a} />
     <RoomLights />
     <Room roof={0} door={0} rug={0} />
-    <Tamandua p={[0, 0, -0.4]} rotY={0.35} c={{t, belly: 1, blink: blinkCurve(f + 9), wifi: backOut(ramp(f, a + 4, a + 14))}} />
+    <Tamandua p={[0.35, 0, -0.5]} rotY={-0.9} c={{t, belly: 1, blink: blinkCurve(f + 9), wifi: backOut(ramp(f, a + 4, a + 14))}} />
   </>
 );
 /* a família grudada no tamanduá */
@@ -372,14 +372,14 @@ const S5: React.FC<ShotProps> = ({f, a, t}) => {
   const palmD = useRef<THREE.Object3D>(null);
   return (
     <>
-      <Cam pos={[0, 1.7, 4.0]} look={[0, 0.7, -0.3]} fov={52} f={f} a={a} />
+      <Cam pos={[0, 3.2, 5.0]} look={[0, 0.55, -0.6]} fov={56} f={f} a={a} />
       <RoomLights />
       <Room roof={0} door={0} rug={0} wall="#ffe3b8" />
-      <Tamandua p={[0, 0, -1.0]} rotY={Math.PI / 2} c={{t, belly: 1, lie: 1, blink: blinkCurve(f + 9), wifi: 1}} />
-      <PhoneToy pose={{...idle(f), ...SIT, ...PHONE_LOOK, pos: [-1.05, -0.35, -0.2], rotY: 0.2, smile: 0.5}} look={DAD} headExtra={<DadHead />} />
-      <PhoneToy pose={{...idle(f + 13), ...SIT, ...PHONE_UP, pos: [0.05, -0.35, -0.05], rotY: 0, mouthOpen: 0.5 + 0.3 * Math.sin(t * 9), smile: 1}} look={TIO} headExtra={<Cap color="#2e86de" />} />
-      <Dog d={{pos: [1.05, 0, -0.1], rotY: -0.25, legs: "hold", legK: 1, t, blink: blinkCurve(f + 31), tail: 1, tongue: 0.6, mouth: 0.3}} />
-      <group position={[1.03, 0.62, 0.42]} rotation={[-0.4, -0.25, 0]}>
+      <Tamandua p={[0, 0, 0.75]} rotY={Math.PI / 2} c={{t, belly: 1, lie: 1, blink: blinkCurve(f + 9), wifi: 1}} />
+      <PhoneToy pose={{...idle(f), ...SIT, ...PHONE_LOOK, pos: [-1.05, -0.35, -0.45], rotY: 0.2, smile: 0.5}} look={DAD} headExtra={<DadHead />} />
+      <PhoneToy pose={{...idle(f + 13), ...SIT, ...PHONE_UP, pos: [0.05, -0.35, -0.35], rotY: 0, mouthOpen: 0.5 + 0.3 * Math.sin(t * 9), smile: 1}} look={TIO} headExtra={<Cap color="#e8414f" />} />
+      <Dog d={{pos: [1.05, 0, -0.35], rotY: -0.25, legs: "hold", legK: 1, t, blink: blinkCurve(f + 31), tail: 1, tongue: 0.6, mouth: 0.3}} />
+      <group position={[1.03, 0.62, 0.17]} rotation={[-0.4, -0.25, 0]}>
         <PhoneProp />
       </group>
     </>
@@ -393,12 +393,12 @@ const S6: React.FC<ShotProps> = ({f, a, t}) => {
   const gone = f > PULA + 22;
   return (
     <>
-      <Cam pos={[0, 1.7, 4.2]} look={[0, 1.1, -1.0]} fov={54} f={f} a={a} />
+      <Cam pos={[0, 2.0, 5.8]} look={[0, 1.2, -1.0]} fov={58} f={f} a={a} />
       <RoomLights />
       <Room roof={0} door={0} rug={0} wall="#ffe3b8" />
       {!gone && <Tamandua p={[0, lerp(0, 1.35, Math.sin(j * Math.PI * 0.6)) + 1.0 * j, lerp(-0.6, RZ0 - 1.2, j)]} rotY={Math.PI} s={lerp(1, 0.7, j)} c={{t, belly: 1, walk: f < PULA ? 1 : 0.3, run: 1.6, sniff: 1, headDown: 0.3, wifi: 1}} />}
       <PhoneToy pose={{...idle(f), ...PHONE_UP, pos: [-1.1, 0, 0.6], rotY: 0.2, brow: 0.8, mouthOpen: 0.4}} look={DAD} headExtra={<DadHead />} lit={!gone} />
-      <PhoneToy pose={{...idle(f + 13), ...PHONE_UP, pos: [0.1, 0, 0.9], rotY: 0, brow: 0.8, mouthOpen: 0.5}} look={TIO} headExtra={<Cap color="#2e86de" />} lit={!gone} />
+      <PhoneToy pose={{...idle(f + 13), ...PHONE_UP, pos: [0.1, 0, 0.9], rotY: 0, brow: 0.8, mouthOpen: 0.5}} look={TIO} headExtra={<Cap color="#e8414f" />} lit={!gone} />
       <Dog d={{pos: [1.1, 0, 0.7], rotY: -0.3, t, blink: blinkCurve(f + 31), tail: 0.2, head: [0.2, 0.3, 0]}} />
     </>
   );
@@ -434,9 +434,10 @@ const S7: React.FC<ShotProps> = ({f, a, t}) => {
   const show = {noiva: f >= NOIVA7 - 2, goleiro: f >= GOLEIRO7 - 2, piloto: f >= PILOTO7 - 2, aviao: f >= AVIAO7 - 2, caminhao: f >= CAMINHAO7 - 2};
   const focus = f >= CAMINHAO7 - 2 ? -13 : f >= AVIAO7 - 2 ? -8.5 : 0;
   const camX = x + 5.5 + focus * 0.55;
+  const high = f >= AVIAO7 - 2;
   return (
     <>
-      <Cam pos={[camX, f >= AVIAO7 - 2 ? 4.2 : 2.4, 2.2]} look={[x + focus * 0.55 - 1.0, 1.0, 0]} fov={58} f={f} a={a} punch={4} />
+      <Cam pos={high ? [x + focus + 4, 6.5, 8] : [camX, 2.4, 2.2]} look={high ? [x + focus, 1.0, 0] : [x + focus * 0.55 - 1.0, 1.0, 0]} fov={58} f={f} a={a} punch={4} />
       <Sky />
       <hemisphereLight args={["#d6ecff", "#a08a5e", 1.1]} />
       <SunLight target={[x, 1, 0]} dir={[-6, 10, 7]} intensity={2.6} ext={14} />
@@ -503,7 +504,7 @@ const S10: React.FC<ShotProps> = ({f, a, t}) => {
   const ballP: V3 = [lerp(TAMM[0] + 2.5, TAMM[0] + tip[0], ballK), 0.15, lerp(TAMM[2] + 1.6, TAMM[2] + tip[2], ballK)];
   return (
     <>
-      <Cam pos={[0.6, 2.4, 6.5]} look={[0.2, 0.7, 0.6]} fov={50} f={f} a={a} />
+      <Cam pos={[-0.3, 2.4, 6.5]} look={[-0.5, 0.7, 0.6]} fov={52} f={f} a={a} />
       <StadiumLights />
       <Stadium />
       <AntHill p={[0, 0, 0]} s={1.4} />
@@ -685,7 +686,7 @@ const S13: React.FC<ShotProps> = ({f, a, t}) => {
   const on = f < DESLIGA + 2 ? 1 : f < LIGA + 2 ? 0 : 1;
   return (
     <>
-      <Cam pos={[0, 1.9, 4.2]} look={[0, 1.2, 0]} fov={50} f={f} a={a} />
+      <Cam pos={[-0.15, 1.9, 4.8]} look={[-0.15, 1.2, 0]} fov={52} f={f} a={a} />
       <ShopLights on={on} />
       <TechShop />
       <Tamandua p={[0.45, 1.0, 0.2]} rotY={-0.5} s={0.62} c={{t, belly: 1, sleep: on ? 0 : 1, blink: blinkCurve(f + 9), wifi: on ? 1 : 0}} />
@@ -737,10 +738,10 @@ const S15b: React.FC<ShotProps> = ({f, a, t}) => {
       <hemisphereLight args={["#dfe6ff", "#202030", 0.7]} />
       <directionalLight position={[6, 10, 6]} intensity={2.0} castShadow />
       <MoonSet t={t} />
-      <Toy pose={{...idle(f), pos: [0, 0, 0.6], rotY: 0, rShoulder: [-1.25, 0.6, 0.1], rElbow: -0.9, brow: 0.8, mouthOpen: 0.4}} look={ASTRO} palmRef={palm} headExtra={<EvaHelmet open />} />
+      <Toy pose={{...idle(f), pos: [0, 0, 0.6], rotY: 0, rShoulder: [-1.1, 0.4, 0.1], rElbow: -1.2, brow: 0.8, mouthOpen: 0.4}} look={ASTRO} palmRef={palm} headExtra={<EvaHelmet open />} />
       <EvaGear pos={[0, 0, 0.6]} rotY={0} t={t} />
       <InHand palm={palm}>
-        <BigPhone p={[0, -0.02, 0.1]} r={[0.1, 0, 0]} s={0.38} screen={grupoTex(14)} key2="grupo-14" />
+        <BigPhone p={[0, 0.02, 0.12]} r={[0.3, 0, 0]} s={0.55} screen={grupoTex(14)} key2="grupo-14" />
       </InHand>
     </>
   );
@@ -749,14 +750,14 @@ const S15c: React.FC<ShotProps> = ({f, a, t}) => {
   const k = (f - a) / FPS;
   return (
     <>
-      <Cam pos={[0, 3.6, 8]} look={[0, 0.6, -4]} fov={54} f={f} a={a} />
+      <Cam pos={f >= CAPIVARA15 - 2 ? [1.5, 2.2, -4] : [0, 3.6, 8]} look={f >= CAPIVARA15 - 2 ? [0, 0.5, -10] : [0, 0.6, -4]} fov={54} f={f} a={f >= CAPIVARA15 - 2 ? CAPIVARA15 - 2 : a} />
       <hemisphereLight args={["#ffffff", "#5a8a3a", 1.0]} />
       <directionalLight position={[4, 8, 6]} intensity={2.2} castShadow shadow-mapSize={[1024, 1024]} shadow-camera-left={-6} shadow-camera-right={6} shadow-camera-top={8} shadow-camera-bottom={-8} />
       <Pantanal />
       {Array.from({length: 7}, (_, i) => (
         <Tamandua key={i} p={[(i % 2 ? 0.35 : -0.35), 0, -14 + i * 2.1 + k * 1.2]} rotY={0} s={0.8} c={{t: t + i * 0.3, walk: 1, sniff: 1, headDown: 0.3}} />
       ))}
-      {f >= CAPIVARA15 - 2 && <Capivara p={[0, 0, -14 + 7 * 2.1 + k * 1.2 - 0.5 + 2.4]} s={1.0} t={t} walk={1} blink={blinkCurve(f)} />}
+      {f >= CAPIVARA15 - 2 && <Capivara p={[0, 0, -14 - 2.1 + k * 1.2]} s={1.0} t={t} walk={1} blink={blinkCurve(f)} />}
     </>
   );
 };
@@ -777,7 +778,7 @@ const S16: React.FC<ShotProps> = ({f, a, t}) => {
   const close = f >= ESPIRRA - 26;
   return (
     <>
-      <Cam pos={close ? [0.2, 1.3, 2.4] : [0, 3.2, 7]} look={close ? [0, 1.0, 0] : [0, 0.8, -2.5]} fov={close ? 46 : 56} f={f} a={close ? ESPIRRA - 26 : a} />
+      <Cam pos={close ? [2.8, 1.5, 2.6] : [0, 3.2, 7]} look={close ? [0.35, 0.95, 0.1] : [0, 0.8, -2.5]} fov={close ? 46 : 56} f={f} a={close ? ESPIRRA - 26 : a} />
       <Sky />
       <hemisphereLight args={["#d6ecff", "#a08a5e", 1.1]} />
       <SunLight target={[0, 1, 0]} dir={[-6, 10, 7]} intensity={2.6} ext={10} />
@@ -840,8 +841,8 @@ const SParis: React.FC<ShotProps> = ({f, a, t}) => {
         <planeGeometry args={[80, 80]} />
       </mesh>
       <EiffelTower p={[0, 0, 0]} />
-      <Sock p={[0.35, lerp(9, 4.0, k), 0.3]} r={[0, 0, 0.2]} s={2.4} color="#ffffff" />
-      <Sock p={[-0.35, lerp(10, 3.6, k), 0.4]} r={[0, 0.5, -0.2]} s={2.4} color="#ffd21f" />
+      <Sock p={[0.45, lerp(9, 3.9, k), 0.6]} r={[0, 0, 0.2]} s={5} color="#ffffff" />
+      <Sock p={[-0.45, lerp(10, 3.5, k), 0.7]} r={[0, 0.5, -0.2]} s={5} color="#ffd21f" />
     </>
   );
 };
@@ -898,13 +899,13 @@ const SCama: React.FC<ShotProps> = ({f, a, t}) => {
   const k = easeOut(ramp(f, a, a + 14));
   return (
     <>
-      <Cam pos={[-0.6, 1.9, 2.6]} look={[-1.8, 0.7, -1.4]} fov={52} f={f} a={a} />
+      <Cam pos={[-0.9, 2.2, 2.9]} look={[-1.5, 0.7, -1.3]} fov={54} f={f} a={a} />
       <RoomLights />
       <Room roof={0} door={0} rug={0} />
-      <group position={[-2.0, lerp(4, 0.55, k), -1.55]} rotation={[-Math.PI / 2 * k, 0, 0]}>
+      <group position={[-2.0, lerp(4, 0.72, k), -0.7]} rotation={[-Math.PI / 2 * k, 0, 0]}>
         <Toy pose={{...idle(f), pos: [0, 0, 0], rotY: 0, eyeWide: 0.5, smile: 0.5, rShoulder: [-1.4, 0, -0.3], rElbow: -1.5}} look={VIZ} headExtra={<ShowerCap />} />
       </group>
-      <Toy pose={{...idle(f), pos: [-0.5, 0, -0.3], rotY: -0.7, eyeWide: 1, mouthOpen: 0.6, brow: 1}} look={BOYL} />
+      <Toy pose={{...idle(f), pos: [-0.8, 0, -0.5], rotY: -0.6, eyeWide: 1, mouthOpen: 0.6, brow: 1}} look={BOYL} />
     </>
   );
 };
@@ -952,14 +953,18 @@ const S22: React.FC<ShotProps> = ({f, a, t}) => {
   const back = easeInOut(ramp(f, a + 62, a + 80));
   const reach = k * (1 - back);
   const rp: V3 = [0.3, 1.25, -2.0];
-  const tipW: V3 = [0, 1.6, RZ0 - 0.6];
+  const TP: V3 = [0, 0.75, RZ0 - 1.55];
+  const tl = tamTip(0, 0);
+  const tipW: V3 = [TP[0] + tl[0], TP[1] + tl[1], TP[2] + tl[2]];
   const end: V3 = [lerp(tipW[0], rp[0], reach), lerp(tipW[1], rp[1], reach), lerp(tipW[2], rp[2], reach)];
   return (
     <>
       <Cam pos={[0.2, 1.7, 1.8]} look={[0, 1.4, RZ0]} fov={52} f={f} a={a} />
-      <hemisphereLight args={["#6a7ab8", "#201a30", 0.5]} />
-      <pointLight position={[0.5, 1.6, 0]} intensity={2} distance={4} decay={1.6} color="#ffd9a0" />
+      <hemisphereLight args={["#6a7ab8", "#201a30", 0.8]} />
+      <pointLight position={[0.5, 1.8, -1.0]} intensity={4} distance={4} decay={1.6} color="#ffd9a0" />
       <Room night roof={1} door={1} />
+      <Tamandua p={TP} rotY={0} c={{t, sniff: 1, blink: blinkCurve(f + 9)}} />
+      <pointLight position={[0, 1.6, RZ0 - 0.4]} intensity={2.5} distance={2.5} decay={1.5} color="#c8d4ff" />
       <mesh position={[0.3, 1.0, -2.25]} geometry={rbox(0.7, 0.06, 0.45, 0.02)} material={sm("#8a5a2b", 0.6)} />
       {reach < 0.98 || back < 0.02 ? (
         <group position={back > 0 ? [lerp(rp[0], tipW[0], back), lerp(rp[1], tipW[1], back), lerp(rp[2], tipW[2], back)] : rp}>
@@ -1247,8 +1252,8 @@ export const VideoTamandua: React.FC = () => {
       })}
 
       {/* 1 */}
-      <Ono from={4} to={ECO - 2} text="?" x={540} y={560} size={230} color="#ffd21f" rot={8} />
-      <Ono from={ECO + 2} to={ENTAO0 - 2} text="OI… oi… oi…" x={540} y={460} size={110} color="#ffffff" rot={-4} />
+      <Ono from={4} to={ECO - 2} text="?" x={540} y={470} size={200} color="#ffd21f" rot={8} />
+      <Ono from={ECO + 2} to={ENTAO0 - 2} text="OI… oi… oi…" x={540} y={300} size={110} color="#ffffff" rot={-4} />
       <Tag from={at(0, "bagunca") - 2} to={ECO - 2} text="BAGUNÇA" x={540} y={420} />
       <Tag from={TAMANDUA0 - 2} to={L(1) - 2} text="TAMANDUÁ" x={540} y={420} />
       {ITEMS.map((item, i) => (
@@ -1261,7 +1266,7 @@ export const VideoTamandua: React.FC = () => {
       ))}
       <Tag from={VIZINHO3 + 4} to={L(4) - 2} text="VIZINHO" x={540} y={620} />
       <Tag from={SENHA - 2} to={at(4, "e", 0) - 2} text="SENHA: TAMANDUÁ" x={540} y={420} />
-      <Bubble from={at(4, "e", 0)} to={PODCAST - 2} text="TÁ ESCURO, MAS O SINAL TÁ ÓTIMO" x={540} y={560} size={38} audio />
+      <Bubble from={at(4, "e", 0)} to={PODCAST - 2} text="TÁ ESCURO, MAS O SINAL TÁ ÓTIMO" x={540} y={330} size={42} audio />
       <Live from={PODCAST - 2} to={L(5) - 2} />
       <Tag from={at(5, "sinal") - 2} to={L(6) - 2} text="SINAL CHEIO" x={540} y={420} />
       <Tag from={PULA + 16} to={L(7) - 2} text="SEM SINAL" x={540} y={420} />
@@ -1278,7 +1283,7 @@ export const VideoTamandua: React.FC = () => {
       <Bubble from={GOL10 - 2} to={COMEMORA - 3} text="GOL DO TAMANDUÁ!" x={540} y={560} size={56} />
       <Ono from={COMEMORA} to={L(11) - 2} text="UHUUUU!" x={540} y={420} size={140} color="#ffd21f" />
       {/* 4 */}
-      <Ono from={FIGURINHAS} to={BRASIL11 - 4} text="PLIM PLIM PLIM!" x={540} y={330} size={90} color="#2ecc71" />
+      <Ono from={FIGURINHAS} to={BRASIL11 - 4} text="PLIM PLIM PLIM!" x={540} y={1120} size={90} color="#2ecc71" />
       <Tag from={SEMAFOROS - 2} to={E11 - 3} text="SEMÁFOROS" x={540} y={420} />
       <Tag from={SHOPPING - 2} to={L(12) - 2} text="SHOPPING" x={540} y={420} />
       {/* 5 */}
