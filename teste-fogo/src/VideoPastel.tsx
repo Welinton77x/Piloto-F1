@@ -369,49 +369,48 @@ const PB = L(12);
 const OLEO = at(12, "gasolina");
 const GELO = at(12, "gelo");
 const POEIRA = at(12, "poeira");
-/** partículas saindo do pastel (no espaço da cabeça) */
-const PastelFX: React.FC<{f: number; t: number}> = ({f, t}) => {
-  const on = (w: number) => clamp((f - w + 2) / 8);
-  const oil = on(OLEO), ice = on(GELO), dust = on(POEIRA);
+/** sai da boca, um de cada vez: óleo (gasolina) → gelo (girafa) → poeira (Lua) — no espaço da cabeça */
+const FX_END = L(13);
+const Spray: React.FC<{f: number; t: number; from: number; to: number; n: number; life: number; render: (q: number, i: number, amp: number) => React.ReactNode}> = ({f, from, to, n, life, render}) => {
+  if (f < from || f > to + life * FPS) return null;
+  const el = (f - from) / FPS;
+  const amp = clamp((f - from) / 5);
   return (
-    <group position={[0.0, -0.26, 0.38]}>
-      {/* óleo do carro pingando */}
-      {oil > 0 &&
-        Array.from({length: 7}, (_, i) => {
-          const q = (t * 1.3 + i / 7) % 1;
-          return (
-            <mesh key={"o" + i} position={[-0.12 + 0.04 * i, -0.08 - q * 0.6, 0.05]} scale={[0.022, 0.032 + 0.012 * q, 0.022].map((v) => v * oil) as V3}>
-              <sphereGeometry args={[1, 10, 8]} />
-              <meshStandardMaterial color="#2a1a08" roughness={0.1} metalness={0.5} emissive="#3a2408" emissiveIntensity={0.3} />
-            </mesh>
-          );
-        })}
-      {/* gelo saindo (cristais e fumacinha fria) */}
-      {ice > 0 &&
-        Array.from({length: 8}, (_, i) => {
-          const q = (t * 0.9 + i / 8) % 1;
-          const a = (i / 8) * Math.PI * 2;
-          return (
-            <mesh key={"g" + i} position={[(i % 2 ? 1 : -1) * (0.22 + 0.5 * q), -0.05 + Math.sin(a) * 0.08 + 0.12 * q, 0.15]} rotation={[t * 2 + i, t * 3, 0]} scale={(0.04 + 0.03 * q) * ice}>
-              <octahedronGeometry args={[1, 0]} />
-              <meshStandardMaterial color="#cfefff" emissive="#9fd8ff" emissiveIntensity={0.6} transparent opacity={0.9 * (1 - q * 0.6)} />
-            </mesh>
-          );
-        })}
-      {/* poeira de Lua */}
-      {dust > 0 &&
-        Array.from({length: 9}, (_, i) => {
-          const q = (t * 0.7 + i / 9) % 1;
-          return (
-            <mesh key={"p" + i} position={[(i % 2 ? 1 : -1) * (0.25 + 0.5 * q), -0.15 - 0.1 * Math.sin(i) + 0.05 * q, 0.1]} scale={(0.05 + 0.1 * q) * dust}>
-              <sphereGeometry args={[1, 10, 8]} />
-              <meshStandardMaterial color="#b9b4a4" roughness={1} transparent opacity={0.75 * (1 - q)} />
-            </mesh>
-          );
-        })}
-    </group>
+    <>
+      {Array.from({length: n}, (_, i) => {
+        const age = ((el / life + i / n) % 1) * life;
+        const born = f / FPS - age; // instante em que a partícula saiu da boca
+        if (age > el || born > to / FPS) return null;
+        return <React.Fragment key={i}>{render(age / life, i, amp)}</React.Fragment>;
+      })}
+    </>
   );
 };
+const PastelFX: React.FC<{f: number; t: number}> = ({f, t}) => (
+  <group position={[0.0, -0.21, 0.36]}>
+    {/* 1) óleo do carro jorrando da boca e caindo */}
+    <Spray f={f} t={t} from={OLEO - 2} to={GELO - 3} n={14} life={0.7} render={(q, i, amp) => (
+      <mesh position={[Math.sin(i * 2.1) * 0.35 * q, 0.08 * q - 0.9 * q * q, 0.04 + 0.55 * q]} scale={[0.03 * amp, (0.04 + 0.03 * q) * amp, 0.03 * amp]}>
+        <sphereGeometry args={[1, 10, 8]} />
+        <meshStandardMaterial color="#2a1a08" roughness={0.1} metalness={0.5} emissive="#3a2408" emissiveIntensity={0.3} />
+      </mesh>
+    )} />
+    {/* 2) gelo saindo da boca (cristais + fumacinha fria) */}
+    <Spray f={f} t={t} from={GELO - 2} to={POEIRA - 3} n={14} life={0.8} render={(q, i, amp) => (
+      <mesh position={[Math.sin(i * 2.4) * 0.45 * q, Math.cos(i * 1.7) * 0.25 * q, 0.04 + 0.6 * q]} rotation={[t * 3 + i, t * 2 + i, 0]} scale={(0.035 + 0.02 * q) * amp}>
+        {i % 3 === 0 ? <sphereGeometry args={[1.4, 8, 6]} /> : <octahedronGeometry args={[1, 0]} />}
+        <meshStandardMaterial color={i % 3 === 0 ? "#ffffff" : "#cfefff"} emissive="#9fd8ff" emissiveIntensity={0.6} transparent opacity={(i % 3 === 0 ? 0.5 : 0.95) * (1 - q * 0.7)} />
+      </mesh>
+    )} />
+    {/* 3) poeira de Lua saindo da boca */}
+    <Spray f={f} t={t} from={POEIRA - 2} to={FX_END - 4} n={12} life={0.9} render={(q, i, amp) => (
+      <mesh position={[(i % 2 ? 1 : -1) * (0.08 + 0.45 * q) * (0.6 + 0.4 * Math.abs(Math.sin(i * 2.7))), -0.08 * q + Math.cos(i * 1.3) * 0.1 * q, 0.06 + 0.55 * q]} scale={(0.025 + 0.085 * q) * amp}>
+        <sphereGeometry args={[1, 10, 8]} />
+        <meshStandardMaterial color="#b9b4a4" roughness={1} transparent opacity={0.85 * (1 - q)} />
+      </mesh>
+    )} />
+  </group>
+);
 const S15: React.FC<ShotProps> = ({f, a, t}) => (
   <>
     <Cam pos={[0.0, 1.7, 4.6]} look={[0, 1.4, 0.6]} fov={50} f={f} a={a} />
