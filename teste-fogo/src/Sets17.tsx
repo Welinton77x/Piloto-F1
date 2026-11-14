@@ -678,32 +678,129 @@ export const OpenSea: React.FC<{t: number}> = ({t}) => (
     </mesh>
   </>
 );
-export const Pantanal: React.FC = () => (
-  <>
-    <color attach="background" args={["#9fd8ff"]} />
-    <mesh rotation={[-Math.PI / 2, 0, 0]} material={sm("#8ccf5a", 0.95)} receiveShadow>
-      <planeGeometry args={[80, 80]} />
+/* tuiuiú (normal): corpo branco, pescoço preto, colar vermelho */
+export const Tuiuiu: React.FC<{p: V3; rotY?: number; s?: number; t?: number; fly?: boolean}> = ({p, rotY = 0, s = 1, t = 0, fly = false}) => {
+  const black = sm("#15161a", 0.5);
+  const white = sm("#f6f6f2", 0.6);
+  const flap = fly ? Math.sin(t * 9) * 0.6 : 0;
+  return (
+    <group position={p} rotation={[0, rotY, 0]} scale={s}>
+      <mesh position={[0, 0.95, 0]} scale={[0.22, 0.2, 0.34]} material={white} castShadow>
+        <sphereGeometry args={[1, 14, 10]} />
+      </mesh>
+      {[-1, 1].map((sd) => (
+        <mesh key={sd} position={[0.2 * sd, 0.98, -0.02]} rotation={[0, 0, sd * (0.15 + flap)]} scale={fly ? [0.55, 0.03, 0.22] : [0.06, 0.16, 0.3]} material={fly ? white : sm("#2a2b30", 0.6)}>
+          <sphereGeometry args={[1, 10, 8]} />
+        </mesh>
+      ))}
+      <mesh position={[0, 1.2, 0.26]} rotation={[0.5, 0, 0]} material={black}>
+        <cylinderGeometry args={[0.055, 0.07, 0.42, 10]} />
+      </mesh>
+      <mesh position={[0, 1.05, 0.2]} rotation={[0.5, 0, 0]} material={sm("#d8262d", 0.4)}>
+        <cylinderGeometry args={[0.085, 0.09, 0.08, 12]} />
+      </mesh>
+      <mesh position={[0, 1.42, 0.38]} material={black}>
+        <sphereGeometry args={[0.075, 10, 8]} />
+      </mesh>
+      <mesh position={[0, 1.4, 0.58]} rotation={[Math.PI / 2 + 0.25, 0, 0]} material={black}>
+        <coneGeometry args={[0.035, 0.36, 8]} />
+      </mesh>
+      {[-0.03, 0.03].map((x) => (
+        <mesh key={x} position={[x * 1.6, 0.4, 0.0]} material={black} visible={!fly}>
+          <cylinderGeometry args={[0.012, 0.012, 0.8, 6]} />
+        </mesh>
+      ))}
+    </group>
+  );
+};
+/* jacaré (normal) na beira d'água */
+export const Jacare: React.FC<{p: V3; rotY?: number; s?: number; t?: number}> = ({p, rotY = 0, s = 1, t = 0}) => {
+  const g = sm("#3f5a2a", 0.8);
+  const gd = sm("#2e4420", 0.8);
+  return (
+    <group position={p} rotation={[0, rotY, 0]} scale={s}>
+      <mesh position={[0, 0.12, 0]} geometry={rbox(0.42, 0.2, 1.1, 0.08)} material={g} castShadow />
+      {Array.from({length: 5}, (_, i) => (
+        <mesh key={i} position={[0, 0.24, -0.4 + i * 0.2]} geometry={rbox(0.24, 0.05, 0.1, 0.02)} material={gd} />
+      ))}
+      <mesh position={[0, 0.1, 0.78]} geometry={rbox(0.3, 0.12, 0.55, 0.05)} material={g} castShadow />
+      {[-1, 1].map((sd) => (
+        <group key={sd}>
+          <mesh position={[0.09 * sd, 0.2, 0.6]} material={sm("#e3c23a", 0.3)}>
+            <sphereGeometry args={[0.045, 8, 6]} />
+          </mesh>
+          <mesh position={[0.09 * sd, 0.2, 0.635]} material={sm("#0c0c10", 0.2)}>
+            <sphereGeometry args={[0.02, 6, 4]} />
+          </mesh>
+          {[0.3, -0.3].map((z) => (
+            <mesh key={z} position={[0.25 * sd, 0.06, z]} rotation={[0, 0, sd * 0.9]} material={g}>
+              <capsuleGeometry args={[0.04, 0.12, 4, 6]} />
+            </mesh>
+          ))}
+        </group>
+      ))}
+      <mesh position={[0.05 * Math.sin(t * 2), 0.08, -0.95]} rotation={[-Math.PI / 2, 0, 0]} material={g}>
+        <coneGeometry args={[0.16, 0.8, 8]} />
+      </mesh>
+    </group>
+  );
+};
+/* carandá (palmeira do Pantanal) */
+export const Palm: React.FC<{p: V3; s?: number}> = ({p, s = 1}) => (
+  <group position={p} scale={s}>
+    <mesh position={[0, 1.6, 0]} material={sm("#8a6a4a", 0.85)} castShadow>
+      <cylinderGeometry args={[0.08, 0.12, 3.2, 8]} />
     </mesh>
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]} material={sm("#c9a46a", 0.95)}>
-      <planeGeometry args={[2.2, 80]} />
-    </mesh>
-    {[[-5, -6], [6, -8], [-7, -14], [5, -16]].map(([x, z], i) => (
-      <mesh key={i} rotation={[-Math.PI / 2, 0, 0]} position={[x, 0.015, z]} scale={[2.2, 1.2, 1]} material={sm("#4aa8d8", 0.2)}>
-        <circleGeometry args={[1.4, 24]} />
+    {Array.from({length: 9}, (_, i) => (
+      <mesh key={i} position={[0, 3.2, 0]} rotation={[0.9, (i / 9) * Math.PI * 2, 0]} material={sm(i % 2 ? "#4f9a35" : "#3f8a2a", 0.8, {side: THREE.DoubleSide})} castShadow>
+        <coneGeometry args={[0.32, 1.3, 4, 1, true]} />
       </mesh>
     ))}
-    {[[-4, -3], [4.5, -4], [-6, -10], [7, -12], [-3, -18]].map(([x, z], i) => (
-      <group key={"tr" + i} position={[x, 0, z]}>
-        <mesh position={[0, 1.0, 0]} material={sm("#7a5a3a", 0.8)}>
-          <cylinderGeometry args={[0.12, 0.16, 2, 8]} />
-        </mesh>
-        <mesh position={[0, 2.3, 0]} scale={[1.3, 0.9, 1.3]} material={sm("#3f9a35", 0.85)}>
-          <icosahedronGeometry args={[0.9, 0]} />
-        </mesh>
-      </group>
-    ))}
-  </>
+  </group>
 );
+export const Pantanal: React.FC<{t?: number}> = ({t = 0}) => {
+  const water = sm("#3f9fd0", 0.15, {metalness: 0.1});
+  const r = rng(77);
+  const grass = Array.from({length: 46}, () => [(r() < 0.5 ? -1 : 1) * (2.8 + r() * 9), -2 - r() * 40] as [number, number]);
+  return (
+    <>
+      <color attach="background" args={["#a8dcff"]} />
+      <fog attach="fog" args={["#cfeaff", 22, 60]} />
+      <mesh rotation={[-Math.PI / 2, 0, 0]} material={sm("#8ccf5a", 0.95)} receiveShadow>
+        <planeGeometry args={[90, 90]} />
+      </mesh>
+      {/* estrada de terra larga */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]} material={sm("#c9a46a", 0.95)} receiveShadow>
+        <planeGeometry args={[4.6, 90]} />
+      </mesh>
+      {/* lagoas alagadas dos dois lados */}
+      {[[-7, -6, 3.2], [7.5, -9, 3.6], [-8, -20, 4.2], [8, -24, 4.4], [-6.5, 3, 2.6], [6.8, 2, 2.4], [-9, -34, 5], [9, -38, 5]].map(([x, z, rr], i) => (
+        <mesh key={i} rotation={[-Math.PI / 2, 0, 0]} position={[x, 0.02, z]} scale={[1.6, 1, 1]} material={water}>
+          <circleGeometry args={[rr, 28]} />
+        </mesh>
+      ))}
+      {[[-4.4, -3], [4.6, -5], [-5.5, -14], [5.2, -16], [-4.6, -27], [4.8, -30], [-3.8, 4.5], [4.2, 5.5]].map(([x, z], i) => (
+        <Palm key={"pa" + i} p={[x, 0, z]} s={0.9 + (i % 3) * 0.2} />
+      ))}
+      {grass.map(([x, z], i) => (
+        <mesh key={"g" + i} position={[x, 0.25, z]} material={sm(i % 2 ? "#5aa83a" : "#73b84a", 0.9)}>
+          <coneGeometry args={[0.18, 0.55, 5]} />
+        </mesh>
+      ))}
+      {/* tuiuiús na beira da lagoa e voando */}
+      <Tuiuiu p={[-3.0, 0, -2.6]} rotY={0.8} s={1.2} />
+      <Tuiuiu p={[3.1, 0, -5.4]} rotY={-0.9} s={1.2} />
+      <Tuiuiu p={[-6.4, 0, -18]} rotY={0.4} s={1.3} />
+      {[0, 1, 2].map((i) => (
+        <Tuiuiu key={"v" + i} p={[-6 + ((t * 1.4 + i * 3) % 14), 5.2 + i * 0.5, -12 - i * 2]} rotY={Math.PI / 2} s={1.0} t={t + i} fly />
+      ))}
+      {/* jacarés tomando sol */}
+      <Jacare p={[-4.9, 0.02, -7.6]} rotY={0.7} s={1.2} t={t} />
+      <Jacare p={[5.4, 0.02, -10.5]} rotY={-2.2} s={1.2} t={t + 1} />
+      <Jacare p={[5.2, 0.02, 1.4]} rotY={-0.6} s={1.1} t={t + 2} />
+    </>
+  );
+};
 
 /* ---------- praça de alimentação do shopping ---------- */
 const lojaTex = (name: string, col: string) =>
@@ -715,33 +812,188 @@ const lojaTex = (name: string, col: string) =>
     c.textAlign = "center";
     c.fillText(name, 128, 46);
   });
-export const FoodCourt: React.FC = () => (
-  <>
-    <color attach="background" args={["#f2efe6"]} />
-    <mesh rotation={[-Math.PI / 2, 0, 0]} material={sm("#e6e0d2", 0.4)} receiveShadow>
-      <planeGeometry args={[40, 40]} />
+const mallSignTex = (name: string, col: string, fg = "#ffffff") =>
+  canvasTex("mall-" + name, 384, 80, (c) => {
+    c.fillStyle = col;
+    c.fillRect(0, 0, 384, 80);
+    c.fillStyle = fg;
+    c.font = "bold 44px sans-serif";
+    c.textAlign = "center";
+    c.fillText(name, 192, 58);
+  });
+/** sacola de compras */
+export const ShopBag: React.FC<{p?: V3; col?: string; s?: number}> = ({p = [0, 0, 0], col = "#e8414f", s = 1}) => (
+  <group position={p} scale={s}>
+    <mesh position={[0, -0.16, 0]} geometry={rbox(0.22, 0.26, 0.09, 0.01)} material={sm(col, 0.6)} castShadow />
+    <mesh position={[0, -0.02, 0]} material={sm("#1d1f27", 0.5)}>
+      <torusGeometry args={[0.06, 0.008, 6, 14, Math.PI]} />
     </mesh>
-    {[["PASTEL", "#e8414f"], ["SUSHI", "#2e86de"], ["BURGER", "#ff8a1f"], ["AÇAÍ", "#9b59b6"], ["PIZZA", "#2ecc71"]].map(([n, col], i) => (
-      <group key={n} position={[-6 + i * 3, 0, -6]}>
-        <mesh position={[0, 1.6, 0]} geometry={rbox(2.8, 3.2, 1.2, 0.05)} material={sm("#fbfbf6", 0.6)} />
-        <mesh position={[0, 2.8, 0.61]} material={tm("loja-" + n, lojaTex(n, col), 0.5)}>
-          <planeGeometry args={[2.4, 0.6]} />
-        </mesh>
-        <mesh position={[0, 1.0, 0.65]} geometry={rbox(2.4, 0.9, 0.1, 0.03)} material={sm(col, 0.5)} />
-      </group>
-    ))}
-    {[[-4, 1], [-1.5, 2.5], [2, 1.5], [4.5, 2.8], [-4.5, 4]].map(([x, z], i) => (
-      <group key={"m" + i} position={[x, 0, z]}>
-        <mesh position={[0, 0.72, 0]} material={sm("#ffffff", 0.4)}>
-          <cylinderGeometry args={[0.5, 0.5, 0.05, 20]} />
-        </mesh>
-        <mesh position={[0, 0.36, 0]} material={sm("#8c919b", 0.4)}>
-          <cylinderGeometry args={[0.05, 0.05, 0.72, 8]} />
-        </mesh>
-      </group>
-    ))}
-  </>
+  </group>
 );
+/** loja com vitrine (andar de cima) */
+const MallStore: React.FC<{p: V3; name: string; col: string; kind: "moda" | "cinema" | "brinquedo" | "tenis" | "sale"}> = ({p, name, col, kind}) => (
+  <group position={p}>
+    <mesh position={[0, 1.6, -0.2]} geometry={rbox(3.6, 3.2, 0.4, 0.04)} material={sm("#fbfbf6", 0.6)} />
+    <mesh position={[0, 2.85, 0.02]} material={tm("mall-" + name, mallSignTex(name, col), 0.5)}>
+      <planeGeometry args={[3.0, 0.62]} />
+    </mesh>
+    {/* vitrine */}
+    <mesh position={[0, 1.25, 0.01]} material={sm("#bfe6ff", 0.05, {transparent: true, opacity: 0.55, metalness: 0.2})}>
+      <planeGeometry args={[3.2, 2.1]} />
+    </mesh>
+    <mesh position={[0, 1.25, -0.02]} material={sm(kind === "cinema" ? "#2a2440" : "#f3ead8", 0.8)}>
+      <planeGeometry args={[3.2, 2.1]} />
+    </mesh>
+    {kind === "moda" &&
+      [-0.9, 0, 0.9].map((x, i) => (
+        <group key={i} position={[x, 0.2, -0.1]}>
+          <mesh position={[0, 0.55, 0]} material={sm("#8c919b", 0.4)}>
+            <cylinderGeometry args={[0.02, 0.02, 1.1, 6]} />
+          </mesh>
+          <mesh position={[0, 1.15, 0]} geometry={rbox(0.42, 0.55, 0.2, 0.08)} material={sm(["#e8414f", "#2e86de", "#2ecc71"][i], 0.6)} />
+          <mesh position={[0, 1.55, 0]} material={sm("#f2f2f2", 0.5)}>
+            <sphereGeometry args={[0.13, 12, 10]} />
+          </mesh>
+        </group>
+      ))}
+    {kind === "cinema" &&
+      [-0.8, 0.8].map((x, i) => (
+        <mesh key={i} position={[x, 1.25, 0.0]} geometry={rbox(1.0, 1.5, 0.03, 0.02)} material={sm(i ? "#ff8a1f" : "#e8414f", 0.5, {emissive: i ? "#ff8a1f" : "#e8414f", emissiveIntensity: 0.3})} />
+      ))}
+    {kind === "brinquedo" &&
+      [[-1, "#ffd21f"], [-0.3, "#2e86de"], [0.4, "#e8414f"], [1.05, "#2ecc71"]].map(([x, c], i) => (
+        <mesh key={i} position={[x as number, 0.5 + (i % 2) * 0.35, -0.05]} material={sm(c as string, 0.5)}>
+          {i % 2 ? <sphereGeometry args={[0.22, 12, 10]} /> : <boxGeometry args={[0.4, 0.4, 0.3]} />}
+        </mesh>
+      ))}
+    {kind === "tenis" &&
+      [-0.8, 0, 0.8].map((x, i) => (
+        <mesh key={i} position={[x, 0.9 + (i % 2) * 0.4, -0.05]} geometry={rbox(0.5, 0.2, 0.22, 0.08)} material={sm(["#ffffff", "#e8414f", "#101018"][i], 0.5)} />
+      ))}
+    {kind === "sale" && (
+      <mesh position={[0, 1.3, 0.0]} material={tm("mall-sale50", mallSignTex("-50%", "#ffd21f", "#e8262d"), 0.5)}>
+        <planeGeometry args={[2.4, 0.9]} />
+      </mesh>
+    )}
+  </group>
+);
+/** shopping: praça de alimentação embaixo, lojas no andar de cima, escada rolante, vasos e luminárias */
+export const FoodCourt: React.FC = () => {
+  const UP = 4.4;
+  return (
+    <>
+      <color attach="background" args={["#f2efe6"]} />
+      {/* piso de porcelanato em xadrez */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} material={tm("piso-shopping", pisoShoppingTex(), 0.25)} receiveShadow>
+        <planeGeometry args={[40, 40]} />
+      </mesh>
+      {/* parede do fundo */}
+      <mesh position={[0, 6, -8.2]} material={sm("#efe9dc", 0.8)}>
+        <planeGeometry args={[40, 14]} />
+      </mesh>
+      {/* lojas de comida embaixo */}
+      {[["PASTEL", "#e8414f"], ["SUSHI", "#2e86de"], ["BURGER", "#ff8a1f"], ["AÇAÍ", "#9b59b6"], ["PIZZA", "#2ecc71"]].map(([n, col], i) => (
+        <group key={n} position={[-6 + i * 3, 0, -6]}>
+          <mesh position={[0, 1.6, 0]} geometry={rbox(2.8, 3.2, 1.2, 0.05)} material={sm("#fbfbf6", 0.6)} />
+          <mesh position={[0, 2.8, 0.61]} material={tm("loja-" + n, lojaTex(n, col), 0.5)}>
+            <planeGeometry args={[2.4, 0.6]} />
+          </mesh>
+          <mesh position={[0, 1.0, 0.65]} geometry={rbox(2.4, 0.9, 0.1, 0.03)} material={sm(col, 0.5)} />
+        </group>
+      ))}
+      {/* andar de cima: laje, guarda-corpo de vidro e lojas */}
+      <mesh position={[0, UP - 0.15, -6.2]} geometry={rbox(40, 0.3, 4.6, 0.02)} material={sm("#fbfbf6", 0.6)} castShadow />
+      <mesh position={[0, UP + 0.45, -3.92]} material={sm("#cfefff", 0.05, {transparent: true, opacity: 0.35})}>
+        <boxGeometry args={[40, 0.9, 0.04]} />
+      </mesh>
+      <mesh position={[0, UP + 0.92, -3.92]} material={sm("#b8bec8", 0.3, {metalness: 0.6})}>
+        <boxGeometry args={[40, 0.06, 0.08]} />
+      </mesh>
+      {(
+        [
+          [-7.6, "MODA", "#e8414f", "moda"],
+          [-3.8, "CINEMA", "#2a2440", "cinema"],
+          [0, "BRINQUEDOS", "#2e86de", "brinquedo"],
+          [3.8, "LIQUIDAÇÃO", "#e8262d", "sale"],
+          [7.6, "TÊNIS", "#101018", "tenis"],
+        ] as [number, string, string, "moda" | "cinema" | "brinquedo" | "tenis" | "sale"][]
+      ).map(([x, n, col, kind]) => (
+        <MallStore key={n} p={[x, UP, -7.9]} name={n} col={col} kind={kind} />
+      ))}
+      {/* colunas */}
+      {[-9.5, 9.5].map((x) => (
+        <mesh key={x} position={[x, 4.5, -3.9]} material={sm("#ffffff", 0.5)}>
+          <cylinderGeometry args={[0.35, 0.35, 9, 16]} />
+        </mesh>
+      ))}
+      {/* escada rolante subindo pela direita */}
+      <group position={[4.6, UP / 2, -2.9]} rotation={[0, 0, Math.atan2(UP, 5)]}>
+        <mesh geometry={rbox(Math.hypot(UP, 5), 0.25, 1.1, 0.03)} material={sm("#5a5f6b", 0.4, {metalness: 0.4})} castShadow />
+        {[-0.58, 0.58].map((z) => (
+          <group key={z}>
+            <mesh position={[0, 0.5, z]} material={sm("#cfefff", 0.05, {transparent: true, opacity: 0.4})}>
+              <boxGeometry args={[Math.hypot(UP, 5), 0.8, 0.04]} />
+            </mesh>
+            <mesh position={[0, 0.92, z]} material={sm("#15161a", 0.4)}>
+              <boxGeometry args={[Math.hypot(UP, 5), 0.07, 0.09]} />
+            </mesh>
+          </group>
+        ))}
+        {Array.from({length: 18}, (_, i) => (
+          <mesh key={i} position={[-3.1 + i * 0.37, 0.14, 0]} material={sm("#8c919b", 0.3, {metalness: 0.5})}>
+            <boxGeometry args={[0.04, 0.02, 1.0]} />
+          </mesh>
+        ))}
+      </group>
+      {/* luminárias penduradas */}
+      {[-6, -2, 2, 6].map((x) => (
+        <group key={x} position={[x, 9.4, -1]}>
+          <mesh position={[0, 0.8, 0]} material={sm("#3a3f4a", 0.5)}>
+            <cylinderGeometry args={[0.01, 0.01, 1.6, 4]} />
+          </mesh>
+          <mesh material={sm("#fff4d0", 0.3, {emissive: "#fff0b0", emissiveIntensity: 1.4})}>
+            <sphereGeometry args={[0.35, 14, 10]} />
+          </mesh>
+        </group>
+      ))}
+      {/* vasos com plantas */}
+      {[[-5.8, 0.6], [5.8, 1.0], [-2.6, -4.2], [2.4, -4.4]].map(([x, z], i) => (
+        <group key={"v" + i} position={[x, 0, z]}>
+          <mesh position={[0, 0.35, 0]} material={sm("#e3d6c0", 0.7)}>
+            <cylinderGeometry args={[0.38, 0.3, 0.7, 14]} />
+          </mesh>
+          {Array.from({length: 7}, (_, k) => (
+            <mesh key={k} position={[0, 1.1, 0]} rotation={[0.55, (k / 7) * Math.PI * 2, 0]} material={sm("#3f9a35", 0.8, {side: THREE.DoubleSide})}>
+              <coneGeometry args={[0.16, 1.1, 4, 1, true]} />
+            </mesh>
+          ))}
+        </group>
+      ))}
+      {/* mesinhas da praça de alimentação (longe do pouso) */}
+      {[[-4.6, 3.4], [4.4, 3.6], [-3.4, -3.0], [3.4, -2.2]].map(([x, z], i) => (
+        <group key={"m" + i} position={[x, 0, z]}>
+          <mesh position={[0, 0.72, 0]} material={sm("#ffffff", 0.4)}>
+            <cylinderGeometry args={[0.5, 0.5, 0.05, 20]} />
+          </mesh>
+          <mesh position={[0, 0.36, 0]} material={sm("#8c919b", 0.4)}>
+            <cylinderGeometry args={[0.05, 0.05, 0.72, 8]} />
+          </mesh>
+          {[-1, 1].map((sd) => (
+            <mesh key={sd} position={[0.75 * sd, 0.42, 0]} geometry={rbox(0.36, 0.06, 0.36, 0.02)} material={sm("#e8414f", 0.5)} />
+          ))}
+        </group>
+      ))}
+    </>
+  );
+};
+const pisoShoppingTex = () =>
+  canvasTex("piso-shopping", 256, 256, (c) => {
+    for (let i = 0; i < 8; i++)
+      for (let j = 0; j < 8; j++) {
+        c.fillStyle = (i + j) % 2 ? "#ece6d8" : "#dcd4c2";
+        c.fillRect(i * 32, j * 32, 32, 32);
+      }
+  });
 
 /* ---------- paraquedas ---------- */
 export const Parachute: React.FC<{p: V3; t: number; s?: number}> = ({p, t, s = 1}) => (
@@ -758,12 +1010,38 @@ export const Parachute: React.FC<{p: V3; t: number; s?: number}> = ({p, t, s = 1
 );
 
 /* ---------- celular com tela (grupo da família, travado etc.) ---------- */
-export const BigPhone: React.FC<{p?: V3; r?: V3; s?: number; screen: THREE.Texture; key2: string}> = ({p = [0, 0, 0], r = [0, 0, 0], s = 1, screen, key2}) => (
-  <group position={p} rotation={r} scale={s}>
-    <mesh geometry={rbox(0.5, 0.95, 0.06, 0.06)} material={sm("#1d1f27", 0.3)} castShadow />
-    <mesh position={[0, 0, 0.031]}>
-      <meshBasicMaterial map={screen} toneMapped={false} />
-      <planeGeometry args={[0.44, 0.86]} />
-    </mesh>
-  </group>
-);
+export const BigPhone: React.FC<{p?: V3; r?: V3; s?: number; screen: THREE.Texture; key2: string; hand?: boolean}> = ({p = [0, 0, 0], r = [0, 0, 0], s = 1, screen, key2, hand = false}) => {
+  const skin = sm("#dfac80", 0.5);
+  return (
+    <group position={p} rotation={r} scale={s}>
+      <mesh geometry={rbox(0.5, 0.95, 0.06, 0.06)} material={sm("#1d1f27", 0.3)} castShadow />
+      <mesh position={[0, 0, 0.031]}>
+        <meshBasicMaterial map={screen} toneMapped={false} />
+        <planeGeometry args={[0.44, 0.86]} />
+      </mesh>
+      {hand && (
+        <group>
+          {/* palma atrás do celular */}
+          <mesh position={[0.02, -0.3, -0.075]} geometry={rbox(0.44, 0.42, 0.1, 0.05)} material={skin} />
+          {/* dedão na lateral esquerda, por cima da borda */}
+          <mesh position={[-0.27, -0.2, 0.03]} rotation={[0, 0, -0.35]} material={skin}>
+            <capsuleGeometry args={[0.048, 0.2, 6, 10]} />
+          </mesh>
+          {/* quatro dedos abraçando a lateral direita */}
+          {[0, 1, 2, 3].map((i) => (
+            <mesh key={i} position={[0.265, -0.06 - i * 0.1, 0.01]} rotation={[0, 0, Math.PI / 2]} material={skin}>
+              <capsuleGeometry args={[0.04, 0.05, 6, 10]} />
+            </mesh>
+          ))}
+          {/* pulso e braço com a manga do moletom */}
+          <mesh position={[0.08, -0.72, -0.12]} rotation={[0, 0, -0.18]} material={skin}>
+            <cylinderGeometry args={[0.11, 0.12, 0.5, 14]} />
+          </mesh>
+          <mesh position={[0.2, -1.3, -0.16]} rotation={[0, 0, -0.18]} material={sm("#ffcd2e", 0.6)}>
+            <cylinderGeometry args={[0.17, 0.19, 0.8, 16]} />
+          </mesh>
+        </group>
+      )}
+    </group>
+  );
+};

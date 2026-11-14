@@ -82,7 +82,14 @@ const InHand: React.FC<{palm: React.RefObject<THREE.Object3D | null>; children: 
   useFrame(() => {
     if (!palm.current || !g.current) return;
     palm.current.updateWorldMatrix(true, false);
-    palm.current.matrixWorld.decompose(g.current.position, g.current.quaternion, g.current.scale);
+    // relativo ao pai do grupo (senão um grupo que se move soma a posição duas vezes e o objeto flutua)
+    const m = palm.current.matrixWorld.clone();
+    const par = g.current.parent;
+    if (par) {
+      par.updateWorldMatrix(true, false);
+      m.premultiply(par.matrixWorld.clone().invert());
+    }
+    m.decompose(g.current.position, g.current.quaternion, g.current.scale);
   }, -1);
   return <group ref={g}>{children}</group>;
 };
