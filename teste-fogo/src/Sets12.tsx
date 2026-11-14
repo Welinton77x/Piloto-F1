@@ -43,7 +43,7 @@ export const DadHead: React.FC<{cap?: boolean}> = ({cap = true}) => (
 );
 
 /* ---------- carro com cara (frente = +z) ---------- */
-export type CarP = {mood?: number; sleepy?: number; wide?: number; smile?: number; mouth?: number; t?: number; spin?: number; bounce?: number; shake?: number; melon?: number; color?: string; blink?: number; steam?: number};
+export type CarP = {mood?: number; sleepy?: number; wide?: number; smile?: number; mouth?: number; t?: number; spin?: number; bounce?: number; shake?: number; melon?: number; color?: string; blink?: number; steam?: number; noFace?: boolean};
 const melonTex = () =>
   canvasTex("casca-melancia", 512, 256, (c) => {
     c.fillStyle = "#3f9a35";
@@ -147,14 +147,27 @@ export const Car: React.FC<{p: V3; rotY?: number; c?: CarP; s?: number}> = ({p, 
             </group>
           )),
         )}
-        {/* cara: faróis = olhos */}
-        {[-1, 1].map((sd) => (
-          <group key={"e" + sd} position={[0.32 * sd, 0.63, 1.06]}>
-            <CarEye sd={sd} r={0.17} lid={lid} mood={mood} wide={wide} body={body} />
-          </group>
-        ))}
+        {/* cara: faróis = olhos (ou faróis normais, sem rosto) */}
+        {[-1, 1].map((sd) =>
+          c.noFace ? (
+            <group key={"e" + sd} position={[0.34 * sd, 0.6, 1.07]}>
+              <mesh rotation={[Math.PI / 2, 0, 0]} material={sm("#d0d4da", 0.25, {metalness: 0.6})}>
+                <cylinderGeometry args={[0.13, 0.13, 0.05, 24]} />
+              </mesh>
+              <mesh position={[0, 0, 0.028]} material={sm("#fffbe6", 0.1, {emissive: "#fff3c0", emissiveIntensity: 0.6})}>
+                <circleGeometry args={[0.105, 24]} />
+              </mesh>
+            </group>
+          ) : (
+            <group key={"e" + sd} position={[0.32 * sd, 0.63, 1.06]}>
+              <CarEye sd={sd} r={0.17} lid={lid} mood={mood} wide={wide} body={body} />
+            </group>
+          ),
+        )}
         {/* grade = boca */}
-        {mouth > 0.05 ? (
+        {c.noFace ? (
+          <mesh position={[0, 0.47, 1.07]} geometry={rbox(0.4, 0.14, 0.04, 0.03)} material={dark} />
+        ) : mouth > 0.05 ? (
           <mesh position={[0, 0.4, 1.09]} scale={[0.26, 0.05 + 0.1 * mouth, 0.05]} material={sm("#3a1510", 0.5)}>
             <sphereGeometry args={[1, 16, 10]} />
           </mesh>

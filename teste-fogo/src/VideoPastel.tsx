@@ -215,7 +215,7 @@ const S5: React.FC<ShotProps> = ({f, a, t}) => (
   <>
     <Cam pos={[FX + 0.5, 2.7, 7.4]} look={[FX + 0.5, 1.0, 0.8]} fov={48} f={f} a={a} />
     <StreetScene t={t} hot={1} />
-    <Car p={CAR_P} rotY={0} c={{t, sleepy: 0.3, mood: 0.2}} s={1.6} />
+    <Car p={CAR_P} rotY={0} c={{noFace: true, t, sleepy: 0.3, mood: 0.2}} s={1.6} />
     <HoodPastel t={t} fry={ramp(f, a, a + 120)} />
     <Toy pose={{...idle(f), pos: [FX + 1.45, 0, 1.3], rotY: -0.35, rShoulder: [-1.2, 0, 0.2], rElbow: -0.4, smile: 1, heat: 0.5}} look={BOYL} headExtra={<Shades />} />
   </>
@@ -235,14 +235,14 @@ const S7: React.FC<ShotProps> = ({f, a, t}) => (
   <>
     <Cam pos={[FX, 2.2, 7.0]} look={[FX, 1.0, 0.6]} fov={48} f={f} a={a} />
     <StreetScene t={t} hot={1} />
-    <Car p={CAR_P} rotY={0} c={{t, smile: 1, wide: 1, bounce: 0.3}} s={1.6} />
+    <Car p={CAR_P} rotY={0} c={{noFace: true, t, smile: 1, wide: 1, bounce: 0.3}} s={1.6} />
     <HoodPastel t={t} fry={1} />
   </>
 );
 const CZ = -0.2;
 const CookCar: React.FC<{t: number; f: number; trophy?: boolean}> = ({t, trophy}) => (
   <>
-    <Car p={[0, 0, CZ]} rotY={0} c={{t, smile: 1, wide: trophy ? 0 : 0.5, bounce: trophy ? 0.6 : 0}} s={1.4} />
+    <Car p={[0, 0, CZ]} rotY={0} c={{noFace: true, t, smile: 1, wide: trophy ? 0 : 0.5, bounce: trophy ? 0.6 : 0}} s={1.4} />
     <group position={[0, 1.32, CZ - 0.2]} scale={1.5}>
       <ChefHat />
     </group>
@@ -321,7 +321,7 @@ const S11: React.FC<ShotProps> = ({f, a, t}) => (
     <Cam pos={[0.05, 1.9, 6.2]} look={[0.05, 1.05, 0.5]} fov={48} f={f} a={a} />
     <MoonScene t={t} />
     <Astro pose={{...idle(f), rShoulder: [-0.3, 0, -0.8], lShoulder: [-0.3, 0, 0.8], rElbow: -0.3, lElbow: -0.3, brow: 0.6, mouthOpen: 0.2, head: [0, 0.6 * Math.sin(t * 2), 0]}} pos={MOON_BOY} rotY={0.2} t={t} />
-    <Car p={[0.65, 0, 0.1]} rotY={-0.35} c={{t, wide: 0.6, mood: 0.3}} s={1.0} />
+    <Car p={[0.65, 0, 0.1]} rotY={-0.35} c={{noFace: true, t, wide: 0.6, mood: 0.3}} s={1.0} />
   </>
 );
 /* 🌀 "A Lua não tem vento, então ninguém lá nunca perdeu um boné." */
