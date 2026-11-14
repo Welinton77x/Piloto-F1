@@ -217,7 +217,7 @@ const S6: React.FC<ShotProps> = ({f, a, t}) => {
 };
 
 /* =================== 3 — Buenos Aires: o controle vivo dançando tango =================== */
-const E6 = at(6, "e");
+const E6 = at(6, "e", 1);
 const VIVO = at(6, "vivo");
 const DANCANDO = at(6, "dancando");
 const TANGO6 = at(6, "tango");
