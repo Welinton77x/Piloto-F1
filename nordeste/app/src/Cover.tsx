@@ -1,5 +1,5 @@
-// Capa do vídeo 3 (piscina) no padrão das capas de referência: cena clara, título branco com
-// palavras-chave em amarelo e vermelho, mascote reagindo e círculo vermelho no objeto principal.
+// Capa do vídeo 6 (Nordeste) no padrão das capas de referência: cena clara, título branco com
+// palavras-chave em amarelo e vermelho, mascote reagindo ao calor (sem círculo vermelho).
 import React from "react";
 import * as THREE from "three";
 import {AbsoluteFill} from "remotion";
@@ -39,12 +39,13 @@ export const Cover: React.FC<P> = ({at, dy = 0, fixed, ring, ringR = 150}) => {
         </svg>
       )}
       <div style={{position: "absolute", top: 200, left: 30, right: 30, textAlign: "center", fontFamily: FONT, fontWeight: 900, fontSize: 112, lineHeight: 1.0, color: "#fff", WebkitTextStroke: "16px #101820", paintOrder: "stroke fill", textShadow: "0 8px 0 rgba(0,0,0,0.3)"}}>
-        <div>
-          COMO UM <W c="#FF2B2B">BURACO</W>
+        <div>POR QUE O</div>
+        <div style={{fontSize: 140}}>
+          <W c="#FFD400">NORDESTE</W>
         </div>
-        <div>VIRA UMA</div>
-        <div style={{fontSize: 150}}>
-          <W c="#FFD400">PISCINA</W>?
+        <div>TÁ TÃO</div>
+        <div style={{fontSize: 165}}>
+          <W c="#FF3B1F">QUENTE</W>?
         </div>
       </div>
     </AbsoluteFill>
