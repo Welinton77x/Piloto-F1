@@ -41,7 +41,7 @@ export const MecPreview: React.FC = () => {
     );
   const views: Record<number, {pos: [number, number, number]; look: [number, number, number]; fov: number}> = {
     1: {pos: [0, 1.5, 5.2], look: [0, 1.15, 0], fov: 40},
-    2: {pos: [3.6, 1.6, 4.0], look: [3.0, 1.0, 0], fov: 45},
+    2: {pos: [3.3, 1.5, 4.4], look: [3.1, 1.05, 0], fov: 45},
     3: {pos: [4.5, 9.5, 5.5], look: [0, 8.0, -2], fov: 45},
     5: {pos: [-2.5, 2.2, 4.5], look: [-3.5, 2.0, -2], fov: 50},
     4: {pos: [7.5, 1.7, 6], look: [7.5, 1.2, 0], fov: 50},
@@ -56,7 +56,7 @@ export const MecPreview: React.FC = () => {
         <directionalLight position={[3, 6, 5]} intensity={2.0} castShadow />
         <Toy pose={{pos: [-0.7, 0, 0], rotY: 0.3, smile: 0.4, brow: -0.3}} look={DAD} headExtra={<DadHead />} />
         <Toy pose={{pos: [0.7, 0, 0], rotY: -0.3, smile: 0.8}} look={{hoodie: true, hairStyle: "mohawk"}} />
-        <Octopus o={{pos: [3.0, 0, 0], rotY: 0.3, t, tools: true, work: 1, s: 1.1, scissors: [-0.5, 1.9, 0.7], mouth: 0.5}} />
+        <Octopus o={{pos: [3.0, 0, 0], rotY: 0.15, t, s: 1.1, mouth: 0}} />
         <group position={[0, 6, -2]}>
           <WeddingPigeon p={{pos: [0, 0, 0], rotY: 0.6, t, flap: 1}} s={7} />
           <Toy pose={{pos: [0, 1.9, 0], rotY: 0.6, legLift: 1, smile: 0.8, head: [0, 1.2, 0], rShoulder: [-0.5, 0, 0.3], lShoulder: [-0.5, 0, -0.3]}} look={{hoodie: true}} />

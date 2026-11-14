@@ -516,7 +516,7 @@ const TRX = -18;
 const ROBO = at(10, "robo");
 const TR = ROBO - 4; // vira robô
 const QUE2 = at(10, "que", 1);
-const RS = 1.45; // robô gigante
+const RS = 2.4; // robô gigante (~9,5 m)
 const S20: React.FC<ShotProps> = ({f, a, t}) => {
   const tight = ramp(f, MAIS - 8, MAIS);
   return (
@@ -532,23 +532,24 @@ const robotK = (f: number) => backOut(ramp(f, TR, TR + 14));
 const StreetT: React.FC<{t: number}> = ({t}) => <StreetScene t={t} target={[TRX, 1.5, 1]} ext={8} />;
 const S21: React.FC<ShotProps> = ({f, a, t}) => {
   const shake = ramp(f, a, a + 6);
-  const boy = physics("b21" + a, (fr) => ({...idle(fr), pos: [TRX + 2.15, 0, 2.7], rotY: -0.65, ...HANDS_HEAD, eyeWide: ramp(fr, TR, TR + 6), mouthOpen: 0.5 * ramp(fr, TR, TR + 6), brow: 0.9, head: [-0.3, 0, 0]}), a, f, );
+  const boy = physics("b21" + a, (fr) => ({...idle(fr), pos: [TRX + 2.4, 0, 4.4], rotY: -0.55, ...HANDS_HEAD, eyeWide: ramp(fr, TR, TR + 6), mouthOpen: 0.5 * ramp(fr, TR, TR + 6), brow: 0.9, head: [-0.3, 0, 0]}), a, f, );
   return (
     <>
-      <Cam pos={[TRX - 0.1, 2.6, 13.0]} look={[TRX - 0.1, 2.4, 0.4]} fov={52} f={f} a={a} />
+      <Cam pos={[TRX - 0.1, 2.2, 16.5]} look={[TRX - 0.1, 4.6, 0.4]} fov={56} f={f} a={a} />
       <StreetT t={t} />
       {f < TR + 2 && <Car p={[TRX, 0, 0.4]} rotY={0} c={{t, wide: 1, shake: 1.5 * shake, bounce: 0.3 * shake}} s={CS} />}
       <CarRobot p={[TRX, 0, 0.4]} rotY={0} t={t} k={robotK(f)} mic={false} dance={0} s={RS} />
-      <Puff p={[TRX, 1.2, 0.6]} k={(f - TR + 2) / 24} color="#ffe9c9" />
+      <Puff p={[TRX, 2.2, 0.8]} k={(f - TR + 2) / 24} color="#ffe9c9" />
+      <Puff p={[TRX, 5.0, 0.6]} k={(f - TR + 6) / 26} color="#ffe9c9" />
       <Boy pose={boy} mohawk />
-      <Octopus o={{pos: [TRX - 2.3, 0, 2.5], rotY: 0.6, t, thumbs: 0.6, mouth: 0.6, blink: 0, s: OS}} />
+      <Octopus o={{pos: [TRX - 2.5, 0, 4.2], rotY: 0.5, t, thumbs: 0.6, mouth: 0.6, blink: 0, s: OS}} />
     </>
   );
 };
 /* "...que só quer ser cantor de pagode." */
 const S22: React.FC<ShotProps> = ({f, a, t}) => (
   <>
-    <Cam pos={[TRX + 1.3, 2.7, 7.4]} look={[TRX, 3.3, 0.4]} fov={50} f={f} a={a} />
+    <Cam pos={[TRX - 1.6, 3.2, 12.5]} look={[TRX, 6.5, 0.4]} fov={50} f={f} a={a} />
     <StreetT t={t} />
     <CarRobot p={[TRX, 0, 0.4]} rotY={-0.15} t={t} mic dance={ramp(f, a + 8, a + 20)} mouth={0.2 + 0.6 * Math.abs(Math.sin(t * 7))} s={RS} />
   </>
@@ -559,9 +560,9 @@ const S23: React.FC<ShotProps> = ({f, a, t}) => {
   const past = physics("p23" + a, (fr) => ({...idle(fr), pos: [TRX + 2.3, 0, 2.0], rotY: -0.35, rShoulder: [-1.5, 0.3, 0.2], rElbow: -0.9 - 0.25 * Math.sin((fr / FPS) * 14), lShoulder: [-1.2, -0.3, -0.3], lElbow: -1.1, smile: 1, mouthOpen: 0.3, head: [0, 0, 0.1 * Math.sin((fr / FPS) * 7)]}), a, f);
   return (
     <>
-      <Cam pos={[TRX + 0.1, 2.6, 13.6]} look={[TRX + 0.1, 2.2, 0.6]} fov={52} f={f} a={a} />
+      <Cam pos={[TRX + 0.1, 2.0, 15.0]} look={[TRX + 0.1, 5.1, 0]} fov={60} f={f} a={a} />
       <StreetT t={t} />
-      <CarRobot p={[TRX, 0, 0.0]} rotY={0} t={t} mic dance={1} mouth={0.2 + 0.6 * Math.abs(Math.sin(t * 7))} s={RS} />
+      <CarRobot p={[TRX, 0, -1.0]} rotY={0} t={t} mic dance={1} mouth={0.2 + 0.6 * Math.abs(Math.sin(t * 7))} s={RS} />
       <Pasteleiro pose={past} palmRef={ppalm} />
       <InHand palm={ppalm}>
         <Pandeiro p={[0, -0.02, 0.17]} r={[0, 0, 0]} s={1.3} />
@@ -674,9 +675,9 @@ const DEIXA = at(14, "deixa");
 const LAVANDO = at(14, "lavando");
 const OCTO_L: V3 = [0.7, 0, -1.0];
 const DAD_L: V3 = [2.45, 0, -0.35];
-const WASH_TIP: V3 = [1.3, 1.0, 0.75]; // braço 1 levantado pro pai lavar (espaço do polvo, rotY 0)
+const WASH_TIP: V3 = [1.3, 1.0, 0.75]; // braço 2 levantado pro pai lavar (espaço do polvo, rotY 0)
 const WashOcto: React.FC<{f: number; t: number}> = ({f, t}) => (
-  <Octopus o={{pos: OCTO_L, rotY: 0, t, shades: true, foam: 1, mouth: 0, work: 0, tips: {1: [WASH_TIP[0], WASH_TIP[1] + 0.03 * Math.sin(t * 9), WASH_TIP[2]]}, lean: -0.08, s: OS}} />
+  <Octopus o={{pos: OCTO_L, rotY: 0, t, shades: true, foam: 1, mouth: 0, work: 0, tips: {1: [0.7, 1.7, 0.15], 2: [WASH_TIP[0], WASH_TIP[1] + 0.03 * Math.sin(t * 9), WASH_TIP[2]]}, lean: -0.08, s: OS}} />
 );
 const scrub = (fr: number): Pose => ({rShoulder: [-1.28 + 0.12 * Math.sin((fr / FPS) * 16), 0.98, 0.1], rElbow: -0.47 - 0.25 * Math.sin((fr / FPS) * 16)});
 const Foam: React.FC<{t: number; c: V3}> = ({t, c}) => (
@@ -773,9 +774,9 @@ const S32: React.FC<ShotProps> = ({f, a, t}) => {
   const boy = physics("b32" + a, (fr) => ({...idle(fr), pos: [TRX + 0.4, 0, 3.4], rotY: 0.1, ...ARMS_UP, rShoulder: [-2.9 + 0.2 * Math.sin((fr / FPS) * 9), 0, -0.35], smile: 1, mouthOpen: 0.4, squash: 0.08 * Math.abs(Math.sin((fr / FPS) * 9))}), a, f);
   return (
     <>
-      <Cam pos={[TRX + 0.4, 2.2, 9.6]} look={[TRX + 0.2, 2.1, 0.8]} fov={52} f={f} a={a} />
+      <Cam pos={[TRX + 0.4, 1.9, 12.5]} look={[TRX + 0.2, 4.0, 0.8]} fov={58} f={f} a={a} />
       <StreetT t={t} />
-      <CarRobot p={[TRX, 0, 0.0]} rotY={0} t={t} mic dance={1} mouth={0.2 + 0.6 * Math.abs(Math.sin(t * 7))} s={RS} />
+      <CarRobot p={[TRX, 0, -1.0]} rotY={0} t={t} mic dance={1} mouth={0.2 + 0.6 * Math.abs(Math.sin(t * 7))} s={RS} />
       <Boy pose={boy} mohawk />
     </>
   );
@@ -810,9 +811,9 @@ const S34: React.FC<ShotProps> = ({f, a, t}) => {
   const ring = f < LIGA - 6 ? 1 : 0;
   return (
     <>
-      <Cam pos={[TRX + 1.0, 2.0, 7.4]} look={[TRX + 0.6, 1.9, 0.6]} fov={50} f={f} a={a} />
+      <Cam pos={[TRX + 2.2, 2.0, 8.8]} look={[TRX + 1.2, 2.4, 0.6]} fov={55} f={f} a={a} />
       <StreetT t={t} />
-      <CarRobot p={[TRX - 0.6, 0, -0.2]} rotY={0.2} t={t} mic dance={1} mouth={0.2 + 0.6 * Math.abs(Math.sin(t * 7))} s={RS} />
+      <CarRobot p={[TRX - 0.8, 0, -1.0]} rotY={0.2} t={t} mic dance={1} mouth={0.2 + 0.6 * Math.abs(Math.sin(t * 7))} s={RS} />
       <Boy pose={boy} palmRef={palm} mohawk />
       <InHand palm={palm}>
         <Phone p={[0, -0.03, 0.04]} r={[0, 0, 0]} s={1.3} ring={ring} t={t} />
@@ -831,7 +832,7 @@ const S35: React.FC<ShotProps> = ({f, a, t}) => {
     <>
       <Cam pos={[TRX + 1.5, 2.0, 6.4]} look={[TRX + 1.3, 1.9, 0.6]} fov={44} f={f} a={a} punch={4} />
       <StreetT t={t} />
-      <CarRobot p={[TRX - 0.6, 0, -0.2]} rotY={0.2} t={t} mic dance={1} mouth={0.2 + 0.6 * Math.abs(Math.sin(t * 7))} s={RS} />
+      <CarRobot p={[TRX - 0.8, 0, -1.0]} rotY={0.2} t={t} mic dance={1} mouth={0.2 + 0.6 * Math.abs(Math.sin(t * 7))} s={RS} />
       <Boy pose={boy} palmRef={palm} mohawk />
       <InHand palm={palm}>
         <Phone p={[0, -0.03, 0.04]} s={1.3} t={t} />
@@ -920,50 +921,40 @@ const Notes: React.FC<{from: number; to: number; x: number; y: number}> = ({from
     </>
   );
 };
-/** cartão "seguir o perfil" (aparece no fim, aperta o botão e vira "Seguindo") */
+/** cartão "seguir o perfil" (aparece no fim; o botão afunda e vira "Seguindo") */
 const HANDLE = "@e.naoepossivel";
 const FollowCard: React.FC<{from: number; to: number; tap: number}> = ({from, to, tap}) => {
   const f = useCurrentFrame();
   if (f < from || f > to) return null;
   const s = pop(f, from, 12) * (1 - ramp(f, to - 8, to));
   const done = f >= tap + 2;
-  const press = 1 - 0.08 * Math.sin(clamp((f - tap + 3) / 6) * Math.PI);
-  // dedinho chegando e apertando
-  const hk = easeInOut(ramp(f, tap - 18, tap - 2));
-  const hx = lerp(1000, 760, hk);
-  const hy = lerp(1820, 1590, hk) + (f >= tap - 2 && f < tap + 4 ? 14 : 0);
-  const hOp = 1 - ramp(f, tap + 10, tap + 18);
+  const press = 1 - 0.1 * Math.sin(clamp((f - tap + 3) / 6) * Math.PI);
   return (
-    <>
-      <div style={{position: "absolute", left: 70, top: 1440, width: 940, height: 230, transform: `scale(${s})`, transformOrigin: "50% 50%"}}>
-        <div style={{position: "absolute", inset: 0, background: "#ffffff", borderRadius: 48, boxShadow: "0 14px 0 rgba(0,0,0,0.22), 0 0 0 6px rgba(16,16,24,0.9)", display: "flex", alignItems: "center", padding: "0 34px", gap: 26}}>
-          <div style={{width: 160, height: 160, borderRadius: "50%", overflow: "hidden", border: "6px solid #ffd21f", flexShrink: 0, background: "#eee"}}>
-            <Img src={staticFile("perfil.png")} style={{width: "100%", height: "100%", objectFit: "cover"}} />
-          </div>
-          <div style={{flex: 1, fontFamily, fontWeight: 900, fontSize: 54, color: "#101018", letterSpacing: -1, whiteSpace: "nowrap"}}>{HANDLE}</div>
-          <div
-            style={{
-              flexShrink: 0,
-              transform: `scale(${press})`,
-              background: done ? "#e4e4ea" : "#ffd21f",
-              color: done ? "#3a3a44" : "#101018",
-              fontFamily,
-              fontWeight: 900,
-              fontSize: 46,
-              padding: "20px 30px",
-              borderRadius: 30,
-              border: done ? "5px solid #c9c9d2" : "5px solid #101018",
-              whiteSpace: "nowrap",
-            }}
-          >
-            {done ? "Seguindo ✓" : "+ Seguir"}
-          </div>
+    <div style={{position: "absolute", left: 230, top: 1540, width: 620, height: 140, transform: `scale(${s})`, transformOrigin: "50% 50%"}}>
+      <div style={{position: "absolute", inset: 0, background: "#ffffff", borderRadius: 34, boxShadow: "0 8px 0 rgba(0,0,0,0.22), 0 0 0 4px rgba(16,16,24,0.9)", display: "flex", alignItems: "center", padding: "0 20px", gap: 16}}>
+        <div style={{width: 100, height: 100, borderRadius: "50%", overflow: "hidden", border: "4px solid #ffd21f", flexShrink: 0, background: "#eee"}}>
+          <Img src={staticFile("perfil.png")} style={{width: "100%", height: "100%", objectFit: "cover"}} />
+        </div>
+        <div style={{flex: 1, fontFamily, fontWeight: 900, fontSize: 34, color: "#101018", letterSpacing: -0.5, whiteSpace: "nowrap"}}>{HANDLE}</div>
+        <div
+          style={{
+            flexShrink: 0,
+            transform: `scale(${press})`,
+            background: done ? "#e4e4ea" : "#ffd21f",
+            color: done ? "#3a3a44" : "#101018",
+            fontFamily,
+            fontWeight: 900,
+            fontSize: 28,
+            padding: "12px 18px",
+            borderRadius: 22,
+            border: done ? "4px solid #c9c9d2" : "4px solid #101018",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {done ? "Seguindo ✓" : "+ Seguir"}
         </div>
       </div>
-      {hOp > 0.01 && f >= tap - 20 && (
-        <div style={{position: "absolute", left: hx, top: hy, fontSize: 130, opacity: hOp, transform: "rotate(-20deg)", filter: "drop-shadow(0 6px 0 rgba(0,0,0,0.3))"}}>👆</div>
-      )}
-    </>
+    </div>
   );
 };
 

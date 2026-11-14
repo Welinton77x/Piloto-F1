@@ -6,6 +6,7 @@ import {sm, rbox} from "./Sets9";
 import {canvasTex, rng} from "./util";
 
 /* ===== Vídeo "Se o seu pai pedir pra você levar o carro no mecânico" ===== */
+const lerp = (a: number, b: number, k: number) => a + (b - a) * k;
 
 const texCache = new Map<string, THREE.MeshStandardMaterial>();
 const tm = (key: string, t: THREE.Texture, rough = 0.6, extra: Partial<THREE.MeshStandardMaterialParameters> = {}) => {
@@ -58,13 +59,59 @@ const melonTex = () =>
       c.fill();
     }
   });
+const plateTex = () =>
+  canvasTex("placa-carro", 256, 80, (x) => {
+    x.fillStyle = "#ffffff";
+    x.fillRect(0, 0, 256, 80);
+    x.fillStyle = "#2e5bd0";
+    x.fillRect(0, 0, 256, 18);
+    x.fillStyle = "#101018";
+    x.font = "bold 46px sans-serif";
+    x.textAlign = "center";
+    x.fillText("PAI-0001", 128, 68);
+  });
+/** olho-farol: globo branco brilhante, aro cromado, íris azul, pupila, dois brilhos e pálpebra da cor da lataria */
+export const CarEye: React.FC<{sd: number; r?: number; lid?: number; mood?: number; wide?: number; look?: [number, number]; body: THREE.Material; brow?: boolean}> = ({sd, r = 0.17, lid = 0, mood = 0, wide = 0, look = [0, 0], body, brow = true}) => {
+  const sy = 1 + 0.15 * wide;
+  const th = lid > 0.001 ? lerp(0.2, 1, lid) * Math.PI : lerp(0.2, 0.1, wide) * Math.PI;
+  const ps = 1 - 0.35 * wide;
+  return (
+    <group>
+      <mesh scale={[1, sy, 0.62]} material={sm("#ffffff", 0.08)}>
+        <sphereGeometry args={[r, 28, 20]} />
+      </mesh>
+      <mesh scale={[1, sy, 1]} material={sm("#d9dde3", 0.22, {metalness: 0.65})}>
+        <torusGeometry args={[r * 1.02, r * 0.13, 10, 32]} />
+      </mesh>
+      <group position={[look[0] * r * 0.28, look[1] * r * 0.28, 0]}>
+        <mesh position={[0, 0, r * 0.555]} scale={[r * 0.56, r * 0.56 * sy, r * 0.12]} material={sm("#2f7fd6", 0.15)}>
+          <sphereGeometry args={[1, 20, 14]} />
+        </mesh>
+        <mesh position={[0, 0, r * 0.6]} scale={[r * 0.3 * ps, r * 0.33 * ps * sy, r * 0.1]} material={sm("#08080c", 0.1)}>
+          <sphereGeometry args={[1, 16, 12]} />
+        </mesh>
+        <mesh position={[r * 0.2, r * 0.22, r * 0.66]} scale={r * 0.12} material={sm("#ffffff", 0.1, {emissive: "#ffffff", emissiveIntensity: 0.4})}>
+          <sphereGeometry args={[1, 10, 8]} />
+        </mesh>
+        <mesh position={[-r * 0.13, -r * 0.16, r * 0.66]} scale={r * 0.055} material={sm("#ffffff", 0.1, {emissive: "#ffffff", emissiveIntensity: 0.4})}>
+          <sphereGeometry args={[1, 8, 6]} />
+        </mesh>
+      </group>
+      {/* pálpebra de cima: fecha do topo pra baixo; inclina quando bravo */}
+      <group rotation={[0, 0, sd * 0.42 * mood]}>
+        <mesh scale={[1.06, sy * 1.06, 0.7]} material={body}>
+          <sphereGeometry args={[r, 28, 16, 0, Math.PI * 2, 0, th]} />
+        </mesh>
+      </group>
+      {brow && <mesh position={[0, r * 1.3 * sy + 0.02, r * 0.3]} rotation={[0, 0, sd * (-0.45 * mood + 0.15 * wide)]} geometry={rbox(r * 1.45, r * 0.28, r * 0.3, r * 0.1)} material={sm("#1d1f27", 0.4)} />}
+    </group>
+  );
+};
 export const Car: React.FC<{p: V3; rotY?: number; c?: CarP; s?: number}> = ({p, rotY = 0, c = {}, s = 1}) => {
   const {mood = 0, sleepy = 0, wide = 0, smile = 0, mouth = 0, t = 0, spin = 0, bounce = 0, shake = 0, melon = 0, color = "#e8414f", blink = 0, steam = 0} = c;
   const body = sm(color, 0.3, {metalness: 0.15});
   const dark = sm("#1d1f27", 0.4);
   const glass = sm("#9fd8ff", 0.1, {metalness: 0.2});
-  const white = sm("#ffffff", 0.2);
-  const eye = sm("#0c0c10", 0.1);
   const lid = Math.max(sleepy, blink);
   const hop = Math.abs(Math.sin(t * 9)) * 0.25 * bounce;
   const sx = shake * 0.03 * Math.sin(t * 55);
@@ -84,16 +131,7 @@ export const Car: React.FC<{p: V3; rotY?: number; c?: CarP; s?: number}> = ({p, 
         <mesh position={[0, 0.33, 1.06]} geometry={rbox(1.18, 0.16, 0.12, 0.06)} material={sm("#d0d4da", 0.25, {metalness: 0.6})} castShadow />
         <mesh position={[0, 0.33, -1.06]} geometry={rbox(1.18, 0.16, 0.12, 0.06)} material={sm("#d0d4da", 0.25, {metalness: 0.6})} castShadow />
         {/* placa */}
-        <mesh position={[0, 0.33, 1.125]} material={tm("placa-carro", canvasTex("placa-carro", 256, 80, (x) => {
-          x.fillStyle = "#ffffff";
-          x.fillRect(0, 0, 256, 80);
-          x.fillStyle = "#2e5bd0";
-          x.fillRect(0, 0, 256, 18);
-          x.fillStyle = "#101018";
-          x.font = "bold 46px sans-serif";
-          x.textAlign = "center";
-          x.fillText("PAI-0001", 128, 68);
-        }), 0.5)}>
+        <mesh position={[0, 0.33, 1.125]} material={tm("placa-carro", plateTex(), 0.5)}>
           <planeGeometry args={[0.32, 0.1]} />
         </mesh>
         {/* rodas */}
@@ -111,24 +149,8 @@ export const Car: React.FC<{p: V3; rotY?: number; c?: CarP; s?: number}> = ({p, 
         )}
         {/* cara: faróis = olhos */}
         {[-1, 1].map((sd) => (
-          <group key={"e" + sd} position={[0.33 * sd, 0.6, 1.02]}>
-            <mesh scale={[1, 1 + 0.25 * wide, 0.55]} material={white}>
-              <sphereGeometry args={[0.16, 20, 14]} />
-            </mesh>
-            <mesh position={[0, 0, 0.075]} scale={[0.075, 0.085 * (1 + 0.3 * wide), 0.04]} material={eye}>
-              <sphereGeometry args={[1, 14, 10]} />
-            </mesh>
-            <mesh position={[0.025, 0.035, 0.1]} scale={0.022} material={white}>
-              <sphereGeometry args={[1, 8, 6]} />
-            </mesh>
-            {/* pálpebra (sono) */}
-            {lid > 0.02 && (
-              <mesh position={[0, 0.16 - 0.16 * lid, 0.02]} rotation={[0, 0, 0]} scale={[1.05, lid * 1.0 + 0.02, 0.6]} material={body}>
-                <sphereGeometry args={[0.165, 20, 10, 0, Math.PI * 2, 0, Math.PI / 2]} />
-              </mesh>
-            )}
-            {/* sobrancelha */}
-            <mesh position={[0, 0.2 + 0.03 * wide, 0.07]} rotation={[0, 0, sd * (-0.45 * mood + 0.15 * wide)]} geometry={rbox(0.24, 0.05, 0.05, 0.02)} material={dark} />
+          <group key={"e" + sd} position={[0.32 * sd, 0.63, 1.06]}>
+            <CarEye sd={sd} r={0.17} lid={lid} mood={mood} wide={wide} body={body} />
           </group>
         ))}
         {/* grade = boca */}
@@ -345,7 +367,7 @@ export const Workshop: React.FC = () => {
 };
 
 /* ---------- polvo mecânico ---------- */
-export type OctoP = {pos?: V3; rotY?: number; t?: number; blink?: number; mouth?: number; tools?: boolean; work?: number; shades?: boolean; foam?: number; tapFeet?: number; thumbs?: number; s?: number; scissors?: V3; tips?: Partial<Record<number, V3>>; lean?: number};
+export type OctoP = {pos?: V3; rotY?: number; t?: number; blink?: number; mouth?: number; tools?: boolean; work?: number; shades?: boolean; foam?: number; tapFeet?: number; thumbs?: number; s?: number; scissors?: V3; tips?: Partial<Record<number, V3>>; lean?: number; wrench?: boolean};
 /* braços: ângulo a partir da frente (+z), 0..3 à direita (+x), 4..7 à esquerda */
 const ARM_A = Array.from({length: 8}, (_, i) => ((i + 0.5) / 8) * Math.PI * 2);
 const ARM_WORK: V3[] = [
@@ -359,7 +381,7 @@ const ARM_WORK: V3[] = [
   [-0.6, 1.0, 0.62], // livre / tesoura
 ];
 const ARM_THUMB: V3[] = [ARM_WORK[0], [0.95, 2.1, 0.35], ARM_WORK[2], ARM_WORK[3], ARM_WORK[4], ARM_WORK[5], [-0.95, 2.1, 0.35], ARM_WORK[7]];
-const restTip = (i: number): V3 => [Math.sin(ARM_A[i]) * 1.05, 0.04, Math.cos(ARM_A[i]) * 0.95];
+const restTip = (i: number): V3 => (i === 1 ? [0.95, 1.2, 0.5] : [Math.sin(ARM_A[i]) * 1.05, 0.04, Math.cos(ARM_A[i]) * 0.95]);
 /** ponta do braço i (espaço do polvo) */
 export const octoTip = (i: number, o: OctoP): V3 => {
   const {t = 0, work = 0, thumbs = 0, tapFeet = 0, scissors, tips} = o;
@@ -374,7 +396,23 @@ export const octoTip = (i: number, o: OctoP): V3 => {
   if (p[1] < 0.1) p[1] += 0.1 * Math.abs(Math.sin(t * 11 + i * 1.3)) * tapFeet;
   return p;
 };
-const lerp = (a: number, b: number, k: number) => a + (b - a) * k;
+/** chave inglesa (segura pelo cabo; cabeça pra cima) */
+export const ChaveInglesa: React.FC<{p?: V3; r?: V3; s?: number}> = ({p = [0, 0, 0], r = [0, 0, 0], s = 1}) => {
+  const steel = sm("#c9ced6", 0.22, {metalness: 0.75});
+  return (
+    <group position={p} rotation={r} scale={s}>
+      <mesh position={[0, 0.16, 0]} geometry={rbox(0.075, 0.36, 0.03, 0.03)} material={steel} castShadow />
+      <mesh position={[0, 0.02, 0]} geometry={rbox(0.085, 0.12, 0.04, 0.03)} material={sm("#e8414f", 0.4)} />
+      {/* cabeça: mandíbula fixa + móvel e a rosca */}
+      <mesh position={[0.0, 0.37, 0]} geometry={rbox(0.12, 0.1, 0.035, 0.02)} material={steel} castShadow />
+      <mesh position={[0.07, 0.43, 0]} geometry={rbox(0.11, 0.05, 0.035, 0.015)} material={steel} />
+      <mesh position={[0.06, 0.33, 0]} geometry={rbox(0.09, 0.045, 0.035, 0.015)} material={steel} />
+      <mesh position={[-0.01, 0.335, 0.0]} rotation={[0, 0, Math.PI / 2]} material={sm("#8c919b", 0.3, {metalness: 0.7})}>
+        <cylinderGeometry args={[0.022, 0.022, 0.07, 10]} />
+      </mesh>
+    </group>
+  );
+};
 const Tool: React.FC<{i: number}> = ({i}) => {
   switch (i) {
     case 0:
@@ -444,7 +482,7 @@ const taperTube = (curve: THREE.Curve<THREE.Vector3>, r0: number, r1: number, se
 };
 export const OCTO_MANTLE_Y = 1.1;
 export const Octopus: React.FC<{o: OctoP; children?: React.ReactNode}> = ({o, children}) => {
-  const {pos = [0, 0, 0], rotY = 0, t = 0, blink = 0, mouth = 0, tools = false, shades = false, foam = 0, s = 1, scissors, lean = 0} = o;
+  const {pos = [0, 0, 0], rotY = 0, t = 0, blink = 0, mouth = 0, tools = false, shades = false, foam = 0, s = 1, scissors, lean = 0, wrench = true} = o;
   const skin = sm("#9b59b6", 0.4);
   const skin2 = sm("#d7b4e6", 0.45);
   const blue = sm("#2e5bd0", 0.6);
@@ -473,11 +511,12 @@ export const Octopus: React.FC<{o: OctoP; children?: React.ReactNode}> = ({o, ch
                 </mesh>
               );
             })}
-            {tools && (
+            {tools && i !== 1 && (
               <group position={tip}>
                 <Tool i={i} />
               </group>
             )}
+            {wrench && i === 1 && <ChaveInglesa p={[tip[0], tip[1] - 0.06, tip[2]]} r={[0, -0.5, -0.35]} s={1.5} />}
             {i === 7 && scissors && <Scissors p={tip} t={t} s={1.6} />}
             {foam > 0.01 &&
               [0.35, 0.6, 0.85].map((u, k) => {
@@ -497,19 +536,23 @@ export const Octopus: React.FC<{o: OctoP; children?: React.ReactNode}> = ({o, ch
           <mesh position={[0, MY, -0.02]} scale={[0.55, 0.65, 0.52]} material={skin} castShadow>
             <sphereGeometry args={[1, 32, 24]} />
           </mesh>
-          {/* macacão: calça na parte de baixo + peitilho com botões */}
+          {/* macacão jeans: calça cobrindo a parte de baixo + peitilho com bolso e botões */}
           <mesh position={[0, MY, -0.02]} scale={[0.55 * 1.035, 0.65 * 1.035, 0.52 * 1.035]} material={blue} castShadow>
-            <sphereGeometry args={[1, 32, 12, 0, Math.PI * 2, Math.PI * 0.68, Math.PI * 0.32]} />
+            <sphereGeometry args={[1, 32, 12, 0, Math.PI * 2, Math.PI * 0.62, Math.PI * 0.38]} />
           </mesh>
-          <mesh position={[0, 0.775, 0.445]} rotation={[0.44, 0, 0]} geometry={rbox(0.36, 0.16, 0.035, 0.02)} material={blue} />
+          <mesh position={[0, MY - 0.245, -0.02]} rotation={[Math.PI / 2, 0, 0]} scale={[0.55 * 1.04 * 0.93, 0.52 * 1.04 * 0.93, 1]} material={sm("#1f3f9a", 0.6)}>
+            <torusGeometry args={[1, 0.022, 8, 40]} />
+          </mesh>
+          <mesh position={[0, 0.875, 0.49]} rotation={[0.29, 0, 0]} geometry={rbox(0.44, 0.15, 0.035, 0.03)} material={blue} />
+          <mesh position={[0, 0.86, 0.51]} rotation={[0.29, 0, 0]} geometry={rbox(0.17, 0.08, 0.015, 0.015)} material={sm("#4a7be0", 0.6)} />
           {[-1, 1].map((sd) => (
-            <mesh key={"bt" + sd} position={[0.13 * sd, 0.815, 0.47]} material={sm("#ffd21f", 0.4)}>
-              <sphereGeometry args={[0.025, 10, 8]} />
+            <mesh key={"bt" + sd} position={[0.17 * sd, 0.925, 0.5]} material={sm("#ffd21f", 0.35, {metalness: 0.3})}>
+              <sphereGeometry args={[0.028, 10, 8]} />
             </mesh>
           ))}
           {/* olhos */}
           {[-1, 1].map((sd) => (
-            <group key={sd} position={[0.19 * sd, MY - 0.03, 0.43]} rotation={[0, 0.32 * sd, 0]} scale={[1, eyeY, 1]}>
+            <group key={sd} position={[0.19 * sd, MY + 0.08, 0.44]} rotation={[0, 0.32 * sd, 0]} scale={[1, eyeY, 1]}>
               <mesh scale={[0.13, 0.15, 0.06]} material={sm("#ffffff", 0.2)}>
                 <sphereGeometry args={[1, 18, 14]} />
               </mesh>
@@ -522,20 +565,33 @@ export const Octopus: React.FC<{o: OctoP; children?: React.ReactNode}> = ({o, ch
             </group>
           ))}
           {shades && (
-            <group position={[0, MY - 0.02, 0.5]}>
+            <group position={[0, MY + 0.09, 0.51]}>
               {[-1, 1].map((sd) => (
                 <mesh key={sd} position={[0.19 * sd, 0, 0]} rotation={[0, 0.32 * sd, 0]} geometry={rbox(0.27, 0.18, 0.03, 0.07)} material={sm("#0b0b10", 0.1)} />
               ))}
               <mesh position={[0, 0.03, 0.015]} geometry={rbox(0.12, 0.03, 0.02, 0.01)} material={sm("#0b0b10", 0.1)} />
             </group>
           )}
+          {/* bigodão */}
+          <group position={[0, 1.035, 0.5]}>
+            {[-1, 1].map((sd) => (
+              <group key={"bg" + sd}>
+                <mesh position={[0.1 * sd, 0, 0]} rotation={[0, 0.3 * sd, -0.28 * sd]} scale={[0.135, 0.055, 0.06]} material={sm("#3b2416", 0.55)} castShadow>
+                  <sphereGeometry args={[1, 16, 10]} />
+                </mesh>
+                <mesh position={[0.225 * sd, 0.03, -0.04]} material={sm("#3b2416", 0.55)}>
+                  <sphereGeometry args={[0.035, 10, 8]} />
+                </mesh>
+              </group>
+            ))}
+          </group>
           {mouth > 0.05 ? (
-            <mesh position={[0, 0.885, 0.475]} scale={[0.08, 0.02 + 0.05 * mouth, 0.03]} material={sm("#3a1510", 0.5)}>
+            <mesh position={[0, 0.96, 0.49]} scale={[0.08, 0.02 + 0.045 * mouth, 0.03]} material={sm("#3a1510", 0.5)}>
               <sphereGeometry args={[1, 12, 8]} />
             </mesh>
           ) : (
-            <mesh position={[0, 0.9, 0.48]} rotation={[0.25, 0, Math.PI + 0.55]} material={sm("#3a1510", 0.5)}>
-              <torusGeometry args={[0.075, 0.013, 8, 18, Math.PI * 0.62]} />
+            <mesh position={[0, 0.975, 0.495]} rotation={[0.25, 0, Math.PI + 0.55]} material={sm("#3a1510", 0.5)}>
+              <torusGeometry args={[0.07, 0.013, 8, 18, Math.PI * 0.62]} />
             </mesh>
           )}
           {/* boné */}
@@ -585,86 +641,166 @@ export const HairBits: React.FC<{p: V3; k: number; t: number}> = ({p, k, t}) => 
   );
 };
 
-/* ---------- robô (o carro transformado) ---------- */
-export const CarRobot: React.FC<{p: V3; rotY?: number; t?: number; dance?: number; k?: number; mic?: boolean; mouth?: number; s?: number}> = ({p, rotY = 0, t = 0, dance = 0, k = 1, mic = true, mouth = 0, s = 1}) => {
-  const body = sm("#e8414f", 0.3, {metalness: 0.15});
+/* ---------- robô (o carro transformado): ~3,95 de altura em escala 1 ---------- */
+const RobotArm: React.FC<{sd: number; rot: V3; elbow: number; body: THREE.Material; steel: THREE.Material; dark: THREE.Material; mic?: boolean; wave?: number}> = ({sd, rot, elbow, body, steel, dark, mic}) => (
+  <group position={[0.98 * sd, 2.65, 0]} rotation={rot}>
+    {/* ombro = roda */}
+    <group rotation={[0, 0, Math.PI / 2]}>
+      <mesh material={dark} castShadow>
+        <cylinderGeometry args={[0.3, 0.3, 0.26, 26]} />
+      </mesh>
+      <mesh position={[0, 0.135 * sd, 0]} material={steel}>
+        <cylinderGeometry args={[0.15, 0.15, 0.02, 18]} />
+      </mesh>
+    </group>
+    <mesh position={[0, -0.3, 0]} material={steel} castShadow>
+      <cylinderGeometry args={[0.11, 0.11, 0.5, 14]} />
+    </mesh>
+    <group position={[0, -0.55, 0]} rotation={[elbow, 0, 0]}>
+      <mesh material={dark}>
+        <sphereGeometry args={[0.15, 14, 10]} />
+      </mesh>
+      <mesh position={[0, -0.3, 0]} geometry={rbox(0.3, 0.5, 0.32, 0.08)} material={body} castShadow />
+      <mesh position={[0, -0.3, 0.165]} geometry={rbox(0.18, 0.06, 0.02, 0.02)} material={sm("#ffb020", 0.3, {emissive: "#ff9a1f", emissiveIntensity: 0.6})} />
+      {/* mão de 3 dedos */}
+      <group position={[0, -0.62, 0]}>
+        <mesh material={steel}>
+          <sphereGeometry args={[0.13, 14, 10]} />
+        </mesh>
+        {[-1, 0, 1].map((k) => (
+          <mesh key={k} position={[0.07 * k, -0.11, 0.06 * Math.abs(k) - 0.03]} rotation={[0.5, 0, 0.25 * k]} geometry={rbox(0.06, 0.16, 0.06, 0.025)} material={dark} />
+        ))}
+        {mic && (
+          <group position={[0, -0.12, 0.02]}>
+            <mesh material={sm("#2b2e3b", 0.35)}>
+              <cylinderGeometry args={[0.04, 0.032, 0.26, 12]} />
+            </mesh>
+            <mesh position={[0, -0.17, 0]} material={sm("#9aa0aa", 0.25, {metalness: 0.6})}>
+              <sphereGeometry args={[0.085, 14, 10]} />
+            </mesh>
+          </group>
+        )}
+      </group>
+    </group>
+  </group>
+);
+export const CarRobot: React.FC<{p: V3; rotY?: number; t?: number; dance?: number; k?: number; mic?: boolean; mouth?: number; s?: number; look?: [number, number]}> = ({p, rotY = 0, t = 0, dance = 0, k = 1, mic = true, mouth = 0, s = 1, look = [0, 0]}) => {
+  const body = sm("#e8414f", 0.28, {metalness: 0.15});
   const dark = sm("#1d1f27", 0.4);
-  const steel = sm("#c9ced6", 0.3, {metalness: 0.6});
-  const sway = dance * 0.18 * Math.sin(t * 6);
-  const bob = dance * 0.08 * Math.abs(Math.sin(t * 6));
-  const armL = dance * (0.6 + 0.6 * Math.sin(t * 6));
-  const armR = dance * (0.6 + 0.6 * Math.sin(t * 6 + Math.PI));
+  const steel = sm("#c9ced6", 0.28, {metalness: 0.6});
+  const glass = sm("#9fd8ff", 0.08, {metalness: 0.2});
+  const ph = t * 6;
+  const sway = dance * 0.12 * Math.sin(ph);
+  const bob = dance * 0.12 * Math.abs(Math.sin(ph));
+  const nod = dance * 0.1 * Math.sin(ph * 2);
   if (k < 0.01) return null;
+  const rArm: V3 = mic ? [-1.774 + 0.06 * Math.sin(ph), -0.704, -0.538] : [-0.4 - 0.9 * dance * (0.5 + 0.5 * Math.sin(ph)), 0, -0.35 - 0.5 * dance];
+  const lArm: V3 = [-0.3 - 0.5 * dance * (0.5 + 0.5 * Math.sin(ph + Math.PI)), 0, 0.35 + 1.3 * dance * (0.5 + 0.5 * Math.sin(ph + Math.PI))];
   return (
     <group position={p} rotation={[0, rotY, 0]} scale={s * k}>
-      {/* pernas com rodas de pé */}
-      {[-1, 1].map((sd) => (
-        <group key={sd} position={[0.42 * sd, 0, 0]}>
-          <mesh position={[0, 0.75, 0]} geometry={rbox(0.36, 1.1, 0.4, 0.08)} material={steel} castShadow />
-          <mesh position={[0, 0.22, 0.05]} rotation={[0, 0, Math.PI / 2]} material={dark} castShadow>
-            <cylinderGeometry args={[0.24, 0.24, 0.3, 20]} />
-          </mesh>
-        </group>
-      ))}
+      {/* pernas: pés com pneu, canela vermelha, joelho cromado, coxa de pistão */}
+      {[-1, 1].map((sd) => {
+        const lift = dance * 0.12 * Math.max(0, Math.sin(ph + (sd > 0 ? 0 : Math.PI)));
+        return (
+          <group key={sd} position={[0.45 * sd, lift, 0]}>
+            <mesh position={[0, 0.14, 0.08]} geometry={rbox(0.55, 0.28, 0.8, 0.1)} material={dark} castShadow />
+            <mesh position={[0.29 * sd, 0.2, 0.0]} rotation={[0, 0, Math.PI / 2]} material={sm("#2b2e3b", 0.6)}>
+              <cylinderGeometry args={[0.22, 0.22, 0.1, 22]} />
+            </mesh>
+            <mesh position={[0.35 * sd, 0.2, 0.0]} rotation={[0, 0, Math.PI / 2]} material={steel}>
+              <cylinderGeometry args={[0.11, 0.11, 0.02, 16]} />
+            </mesh>
+            <mesh position={[0, 0.72, 0]} geometry={rbox(0.44, 0.85, 0.48, 0.1)} material={body} castShadow />
+            <mesh position={[0, 0.72, 0.245]} geometry={rbox(0.26, 0.5, 0.02, 0.05)} material={glass} />
+            <mesh position={[0, 1.2, 0.05]} material={steel} castShadow>
+              <sphereGeometry args={[0.17, 16, 12]} />
+            </mesh>
+            <mesh position={[0, 1.42, 0]} material={steel} castShadow>
+              <cylinderGeometry args={[0.13, 0.15, 0.4, 14]} />
+            </mesh>
+          </group>
+        );
+      })}
       <group position={[0, bob, 0]} rotation={[0, 0, sway]}>
-        {/* tronco = carroceria */}
-        <mesh position={[0, 1.85, 0]} geometry={rbox(1.4, 1.2, 0.8, 0.2)} material={body} castShadow />
-        <mesh position={[0, 1.95, 0.41]} geometry={rbox(0.9, 0.5, 0.03, 0.06)} material={sm("#9fd8ff", 0.1, {metalness: 0.2})} />
-        <mesh position={[0, 1.4, 0.42]} geometry={rbox(1.2, 0.14, 0.1, 0.05)} material={steel} />
-        <mesh position={[0, 1.55, 0.44]} material={tm("placa-carro", canvasTex("placa-carro", 256, 80, () => undefined), 0.5)}>
-          <planeGeometry args={[0.32, 0.1]} />
+        {/* quadril */}
+        <mesh position={[0, 1.66, 0]} geometry={rbox(1.05, 0.3, 0.55, 0.1)} material={dark} castShadow />
+        {/* tronco = frente do carro */}
+        <mesh position={[0, 2.3, 0]} geometry={rbox(1.6, 1.15, 0.9, 0.22)} material={body} castShadow />
+        <mesh position={[0, 2.58, 0.4]} rotation={[-0.25, 0, 0]} geometry={rbox(1.15, 0.42, 0.05, 0.07)} material={glass} />
+        {/* grade no peito */}
+        <mesh position={[0, 2.02, 0.455]} geometry={rbox(0.9, 0.34, 0.03, 0.06)} material={dark} />
+        {[-0.3, -0.1, 0.1, 0.3].map((x) => (
+          <mesh key={x} position={[x, 2.02, 0.475]} geometry={rbox(0.05, 0.26, 0.02, 0.015)} material={steel} />
+        ))}
+        {/* faróis do peito */}
+        {[-1, 1].map((sd) => (
+          <mesh key={"f" + sd} position={[0.62 * sd, 2.05, 0.43]} scale={[1, 1, 0.4]} material={sm("#fff6c8", 0.2, {emissive: "#ffe9a0", emissiveIntensity: 0.9})}>
+            <sphereGeometry args={[0.12, 16, 12]} />
+          </mesh>
+        ))}
+        <mesh position={[0, 1.8, 0.47]} material={tm("placa-carro", plateTex(), 0.5)}>
+          <planeGeometry args={[0.42, 0.13]} />
         </mesh>
-        {/* cabeça = cabine com faróis */}
-        <group position={[0, 2.75, 0]} rotation={[0, 0, -sway * 0.6]}>
-          <mesh geometry={rbox(0.9, 0.6, 0.7, 0.2)} material={body} castShadow />
+        {/* portas nas costas (asas) */}
+        {[-1, 1].map((sd) => (
+          <group key={"p" + sd} position={[0.6 * sd, 2.45, -0.5]} rotation={[0.15, sd * 0.55, sd * 0.25]}>
+            <mesh position={[0.45 * sd, 0, 0]} geometry={rbox(0.9, 0.8, 0.08, 0.1)} material={body} castShadow />
+            <mesh position={[0.45 * sd, 0.15, 0.045]} geometry={rbox(0.62, 0.32, 0.02, 0.06)} material={glass} />
+          </group>
+        ))}
+        {/* escapamentos nos ombros, soltando fumaça */}
+        {[-1, 1].map((sd) => (
+          <group key={"x" + sd} position={[0.62 * sd, 3.0, -0.3]}>
+            <mesh material={steel}>
+              <cylinderGeometry args={[0.07, 0.07, 0.4, 12]} />
+            </mesh>
+            {[0, 1].map((i) => {
+              const q = (t * 0.7 + i * 0.5 + (sd > 0 ? 0.25 : 0)) % 1;
+              return (
+                <mesh key={i} position={[0, 0.3 + q * 0.8, 0]} material={sm("#d8dbe2", 0.9, {transparent: true, opacity: 0.55 * (1 - q)})}>
+                  <sphereGeometry args={[0.08 + 0.14 * q, 10, 8]} />
+                </mesh>
+              );
+            })}
+          </group>
+        ))}
+        <RobotArm sd={1} rot={rArm} elbow={mic ? -1.151 : -0.5 - 0.4 * dance} body={body} steel={steel} dark={dark} mic={mic} />
+        <RobotArm sd={-1} rot={lArm} elbow={-0.6 - 0.5 * dance} body={body} steel={steel} dark={dark} />
+        {/* cabeça = cabine, com os mesmos olhos do carro */}
+        <group position={[0, 3.25, 0.02]} rotation={[nod, 0, -sway * 0.6]}>
+          <mesh position={[0, -0.32, 0]} material={steel}>
+            <cylinderGeometry args={[0.16, 0.2, 0.2, 14]} />
+          </mesh>
+          <mesh geometry={rbox(1.0, 0.68, 0.78, 0.22)} material={body} castShadow />
+          <mesh position={[0, 0.3, 0]} geometry={rbox(0.9, 0.12, 0.7, 0.05)} material={glass} />
           {[-1, 1].map((sd) => (
-            <group key={sd} position={[0.22 * sd, 0.05, 0.34]}>
-              <mesh scale={[1, 1, 0.5]} material={sm("#fff9d0", 0.2, {emissive: "#fff3b0", emissiveIntensity: 0.6})}>
-                <sphereGeometry args={[0.13, 18, 12]} />
-              </mesh>
-              <mesh position={[0, 0, 0.06]} scale={[0.06, 0.07, 0.03]} material={sm("#0c0c10", 0.1)}>
-                <sphereGeometry args={[1, 12, 8]} />
+            <group key={"e" + sd} position={[0.24 * sd, 0.06, 0.4]}>
+              <CarEye sd={sd} r={0.15} look={look} body={body} />
+            </group>
+          ))}
+          {/* boca = grade que abre cantando */}
+          <group position={[0, -0.2, 0.395]}>
+            <mesh scale={[1, 0.35 + 1.2 * mouth, 1]} geometry={rbox(0.38, 0.12, 0.03, 0.04)} material={sm("#3a1510", 0.5)} />
+            {[-0.12, 0, 0.12].map((x) => (
+              <mesh key={x} position={[x, 0.02 + 0.05 * mouth, 0.02]} geometry={rbox(0.025, 0.07 * (0.35 + 1.2 * mouth), 0.02, 0.01)} material={steel} />
+            ))}
+          </group>
+          {/* retrovisores = orelhas */}
+          {[-1, 1].map((sd) => (
+            <group key={"r" + sd} position={[0.55 * sd, 0.05, 0.1]} rotation={[0, 0, -0.2 * sd]}>
+              <mesh geometry={rbox(0.12, 0.2, 0.14, 0.04)} material={body} />
+              <mesh position={[0.065 * sd, 0, 0]} rotation={[0, (Math.PI / 2) * sd, 0]} material={glass}>
+                <planeGeometry args={[0.1, 0.14]} />
               </mesh>
             </group>
           ))}
-          {mouth > 0.05 ? (
-            <mesh position={[0, -0.17, 0.35]} scale={[0.14, 0.03 + 0.08 * mouth, 0.03]} material={sm("#3a1510", 0.5)}>
-              <sphereGeometry args={[1, 12, 8]} />
-            </mesh>
-          ) : (
-            <mesh position={[0, -0.15, 0.36]} rotation={[0, 0, Math.PI + 0.35]} material={dark}>
-              <torusGeometry args={[0.12, 0.02, 8, 18, Math.PI * 0.75]} />
-            </mesh>
-          )}
-          <mesh position={[0, 0.38, 0]} material={steel}>
-            <cylinderGeometry args={[0.02, 0.02, 0.2, 8]} />
+          <mesh position={[0, 0.48, 0]} material={steel}>
+            <cylinderGeometry args={[0.02, 0.02, 0.32, 8]} />
           </mesh>
-          <mesh position={[0, 0.5, 0]} material={sm("#ffd21f", 0.3, {emissive: "#ffd21f", emissiveIntensity: 0.6 + 0.6 * Math.abs(Math.sin(t * 8))})}>
-            <sphereGeometry args={[0.06, 10, 8]} />
+          <mesh position={[0, 0.66, 0]} material={sm("#ffd21f", 0.3, {emissive: "#ffd21f", emissiveIntensity: 0.6 + 0.6 * Math.abs(Math.sin(t * 8))})}>
+            <sphereGeometry args={[0.07, 12, 10]} />
           </mesh>
         </group>
-        {/* braços com rodas de ombro */}
-        {[-1, 1].map((sd) => (
-          <group key={"b" + sd} position={[0.85 * sd, 2.25, 0]} rotation={sd > 0 && mic ? [-2.11 + 0.08 * Math.sin(t * 6), 0, -0.79] : [-0.3 * (sd > 0 ? armR : armL), 0, sd * (0.25 + 0.9 * (sd > 0 ? armR : armL))]}>
-            <mesh rotation={[0, 0, Math.PI / 2]} material={dark} castShadow>
-              <cylinderGeometry args={[0.22, 0.22, 0.2, 20]} />
-            </mesh>
-            <mesh position={[0, -0.45, 0]} geometry={rbox(0.28, 0.8, 0.3, 0.08)} material={steel} castShadow />
-            <mesh position={[0, -0.9, 0]} material={body}>
-              <sphereGeometry args={[0.17, 14, 10]} />
-            </mesh>
-            {mic && sd > 0 && (
-              <group position={[0, -1.05, 0]}>
-                <mesh material={sm("#2b2e3b", 0.4)}>
-                  <cylinderGeometry args={[0.035, 0.03, 0.22, 10]} />
-                </mesh>
-                <mesh position={[0, -0.15, 0]} material={sm("#8c8f99", 0.3, {metalness: 0.5})}>
-                  <sphereGeometry args={[0.075, 12, 10]} />
-                </mesh>
-              </group>
-            )}
-          </group>
-        ))}
       </group>
     </group>
   );
