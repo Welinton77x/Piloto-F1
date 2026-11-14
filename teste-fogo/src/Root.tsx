@@ -18,6 +18,7 @@ import {BoloPreview} from "./BoloPreview";
 import {MecPreview} from "./MecPreview";
 import {ChulePreview} from "./ChulePreview";
 import {VideoChuveiro, TOTAL_CHUV} from "./VideoChuveiro";
+import {VideoPastel, TOTAL_PASTEL} from "./VideoPastel";
 import {VideoChule, TOTAL_CHULE} from "./VideoChule";
 import {VideoMec, TOTAL_MEC} from "./VideoMec";
 import {VideoBolo, TOTAL_BOLO} from "./VideoBolo";
@@ -30,6 +31,7 @@ export const Root: React.FC = () => (
     <Composition id="Mecanico" component={VideoMec} durationInFrames={TOTAL_MEC} fps={30} width={1080} height={1920} />
     <Composition id="Chule" component={VideoChule} durationInFrames={TOTAL_CHULE} fps={30} width={1080} height={1920} />
     <Composition id="Chuveiro" component={VideoChuveiro} durationInFrames={TOTAL_CHUV} fps={30} width={1080} height={1920} />
+    <Composition id="Pastel" component={VideoPastel} durationInFrames={TOTAL_PASTEL} fps={30} width={1080} height={1920} />
     <Composition id="ChulePreview" component={ChulePreview} durationInFrames={8} fps={30} width={1080} height={1920} />
     <Composition id="MecPreview" component={MecPreview} durationInFrames={6} fps={30} width={1080} height={1920} />
     <Composition id="Casamento" component={VideoCasamento} durationInFrames={TOTAL_CASA} fps={30} width={1080} height={1920} />

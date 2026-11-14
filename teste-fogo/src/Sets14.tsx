@@ -539,15 +539,35 @@ export const Dam: React.FC<{t: number}> = ({t}) => (
   </group>
 );
 /** capacete de astronauta tipo traje espacial (casco branco + viseira dourada espelhada) — espaço da cabeça */
-export const EvaHelmet: React.FC<{visor?: number}> = ({visor = 1}) => (
+export const EvaHelmet: React.FC<{visor?: number; open?: boolean}> = ({visor = 1, open = false}) => (
   <group position={[0, 0.02, 0]}>
-    <mesh material={sm("#f4f4f2", 0.35)} castShadow>
-      <sphereGeometry args={[0.52, 32, 24]} />
-    </mesh>
-    {/* abertura da frente com viseira dourada */}
-    <mesh position={[0, 0.02, 0.1]} rotation={[0, 0, 0]} scale={[0.92, 0.82, 0.92]} material={sm("#d4a017", 0.08, {metalness: 0.9, emissive: "#7a5a10", emissiveIntensity: 0.35 * visor, transparent: visor < 1, opacity: 0.35 + 0.65 * visor})}>
-      <sphereGeometry args={[0.5, 28, 18, Math.PI * 0.12, Math.PI * 0.76, Math.PI * 0.22, Math.PI * 0.5]} />
-    </mesh>
+    {open ? (
+      <>
+        {/* casco com a janela da frente aberta (rosto visível pelo vidro) */}
+        <mesh material={sm("#f4f4f2", 0.35, {side: THREE.DoubleSide})} castShadow>
+          <sphereGeometry args={[0.52, 32, 24, Math.PI * 0.86, Math.PI * 1.28]} />
+        </mesh>
+        <mesh material={sm("#f4f4f2", 0.35, {side: THREE.DoubleSide})}>
+          <sphereGeometry args={[0.52, 24, 8, Math.PI * 0.12, Math.PI * 0.76, 0, Math.PI * 0.2]} />
+        </mesh>
+        <mesh material={sm("#f4f4f2", 0.35, {side: THREE.DoubleSide})}>
+          <sphereGeometry args={[0.52, 24, 8, Math.PI * 0.12, Math.PI * 0.76, Math.PI * 0.7, Math.PI * 0.3]} />
+        </mesh>
+        <mesh material={sm("#dff1ff", 0.05, {transparent: true, opacity: 0.18, metalness: 0.3})}>
+          <sphereGeometry args={[0.53, 28, 18, Math.PI * 0.1, Math.PI * 0.8, Math.PI * 0.18, Math.PI * 0.54]} />
+        </mesh>
+      </>
+    ) : (
+      <>
+        <mesh material={sm("#f4f4f2", 0.35)} castShadow>
+          <sphereGeometry args={[0.52, 32, 24]} />
+        </mesh>
+        {/* abertura da frente com viseira dourada */}
+        <mesh position={[0, 0.02, 0.1]} rotation={[0, 0, 0]} scale={[0.92, 0.82, 0.92]} material={sm("#d4a017", 0.08, {metalness: 0.9, emissive: "#7a5a10", emissiveIntensity: 0.35 * visor, transparent: visor < 1, opacity: 0.35 + 0.65 * visor})}>
+          <sphereGeometry args={[0.5, 28, 18, Math.PI * 0.12, Math.PI * 0.76, Math.PI * 0.22, Math.PI * 0.5]} />
+        </mesh>
+      </>
+    )}
     {/* lanternas laterais */}
     {[-1, 1].map((sd) => (
       <group key={sd} position={[0.42 * sd, 0.22, 0.18]}>
