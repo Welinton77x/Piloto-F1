@@ -273,16 +273,28 @@ export const CoffeeCup: React.FC<{p?: V3; s?: number}> = ({p = [0, 0, 0], s = 1}
 
 /* ---------- estátua do chinelo na praça ---------- */
 export const ChineloStatue: React.FC<{p: V3; s?: number}> = ({p, s = 1}) => {
-  const gold = sm("#e3b33b", 0.25, {metalness: 0.75, emissive: "#5a3a00", emissiveIntensity: 0.25});
+  const gold = sm("#f4c430", 0.35, {metalness: 0.15, emissive: "#8a5a00", emissiveIntensity: 0.35});
+  const strap = sm("#ffde59", 0.3, {metalness: 0.15, emissive: "#8a5a00", emissiveIntensity: 0.3});
   return (
     <group position={p} scale={s}>
       <mesh position={[0, 0.6, 0]} geometry={rbox(1.6, 1.2, 1.6, 0.04)} material={sm("#d9d4c8", 0.8)} castShadow receiveShadow />
-      <group position={[0, 1.2, 0]} rotation={[-0.25, 0.4, 0]}>
-        <mesh position={[0, 1.1, 0]} rotation={[Math.PI / 2, 0, 0]} scale={[0.45, 1.2, 0.08]} material={gold} castShadow>
-          <sphereGeometry args={[1, 24, 12]} />
+      {/* chinelo de dedo em pé, dourado */}
+      <group position={[0, 1.2, 0]} rotation={[-0.12, 0.25, 0]}>
+        {/* sola: dedos (larga em cima) + calcanhar */}
+        <mesh position={[0, 1.6, 0]} scale={[0.5, 0.75, 0.1]} material={gold} castShadow>
+          <sphereGeometry args={[1, 28, 14]} />
         </mesh>
-        <mesh position={[0, 1.1, 0.12]} rotation={[0, 0, 0]} material={gold}>
-          <torusGeometry args={[0.3, 0.06, 8, 20, Math.PI]} />
+        <mesh position={[0, 0.85, 0]} scale={[0.42, 0.7, 0.1]} material={gold} castShadow>
+          <sphereGeometry args={[1, 28, 14]} />
+        </mesh>
+        {/* tiras em V saindo do pino do dedo */}
+        {[-1, 1].map((sd) => (
+          <mesh key={sd} position={[sd * 0.2, 1.62, 0.13]} rotation={[0, 0, sd * 0.95]} material={strap} castShadow>
+            <capsuleGeometry args={[0.065, 0.42, 6, 10]} />
+          </mesh>
+        ))}
+        <mesh position={[0, 1.8, 0.12]} material={strap}>
+          <sphereGeometry args={[0.08, 12, 10]} />
         </mesh>
       </group>
     </group>

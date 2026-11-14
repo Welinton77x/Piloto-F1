@@ -44,8 +44,8 @@ const VO: ToyLook = {hairStyle: "bun", hair: "#e6e6e6", shirt: "#8e5aa8", pants:
 const TIA1: ToyLook = {hairStyle: "curly", hair: "#d9d9d9", shirt: "#f06292", pants: "#5a4a6a", skin: "#e9b88a"};
 const TIA2: ToyLook = {hairStyle: "bun", hair: "#b0b0b0", shirt: "#26c6da", pants: "#3a3f4a"};
 const NOIVA: ToyLook = {dress: true, veil: true, hairStyle: "long", hair: "#5a3a20", lashes: true, lips: "#d6455d"};
-const NOIVO: ToyLook = {suit: true, hairStyle: "buzz", hair: "#101018"};
-const TECNICO: ToyLook = {suit: true, hairStyle: "bald", skin: "#e9b88a"};
+const NOIVO: ToyLook = {suit: true, shirt: "#1f2330", pants: "#1f2330", hairStyle: "buzz", hair: "#101018"};
+const TECNICO: ToyLook = {suit: true, shirt: "#2a2f3a", pants: "#2a2f3a", hairStyle: "bald", skin: "#e9b88a"};
 const ARQUEOLOGO: ToyLook = {shirt: "#c9a46a", pants: "#8a6a4a", hairStyle: "buzz", hair: "#5a3a20"};
 const MAE: ToyLook = {apron: true, shirt: "#2e86de", hairStyle: "ponytail", hair: "#2a1a10", lips: "#c0392b"};
 const FORRO: ToyLook[] = [
@@ -122,7 +122,7 @@ const Goals: React.FC = () => (
     <BrickGoal p={[8, 0, FZ]} rotY={Math.PI / 2} />
   </>
 );
-const friendPos = (i: number): V3 => [[-2.6, 0, FZ - 1.8], [2.4, 0, FZ - 2.2], [-1.4, 0, FZ - 3.2], [1.2, 0, FZ - 3.0]][i] as V3;
+const friendPos = (i: number): V3 => [[-1.85, 0, FZ - 1.9], [1.85, 0, FZ - 2.3], [-0.95, 0, FZ - 3.4], [0.95, 0, FZ - 3.2]][i] as V3;
 
 /* =================== abertura =================== */
 const CINCO0 = at(0, "cinco");
@@ -145,7 +145,7 @@ const S1: React.FC<ShotProps> = ({f, a, t}) => {
   const k = easeInOut(ramp(f, a + 6, a + 60));
   return (
     <>
-      <Cam pos={[2.2, 1.6, FZ + 4.5]} look={[0.2, 0.9, FZ]} fov={52} f={f} a={a} />
+      <Cam pos={[3.4, 1.5, FZ + 2.6]} look={[-0.6, 0.85, FZ + 0.95]} fov={50} f={f} a={a} />
       <DayLights />
       <Bairro t={t} />
       <Goals />
@@ -180,8 +180,8 @@ const S2b: React.FC<ShotProps> = ({f, a, t}) => {
       <Space t={t} />
       <hemisphereLight args={["#ffffff", "#202030", 0.5]} />
       <directionalLight position={[5, 4, 6]} intensity={2.2} />
-      <Satellite p={[-1.4, 0.6, 0]} r={[0.3, t * 0.4, 0.2]} s={0.7} />
-      <Ball p={[Math.cos(ang) * 1.8, 0.5 + Math.sin(ang) * 0.3, Math.sin(ang) * 1.2]} s={3} />
+      <Satellite p={[-0.45, 1.65, -0.2]} r={[0.3, t * 0.4, 0.2]} s={0.85} />
+      <Ball p={[Math.cos(ang) * 0.95, 0.85 + Math.sin(ang) * 0.2, Math.sin(ang) * 1.0]} s={3} />
     </>
   );
 };
@@ -219,7 +219,7 @@ const S3: React.FC<ShotProps> = ({f, a, t}) => {
   const tex = rachaTvTex(fr);
   return (
     <>
-      <Cam pos={[0.9, 1.5, 0.6]} look={[-0.2, 1.1, 2.95]} fov={58} f={f} a={a} />
+      <Cam pos={[0.35, 1.45, -1.6]} look={[0.05, 1.05, 2.4]} fov={56} f={f} a={a} />
       <hemisphereLight args={["#fff6e6", "#b08a60", 1.0]} />
       <pointLight position={[0.2, 2.9, 0.4]} intensity={9} distance={10} decay={1.4} color="#fff4e0" />
       <RoomShell wall="#ffe3b8" accent="#3a86ff" />
@@ -230,7 +230,7 @@ const S3: React.FC<ShotProps> = ({f, a, t}) => {
       </mesh>
       {f >= TIO3 - 2 && (
         <HandToy
-          pose={{...idle(f), pos: [0.75, 0, 2.0], rotY: Math.PI + 0.5, rShoulder: [-1.65, 0.45, -0.2], rElbow: -1.7, mouthOpen: 0.4 + 0.4 * Math.abs(Math.sin(t * 11)), eyeWide: 0.5}}
+          pose={{...idle(f), pos: [0.45, 0, 1.1], rotY: Math.PI + 0.35, rShoulder: [-1.65, 0.45, -0.2], rElbow: -1.7, mouthOpen: 0.4 + 0.4 * Math.abs(Math.sin(t * 11)), eyeWide: 0.5}}
           look={TIO}
           headExtra={<DadHead />}
           item={<BananaMic p={[0, 0.02, 0.06]} r={[0, 0, 1.4]} s={1.4} />}
@@ -368,7 +368,7 @@ const S9: React.FC<ShotProps> = ({f, a, t}) => {
 };
 const S9b: React.FC<ShotProps> = ({f, a, t}) => (
   <>
-    <Cam pos={[0.3, 1.5, 3.4]} look={[0, 1.1, 0]} fov={50} f={f} a={a} />
+    <Cam pos={[0.4, 1.15, 3.9]} look={[0.38, 0.62, 0]} fov={50} f={f} a={a} />
     <hemisphereLight args={["#fff2d8", "#3a2a3a", 0.8]} />
     <spotLight position={[0, 4, 1]} angle={0.5} penumbra={0.6} intensity={30} distance={10} castShadow />
     <Museum />
@@ -379,14 +379,14 @@ const S9b: React.FC<ShotProps> = ({f, a, t}) => (
         <meshStandardMaterial color="#8a6a3a" transparent opacity={0.45} roughness={1} />
       </mesh>
     </group>
-    <Toy pose={{...idle(f), pos: [1.1, 0, 0.4], rotY: -0.6, rShoulder: [-1.3, 0.6, 0.1], rElbow: -0.5, smile: 1}} look={ARQUEOLOGO} headExtra={<><SafariHat /><HeadGlasses /></>} />
+    <Toy pose={{...idle(f), pos: [0.75, 0, -0.45], rotY: -0.45, rShoulder: [-1.3, 0.6, 0.1], rElbow: -0.5, smile: 1}} look={ARQUEOLOGO} headExtra={<><SafariHat /><HeadGlasses /></>} />
   </>
 );
 
 /* =================== Nº 3 — o chinelo =================== */
 const S10: React.FC<ShotProps> = ({f, a, t}) => (
   <>
-    <Cam pos={[0.3, 0.8, FZ + 3.0]} look={[0, 0.5, FZ]} fov={48} f={f} a={a} />
+    <Cam pos={[0.3, 0.95, FZ + 4.6]} look={[0, 0.95, FZ]} fov={46} f={f} a={a} />
     <DayLights />
     <Bairro t={t} />
     <Toy pose={{...idle(f), pos: [0, 0, FZ], rotY: 0, smile: 0.7}} look={BOY_CHINELO} />
@@ -399,7 +399,7 @@ const S11: React.FC<ShotProps> = ({f, a, t}) => {
   const bl: V3 = [lerp(4.4, 8.6, k), 0.2 + Math.sin(k * Math.PI) * 2.2, FZ + lerp(0.3, 3.5, k)];
   return (
     <>
-      <Cam pos={[6.2, 2.0, FZ + 5.2]} look={[6.6, 0.8, FZ]} fov={56} f={f} a={a} />
+      <Cam pos={[1.6, 2.0, FZ + 3.6]} look={[5.4, 0.8, FZ - 0.1]} fov={62} f={f} a={a} />
       <DayLights x={6} />
       <Bairro t={t} />
       <Goals />
@@ -415,11 +415,11 @@ const GOLE = at(13, "gole");
 const VALEU = at(13, "valeu");
 const S12: React.FC<ShotProps> = ({f, a, t}) => (
   <>
-    <Cam pos={[0, 1.2, FZ + 5]} look={[0, 1.6, FZ - 3]} fov={56} f={f} a={a} />
+    <Cam pos={[0, 1.8, FZ + 7.5]} look={[0, 1.6, FZ - 3]} fov={56} f={f} a={a} />
     <DayLights />
     <Bairro t={t} />
     {AMIGOS.map((lk, i) => (
-      <Toy key={i} pose={{...idle(f + i * 9), pos: [-1.5 + i, 0, FZ + 1.5], rotY: Math.PI, head: [-0.35, 0, 0]}} look={lk} />
+      <Toy key={i} pose={{...idle(f + i * 9), pos: [-1.2 + i * 0.8, 0, FZ + 1.5], rotY: Math.PI, head: [-0.35, 0, 0]}} look={lk} />
     ))}
     <Toy pose={{...idle(f), pos: [0, 0, FZ + 2.4], rotY: Math.PI, head: [-0.35, 0, 0]}} look={BOY_CHINELO} />
   </>
@@ -450,7 +450,7 @@ const S13: React.FC<ShotProps> = (p) => <VoWindow {...p} close />;
 /* a estátua do chinelo na praça */
 const S14: React.FC<ShotProps> = ({f, a, t}) => (
   <>
-    <Cam pos={[0, 2.4, 6.4]} look={[0, 2.0, 0]} fov={54} f={f} a={a} />
+    <Cam pos={[0, 2.6, 7.4]} look={[0, 2.55, 0]} fov={54} f={f} a={a} />
     <DayLights x={0} z={0} />
     <mesh rotation={[-Math.PI / 2, 0, 0]} material={sm("#d9d4c8", 0.9)} receiveShadow>
       <planeGeometry args={[40, 40]} />
@@ -461,8 +461,8 @@ const S14: React.FC<ShotProps> = ({f, a, t}) => (
     <Tree p={[-3.2, 0, -2.5]} s={1.2} />
     <Tree p={[3.4, 0, -2.8]} s={1.1} />
     <ChineloStatue p={[0, 0, 0]} s={1.3} />
-    {[[-0.15, 3.95, 0.1], [0.3, 3.7, 0.25]].map((pp, i) => (
-      <Pigeon key={i} p={{pos: pp as V3, rotY: i ? -0.5 : 0.6, t, blink: blinkCurve(f + i * 20), peck: 0.3 * Math.max(0, Math.sin(t * 3 + i))}} s={0.9} />
+    {[[-0.12, 4.56, 0.05], [0.42, 4.38, 0.1]].map((pp, i) => (
+      <Pigeon key={i} p={{pos: pp as V3, rotY: i ? -0.5 : 0.6, t, blink: blinkCurve(f + i * 20), peck: 0.3 * Math.max(0, Math.sin(t * 3 + i))}} s={1.7} />
     ))}
   </>
 );
@@ -488,7 +488,7 @@ const S16: React.FC<ShotProps> = ({f, a, t}) => {
   const y = 1.2 + k * 1.3;
   return (
     <>
-      <Cam pos={[0, y + 0.6, FZ + 5.5]} look={[0, y, FZ]} fov={54} f={f} a={a} punch={4} />
+      <Cam pos={[0, y + 3.4, FZ + 3.8]} look={[0, y - 0.3, FZ]} fov={56} f={f} a={a} punch={4} />
       <DayLights />
       <Bairro t={t} />
       <group position={[0, y, FZ]} rotation={[0, t * 18, 0]}>
@@ -496,6 +496,10 @@ const S16: React.FC<ShotProps> = ({f, a, t}) => {
           <Toy pose={{...idle(f), pos: [0, -0.95, 0], rotY: 0, ...ARMS_UP, eyeWide: 1, mouthOpen: 0.6}} look={BOYL} />
         </group>
       </group>
+      <mesh position={[0, y, FZ]} rotation={[-Math.PI / 2, 0, 0]}>
+        <circleGeometry args={[1.15, 48]} />
+        <meshBasicMaterial color="#ffffff" transparent opacity={0.16} depthWrite={false} />
+      </mesh>
       {f >= PATOS - 4 &&
         [[0, 0], [-1, -1], [1, -1], [-2, -2], [2, -2], [-3, -3], [3, -3]].map(([dx, dz], i) => (
           <FlyingDuck key={i} p={[dx * 0.7, y - 0.4 + dz * 0.2, FZ + dz * 0.8 - 1.2]} rotY={Math.PI} t={t + i * 0.2} s={1.2} />
@@ -549,7 +553,7 @@ const S18: React.FC<ShotProps> = ({f, a, t}) => (
     <Bairro t={t} />
     <Toy pose={{...idle(f), pos: [0, 0, FZ], rotY: 0, ...SHOUT}} look={JUNINHO} />
     {[0, 1, 2].map((i) => (
-      <Toy key={i} pose={{...idle(f + i * 9), pos: [-1.4 + i * 1.4, 0, FZ - 2.2], rotY: 0, eyeWide: 0.8, mouthOpen: 0.3}} look={i === 1 ? BOYL : AMIGOS[i]} />
+      <Toy key={i} pose={{...idle(f + i * 9), pos: [-1.0 + i * 1.0, 0, FZ - 2.2], rotY: 0, eyeWide: 0.8, mouthOpen: 0.3}} look={i === 1 ? BOYL : AMIGOS[i]} />
     ))}
   </>
 );
@@ -562,8 +566,8 @@ const S19: React.FC<ShotProps> = ({f, a, t}) => {
       <DayLights />
       <Bairro t={t} grass={g * 0.8} />
       <Scoreboard p={[0, 0, FZ - 4]} s={1.2} />
-      {[-1.6, 0, 1.6].map((x, i) => (
-        <Toy key={i} pose={{...idle(f + i * 9), pos: [x, 0, FZ - 0.6], rotY: 0, blink: 0.5, brow: -0.2}} look={i === 1 ? BOYL : AMIGOS[i]} headExtra={<Beard g={g} t={t} />} />
+      {[-1.05, 0, 1.05].map((x, i) => (
+        <Toy key={i} pose={{...idle(f + i * 9), pos: [x, 0, FZ - (i === 1 ? 0.3 : 0.7)], rotY: 0, blink: 0.5, brow: -0.2}} look={i === 1 ? BOYL : AMIGOS[i]} headExtra={<Beard g={g} t={t} />} />
       ))}
     </>
   );
@@ -575,10 +579,10 @@ const S20: React.FC<ShotProps> = ({f, a, t}) => {
   const palmA = useRef<THREE.Object3D>(null);
   return (
     <>
-      <Cam pos={[0, 2.4, FZ + 7]} look={[0, 1.0, FZ - 0.5]} fov={58} f={f} a={a} />
+      <S20Cam f={f} a={a} />
       <DayLights />
       <Bairro t={t} grass={0.8} />
-      {[[-4, -2], [-3, 2.2], [3.6, -2.4], [4.2, 1.8], [-1.8, -3.6], [1.9, -3.4], [-4.8, 0.3], [4.9, -0.2]].map(([x, z], i) => (
+      {[[-4, -2], [-5.2, 3.0], [3.6, -2.4], [4.8, 0.8], [-1.8, -3.6], [1.9, -3.4], [-4.8, 0.3], [4.9, -0.2]].map(([x, z], i) => (
         <Tree key={i} p={[x, 0, FZ + z]} s={1.1 + (i % 3) * 0.2} />
       ))}
       {f >= CAPIVARAS20 - 4 && (
@@ -608,13 +612,30 @@ const S20: React.FC<ShotProps> = ({f, a, t}) => {
     </>
   );
 };
+/** câmera da floresta: geral → capivaras → banda → goleiro avô */
+const S20Cam: React.FC<{f: number; a: number}> = ({f, a}) => {
+  const keys: [number, V3, V3][] = [
+    [a, [0, 2.4, FZ + 7], [0, 1.0, FZ - 0.5]],
+    [CAPIVARAS20 - 6, [-2.7, 1.3, FZ + 5.4], [-3.0, 0.65, FZ + 2.2]],
+    [FORRO20 - 8, [0.6, 1.6, FZ + 5.7], [0.6, 1.1, FZ + 0.6]],
+    [AVO20 - 8, [2.45, 1.4, FZ + 5.4], [2.6, 1.0, FZ + 2.4]],
+  ];
+  let pos = keys[0][1];
+  let look = keys[0][2];
+  for (let i = 1; i < keys.length; i++) {
+    const k = easeInOut(ramp(f, keys[i][0], keys[i][0] + 10));
+    pos = pos.map((v, j) => lerp(v, keys[i][1][j], k)) as V3;
+    look = look.map((v, j) => lerp(v, keys[i][2][j], k)) as V3;
+  }
+  return <Cam pos={pos} look={look} fov={56} f={f} a={a} />;
+};
 /* a mãe grita "janta!" e todo mundo corre */
 const JANTA = at(22, "janta");
 const S22: React.FC<ShotProps> = ({f, a, t}) => {
   const run = (f - JANTA - 4) / FPS;
   return (
     <>
-      <Cam pos={[0, 2.0, FZ + 6]} look={[0, 1.2, FZ - 2]} fov={58} f={f} a={a} />
+      {f < JANTA + 22 ? <Cam pos={[0, 1.45, 2.9 + 3.2]} look={[0, 1.15, 2.9]} fov={52} f={f} a={a} /> : <Cam pos={[0, 2.0, FZ + 6]} look={[0, 1.2, FZ - 2]} fov={58} f={f} a={JANTA + 22} />}
       <DayLights />
       <Bairro t={t} grass={0.8} />
       <Toy pose={{...idle(f), pos: [0.0, 0, 2.9], rotY: 0, ...(f >= JANTA - 4 ? SHOUT : {}), brow: -0.4}} look={MAE} />
@@ -646,7 +667,8 @@ const S23: React.FC<ShotProps> = ({f, a, t}) => {
       {Array.from({length: 8}, (_, i) => {
         const q = (k * 0.8 + i / 8) % 1;
         const r = rng(i + 3);
-        return <Ball key={i} p={[lerp(-3, -7.6, q), 0.3 + r() * 1.6 + Math.sin(q * Math.PI) * 0.8, FZ + (r() - 0.5) * 2.6 * (1 - q)]} s={1.4} />;
+        const side = i % 2 ? 1 : -1;
+        return <Ball key={i} p={[lerp(-4.2, -8.6, q), 0.35 + r() * 1.7 + Math.sin(q * Math.PI) * 0.5, FZ + side * (0.75 + r() * 0.7) * (0.5 + 0.5 * q)]} s={1.4} />;
       })}
     </>
   );
@@ -863,7 +885,6 @@ export const VideoFutebol: React.FC = () => {
       <Ono from={PATOS + 4} to={L(17) - 2} text="QUÉN QUÉN!" x={540} y={460} size={130} color="#ffd21f" />
       <Tag from={at(17, "contrata") - 2} to={FIGURINHA17 - 3} text="CONTRATADO" x={540} y={420} />
       <Tag from={FIGURINHA17 - 2} to={L(18) - 2} text="SALÁRIO" x={540} y={420} />
-      <Ono from={at(19, "faz")} to={TRES19 - 6} text="0 x 0" x={540} y={460} size={170} color="#ffffff" />
       <Tag from={CAPIVARAS20 - 2} to={FORRO20 - 3} text="CAPIVARAS" x={540} y={420} />
       <Tag from={FORRO20 - 2} to={AVO20 - 3} text="FORRÓ" x={540} y={420} />
       <Tag from={AVO20 - 2} to={L(21) - 2} text="GOLEIRO AVÔ" x={540} y={420} />
