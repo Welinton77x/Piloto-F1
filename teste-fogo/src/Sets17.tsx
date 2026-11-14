@@ -761,7 +761,8 @@ export const Parachute: React.FC<{p: V3; t: number; s?: number}> = ({p, t, s = 1
 export const BigPhone: React.FC<{p?: V3; r?: V3; s?: number; screen: THREE.Texture; key2: string}> = ({p = [0, 0, 0], r = [0, 0, 0], s = 1, screen, key2}) => (
   <group position={p} rotation={r} scale={s}>
     <mesh geometry={rbox(0.5, 0.95, 0.06, 0.06)} material={sm("#1d1f27", 0.3)} castShadow />
-    <mesh position={[0, 0, 0.031]} material={tm(key2, screen, 0.3, {emissive: "#ffffff", emissiveMap: screen, emissiveIntensity: 0.9})}>
+    <mesh position={[0, 0, 0.031]}>
+      <meshBasicMaterial map={screen} toneMapped={false} />
       <planeGeometry args={[0.44, 0.86]} />
     </mesh>
   </group>

@@ -555,49 +555,163 @@ const SEMAFOROS = at(11, "semaforos");
 const E11 = at(11, "e", 1);
 const POUSA = at(11, "pousa");
 const SHOPPING = at(11, "shopping");
-const grupoTex = (n: number) =>
-  canvasTex("grupo-familia-" + n, 256, 496, (c) => {
-    c.fillStyle = "#ece5dd";
-    c.fillRect(0, 0, 256, 496);
-    c.fillStyle = "#075e54";
-    c.fillRect(0, 0, 256, 56);
-    c.fillStyle = "#ffffff";
-    c.font = "bold 26px sans-serif";
-    c.fillText("FAMÍLIA", 60, 38);
+/** conversa do grupo da família no estilo WhatsApp (n = quantas figurinhas de formiga já chegaram) */
+const drawAnt = (c: CanvasRenderingContext2D, ax: number, ay: number, k: number) => {
+  c.save();
+  c.translate(ax, ay);
+  c.scale(k, k);
+  c.fillStyle = "#3a1a10";
+  c.strokeStyle = "#3a1a10";
+  c.lineWidth = 3;
+  for (let l = -1; l <= 1; l++) {
     c.beginPath();
-    c.arc(30, 28, 16, 0, Math.PI * 2);
-    c.fillStyle = "#ffd21f";
+    c.moveTo(l * 9, 0);
+    c.lineTo(l * 15, 22);
+    c.moveTo(l * 9, 0);
+    c.lineTo(l * 15, -22);
+    c.stroke();
+  }
+  [-22, 0, 20].forEach((dx, kk) => {
+    c.beginPath();
+    c.ellipse(dx, 0, kk === 1 ? 11 : 15, kk === 1 ? 10 : 13, 0, 0, Math.PI * 2);
     c.fill();
-    const r = rng(9 + n);
-    for (let i = 0; i < n; i++) {
-      const col = i % 2;
-      const row = Math.floor(i / 2);
-      const x = col ? 150 : 20, y = 70 + row * 70;
-      if (y > 470) break;
-      c.fillStyle = col ? "#dcf8c6" : "#ffffff";
-      c.fillRect(x, y, 86, 62);
-      // figurinha de formiga
-      c.fillStyle = "#3a1a10";
-      const ax = x + 43 + (r() - 0.5) * 8, ay = y + 32;
-      [-16, 0, 14].forEach((dx, k) => {
-        c.beginPath();
-        c.ellipse(ax + dx, ay, k === 1 ? 8 : 11, k === 1 ? 7 : 9, 0, 0, Math.PI * 2);
+  });
+  c.beginPath();
+  c.moveTo(-30, -8);
+  c.lineTo(-44, -26);
+  c.moveTo(-30, 8);
+  c.lineTo(-44, -14);
+  c.stroke();
+  c.fillStyle = "#ffffff";
+  c.beginPath();
+  c.arc(-26, -4, 4, 0, Math.PI * 2);
+  c.fill();
+  c.restore();
+};
+const roundRect = (c: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) => {
+  c.beginPath();
+  c.moveTo(x + r, y);
+  c.arcTo(x + w, y, x + w, y + h, r);
+  c.arcTo(x + w, y + h, x, y + h, r);
+  c.arcTo(x, y + h, x, y, r);
+  c.arcTo(x, y, x + w, y, r);
+  c.closePath();
+};
+const grupoTex = (n: number) =>
+  canvasTex("whats-familia-" + n, 512, 992, (c) => {
+    // papel de parede bege com rabiscos
+    c.fillStyle = "#efe7dd";
+    c.fillRect(0, 0, 512, 992);
+    c.strokeStyle = "rgba(160,140,120,0.18)";
+    c.lineWidth = 3;
+    const r = rng(3);
+    for (let i = 0; i < 60; i++) {
+      const x = r() * 512, y = 120 + r() * 800;
+      c.beginPath();
+      c.arc(x, y, 8 + r() * 10, 0, Math.PI * (1 + r()));
+      c.stroke();
+    }
+    // barra de cima
+    c.fillStyle = "#075e54";
+    c.fillRect(0, 0, 512, 110);
+    c.fillStyle = "#ffffff";
+    c.font = "bold 40px sans-serif";
+    c.fillText("‹", 14, 70);
+    c.fillStyle = "#ffd21f";
+    c.beginPath();
+    c.arc(76, 56, 30, 0, Math.PI * 2);
+    c.fill();
+    c.fillStyle = "#075e54";
+    c.font = "bold 30px sans-serif";
+    c.textAlign = "center";
+    c.fillText("F", 76, 67);
+    c.textAlign = "left";
+    c.fillStyle = "#ffffff";
+    c.font = "bold 32px sans-serif";
+    c.fillText("Família", 120, 52);
+    c.font = "22px sans-serif";
+    c.fillStyle = "#cfe9e5";
+    c.fillText(n > 0 ? "Formiga está digitando..." : "Vó, Pai, Tio, você", 120, 84);
+    // mensagens
+    type Msg = {who: string; col: string; text?: string; me?: boolean; audio?: boolean; ant?: boolean; time: string};
+    const msgs: Msg[] = [
+      {who: "Tio", col: "#e8414f", text: "Alguém com sinal?", time: "14:01"},
+      {who: "Pai", col: "#2e86de", text: "O tamanduá saiu", time: "14:01"},
+      {who: "Você", col: "", text: "Ele levou a vó", me: true, time: "14:02"},
+      {who: "Vó", col: "#9b59b6", audio: true, time: "14:02"},
+    ];
+    for (let i = 0; i < n; i++) msgs.push({who: "Formiga", col: "#8a5a2b", ant: true, time: "14:03"});
+    // as mensagens mais novas ficam embaixo: começa de baixo pra cima
+    let y = 900;
+    const out: {m: Msg; y: number; h: number}[] = [];
+    for (let i = msgs.length - 1; i >= 0 && y > 120; i--) {
+      const m = msgs[i];
+      const h = m.ant ? 150 : m.audio ? 96 : m.me ? 70 : 96;
+      y -= h + 14;
+      out.push({m, y, h});
+    }
+    for (const {m, y: yy, h} of out) {
+      if (yy < 116) continue;
+      const w = m.ant ? 190 : m.audio ? 330 : Math.max(200, c.measureText(m.text ?? "").width + 60);
+      const x = m.me ? 512 - w - 18 : 18;
+      if (!m.ant) {
+        c.fillStyle = m.me ? "#dcf8c6" : "#ffffff";
+        roundRect(c, x, yy, w, h, 16);
         c.fill();
-      });
-      c.strokeStyle = "#3a1a10";
-      c.lineWidth = 2;
-      for (let l = -1; l <= 1; l++) {
+      }
+      if (!m.me && !m.ant) {
+        c.fillStyle = m.col;
+        c.font = "bold 22px sans-serif";
+        c.fillText(m.who, x + 16, yy + 30);
+      }
+      c.fillStyle = "#101018";
+      c.font = "26px sans-serif";
+      if (m.text) c.fillText(m.text, x + 16, yy + (m.me ? 44 : 70));
+      if (m.audio) {
+        c.fillStyle = "#34b7f1";
         c.beginPath();
-        c.moveTo(ax + l * 6, ay);
-        c.lineTo(ax + l * 9, ay + 16);
-        c.moveTo(ax + l * 6, ay);
-        c.lineTo(ax + l * 9, ay - 16);
-        c.stroke();
+        c.moveTo(x + 22, yy + 46);
+        c.lineTo(x + 46, yy + 62);
+        c.lineTo(x + 22, yy + 78);
+        c.fill();
+        c.fillStyle = "#7d8b8a";
+        for (let b = 0; b < 26; b++) c.fillRect(x + 62 + b * 9, yy + 62 - (4 + ((b * 7) % 13)), 5, 2 * (4 + ((b * 7) % 13)));
+        c.font = "18px sans-serif";
+        c.fillText("0:42", x + 62, yy + 90);
+      }
+      if (m.ant) {
+        c.fillStyle = "#ffffff";
+        roundRect(c, x + 6, yy + 6, 150, 120, 20);
+        c.fill();
+        drawAnt(c, x + 84, yy + 66, 1.55);
+      }
+      c.fillStyle = "#7d8b8a";
+      c.font = "18px sans-serif";
+      c.fillText(m.time + (m.me ? "  ✓✓" : ""), x + w - (m.me ? 110 : 70), yy + h - 10);
+      if (m.me) {
+        c.fillStyle = "#34b7f1";
+        c.fillText("✓✓", x + w - 50, yy + h - 10);
       }
     }
+    // barra de digitar
+    c.fillStyle = "#efe7dd";
+    c.fillRect(0, 912, 512, 80);
+    c.fillStyle = "#ffffff";
+    roundRect(c, 12, 924, 400, 56, 28);
+    c.fill();
+    c.fillStyle = "#9aa3a2";
+    c.font = "24px sans-serif";
+    c.fillText("Mensagem", 40, 960);
+    c.fillStyle = "#128c7e";
+    c.beginPath();
+    c.arc(462, 952, 30, 0, Math.PI * 2);
+    c.fill();
+    c.fillStyle = "#ffffff";
+    c.fillRect(456, 936, 12, 22);
+    c.fillRect(450, 960, 24, 4);
   });
 const S11: React.FC<ShotProps> = ({f, a, t}) => {
-  const n = 2 + Math.floor(clamp((f - FIGURINHAS + 10) / 50) * 12);
+  const n = f < FIGURINHAS - 4 ? 0 : 1 + Math.floor(clamp((f - FIGURINHAS - 6) / 60) * 9);
   const shake = f >= FIGURINHAS ? 0.03 * Math.sin(t * 60) : 0;
   return (
     <>
@@ -605,7 +719,7 @@ const S11: React.FC<ShotProps> = ({f, a, t}) => {
       <color attach="background" args={["#ffd9a8"]} />
       <hemisphereLight args={["#ffffff", "#b08a60", 1.2]} />
       <pointLight position={[0.5, 2.5, 2]} intensity={6} distance={8} decay={1.4} />
-      <BigPhone p={[shake, 1.25, 0]} r={[0, 0, shake * 2]} s={1.2} screen={grupoTex(Math.min(n, 14))} key2={"grupo-" + Math.min(n, 14)} />
+      <BigPhone p={[shake, 1.25, 0]} r={[0, 0, shake * 2]} s={1.2} screen={grupoTex(n)} key2={"whats-" + n} />
     </>
   );
 };
@@ -741,7 +855,7 @@ const S15b: React.FC<ShotProps> = ({f, a, t}) => {
       <Toy pose={{...idle(f), pos: [0, 0, 0.6], rotY: 0, rShoulder: [-1.1, 0.4, 0.1], rElbow: -1.2, brow: 0.8, mouthOpen: 0.4}} look={ASTRO} palmRef={palm} headExtra={<EvaHelmet open />} />
       <EvaGear pos={[0, 0, 0.6]} rotY={0} t={t} />
       <InHand palm={palm}>
-        <BigPhone p={[0, 0.02, 0.12]} r={[0.3, 0, 0]} s={0.55} screen={grupoTex(14)} key2="grupo-14" />
+        <BigPhone p={[0, 0.02, 0.12]} r={[0.3, 0, 0]} s={0.55} screen={grupoTex(10)} key2="whats-10" />
       </InHand>
     </>
   );
@@ -829,17 +943,102 @@ const ANTARTIDA = at(18, "antartida");
 const PEIXINHO18 = at(18, "peixinho");
 const VIZINHO18 = at(18, "vizinho");
 const MUMIA18 = at(18, "mumia");
+/** prédios de Paris (pedra creme, telhado de ardósia, varandinhas) e cafés */
+const PARIS_B: {x: number; z: number; w: number; h: number; ry: number}[] = [
+  {x: -4.6, z: -1.0, w: 3.0, h: 4.4, ry: Math.PI / 2},
+  {x: -4.6, z: -4.4, w: 3.4, h: 5.0, ry: Math.PI / 2},
+  {x: -4.6, z: 2.4, w: 3.0, h: 4.0, ry: Math.PI / 2},
+  {x: 4.6, z: -1.0, w: 3.0, h: 4.8, ry: -Math.PI / 2},
+  {x: 4.6, z: -4.4, w: 3.4, h: 4.4, ry: -Math.PI / 2},
+  {x: 4.6, z: 2.4, w: 3.0, h: 4.2, ry: -Math.PI / 2},
+  {x: -6.5, z: -9.5, w: 4.0, h: 5.2, ry: 0},
+  {x: -2.2, z: -10, w: 4.0, h: 4.6, ry: 0},
+  {x: 2.2, z: -10, w: 4.0, h: 5.0, ry: 0},
+  {x: 6.5, z: -9.5, w: 4.0, h: 4.6, ry: 0},
+];
+const ParisBuilding: React.FC<{w: number; h: number}> = ({w, h}) => {
+  const stone = sm("#efe2c8", 0.85);
+  const roof = sm("#6f7a86", 0.6);
+  const win = sm("#3a4a5a", 0.3);
+  const iron = sm("#1d1f27", 0.5);
+  const cols = Math.max(2, Math.floor(w / 0.8));
+  const rows = Math.max(3, Math.floor((h - 1.3) / 0.85));
+  return (
+    <group>
+      <mesh position={[0, h / 2, 0]} geometry={rbox(w, h, 2.4, 0.03)} material={stone} castShadow receiveShadow />
+      {/* telhado mansarda */}
+      <mesh position={[0, h + 0.35, -0.1]} rotation={[0, Math.PI / 4, 0]} scale={[w / 1.9, 1, 2.2 / 1.9]} material={roof} castShadow>
+        <cylinderGeometry args={[0.9, 1.34, 0.7, 4, 1]} />
+      </mesh>
+      {Array.from({length: cols}, (_, i) => (
+        <mesh key={"lu" + i} position={[-w / 2 + (i + 0.5) * (w / cols), h + 0.3, 0.95]} geometry={rbox(0.26, 0.32, 0.2, 0.03)} material={stone} />
+      ))}
+      {/* janelas com varandinha de ferro */}
+      {Array.from({length: rows}, (_, r) =>
+        Array.from({length: cols}, (_, c) => {
+          const x = -w / 2 + (c + 0.5) * (w / cols);
+          const y = 1.4 + r * 0.85;
+          return (
+            <group key={`${r}-${c}`} position={[x, y, 1.21]}>
+              <mesh material={win}>
+                <planeGeometry args={[0.36, 0.55]} />
+              </mesh>
+              <mesh position={[0, -0.27, 0.06]} material={iron}>
+                <boxGeometry args={[0.46, 0.05, 0.12]} />
+              </mesh>
+              <mesh position={[0, -0.18, 0.12]} material={iron}>
+                <boxGeometry args={[0.46, 0.16, 0.01]} />
+              </mesh>
+            </group>
+          );
+        }),
+      )}
+      {/* térreo: café de toldo vermelho */}
+      <mesh position={[0, 0.55, 1.21]} material={sm("#5a3a2a", 0.6)}>
+        <planeGeometry args={[w * 0.8, 0.9]} />
+      </mesh>
+      <mesh position={[0, 1.12, 1.45]} rotation={[0.45, 0, 0]} geometry={rbox(w * 0.85, 0.04, 0.6, 0.01)} material={sm("#c0392b", 0.7)} castShadow />
+    </group>
+  );
+};
+const ParisStreet: React.FC = () => (
+  <group>
+    {/* calçadão de pedra e a grama do Champ de Mars */}
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.005, 0]} material={sm("#d9cfbd", 0.95)} receiveShadow>
+      <planeGeometry args={[7.2, 40]} />
+    </mesh>
+    {PARIS_B.map((b, i) => (
+      <group key={i} position={[b.x, 0, b.z]} rotation={[0, b.ry, 0]}>
+        <ParisBuilding w={b.w} h={b.h} />
+      </group>
+    ))}
+    {/* postes e árvores */}
+    {[-2.8, 2.8].map((x) =>
+      [-6, -2, 2, 6].map((z) => (
+        <group key={`${x}${z}`} position={[x, 0, z]}>
+          <mesh position={[0, 0.9, 0]} material={sm("#3a5a3a", 0.8)}>
+            <cylinderGeometry args={[0.07, 0.09, 1.8, 6]} />
+          </mesh>
+          <mesh position={[0, 2.2, 0]} scale={[1, 1.2, 1]} material={sm("#4f9a3a", 0.85)}>
+            <icosahedronGeometry args={[0.7, 0]} />
+          </mesh>
+        </group>
+      )),
+    )}
+  </group>
+);
 const SParis: React.FC<ShotProps> = ({f, a, t}) => {
   const k = easeOut(ramp(f, a, a + 18));
   return (
     <>
-      <Cam pos={[0, 3.2, 9.5]} look={[0, 3.0, 0]} fov={52} f={f} a={a} />
+      <Cam pos={[0, 3.0, 10.5]} look={[0, 3.2, 0]} fov={56} f={f} a={a} />
       <color attach="background" args={["#9fd8ff"]} />
       <hemisphereLight args={["#ffffff", "#7a9a5a", 1.1]} />
       <directionalLight position={[4, 8, 6]} intensity={2.2} />
       <mesh rotation={[-Math.PI / 2, 0, 0]} material={sm("#8ccf5a", 0.95)}>
         <planeGeometry args={[80, 80]} />
       </mesh>
+      <ParisStreet />
       <EiffelTower p={[0, 0, 0]} />
       <Sock p={[0.45, lerp(9, 3.9, k), 0.6]} r={[0, 0, 0.2]} s={5} color="#ffffff" />
       <Sock p={[-0.45, lerp(10, 3.5, k), 0.7]} r={[0, 0.5, -0.2]} s={5} color="#ffd21f" />
