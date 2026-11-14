@@ -15,7 +15,7 @@ export type ToyLook = {
   sole?: string;
   backpack?: string; // mochila nas costas (cor)
   hoodie?: boolean; // casaco com capuz, manga comprida e cordinhas pretas
-  hairStyle?: "bowl" | "spiky" | "curly" | "ponytail" | "pigtails" | "long" | "bun" | "buzz" | "straight";
+  hairStyle?: "bowl" | "spiky" | "curly" | "ponytail" | "pigtails" | "long" | "bun" | "buzz" | "straight" | "mohawk" | "bald";
   jelly?: number; // 0..1 coberto de gelatina de morango
   suit?: boolean; // terno de noivo (paletó preto, camisa branca, gravata borboleta)
   dress?: boolean; // vestido de noiva (corpete + saia longa até o chão)
@@ -25,17 +25,49 @@ export type ToyLook = {
   lashes?: boolean; // cílios
   lips?: string; // cor da boca
   apron?: boolean; // avental branco de cozinheiro por cima da roupa
+  plaid?: string; // camisa xadrez: cor das listras
+  belly?: number; // barriguinha (0..1)
+  flipflop?: boolean; // chinelo de dedo (pé de fora; shoe = cor da tira, sole = cor do solado)
 };
 
 const sm = (color: string, rough = 0.55, extra: Partial<THREE.MeshStandardMaterialParameters> = {}) =>
   new THREE.MeshStandardMaterial({color, roughness: rough, metalness: 0, ...extra});
 
+const plaidCache = new Map<string, THREE.CanvasTexture>();
+const plaidTex = (base: string, line: string) => {
+  const k = base + line;
+  let t = plaidCache.get(k);
+  if (t) return t;
+  const c = document.createElement("canvas");
+  c.width = c.height = 128;
+  const x = c.getContext("2d")!;
+  x.fillStyle = base;
+  x.fillRect(0, 0, 128, 128);
+  x.globalAlpha = 0.55;
+  x.fillStyle = line;
+  for (let i = 0; i < 4; i++) {
+    x.fillRect(i * 32 + 10, 0, 10, 128);
+    x.fillRect(0, i * 32 + 10, 128, 10);
+  }
+  x.globalAlpha = 0.25;
+  x.fillStyle = "#000000";
+  for (let i = 0; i < 4; i++) {
+    x.fillRect(i * 32 + 26, 0, 3, 128);
+    x.fillRect(0, i * 32 + 26, 128, 3);
+  }
+  t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.repeat.set(2, 2);
+  plaidCache.set(k, t);
+  return t;
+};
 const useToyMats = (L: ToyLook) =>
   useMemo(
     () => ({
       skin: sm(L.skin ?? "#dfac80", 0.5),
       skinDark: sm("#c98f62", 0.55),
-      shirt: sm(L.shirt ?? "#ffcd2e", 0.6),
+      shirt: L.plaid ? new THREE.MeshStandardMaterial({map: plaidTex(L.shirt ?? "#c0392b", L.plaid), roughness: 0.7}) : sm(L.shirt ?? "#ffcd2e", 0.6),
       shirtDark: sm("#e7a816", 0.6),
       pants: sm(L.pants ?? "#2f55b0", 0.65),
       pantsHem: sm(new THREE.Color(L.pants ?? "#2f55b0").multiplyScalar(0.8).getStyle(), 0.65),
@@ -65,7 +97,7 @@ const useToyMats = (L: ToyLook) =>
       apron: sm("#f8f8f5", 0.55, {side: THREE.DoubleSide}),
       apronDark: sm("#e6e6e0", 0.6),
     }),
-    [L.skin, L.shirt, L.pants, L.hair, L.shoe, L.sole, L.backpack, L.lips, L.hairStyle],
+    [L.skin, L.shirt, L.pants, L.hair, L.shoe, L.sole, L.backpack, L.lips, L.hairStyle, L.plaid],
   );
 
 /* proporções medidas no boneco de referência (altura total ≈ 2,0):
@@ -223,6 +255,26 @@ const OtherHair: React.FC<{style: string; m: THREE.Material}> = ({style, m}) => 
             </mesh>
           </group>
         ))}
+      </>
+    );
+  if (style === "bald") return null;
+  if (style === "mohawk")
+    return (
+      <>
+        {/* crista: uma "barbatana" lisa + pontas por cima, da testa até a nuca */}
+        <mesh position={[0, 0.3, -0.06]} rotation={[0.35, 0, 0]} scale={[0.08, 0.16, 0.31]} material={m} castShadow>
+          <sphereGeometry args={[1, 20, 14]} />
+        </mesh>
+        {Array.from({length: 8}, (_, i) => {
+          const a = -0.35 + (i / 7) * 1.95; // da testa até a nuca
+          const h = 0.38 - Math.abs(i - 2.5) * 0.03;
+          const r = 0.3 + h / 2 - 0.05;
+          return (
+            <mesh key={i} position={[0, Math.cos(a) * r, -Math.sin(a) * r]} rotation={[-a - 0.25, 0, 0]} material={m} castShadow>
+              <coneGeometry args={[0.085, h, 12]} />
+            </mesh>
+          );
+        })}
       </>
     );
   // long
@@ -638,8 +690,22 @@ export const Toy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; lPa
                 <cylinderGeometry args={[PANT_R + (look.flare ? 0.04 : 0.008), PANT_R + (look.flare ? 0.042 : 0.008), 0.045, 24]} />
               </mesh>
               <group position={[0, -SHIN, 0]} rotation={[foot, 0, 0]}>
-                <mesh position={[0, -0.055, 0.05]} geometry={geo.shoe} material={m.shoe} castShadow />
-                <mesh position={[0, -0.112, 0.05]} geometry={geo.sole} material={m.sole} />
+                {look.flipflop ? (
+                  <>
+                    <mesh position={[0, -0.07, 0.05]} scale={[0.82, 0.62, 0.9]} geometry={geo.shoe} material={m.skin} castShadow />
+                    <mesh position={[0, -0.112, 0.05]} geometry={geo.sole} material={m.sole} />
+                    {[-1, 1].map((k) => (
+                      <mesh key={k} position={[0.045 * k, -0.06, 0.1]} rotation={[0, 0.5 * k, 0]} material={m.shoe}>
+                        <boxGeometry args={[0.025, 0.07, 0.13]} />
+                      </mesh>
+                    ))}
+                  </>
+                ) : (
+                  <>
+                    <mesh position={[0, -0.055, 0.05]} geometry={geo.shoe} material={m.shoe} castShadow />
+                    <mesh position={[0, -0.112, 0.05]} geometry={geo.sole} material={m.sole} />
+                  </>
+                )}
               </group>
             </group>
           </group>
@@ -733,6 +799,11 @@ export const Toy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; lPa
           ) : (
             <>
               <mesh position={[0, (TORSO_BOT + TORSO_TOP) / 2 + breathe * 0.004, 0]} scale={[1, 1 + breathe * 0.008, 1]} geometry={geo.torso} material={m.shirt} castShadow receiveShadow />
+              {(look.belly ?? 0) > 0.01 && (
+                <mesh position={[0, 0.92, 0.12]} scale={[0.27, 0.24, 0.17 * (look.belly ?? 0) + 0.08]} material={m.shirt} castShadow>
+                  <sphereGeometry args={[1, 24, 18]} />
+                </mesh>
+              )}
               {/* gola */}
               <mesh position={[0, TORSO_TOP - 0.01, 0.02]} rotation={[Math.PI / 2, 0, 0]} material={look.polo ? m.cuffWhite : m.shirtDark}>
                 <torusGeometry args={[0.11, 0.026, 8, 20]} />
