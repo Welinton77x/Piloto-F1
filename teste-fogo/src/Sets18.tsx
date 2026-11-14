@@ -430,9 +430,9 @@ export const Granny: React.FC = () => {
   return (
     <group>
       {/* rugas da testa */}
-      {[0.12, 0.155, 0.19].map((y, i) => (
-        <mesh key={i} position={[0, y, 0.27 - i * 0.025]} rotation={[-0.35 - i * 0.12, 0, 0]} material={line}>
-          <torusGeometry args={[0.085 - i * 0.01, 0.006, 4, 16, Math.PI * 0.55]} />
+      {[0.125, 0.16, 0.195].map((y, i) => (
+        <mesh key={i} position={[0, y - 0.14, 0.305 - i * 0.024]} rotation={[0.08, 0, Math.PI * 0.35]} material={line}>
+          <torusGeometry args={[0.14, 0.006, 4, 18, Math.PI * 0.3]} />
         </mesh>
       ))}
       {/* pés de galinha e marquinhas do sorriso */}
