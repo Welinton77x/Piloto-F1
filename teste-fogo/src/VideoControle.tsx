@@ -122,15 +122,15 @@ const S0b: React.FC<ShotProps> = ({f, a, t}) => {
     </>
   );
 };
-const DOG1: V3 = [0.7, 0, 0.25];
+const DOG1: V3 = [0.5, 0, 0.25];
 const S1: React.FC<ShotProps> = ({f, a, t}) => {
   const k = easeOut(ramp(f, a + 2, FAREJADOR - 2));
   const sat = f >= FAREJADOR - 2;
   return (
     <>
-      <Cam pos={[0.05, 1.4, 3.15]} look={[0.05, 0.85, -0.4]} fov={52} f={f} a={a} />
+      <Cam pos={[0.0, 1.4, 3.15]} look={[0.0, 0.85, -0.4]} fov={62} f={f} a={a} />
       <LivingRoom />
-      <Toy pose={{...idle(f), pos: [-0.6, 0, -0.3], rotY: 0.45, smile: 0.6, eyeWide: 0.4, head: [0, 0.3, 0]}} look={BOYL} />
+      <Toy pose={{...idle(f), pos: [-0.5, 0, -0.35], rotY: 0.45, smile: 0.6, eyeWide: 0.4, head: [0, 0.3, 0]}} look={BOYL} />
       {sat ? (
         <Dog d={DET({pos: DOG1, rotY: -0.35, legs: "point", legK: backOut(ramp(f, FAREJADOR, FAREJADOR + 10)), lupa: true, t, blink: blinkCurve(f + 7), tail: 1, mouth: 0.1, head: [0, 0.1, -0.1]})} />
       ) : (
@@ -163,9 +163,9 @@ const ENCONTRA = at(2, "encontra");
 const DOIS = at(2, "dois");
 const S3: React.FC<ShotProps> = ({f, a, t}) => (
   <>
-    <Cam pos={[2.1, 1.55, 1.9]} look={[0.15, 0.55, -0.7]} fov={46} f={f} a={a} />
+    <Cam pos={[-0.15, 1.45, 3.0]} look={[-0.2, 0.6, -0.5]} fov={50} f={f} a={a} />
     <LivingRoom />
-    <Dog d={DET({pos: [0.15 + 0.25 * Math.sin(t * 2), 0, -0.25], rotY: Math.PI + 0.5, walk: 0.001, run: 1, sniff: 1, t, tail: 1, head: [0.55, 0.3 * Math.sin(t * 5), 0]})} />
+    <Dog d={DET({pos: [0.05 + 0.2 * Math.sin(t * 2), 0, -0.3], rotY: -Math.PI / 2, walk: 0.001, run: 1, sniff: 1, t, tail: 1, head: [0.45, -0.75 + 0.2 * Math.sin(t * 5), 0]})} />
   </>
 );
 const S3b: React.FC<ShotProps> = ({f, a, t}) => (
@@ -272,11 +272,11 @@ const S9: React.FC<ShotProps> = ({f, a, t}) => (
 /* fã-clube: palquinho, plateia de chinelos e meias com cartaz */
 const FAMOSO = at(8, "famoso");
 const FANS: {x: number; z: number; kind: "c" | "m"; col: string}[] = [
-  {x: -1.1, z: 1.4, kind: "m", col: "#ffffff"},
-  {x: -0.55, z: 1.7, kind: "c", col: ""},
-  {x: 0.0, z: 1.45, kind: "m", col: "#ffd21f"},
-  {x: 0.55, z: 1.7, kind: "c", col: ""},
-  {x: 1.1, z: 1.4, kind: "m", col: "#74b9e8"},
+  {x: -1.0, z: 0.55, kind: "m", col: "#ffffff"},
+  {x: -0.5, z: 0.8, kind: "c", col: ""},
+  {x: 0.0, z: 0.6, kind: "m", col: "#ffd21f"},
+  {x: 0.5, z: 0.8, kind: "c", col: ""},
+  {x: 1.0, z: 0.55, kind: "m", col: "#74b9e8"},
 ];
 const S10: React.FC<ShotProps> = ({f, a, t}) => {
   const flash = f >= FAMOSO ? Math.max(0, Math.sin(t * 9)) ** 8 : 0;
@@ -288,7 +288,7 @@ const S10: React.FC<ShotProps> = ({f, a, t}) => {
       <Remote p={[0, 0.3 + REMOTE_LEG * RS, -0.5]} r={[0, 0, 0.08 * Math.sin(t * 3)]} s={RS} c={{alive: 1, t, blink: blinkCurve(f + 11), arms: "wave", smile: 1}} />
       {FANS.map((fn, i) => (
         <group key={i}>
-          {fn.kind === "m" ? <Sock p={[fn.x, 0, fn.z]} rotY={Math.PI} s={0.8} color={fn.col} /> : <Chinelo p={[fn.x, 0, fn.z]} r={[0, Math.PI, 0]} s={0.85} />}
+          {fn.kind === "m" ? <Sock p={[fn.x, 0, fn.z]} rotY={Math.PI} s={0.8} color={fn.col} /> : <Chinelo p={[fn.x, 0, fn.z]} r={[0, Math.PI, 0]} s={0.6} />}
           <HeartSign p={[fn.x + 0.05, 0.85 + 0.06 * Math.sin(t * 6 + i), fn.z - 0.05]} r={[0, 0, 0.15 * Math.sin(t * 5 + i)]} s={1.0} />
         </group>
       ))}
@@ -326,7 +326,7 @@ const S12: React.FC<ShotProps> = ({f, a, t}) => {
   const tt = Math.min(t, DESLIGAR / FPS);
   return (
     <>
-      <Cam pos={[0, 1.4, 4.2]} look={[0, 0.8, 0.3]} fov={48} f={f} a={a} />
+      <Cam pos={[-0.05, 1.4, 4.2]} look={[-0.05, 0.8, 0.3]} fov={54} f={f} a={a} />
       <BAScene />
       {f < DESLIGAR ? (
         <TangoRemote p={RP12} t={t} f={f} />
@@ -401,6 +401,7 @@ const S16: React.FC<ShotProps> = ({f, a, t}) => {
       <Cam pos={[0, 1.3, 2.5]} look={[0, 1.1, SOFA_Z]} fov={48} f={f} a={a} />
       <LivingRoom night />
       <pointLight position={[0.8, 1.6, 0.8]} intensity={2.5} distance={4} decay={1.6} color="#ffd9a0" />
+      <pointLight position={[0, 1.6, SOFA_Z + 0.4]} intensity={3} distance={2.5} decay={1.5} color="#c8d4ff" />
       <Dog d={DET({pos: [0, lerp(-0.6, 0.38, up), SOFA_Z - 0.75], rotY: 0, legs: "point", legK: up, lupa: true, t, blink: blinkCurve(f + 7), tail: 0, sniff: 0.6, mouth: 0})} />
     </>
   );
