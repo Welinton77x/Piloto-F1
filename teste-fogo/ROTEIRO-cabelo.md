@@ -1,7 +1,7 @@
 # Roteiro: "Se você quer cortar o cabelo, primeiro precisa convencer o caranguejo a abrir o salão" (~1min40) · estilo da nova referência
 
 **Formato da referência nova:** uma corrente de problemas, um levando ao outro ("Mas…" → "Então…"). Cada solução
-cria um problema mais absurdo. Tem **5 nomes pomposos**, números exatos e malucos, um personagem que passa e solta
+cria um problema mais absurdo. Tem **4 nomes pomposos**, números exatos e malucos, um personagem que passa e solta
 uma frase do nada, e um "Parabéns!" com resumo. No final a história **volta pro começo**, num loop.
 
 **Na tela:** etiquetas brancas "• TEXTO", onomatopeias, números grandes, mapa com alfinete e ⏩. Sem música de fundo.
