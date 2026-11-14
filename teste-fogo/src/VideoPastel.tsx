@@ -715,7 +715,7 @@ export const VideoPastel: React.FC = () => {
         <SND key={"b" + x} src="sfx7/boing.mp3" from={x + 3} dur={32} v={FXV * 0.75} />
       ))}
       {FACTS.map((x) => (
-        <SND key={"r" + x} src="sfx10/ding.mp3" from={x + 2} dur={30} v={FXV * 0.5} />
+        <SND key={"r" + x} src="sfx10/ding.mp3" from={x + 2} dur={30} v={FXV * 0.32} />
       ))}
       <SND src="sfx11/wind.mp3" from={0} dur={ENTAO0} v={FXV * 0.3} />
       <SND src="sfx3/ring.mp3" from={ENTAO0 + 4} dur={30} v={FXV * 0.35} />
@@ -725,7 +725,7 @@ export const VideoPastel: React.FC = () => {
       <SND src="sfx7/brr.mp3" from={ESFRIA} dur={40} v={FXV * 0.5} />
       <SND src="sfx10/bonk.mp3" from={BOCA} dur={25} v={FXV * 0.5} />
       <SND src="sfx14/spray.mp3" from={QUARENTA + 8} dur={40} v={FXV * 0.4} />
-      <SND src="sfx6/drain.mp3" from={L(5)} dur={L(6) - L(5)} v={FXV * 0.25} />
+      <SND src="sfx6/drain.mp3" from={L(5)} dur={L(6) - L(5)} v={FXV * 0.15} />
       <SND src="sfx14/buzina.mp3" from={at(6, "orgulhoso")} dur={30} v={FXV * 0.4} />
       <SND src="sfx2/cheer.mp3" from={GANHA} dur={60} v={FXV * 0.45} />
       <SND src="sfx14/buzina.mp3" from={L(7) + 8} dur={30} v={FXV * 0.4} />
