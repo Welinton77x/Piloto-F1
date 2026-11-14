@@ -423,3 +423,48 @@ export const BigGlove: React.FC<{color?: string}> = ({color = "#2ecc71"}) => (
   </group>
 );
 export const SuitTie: React.FC = () => null;
+
+/* ---------- cara de vó (vai no headExtra): rugas, bochecha corada, brinco, colar de pérolas e xale ---------- */
+export const Granny: React.FC = () => {
+  const line = sm("#a8714a", 0.6);
+  return (
+    <group>
+      {/* rugas da testa */}
+      {[0.12, 0.155, 0.19].map((y, i) => (
+        <mesh key={i} position={[0, y, 0.27 - i * 0.025]} rotation={[-0.35 - i * 0.12, 0, 0]} material={line}>
+          <torusGeometry args={[0.085 - i * 0.01, 0.006, 4, 16, Math.PI * 0.55]} />
+        </mesh>
+      ))}
+      {/* pés de galinha e marquinhas do sorriso */}
+      {[-1, 1].map((sd) => (
+        <group key={sd}>
+          {[0, 1].map((k) => (
+            <mesh key={k} position={[0.205 * sd, -0.015 - k * 0.03, 0.2]} rotation={[0, 0.9 * sd, sd * (0.35 - k * 0.7)]} material={line}>
+              <boxGeometry args={[0.05, 0.007, 0.007]} />
+            </mesh>
+          ))}
+          <mesh position={[0.085 * sd, -0.11, 0.285]} rotation={[0, 0.3 * sd, sd * 1.1]} material={line}>
+            <torusGeometry args={[0.045, 0.006, 4, 12, Math.PI * 0.6]} />
+          </mesh>
+          {/* brinco de pérola */}
+          <mesh position={[0.3 * sd, -0.12, 0.02]} material={sm("#fffaf0", 0.2, {metalness: 0.2})}>
+            <sphereGeometry args={[0.028, 10, 8]} />
+          </mesh>
+        </group>
+      ))}
+      {/* colar de pérolas */}
+      {Array.from({length: 13}, (_, i) => {
+        const a = -1.2 + (i / 12) * 2.4;
+        return (
+          <mesh key={"p" + i} position={[Math.sin(a) * 0.2, -0.4 - Math.cos(a) * 0.02, 0.06 + Math.cos(a) * 0.17]} material={sm("#fffaf0", 0.2, {metalness: 0.2})}>
+            <sphereGeometry args={[0.022, 8, 6]} />
+          </mesh>
+        );
+      })}
+      {/* xale de crochê nos ombros */}
+      <mesh position={[0, -0.46, -0.02]} rotation={[Math.PI / 2 + 0.12, 0, 0]} scale={[1.25, 1, 0.8]} material={sm("#e9d3e8", 0.95)} castShadow>
+        <torusGeometry args={[0.24, 0.075, 10, 30]} />
+      </mesh>
+    </group>
+  );
+};

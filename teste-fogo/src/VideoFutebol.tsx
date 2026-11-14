@@ -13,7 +13,7 @@ import {FlowerArch} from "./Sets10";
 import {Dog, Sofa, TV, RoomShell, Beard, sm, rbox} from "./Sets9";
 import {DadHead} from "./Sets12";
 import {Ball, Stadium, Capivara} from "./Sets17";
-import {Campinho, ChineloGoal, BrickGoal, FlipFlop, Space, Satellite, BananaMic, Bouquet, DirtPile, Museum, SafariHat, HouseWindow, CoffeeCup, ChineloStatue, FlyingDuck, Scoreboard, LeatherHat, Accordion, Zabumba, Triangle, Cane, BigGlove} from "./Sets18";
+import {Campinho, ChineloGoal, BrickGoal, FlipFlop, Space, Satellite, BananaMic, Bouquet, DirtPile, Museum, SafariHat, HouseWindow, CoffeeCup, ChineloStatue, FlyingDuck, Scoreboard, LeatherHat, Accordion, Zabumba, Triangle, Cane, BigGlove, Granny} from "./Sets18";
 import {HeadGlasses} from "./Sets17";
 import {Captions, StageTitle, Confetti, Wd, clean} from "./Overlays";
 import {FPS, clamp, lerp, ramp, pop, easeInOut, easeOut, canvasTex, rng} from "./util";
@@ -30,17 +30,17 @@ const at = (i: number, txt: string, n = 0) => {
 export const TOTAL_FUTEBOL = F(words[words.length - 1].e + 0.9);
 
 /* ---------- visuais ---------- */
-const BOYL: ToyLook = {hoodie: true, socks: "#ffffff", shoe: "#e8414f", sole: "#101018"};
-const BOY_CHINELO: ToyLook = {hoodie: true, flipflop: true, shoe: "#2e86de", sole: "#ffffff"};
-const JUNINHO: ToyLook = {shirt: "#2ecc71", pants: "#ffffff", hairStyle: "curly", hair: "#2a1a10"};
+const BOYL: ToyLook = {shirt: "#ffd21f", pants: "#1f3fa0", kit: "#ffffff", shoe: "#e8414f", sole: "#101018"};
+const BOY_CHINELO: ToyLook = {shirt: "#ffd21f", pants: "#1f3fa0", kit: "#ffffff", flipflop: true, shoe: "#2e86de", sole: "#ffffff"};
+const JUNINHO: ToyLook = {shirt: "#2ecc71", pants: "#ffffff", kit: "#2ecc71", shoe: "#ffffff", sole: "#2ecc71", hairStyle: "curly", hair: "#2a1a10"};
 const AMIGOS: ToyLook[] = [
-  {shirt: "#e8414f", pants: "#101018", hairStyle: "spiky", hair: "#2a1a10"},
-  {shirt: "#2e86de", pants: "#ffffff", hairStyle: "buzz", hair: "#4a3020"},
-  {shirt: "#ffd21f", pants: "#2e86de", hairStyle: "mohawk", hair: "#101018"},
+  {shirt: "#e8414f", pants: "#101018", kit: "#e8414f", shoe: "#101018", sole: "#ffffff", hairStyle: "spiky", hair: "#2a1a10"},
+  {shirt: "#2e86de", pants: "#ffffff", kit: "#2e86de", shoe: "#ff8a1f", sole: "#101018", hairStyle: "buzz", hair: "#4a3020"},
+  {shirt: "#ff8a1f", pants: "#101018", kit: "#ff8a1f", shoe: "#ffffff", sole: "#e8414f", hairStyle: "mohawk", hair: "#101018"},
   JUNINHO,
 ];
 const TIO: ToyLook = {shirt: "#c0392b", plaid: "#1f2a44", pants: "#6b5b45", hairStyle: "buzz", hair: "#2a1a10", belly: 1};
-const VO: ToyLook = {hairStyle: "bun", hair: "#e6e6e6", shirt: "#8e5aa8", pants: "#5a4a6a", skin: "#f1c8a0"};
+const VO: ToyLook = {hairStyle: "bun", hair: "#f2f2f2", shirt: "#8e5aa8", pants: "#5a4a6a", skin: "#f1c8a0", lips: "#c0606a", browColor: "#e2e2e2"};
 const TIA1: ToyLook = {hairStyle: "curly", hair: "#d9d9d9", shirt: "#f06292", pants: "#5a4a6a", skin: "#e9b88a"};
 const TIA2: ToyLook = {hairStyle: "bun", hair: "#b0b0b0", shirt: "#26c6da", pants: "#3a3f4a"};
 const NOIVA: ToyLook = {dress: true, veil: true, hairStyle: "long", hair: "#5a3a20", lashes: true, lips: "#d6455d"};
@@ -446,7 +446,7 @@ const VoWindow: React.FC<ShotProps & {close?: boolean}> = ({f, a, t, close}) => 
       <HandToy
         pose={{...idle(f), pos: [0, 0.35, -0.6], rotY: 0, rShoulder: sip ? [-1.9, 0.6, 0.0] : [-1.2, 0.5, 0.1], rElbow: sip ? -1.9 : -1.2, brow: f >= VALEU ? 0 : -0.3, mouthOpen: f >= VALEU && f < VALEU + 40 ? 0.4 + 0.2 * Math.sin(t * 10) : 0, smile: f >= VALEU ? 0.8 : 0, head: f < VALEU && !sip ? [0, 0.25 * Math.sin(t * 1.5), 0.1] : [0, 0, 0]}}
         look={VO}
-        headExtra={<HeadGlasses />}
+        headExtra={<><HeadGlasses color="#8a5a2b" /><Granny /></>}
         item={<CoffeeCup p={[0, 0.02, 0.06]} s={1.4} />}
       />
     </>

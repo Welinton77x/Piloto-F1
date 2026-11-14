@@ -30,6 +30,8 @@ export type ToyLook = {
   flipflop?: boolean; // chinelo de dedo (pé de fora; shoe = cor da tira, sole = cor do solado)
   bareR?: boolean; // pé direito descalço (sem o chinelo)
   socks?: string; // só de meia (cor da meia), sem tênis
+  browColor?: string; // cor da sobrancelha (vó: branca)
+  kit?: string; // uniforme de futebol: short (cor de pants), meião desta cor até o joelho e chuteira com travas (cor de shoe)
 };
 
 const sm = (color: string, rough = 0.55, extra: Partial<THREE.MeshStandardMaterialParameters> = {}) =>
@@ -84,7 +86,7 @@ const useToyMats = (L: ToyLook) =>
       sole: sm(L.sole ?? "#f08a1c", 0.5),
       eye: sm("#0c0c10", 0.12, {metalness: 0.1}),
       white: sm("#ffffff", 0.2),
-      brow: sm("#2a170d", 0.5),
+      brow: sm(L.browColor ?? "#2a170d", 0.5),
       mouth: sm("#3a1510", 0.5),
       tongue: sm("#e2606e", 0.45),
       blush: sm("#f3a0a6", 0.6),
@@ -105,7 +107,7 @@ const useToyMats = (L: ToyLook) =>
       apron: sm("#f8f8f5", 0.55, {side: THREE.DoubleSide}),
       apronDark: sm("#e6e6e0", 0.6),
     }),
-    [L.skin, L.shirt, L.pants, L.hair, L.shoe, L.sole, L.backpack, L.lips, L.hairStyle, L.plaid],
+    [L.skin, L.shirt, L.pants, L.hair, L.shoe, L.sole, L.backpack, L.lips, L.hairStyle, L.plaid, L.browColor],
   );
 
 /* proporções medidas no boneco de referência (altura total ≈ 2,0):
@@ -684,19 +686,48 @@ export const Toy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; lPa
         const foot = -(hipRot + knee) * (walkAmt > 0 ? 0.7 : 0);
         return (
           <group key={sd} position={[HIPX * sd, HIP, 0]} rotation={[hipRot, 0, 0]}>
-            <mesh position={[0, -THIGH / 2 + 0.03, 0]} material={m.pants} castShadow receiveShadow>
-              <cylinderGeometry args={[PANT_R, PANT_R, THIGH + 0.06, 24]} />
-            </mesh>
+            {look.kit ? (
+              <>
+                {/* short de futebol + coxa de fora */}
+                <mesh position={[0, -THIGH * 0.28 + 0.03, 0]} material={m.pants} castShadow receiveShadow>
+                  <cylinderGeometry args={[PANT_R + 0.018, PANT_R + 0.03, THIGH * 0.56 + 0.06, 24]} />
+                </mesh>
+                <mesh position={[0, -THIGH * 0.5, 0]} material={m.skin} castShadow receiveShadow>
+                  <cylinderGeometry args={[PANT_R - 0.022, PANT_R - 0.022, THIGH * 0.9, 20]} />
+                </mesh>
+              </>
+            ) : (
+              <mesh position={[0, -THIGH / 2 + 0.03, 0]} material={m.pants} castShadow receiveShadow>
+                <cylinderGeometry args={[PANT_R, PANT_R, THIGH + 0.06, 24]} />
+              </mesh>
+            )}
             <group position={[0, -THIGH, 0]} rotation={[knee, 0, 0]}>
-              <mesh material={m.pants} castShadow>
-                <sphereGeometry args={[PANT_R, 24, 16]} />
-              </mesh>
-              <mesh position={[0, -SHIN / 2 + 0.01, 0]} material={m.pants} castShadow receiveShadow>
-                <cylinderGeometry args={[PANT_R, PANT_R + (look.flare ? 0.035 : 0.004), SHIN - 0.02, 24]} />
-              </mesh>
-              <mesh position={[0, -SHIN + 0.035, 0]} material={m.pantsHem} castShadow>
-                <cylinderGeometry args={[PANT_R + (look.flare ? 0.04 : 0.008), PANT_R + (look.flare ? 0.042 : 0.008), 0.045, 24]} />
-              </mesh>
+              {look.kit ? (
+                <>
+                  <mesh material={m.skin} castShadow>
+                    <sphereGeometry args={[PANT_R - 0.02, 20, 14]} />
+                  </mesh>
+                  {/* meião até o joelho, com listra branca em cima */}
+                  <mesh position={[0, -SHIN / 2 - 0.01, 0]} material={sockMat(look.kit)} castShadow receiveShadow>
+                    <cylinderGeometry args={[PANT_R - 0.008, PANT_R - 0.016, SHIN - 0.06, 20]} />
+                  </mesh>
+                  <mesh position={[0, -0.05, 0]} material={m.cuffWhite} castShadow>
+                    <cylinderGeometry args={[PANT_R - 0.004, PANT_R - 0.004, 0.035, 20]} />
+                  </mesh>
+                </>
+              ) : (
+                <>
+                  <mesh material={m.pants} castShadow>
+                    <sphereGeometry args={[PANT_R, 24, 16]} />
+                  </mesh>
+                  <mesh position={[0, -SHIN / 2 + 0.01, 0]} material={m.pants} castShadow receiveShadow>
+                    <cylinderGeometry args={[PANT_R, PANT_R + (look.flare ? 0.035 : 0.004), SHIN - 0.02, 24]} />
+                  </mesh>
+                  <mesh position={[0, -SHIN + 0.035, 0]} material={m.pantsHem} castShadow>
+                    <cylinderGeometry args={[PANT_R + (look.flare ? 0.04 : 0.008), PANT_R + (look.flare ? 0.042 : 0.008), 0.045, 24]} />
+                  </mesh>
+                </>
+              )}
               <group position={[0, -SHIN, 0]} rotation={[foot, 0, 0]}>
                 {look.socks ? (
                   <mesh position={[0, -0.085, 0.045]} scale={[0.86, 0.75, 0.93]} geometry={geo.shoe} material={sockMat(look.socks)} castShadow />
@@ -716,6 +747,13 @@ export const Toy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; lPa
                   <>
                     <mesh position={[0, -0.055, 0.05]} geometry={geo.shoe} material={m.shoe} castShadow />
                     <mesh position={[0, -0.112, 0.05]} geometry={geo.sole} material={m.sole} />
+                    {/* travas da chuteira */}
+                    {look.kit &&
+                      [[-0.04, -0.02], [0.04, -0.02], [-0.04, 0.12], [0.04, 0.12], [0, 0.2]].map(([x, z], k) => (
+                        <mesh key={k} position={[x, -0.135, 0.05 + z - 0.05]} material={m.sole}>
+                          <cylinderGeometry args={[0.014, 0.01, 0.03, 8]} />
+                        </mesh>
+                      ))}
                   </>
                 )}
               </group>
