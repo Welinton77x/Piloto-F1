@@ -94,11 +94,11 @@ const FAREJADOR = at(0, "farejador");
 const DETETIVE = at(0, "detetive");
 const S0: React.FC<ShotProps> = ({f, a, t}) => (
   <>
-    <Cam pos={[0, 1.55, -0.55]} look={[0, 1.2, 2.95]} fov={52} f={f} a={a} />
+    <Cam pos={[0, 1.75, -2.3]} look={[0, 1.15, 2.95]} fov={46} f={f} a={a} />
     <LivingRoom tvLight={0.8} />
     <TV p={TV_P} rotY={Math.PI} />
     <TVStatic p={TV_P} rotY={Math.PI} f={f} />
-    <Toy pose={{...idle(f), pos: [0, 0, 0.9], rotY: Math.PI, rShoulder: [-2.6, 0, -0.6], rElbow: -1.9, head: [0, 0.25 * Math.sin(t * 2), 0.15]}} look={BOYL} />
+    <Toy pose={{...idle(f), pos: [0, 0, 0.7], rotY: 0, rShoulder: [-2.6, 0, -0.6], rElbow: -1.9, head: [0, 0.25 * Math.sin(t * 2), 0.15]}} look={BOYL} />
   </>
 );
 /* o menino revirando o sofá: almofadas voando */
@@ -128,7 +128,7 @@ const S1: React.FC<ShotProps> = ({f, a, t}) => {
   const sat = f >= FAREJADOR - 2;
   return (
     <>
-      <Cam pos={[0.1, 1.4, 3.6]} look={[0.1, 0.85, -0.3]} fov={50} f={f} a={a} />
+      <Cam pos={[0.05, 1.4, 3.15]} look={[0.05, 0.85, -0.4]} fov={52} f={f} a={a} />
       <LivingRoom />
       <Toy pose={{...idle(f), pos: [-0.6, 0, -0.3], rotY: 0.45, smile: 0.6, eyeWide: 0.4, head: [0, 0.3, 0]}} look={BOYL} />
       {sat ? (
@@ -163,7 +163,7 @@ const ENCONTRA = at(2, "encontra");
 const DOIS = at(2, "dois");
 const S3: React.FC<ShotProps> = ({f, a, t}) => (
   <>
-    <Cam pos={[1.5, 1.3, 1.2]} look={[0, 0.6, -0.9]} fov={50} f={f} a={a} />
+    <Cam pos={[2.1, 1.55, 1.9]} look={[0.15, 0.55, -0.7]} fov={46} f={f} a={a} />
     <LivingRoom />
     <Dog d={DET({pos: [0.15 + 0.25 * Math.sin(t * 2), 0, -0.25], rotY: Math.PI + 0.5, walk: 0.001, run: 1, sniff: 1, t, tail: 1, head: [0.55, 0.3 * Math.sin(t * 5), 0]})} />
   </>
@@ -210,7 +210,7 @@ const S6: React.FC<ShotProps> = ({f, a, t}) => {
       <directionalLight position={[4, 8, 6]} intensity={2.2} castShadow shadow-mapSize={[1024, 1024]} />
       <Cow c={{pos: [0, 0, 0], rotY: 0, arms: "hold", armK: 1, t, blink: blinkCurve(f + 3), glasses: true, headTilt: 0.12}} palmRef={palm} />
       <InHand palm={palm}>
-        <Newspaper p={[0, 0.05, 0.12]} r={[0, 0, 0]} s={1} />
+        <Newspaper p={[0, 0.05, 0.12]} r={[Math.PI / 2, 0, 0]} s={1} />
       </InHand>
     </>
   );
@@ -282,14 +282,14 @@ const S10: React.FC<ShotProps> = ({f, a, t}) => {
   const flash = f >= FAMOSO ? Math.max(0, Math.sin(t * 9)) ** 8 : 0;
   return (
     <>
-      <Cam pos={[0, 1.55, 4.3]} look={[0, 1.0, 0]} fov={50} f={f} a={a} />
+      <Cam pos={[0, 2.5, 5.6]} look={[0, 0.95, -0.4]} fov={44} f={f} a={a} />
       <BAScene />
       <MiniStage p={[0, 0, -0.6]} />
       <Remote p={[0, 0.3 + REMOTE_LEG * RS, -0.5]} r={[0, 0, 0.08 * Math.sin(t * 3)]} s={RS} c={{alive: 1, t, blink: blinkCurve(f + 11), arms: "wave", smile: 1}} />
       {FANS.map((fn, i) => (
         <group key={i}>
-          {fn.kind === "m" ? <Sock p={[fn.x, 0, fn.z]} rotY={Math.PI} s={1.1} color={fn.col} /> : <Chinelo p={[fn.x, 0, fn.z]} r={[0, Math.PI, 0]} s={1.3} />}
-          <HeartSign p={[fn.x + 0.05, 0.95 + 0.06 * Math.sin(t * 6 + i), fn.z - 0.05]} r={[0, Math.PI, 0.15 * Math.sin(t * 5 + i)]} s={1.1} />
+          {fn.kind === "m" ? <Sock p={[fn.x, 0, fn.z]} rotY={Math.PI} s={0.8} color={fn.col} /> : <Chinelo p={[fn.x, 0, fn.z]} r={[0, Math.PI, 0]} s={0.85} />}
+          <HeartSign p={[fn.x + 0.05, 0.85 + 0.06 * Math.sin(t * 6 + i), fn.z - 0.05]} r={[0, 0, 0.15 * Math.sin(t * 5 + i)]} s={1.0} />
         </group>
       ))}
       {flash > 0.05 && <pointLight position={[0, 1.6, 2.2]} intensity={14 * flash} distance={6} decay={1.4} color="#ffffff" />}
@@ -317,7 +317,7 @@ const S11: React.FC<ShotProps> = ({f, a, t}) => (
 /* o cachorro aperta o botão de desligar */
 const APERTA = at(10, "aperta");
 const DESLIGAR = at(10, "desligar");
-const RP12: V3 = [0.35, 0, 0.35];
+const RP12: V3 = [0.3, 0, 0.35];
 const S12: React.FC<ShotProps> = ({f, a, t}) => {
   const k = easeOut(ramp(f, a + 2, APERTA - 4));
   const sat = f >= APERTA - 4;
@@ -326,7 +326,7 @@ const S12: React.FC<ShotProps> = ({f, a, t}) => {
   const tt = Math.min(t, DESLIGAR / FPS);
   return (
     <>
-      <Cam pos={[0, 1.3, 3.6]} look={[0, 0.85, 0.3]} fov={48} f={f} a={a} />
+      <Cam pos={[0, 1.4, 4.2]} look={[0, 0.8, 0.3]} fov={48} f={f} a={a} />
       <BAScene />
       {f < DESLIGAR ? (
         <TangoRemote p={RP12} t={t} f={f} />
@@ -381,7 +381,7 @@ const S14: React.FC<ShotProps> = ({f, a, t}) => {
 /* 🌀 "E lembre-se: o pombo não sabe ler. Ele só finge." */
 const S15: React.FC<ShotProps> = ({f, a, t}) => (
   <>
-    <Cam pos={[0, 0.55, 1.6]} look={[0, 0.4, 0]} fov={44} f={f} a={a} punch={10} />
+    <Cam pos={[0, 0.85, 2.9]} look={[0, 0.6, 0]} fov={44} f={f} a={a} punch={10} />
     <color attach="background" args={["#ffe3b8"]} />
     <hemisphereLight args={["#fff6e6", "#b08a60", 1.0]} />
     <pointLight position={[0.6, 2, 1.6]} intensity={6} distance={8} decay={1.4} castShadow />
@@ -398,10 +398,10 @@ const S16: React.FC<ShotProps> = ({f, a, t}) => {
   const up = easeOut(ramp(f, a + 8, a + 30));
   return (
     <>
-      <Cam pos={[0, 1.15, 2.4]} look={[0, 0.95, SOFA_Z]} fov={48} f={f} a={a} />
+      <Cam pos={[0, 1.3, 2.5]} look={[0, 1.1, SOFA_Z]} fov={48} f={f} a={a} />
       <LivingRoom night />
       <pointLight position={[0.8, 1.6, 0.8]} intensity={2.5} distance={4} decay={1.6} color="#ffd9a0" />
-      <Dog d={DET({pos: [0, lerp(-0.75, 0.05, up), SOFA_Z - 0.75], rotY: 0, legs: "point", legK: up, lupa: true, t, blink: blinkCurve(f + 7), tail: 0, sniff: 0.6, mouth: 0})} />
+      <Dog d={DET({pos: [0, lerp(-0.6, 0.38, up), SOFA_Z - 0.75], rotY: 0, legs: "point", legK: up, lupa: true, t, blink: blinkCurve(f + 7), tail: 0, sniff: 0.6, mouth: 0})} />
     </>
   );
 };
@@ -530,7 +530,7 @@ const SAMap: React.FC<{from: number; to: number; mode: "trail" | "plane"; trailT
         <circle cx={P[0]} cy={P[1]} r={12} fill="#101018" />
         <circle cx={Q[0]} cy={Q[1]} r={12} fill="#e8262d" stroke="#101018" strokeWidth={4} />
       </svg>
-      <div style={{position: "absolute", left: 600, top: 470, transform: "translate(-50%,-50%)", fontFamily, fontWeight: 900, fontSize: 56, color: "#8a5a10"}}>BRASIL</div>
+      <div style={{position: "absolute", left: 420, top: 380, transform: "translate(-50%,-50%)", fontFamily, fontWeight: 900, fontSize: 56, color: "#8a5a10"}}>BRASIL</div>
       <div style={{position: "absolute", left: 245, top: 900, transform: "translate(-50%,-50%) rotate(-70deg)", fontFamily, fontWeight: 900, fontSize: 46, color: "#2a5a88"}}>ARGENTINA</div>
       <div style={{position: "absolute", left: P[0] + 20, top: P[1] - 70, background: "#ffffff", border: "5px solid #101018", fontFamily, fontWeight: 900, fontSize: 32, padding: "2px 12px"}}>🏠 CASA</div>
       {mode === "plane" && (

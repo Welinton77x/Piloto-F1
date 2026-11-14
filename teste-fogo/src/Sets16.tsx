@@ -368,7 +368,7 @@ export const Caminito: React.FC = () => {
   const r = rng(91);
   const houses = Array.from({length: 9}, (_, i) => ({x: -6 + i * 1.5, h: 2.6 + r() * 1.6, c: BA_COLS[i % BA_COLS.length], c2: BA_COLS[(i * 3 + 2) % BA_COLS.length]}));
   return (
-    <group>
+    <>
       <color attach="background" args={["#8fd0ff"]} />
       {/* calçada de pedra */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 1]} material={sm("#b9a58c", 0.95)} receiveShadow>
@@ -401,7 +401,7 @@ export const Caminito: React.FC = () => {
           <circleGeometry args={[0.16, 3]} />
         </mesh>
       ))}
-    </group>
+    </>
   );
 };
 
@@ -460,7 +460,7 @@ export const MiniStage: React.FC<{p: V3}> = ({p}) => (
 
 /* ---------- cabine do avião (poltrona + janelinha) ---------- */
 export const PlaneCabin: React.FC<{t: number}> = ({t}) => (
-  <group>
+  <>
     <color attach="background" args={["#e9eef5"]} />
     <mesh position={[0, 1.4, -0.9]} material={sm("#e9eef5", 0.8)}>
       <planeGeometry args={[8, 5]} />
@@ -495,7 +495,7 @@ export const PlaneCabin: React.FC<{t: number}> = ({t}) => (
       ))}
       <mesh position={[0, 0.2, 0]} geometry={rbox(0.7, 0.4, 0.5, 0.04)} material={sm("#3a3f4a", 0.6)} />
     </group>
-  </group>
+  </>
 );
 
 /* ---------- cuia de chimarrão ---------- */
@@ -515,7 +515,7 @@ export const Cuia: React.FC<{p?: V3; r?: V3; s?: number}> = ({p = [0, 0, 0], r =
 
 /* ---------- pasto (vaca) ---------- */
 export const Pasture: React.FC = () => (
-  <group>
+  <>
     <color attach="background" args={["#8fd0ff"]} />
     <mesh rotation={[-Math.PI / 2, 0, 0]} material={sm("#7fcf5a", 0.95)} receiveShadow>
       <planeGeometry args={[60, 40]} />
@@ -525,5 +525,5 @@ export const Pasture: React.FC = () => (
         <sphereGeometry args={[1, 16, 12]} />
       </mesh>
     ))}
-  </group>
+  </>
 );
