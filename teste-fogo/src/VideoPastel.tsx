@@ -543,9 +543,9 @@ const FastFwd: React.FC<{from: number; to: number}> = ({from, to}) => {
   const a = (f - from) * 0.9;
   return (
     <>
-      <div style={{position: "absolute", left: 820, top: 300, fontSize: 110, fontFamily, color: "#ffffff", WebkitTextStroke: "8px #101018", paintOrder: "stroke fill"}}>⏩</div>
+      <div style={{position: "absolute", left: 800, top: 470, fontSize: 110, fontFamily, color: "#ffffff", WebkitTextStroke: "8px #101018", paintOrder: "stroke fill"}}>⏩</div>
       <svg width={1080} height={1920} style={{position: "absolute", inset: 0}}>
-        <g transform="translate(200,380)">
+        <g transform="translate(220,560)">
           <circle r={95} fill="#ffffff" stroke="#101018" strokeWidth={12} />
           <line x1={0} y1={0} x2={60 * Math.sin(a)} y2={-60 * Math.cos(a)} stroke="#101018" strokeWidth={10} strokeLinecap="round" />
           <line x1={0} y1={0} x2={40 * Math.sin(a / 12)} y2={-40 * Math.cos(a / 12)} stroke="#e8262d" strokeWidth={12} strokeLinecap="round" />
