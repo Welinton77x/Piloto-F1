@@ -1043,7 +1043,7 @@ const FollowCard: React.FC<{from: number; to: number; tap: number}> = ({from, to
 
 /* ======================= vídeo ======================= */
 const FXV = 0.3;
-const MUSIC = 0.125;
+const MUSIC = 0.11;
 const SND: React.FC<{src: string; from: number; dur?: number; v: number; loop?: boolean}> = ({src, from, dur = 60, v, loop}) => (
   <Sequence from={Math.max(0, from)} durationInFrames={dur}>
     <Audio src={staticFile(src)} volume={v} loop={loop} />
@@ -1154,8 +1154,8 @@ export const VideoChule: React.FC = () => {
       <SND src="sfx14/spray.mp3" from={PERF + 4} dur={40} v={FXV * 0.4} />
       <SND src="sfx11/angels.mp3" from={OPERA - 2} dur={L(4) - OPERA + 2} v={FXV * 0.45} />
       <SND src="sfx11/angels.mp3" from={L(4)} dur={GANHA - L(4)} v={FXV * 0.4} />
-      <SND src="sfx2/cheer.mp3" from={GANHA} dur={70} v={FXV * 0.5} />
-      <SND src="sfx10/plim.mp3" from={FICA4} dur={30} v={FXV * 0.7} />
+      <SND src="sfx2/cheer.mp3" from={GANHA} dur={70} v={FXV * 0.4} />
+      <SND src="sfx10/plim.mp3" from={FICA4} dur={30} v={FXV * 0.5} />
       <SND src="sfx8/snap.mp3" from={FICA4 + 4} dur={20} v={FXV * 0.5} />
       <SND src="sfx8/snap.mp3" from={FICA4 + 13} dur={20} v={FXV * 0.5} />
       <SND src="sfx7/cash.mp3" from={at(4, "empresario")} dur={40} v={FXV * 0.55} />
@@ -1169,12 +1169,12 @@ export const VideoChule: React.FC = () => {
       <SND src="sfx12/aww.mp3" from={L(9) + 16} dur={60} v={FXV * 0.45} />
       <SND src="sfx11/angels.mp3" from={L(10)} dur={at(10, "acaba") + 4 - L(10)} v={FXV * 0.45} />
       <SND src="sfx14/scratch.mp3" from={at(10, "acaba")} dur={30} v={FXV * 0.5} />
-      <SND src="sfx12/gasp.mp3" from={E10 - 4} dur={40} v={FXV * 0.45} />
+      <SND src="sfx12/gasp.mp3" from={E10 - 4} dur={40} v={FXV * 0.3} />
       {GUESTS.map((g, i) => (
         <SND key={"t" + i} src="sfx10/bonk.mp3" from={faintAt(g) + 7} dur={20} v={FXV * (g.kind === "dino" ? 0.7 : 0.35)} />
       ))}
       <SND src="sfx14/sirene.mp3" from={L(12) - 4} dur={ELES - L(12) + 10} v={FXV * 0.45} loop />
-      <SND src="sfx11/water.mp3" from={ELES + 2} dur={CRESCE - ELES} v={FXV * 0.5} loop />
+      <SND src="sfx11/water.mp3" from={ELES + 2} dur={CRESCE - ELES} v={FXV * 0.33} loop />
       <SND src="sfx11/grow.mp3" from={CRESCE - 6} dur={60} v={FXV * 0.6} />
       <SND src="sfx2/boom.mp3" from={CHOVE - 4} dur={50} v={FXV * 0.35} />
       <SND src="sfx14/chuva.mp3" from={CHOVE} dur={L(14) - CHOVE} v={FXV * 0.45} loop />
@@ -1189,7 +1189,7 @@ export const VideoChule: React.FC = () => {
       {["desmaiou", "empresariou", "casou", "chover", "milionario"].map((w, i) => (
         <SND key={"st" + i} src="sfx7/pof.mp3" from={at(16, w)} dur={22} v={FXV * 0.45} />
       ))}
-      <SND src="sfx3/bell.mp3" from={L(17)} dur={40} v={FXV * 0.45} />
+      <SND src="sfx3/bell.mp3" from={L(17)} dur={40} v={FXV * 0.3} />
       <SND src="sfx12/tada.mp3" from={CALCA} dur={45} v={FXV * 0.45} />
       <SND src="sfx8/sniff.mp3" from={CHEIRO - 2} dur={40} v={FXV * 0.6} />
       <SND src="sfx11/drama.mp3" from={CHULE17 - 4} dur={40} v={FXV * 0.5} />
