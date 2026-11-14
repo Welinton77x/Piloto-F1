@@ -257,7 +257,7 @@ export const Chinelo: React.FC<{p?: V3; r?: V3; s?: number; c?: ChineloP; stand?
 };
 
 /* ---------- o Chulé: nuvenzinha com carinha (verde → rosa com perfume) ---------- */
-export type ChuleP = {pos?: V3; s?: number; t?: number; pink?: number; mouth?: number; smile?: number; mustache?: number; blink?: number; arms?: "down" | "opera" | "up" | "mic" | "sign" | "wave"; look?: [number, number]; blush?: number; rotY?: number; wide?: number; sad?: number};
+export type ChuleP = {pos?: V3; s?: number; t?: number; pink?: number; mouth?: number; smile?: number; mustache?: number; blink?: number; arms?: "down" | "opera" | "up" | "mic" | "sign" | "wave"; look?: [number, number]; blush?: number; rotY?: number; wide?: number; sad?: number; face?: number};
 const PUFFS: [number, number, number, number][] = [
   [0, 0, 0, 0.42],
   [0.34, 0.08, -0.05, 0.3],
@@ -271,7 +271,7 @@ const PUFFS: [number, number, number, number][] = [
   [-0.2, -0.22, -0.02, 0.26],
 ];
 export const Chule: React.FC<{c: ChuleP}> = ({c}) => {
-  const {pos = [0, 0, 0], s = 1, t = 0, pink = 0, mouth = 0, smile = 1, mustache = 0, blink = 0, arms = "down", look = [0, 0], blush = 0, rotY = 0, wide = 0, sad = 0} = c;
+  const {pos = [0, 0, 0], s = 1, t = 0, pink = 0, mouth = 0, smile = 1, mustache = 0, blink = 0, arms = "down", look = [0, 0], blush = 0, rotY = 0, wide = 0, sad = 0, face = 1} = c;
   const col = new THREE.Color("#8fd14f").lerp(new THREE.Color("#ff9ccf"), pink);
   const col2 = new THREE.Color("#6fb23a").lerp(new THREE.Color("#ff7ab8"), pink);
   const m1 = sm("#" + col.getHexString(), 0.85, {emissive: "#" + col.getHexString(), emissiveIntensity: 0.15});
@@ -322,7 +322,10 @@ export const Chule: React.FC<{c: ChuleP}> = ({c}) => {
           </mesh>
         </group>
       )}
-      {/* rosto */}
+      {/* rosto (só quando face > 0: brota e some) */}
+      {face > 0.01 && (
+        <group position={[0, 0, 0.42]} scale={face}>
+          <group position={[0, 0, -0.42]}>
       {[-1, 1].map((sd) => (
         <LittleEye key={"e" + sd} p={[0.13 * sd, 0.08 + 0.02 * wide, 0.4]} r={0.075} k={1} blink={blink} look={look} wide={wide} />
       ))}
@@ -359,12 +362,15 @@ export const Chule: React.FC<{c: ChuleP}> = ({c}) => {
           ))}
         </group>
       )}
+          </group>
+        </group>
+      )}
     </group>
   );
 };
 
 /* ---------- o sol com carinha ---------- */
-export const SunFace: React.FC<{p: V3; r?: number; t?: number; faint?: number; green?: number; sniff?: number; band?: boolean; blink?: number}> = ({p, r = 3, t = 0, faint = 0, green = 0, sniff = 0, band = false, blink = 0}) => {
+export const SunFace: React.FC<{p: V3; r?: number; t?: number; faint?: number; green?: number; sniff?: number; band?: boolean; blink?: number; face?: number}> = ({p, r = 3, t = 0, faint = 0, green = 0, sniff = 0, band = false, blink = 0, face = 1}) => {
   const col = new THREE.Color("#ffd23a").lerp(new THREE.Color("#a6d64a"), green);
   const hex = "#" + col.getHexString();
   const body = sm(hex, 0.5, {emissive: hex, emissiveIntensity: 0.9});
@@ -384,6 +390,9 @@ export const SunFace: React.FC<{p: V3; r?: number; t?: number; faint?: number; g
           </mesh>
         );
       })}
+      {face > 0.01 && (
+        <group position={[0, 0, r * 0.9]} scale={face}>
+          <group position={[0, 0, -r * 0.9]}>
       {[-1, 1].map((sd) =>
         xEye ? (
           <group key={sd} position={[r * 0.33 * sd, r * 0.18, r * 0.94]}>
@@ -425,12 +434,35 @@ export const SunFace: React.FC<{p: V3; r?: number; t?: number; faint?: number; g
           <sphereGeometry args={[1, 12, 8]} />
         </mesh>
       ))}
+          </group>
+        </group>
+      )}
       {band && (
         <group position={[r * 0.45, r * 0.68, r * 0.62]} rotation={[-0.6, 0.45, 0.6]}>
           <mesh geometry={rbox(r * 0.7, r * 0.2, r * 0.04, r * 0.08)} material={sm("#f2c9a0", 0.7)} />
           <mesh position={[0, 0, r * 0.025]} geometry={rbox(r * 0.22, r * 0.14, r * 0.02, r * 0.04)} material={sm("#fff0e0", 0.8)} />
         </group>
       )}
+    </group>
+  );
+};
+
+/* ---------- lua ---------- */
+export const Moon: React.FC<{p: V3; r?: number; k?: number}> = ({p, r = 3, k = 1}) => {
+  if (k < 0.01) return null;
+  return (
+    <group position={p} scale={k}>
+      <mesh material={sm("#f4f1dc", 0.7, {emissive: "#f4f1dc", emissiveIntensity: 1.1})}>
+        <sphereGeometry args={[r, 32, 24]} />
+      </mesh>
+      {[[0.35, 0.3, 0.22], [-0.3, -0.2, 0.16], [0.1, -0.45, 0.12], [-0.4, 0.4, 0.1]].map(([x, y, c], i) => (
+        <mesh key={i} position={[x * r, y * r, Math.sqrt(Math.max(0, 1 - x * x - y * y)) * r * 0.99]} scale={[c * r, c * r, c * r * 0.25]} material={sm("#d9d4b8", 0.9, {emissive: "#d9d4b8", emissiveIntensity: 0.7})}>
+          <sphereGeometry args={[1, 14, 10]} />
+        </mesh>
+      ))}
+      <mesh scale={1.35} material={sm("#fff8d0", 1, {transparent: true, opacity: 0.12, emissive: "#fff8d0", emissiveIntensity: 1, depthWrite: false})}>
+        <sphereGeometry args={[r, 24, 16]} />
+      </mesh>
     </group>
   );
 };
@@ -918,11 +950,17 @@ export const Rain: React.FC<{c: V3; size: [number, number, number]; t: number; k
 /** guarda-chuva (segura pelo cabo) */
 export const Umbrella: React.FC<{p?: V3; r?: V3; s?: number; color?: string}> = ({p = [0, 0, 0], r = [0, 0, 0], s = 1, color = "#ff4d6d"}) => (
   <group position={p} rotation={r} scale={s}>
-    <mesh position={[0, 0.35, 0]} material={sm("#2b2e3b", 0.5)}>
-      <cylinderGeometry args={[0.012, 0.012, 0.75, 8]} />
+    <mesh position={[0, 0.45, 0]} material={sm("#2b2e3b", 0.5)}>
+      <cylinderGeometry args={[0.015, 0.015, 1.0, 8]} />
     </mesh>
-    <mesh position={[0, 0.78, 0]} material={sm(color, 0.6, {side: THREE.DoubleSide})} castShadow>
-      <coneGeometry args={[0.55, 0.25, 8, 1, true]} />
+    <mesh position={[0, -0.03, 0.05]} rotation={[0, Math.PI / 2, 0]} material={sm("#2b2e3b", 0.5)}>
+      <torusGeometry args={[0.05, 0.015, 6, 12, Math.PI]} />
+    </mesh>
+    <mesh position={[0, 1.0, 0]} material={sm(color, 0.6, {side: THREE.DoubleSide})} castShadow>
+      <coneGeometry args={[0.85, 0.32, 10, 1, true]} />
+    </mesh>
+    <mesh position={[0, 1.18, 0]} material={sm("#2b2e3b", 0.5)}>
+      <sphereGeometry args={[0.03, 8, 6]} />
     </mesh>
   </group>
 );
@@ -939,10 +977,10 @@ export const FireHelmet: React.FC = () => (
   </group>
 );
 /** prendedor de roupa no nariz (espaço da cabeça) */
-export const NoseClip: React.FC<{color?: string; gold?: boolean}> = ({color = "#ff4d6d", gold = false}) => {
+export const NoseClip: React.FC<{color?: string; gold?: boolean; s?: number}> = ({color = "#ff4d6d", gold = false, s = 1}) => {
   const m = gold ? sm("#ffcc33", 0.2, {metalness: 0.8, emissive: "#6a4a00", emissiveIntensity: 0.4}) : sm(color, 0.45);
   return (
-    <group position={[0, -0.075, 0.33]}>
+    <group position={[0, -0.075, 0.33]} scale={s}>
       {[-1, 1].map((sd) => (
         <mesh key={sd} position={[0, 0.028 * sd, 0.05]} rotation={[0.18 * sd, 0, 0]} geometry={rbox(0.05, 0.03, 0.16, 0.012)} material={m} castShadow />
       ))}

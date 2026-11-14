@@ -351,9 +351,74 @@ export const TOWN_HOUSES = (() => {
   }
   return out;
 })();
-export const Town: React.FC<{t: number; cans?: number[]; frontHouses?: boolean; galo?: boolean; lit?: (i: number) => boolean; dark?: boolean; lamps?: boolean; clouds?: boolean; flat?: boolean; clear?: [number, number]}> = ({t, cans = [], frontHouses = false, galo = true, lit, dark, lamps = true, clouds = true, flat = false, clear}) => {
+/* variação "nova" da cidade: outras cores, lojinhas com toldo e placa, bancos e floreiras */
+const NOVA_WALLS = ["#9ad1d4", "#f7a8b8", "#fff1b5", "#b8e0a8", "#c9b6f2", "#ffc9a3", "#a8c8f0"];
+const NOVA_ROOFS = ["#3a6ea5", "#2e8b57", "#7a4a9a", "#e07a5f", "#455a64"];
+const SHOP_NAMES = ["PADARIA", "FARMÁCIA", "SORVETES", "MERCADINHO", "BARBEARIA", "PASTELARIA", "FLORES", "LANCHES"];
+const SHOP_COLS = ["#e8414f", "#2e86de", "#2ecc71", "#ff8a1f", "#9b59b6", "#ffd21f"];
+const toldoTex = (c1: string) =>
+  canvasTex("toldo-" + c1, 128, 32, (c) => {
+    for (let i = 0; i < 8; i++) {
+      c.fillStyle = i % 2 ? "#ffffff" : c1;
+      c.fillRect(i * 16, 0, 16, 32);
+    }
+  });
+const placaLojaTex = (name: string) =>
+  canvasTex("placa-loja-" + name, 512, 128, (c) => {
+    c.fillStyle = "#fffaf0";
+    c.fillRect(0, 0, 512, 128);
+    c.strokeStyle = "#101018";
+    c.lineWidth = 10;
+    c.strokeRect(5, 5, 502, 118);
+    c.fillStyle = "#101018";
+    c.font = "bold 72px sans-serif";
+    c.textAlign = "center";
+    c.textBaseline = "middle";
+    c.fillText(name, 256, 70);
+  });
+const ShopFront: React.FC<{p: V3; w: number; i: number}> = ({p, w, i}) => {
+  const col = SHOP_COLS[i % SHOP_COLS.length];
+  const name = SHOP_NAMES[i % SHOP_NAMES.length];
+  return (
+    <group position={p}>
+      {/* toldo listrado inclinado sobre a porta e a vitrine */}
+      <mesh position={[0, 1.75, 0.38]} rotation={[0.45, 0, 0]} material={new THREE.MeshStandardMaterial({map: toldoTex(col), roughness: 0.7})} castShadow>
+        <boxGeometry args={[w * 0.82, 0.04, 0.85]} />
+      </mesh>
+      {/* placa da loja */}
+      <mesh position={[0, 2.25, 0.05]} material={new THREE.MeshStandardMaterial({map: placaLojaTex(name), roughness: 0.6})}>
+        <boxGeometry args={[w * 0.7, 0.36, 0.06]} />
+      </mesh>
+      {/* floreira na calçada */}
+      <mesh position={[w * 0.3, 0.2, 0.55]} material={lp("#8a5a3a")}>
+        <boxGeometry args={[0.7, 0.32, 0.3]} />
+      </mesh>
+      {[-0.2, 0, 0.2].map((x, k) => (
+        <mesh key={k} position={[w * 0.3 + x, 0.44, 0.55]} material={lp(SHOP_COLS[(i + k + 2) % SHOP_COLS.length])}>
+          <sphereGeometry args={[0.11, 10, 8]} />
+        </mesh>
+      ))}
+    </group>
+  );
+};
+const Bench: React.FC<{p: V3}> = ({p}) => (
+  <group position={p}>
+    <mesh position={[0, 0.42, 0]} material={lp("#b0723c")} castShadow>
+      <boxGeometry args={[1.3, 0.06, 0.38]} />
+    </mesh>
+    <mesh position={[0, 0.72, -0.17]} material={lp("#b0723c")} castShadow>
+      <boxGeometry args={[1.3, 0.3, 0.05]} />
+    </mesh>
+    {[-0.55, 0.55].map((x) => (
+      <mesh key={x} position={[x, 0.21, 0]} material={lp("#2b2e3b")}>
+        <boxGeometry args={[0.06, 0.42, 0.34]} />
+      </mesh>
+    ))}
+  </group>
+);
+export const Town: React.FC<{t: number; cans?: number[]; frontHouses?: boolean; galo?: boolean; lit?: (i: number) => boolean; dark?: boolean; lamps?: boolean; clouds?: boolean; flat?: boolean; clear?: [number, number]; variant?: "nova"}> = ({t, cans = [], frontHouses = false, galo = true, lit, dark, lamps = true, clouds = true, flat = false, clear, variant}) => {
   const free = (x: number) => !clear || x < clear[0] || x > clear[1];
-  const houses = TOWN_HOUSES;
+  const houses = variant === "nova" ? TOWN_HOUSES.map((h, i) => ({...h, wall: NOVA_WALLS[(i * 3) % NOVA_WALLS.length], roof: NOVA_ROOFS[(i * 2) % NOVA_ROOFS.length]})) : TOWN_HOUSES;
   // flat: cidade sem a ladeira (rua toda no nível 0)
   const groundY = flat ? (_x: number) => 0 : groundYSlope;
   const groundAng = flat ? (_x: number) => 0 : groundAngSlope;
@@ -376,6 +441,10 @@ export const Town: React.FC<{t: number; cans?: number[]; frontHouses?: boolean; 
       {houses.map((h, i) => (
         <House key={i} p={[h.x, groundY(h.x), -5.9]} w={h.w} h={h.h} wall={h.wall} roof={h.roof} base={Math.abs(groundY(h.x - 1.8) - groundY(h.x + 1.8)) + 0.3} lit={lit ? lit(i) : false} dark={dark} />
       ))}
+      {variant === "nova" &&
+        houses.map((h, i) => (i % 2 === 0 ? <ShopFront key={"loja" + i} p={[h.x, groundY(h.x), -5.9 + 1.5]} w={h.w} i={i} /> : null))}
+      {variant === "nova" &&
+        houses.map((h, i) => (i % 2 === 1 && free(h.x + 2.45) ? <Bench key={"banco" + i} p={[h.x + 2.45, groundY(h.x + 2.45) + 0.08, -2.35]} /> : null))}
       {frontHouses &&
         houses
           .filter((h) => h.x < -22)

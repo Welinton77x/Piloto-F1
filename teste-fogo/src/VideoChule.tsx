@@ -13,7 +13,7 @@ import {Dino} from "./Sets7";
 import {Puff, WeddingPigeon, GROOM, Church, CHURCH_PLAT, Hall, HallParty, PARTY} from "./Sets10";
 import {Shades, PartyLights} from "./Sets11";
 import {Octopus, CarRobot, DAD, DadHead, Phone} from "./Sets12";
-import {Sneaker, SneakerP, Chinelo, Chule, ChuleP, SunFace, Backyard, SkyDome, SILL, Perfume, Mist, TalentStage, STAGE, Plaque, Trophy, MoneyPile, MoneyRain, Bill, Skate, FireTruck, WaterJet, Rain, Umbrella, FireHelmet, NoseClip, WeatherStudio, Runway, ShoeStore, ShoeBox} from "./Sets13";
+import {Sneaker, SneakerP, Chinelo, Chule, ChuleP, SunFace, Moon, Backyard, SkyDome, SILL, Perfume, Mist, TalentStage, STAGE, Plaque, Trophy, MoneyPile, MoneyRain, Bill, Skate, FireTruck, WaterJet, Rain, Umbrella, FireHelmet, NoseClip, WeatherStudio, Runway, ShoeStore, ShoeBox} from "./Sets13";
 import {Captions, StageTitle, Chip, Sparkles, Confetti, Sticker, Wd, clean} from "./Overlays";
 import {FPS, clamp, lerp, ramp, pop, easeInOut, easeOut} from "./util";
 import W from "./timingChule.json";
@@ -123,7 +123,7 @@ const StreetScene: React.FC<{t: number; target: V3; ext?: number; tint?: number}
     <SunDisc p={[-40, 45, -110]} r={6} />
     <hemisphereLight args={["#d6ecff", "#a08a5e", 1.2]} />
     <SunLight target={target} dir={[-6, 10, 7]} intensity={2.6} ext={ext} />
-    <Town t={t} galo={false} />
+    <Town t={t} galo={false} variant="nova" />
   </>
 );
 
@@ -139,7 +139,7 @@ const S0: React.FC<ShotProps> = ({f, a, t}) => {
   const boy = physics("b0" + a, (fr) => ({...idle(fr), pos: BOY0, rotY: 0.35, ...OFFER, rShoulder: [-1.2, 0.9, 0.1], ...PINCH_L, brow: 0.7, blink: 0.45, mouthOpen: 0.15, head: [0.05, 0.25, -0.12], torso: [-0.12, 0, 0]}), a, f);
   return (
     <>
-      <Cam pos={[0.35, 1.55, 2.5]} look={[-0.75, 1.3, -1.2]} fov={48} f={f} a={a} />
+      <Cam pos={[0.15, 1.7, 2.7]} look={[-0.7, 1.55, -1.2]} fov={50} f={f} a={a} />
       <YardScene t={t} />
       <Toy pose={boy} look={SOCKS} palmRef={palm} />
       <InHand palm={palm}>
@@ -148,7 +148,7 @@ const S0: React.FC<ShotProps> = ({f, a, t}) => {
           <Sneaker p={[0.08, -0.21, -0.02]} r={[0, -0.15, -0.05]} s={0.36} />
         </group>
       </InHand>
-      <Chule c={{pos: [BOY0[0] - 0.55, 1.75 + 0.15 * Math.sin(t), BOY0[2] + 0.55], s: 0.28, t, smile: 1, look: [0.6, 0]}} />
+      <Chule c={{pos: [BOY0[0] - 0.5, lerp(1.3, 2.4, easeOut(clamp((f - a) / 30))) + 0.06 * Math.sin(t * 2), BOY0[2] - 0.25], s: lerp(0.25, 0.62, easeOut(clamp((f - a) / 24))), t, smile: 1, look: [0.6, 0], face: 1 - ramp(f, 34, 50)}} />
     </>
   );
 };
@@ -165,7 +165,7 @@ const S1: React.FC<ShotProps> = ({f, a, t}) => {
       <YardScene t={t} />
       <PairOnSill />
       <Toy pose={boy} look={SOCKS} />
-      <Chule c={{pos: [-1.95, lerp(1.55, 1.85, put), -2.0], s: 0.3, t, smile: 1, look: [0.6, 0.4]}} />
+      <Chule c={{pos: [-1.3, 2.3, -1.65], s: 0.62, t, face: 0}} />
     </>
   );
 };
@@ -178,20 +178,28 @@ const S2: React.FC<ShotProps> = ({f, a, t}) => {
       <Cam pos={[-0.4, 1.25, 1.2]} look={[-3.0, 9.5, -60]} fov={52} f={f} a={a} />
       <YardScene t={t} />
       <PairOnSill />
-      <SunFace p={SUN0} r={6} t={t} sniff={sniff} green={0.4 * sniff} />
-      <Chule c={{pos: mix([-1.95, 1.9, -2.0], [-1.2, 4.2, -6.5], k), s: lerp(0.3, 0.55, k), t, smile: 1, look: [0, 1]}} />
+      <SunFace p={SUN0} r={6} t={t} green={0.4 * sniff} face={0} />
+      <Chule c={{pos: mix([-1.3, 2.3, -1.65], [-1.0, 4.4, -6.5], k), s: lerp(0.62, 1.05, k), t, face: 0}} />
     </>
   );
 };
 /* "...o sol desmaia... e anoitece ao meio-dia." */
-const sunFall = (f: number) => easeInOut(ramp(f, DESMAIA + 6, DESMAIA + 26));
+const DEAD = DESMAIA + 2; // o rosto do sol aparece (X nos olhos)
+const sunFall = (f: number) => easeInOut(ramp(f, DESMAIA + 14, ANOITECE + 8));
+const moonK = (f: number) => easeOut(ramp(f, ANOITECE + 2, ANOITECE + 30));
 const SunFainted: React.FC<{f: number; t: number}> = ({f, t}) => {
   const fall = sunFall(f);
+  if (fall >= 1) return null;
   return (
-    <group position={[SUN0[0] + 3 * fall, SUN0[1] - 5.5 * fall, SUN0[2]]} rotation={[0, 0, -0.7 * fall]}>
-      <SunFace p={[0, 0, 0]} r={6} t={t} faint={f >= DESMAIA + 2 ? 1 : 0} green={lerp(0.4, 0.9, ramp(f, DESMAIA - 4, DESMAIA + 4))} />
+    <group position={[SUN0[0] + 2 * fall, SUN0[1] - 22 * fall, SUN0[2]]} rotation={[0, 0, -0.7 * fall]}>
+      <SunFace p={[0, 0, 0]} r={6} t={t} faint={1} green={lerp(0.4, 0.9, ramp(f, DESMAIA - 4, DESMAIA + 4))} face={f >= DEAD ? backOut(ramp(f, DEAD, DEAD + 8)) : 0} />
     </group>
   );
+};
+/** lua subindo do lado direito do céu */
+const MoonUp: React.FC<{f: number}> = ({f}) => {
+  const k = moonK(f);
+  return <Moon p={[lerp(14, 10, k), lerp(-2, 15, k), -70]} r={4.2} k={k > 0 ? 1 : 0} />;
 };
 const S3: React.FC<ShotProps> = ({f, a, t}) => (
   <>
@@ -199,17 +207,18 @@ const S3: React.FC<ShotProps> = ({f, a, t}) => (
     <YardScene t={t} night={nightK(f)} />
     <PairOnSill />
     <SunFainted f={f} t={t} />
-    <Chule c={{pos: [-1.2, 4.2, -6.5], s: 0.55, t, mouth: 0.4 * ramp(f, DESMAIA, DESMAIA + 6), wide: 1, look: [0, 0.6]}} />
+    <MoonUp f={f} />
+    <Chule c={{pos: [-1.0, 4.4, -6.5], s: 1.05, t, face: 0}} />
   </>
 );
 /* título: ECLIPSE PODÁLICO — o sol desmaiado atrás do morro, o chulé dando risadinha */
 const S4: React.FC<ShotProps> = ({f, a, t}) => (
   <>
-    <Cam pos={[0.2, 1.7, 2.2]} look={[-2.4, 4.6, -40]} fov={54} f={f} a={a} />
+    <Cam pos={[0.4, 1.6, 2.4]} look={[3.0, 6.5, -40]} fov={56} f={f} a={a} />
     <YardScene t={t} night={1} />
     <PairOnSill />
-    <SunFainted f={f} t={t} />
-    <Chule c={{pos: [-0.6, 2.4, -2.4], s: 0.5, t, mouth: 0.3 + 0.3 * Math.abs(Math.sin(t * 10)), blink: 0.6, look: [0.5, 0], blush: 0.5}} />
+    <MoonUp f={f} />
+    <Chule c={{pos: [0.3, 3.0, -3.2], s: 0.95, t, face: 0}} />
   </>
 );
 
@@ -225,7 +234,7 @@ const S5: React.FC<ShotProps> = ({f, a, t}) => {
   const boy = physics("b5" + a, (fr) => ({...idle(fr), pos: BOY5, rotY: -Math.PI / 2 + 0.25, rShoulder: [-2.0, 0, 0.15], rElbow: -0.2, ...PINCH_L, smile: 0.4, brow: 0.3, head: [0.3, 0, 0]}), a, f);
   return (
     <>
-      <Cam pos={[-0.9, 1.75, 1.3]} look={[-1.8, 1.55, -2.1]} fov={50} f={f} a={a} />
+      <Cam pos={[-1.3, 1.9, 2.4]} look={[-1.45, 1.8, -2.0]} fov={52} f={f} a={a} />
       <YardScene t={t} night={1} />
       <PairOnSill />
       <Toy pose={boy} look={SOCKS} palmRef={palm} />
@@ -236,7 +245,7 @@ const S5: React.FC<ShotProps> = ({f, a, t}) => {
       </InHand>
       <WaterJet a={[-1.85, 1.75, -2.15]} b={[-1.95, 1.4, -2.2]} k={ramp(f, PERF - 2, PERF + 4) * (1 - ramp(f, E2 - 6, E2))} t={t} arc={0} color="#ff5fb0" size={0.6} />
       <Mist p={[SILL[0], SILL[1] + 0.15, SILL[2]]} dir={[0.4, 0.8, 0.2]} k={ramp(f, PERF, PERF + 8)} t={t} />
-      <Chule c={{pos: [-1.75, 2.35, -2.0], s: 0.42, t, wide: 1, look: [0.4, -0.5], pink: 0.3 * ramp(f, PERF, E2)}} />
+      <Chule c={{pos: [-1.15, 2.55, -1.9], s: 0.8, t, pink: 0.3 * ramp(f, PERF, E2), face: 0}} />
     </>
   );
 };
@@ -245,11 +254,11 @@ const S6: React.FC<ShotProps> = ({f, a, t}) => {
   const sing = f >= OPERA ? 0.4 + 0.5 * Math.abs(Math.sin(t * 5)) : 0;
   return (
     <>
-      <Cam pos={[-0.35, 2.15, 0.7]} look={[-1.75, 2.2, -2.0]} fov={46} f={f} a={a} punch={4} />
+      <Cam pos={[-0.6, 2.25, 1.5]} look={[-1.2, 2.3, -1.9]} fov={50} f={f} a={a} punch={4} />
       <YardScene t={t} night={1} />
       <PairOnSill />
       <Mist p={[SILL[0], SILL[1] + 0.15, SILL[2]]} dir={[0.4, 0.8, 0.2]} k={1 - ramp(f, a + 20, a + 40)} t={t} />
-      <Chule c={{pos: [-1.75, 2.3, -2.0], s: 0.55, t, pink: pk, mustache: ramp(f, OPERA - 8, OPERA), arms: f >= OPERA - 4 ? "opera" : "down", mouth: sing, smile: 1, blink: f >= OPERA ? 0.5 : blinkCurve(f), look: [0.5, 0.2]}} />
+      <Chule c={{pos: [-1.15, 2.5, -1.9], s: 0.92, t, pink: pk, mustache: ramp(f, OPERA - 8, OPERA), arms: f >= OPERA - 4 ? "opera" : "down", mouth: sing, smile: 1, blink: f >= OPERA ? 0.5 : blinkCurve(f), look: [0.5, 0.2], face: backOut(ramp(f, at(2, "cheiroso") - 2, at(2, "cheiroso") + 8))}} />
     </>
   );
 };
@@ -261,7 +270,7 @@ const S7: React.FC<ShotProps> = ({f, a, t}) => {
       <Cam pos={[-1.8, 2.0, -3.9]} look={[-0.6, 1.95, -0.6]} fov={54} f={f} a={a} />
       <YardScene t={t} night={1} />
       <PairOnSill />
-      <Chule c={{pos: [-0.95, 2.2, -1.45], s: 0.5, t, pink: 1, mustache: 1, arms: "opera", mouth: 0.4 + 0.5 * Math.abs(Math.sin(t * 5)), blink: 0.5, rotY: Math.PI * 0.85}} />
+      <Chule c={{pos: [-0.85, 2.5, -1.25], s: 0.62, t, pink: 1, mustache: 1, arms: "opera", mouth: 0.4 + 0.5 * Math.abs(Math.sin(t * 5)), blink: 0.5, rotY: Math.PI * 0.85}} />
       <Toy pose={boy} look={SOCKS} />
     </>
   );
@@ -271,7 +280,7 @@ const S7: React.FC<ShotProps> = ({f, a, t}) => {
 const GANHA = at(4, "ganha");
 const FICA4 = at(4, "fica");
 const E4 = at(4, "e", 0);
-const CH_STAGE: V3 = [0, STAGE.top + 0.75, STAGE.z + 0.1];
+const CH_STAGE: V3 = [0, STAGE.top + 0.62, STAGE.z + 0.1];
 const ShowScene: React.FC<{t: number; lights?: number}> = ({t, lights = 1}) => (
   <>
     <hemisphereLight args={["#c9b8ff", "#2a1a40", 0.7]} />
@@ -280,28 +289,39 @@ const ShowScene: React.FC<{t: number; lights?: number}> = ({t, lights = 1}) => (
     <TalentStage t={t} lights={lights} />
   </>
 );
-const JX = {pig: -1.2, oct: 0.05, rob: 1.25};
-const Judges: React.FC<{f: number; t: number; facing?: number; plaques?: number}> = ({f, t, facing = Math.PI, plaques = 0}) => (
-  <>
-    <WeddingPigeon p={{pos: [JX.pig, 0.45, 2.75], rotY: facing, t, blink: blinkCurve(f + 3), chest: plaques, flap: plaques > 0.5 ? 0.4 : 0}} s={3.0} />
-    <Octopus o={{pos: [JX.oct, 0, 2.85], rotY: facing, t, shades: true, s: 0.78, mouth: 0.4 * plaques, wrench: false, thumbs: plaques}} />
-    <CarRobot p={[JX.rob, 0.15, 2.85]} rotY={facing} t={t} s={0.33} mic={false} dance={0.5 * plaques} mouth={0.4 * plaques} />
-    {plaques > 0.01 &&
-      [JX.pig, JX.oct, JX.rob].map((x, i) => <Plaque key={i} p={[x + 0.25, lerp(0.4, 1.05, plaques) + 0.04 * Math.sin(t * 6 + i), 2.05]} r={[0, facing, 0.1 * Math.sin(t * 4 + i)]} s={1.3} />)}
-  </>
-);
+const JX = {pig: -0.78, oct: 0.0, rob: 0.8};
+const JZ = 2.75;
+const Judges: React.FC<{f: number; t: number; facing?: number; plaques?: number}> = ({f, t, facing = Math.PI, plaques = 0}) => {
+  const sd = facing === Math.PI ? -1 : 1; // lado "direito" de quem olha pro palco
+  return (
+    <>
+      {/* banquinhos altos atrás da mesa */}
+      {[JX.pig, JX.oct, JX.rob].map((x, i) => (
+        <mesh key={"b" + i} position={[x, 0.22, JZ + 0.15]}>
+          <cylinderGeometry args={[0.28, 0.28, 0.44, 16]} />
+          <meshStandardMaterial color="#3a2a5a" roughness={0.6} />
+        </mesh>
+      ))}
+      <WeddingPigeon p={{pos: [JX.pig, 0.44, JZ], rotY: facing, t, blink: blinkCurve(f + 3), chest: plaques, flap: plaques > 0.5 ? 0.35 : 0}} s={2.5} />
+      <Octopus o={{pos: [JX.oct, 0.42, JZ + 0.1], rotY: facing, t, shades: true, s: 0.72, mouth: 0.5 * plaques, wrench: false, thumbs: 0}} />
+      <CarRobot p={[JX.rob, 0.44, JZ + 0.1]} rotY={facing} t={t} s={0.3} mic={false} dance={0.4 * plaques} mouth={0.5 * plaques} />
+      {plaques > 0.01 &&
+        [JX.pig, JX.oct, JX.rob].map((x, i) => <Plaque key={i} p={[x + sd * 0.42, lerp(0.55, 1.0, plaques) + 0.04 * Math.sin(t * 6 + i), JZ - 0.6]} r={[0, facing, 0.1 * Math.sin(t * 4 + i)]} s={1.25} />)}
+    </>
+  );
+};
 const S8: React.FC<ShotProps> = ({f, a, t}) => (
   <>
     <Cam pos={[0.3, 2.6, 4.8]} look={[0, 1.5, -3.0]} fov={50} f={f} a={a} />
     <ShowScene t={t} />
-    <Chule c={{pos: CH_STAGE, s: 0.8, t, pink: 1, mustache: 1, arms: "mic", mouth: 0.35 + 0.5 * Math.abs(Math.sin(t * 5)), blink: 0.4}} />
+    <Chule c={{pos: CH_STAGE, s: 0.6, t, pink: 1, mustache: 1, arms: "mic", mouth: 0.35 + 0.5 * Math.abs(Math.sin(t * 5)), blink: 0.4}} />
     <Judges f={f} t={t} />
   </>
 );
 /* "...ganha..." — os jurados levantam o 10 */
 const S9: React.FC<ShotProps> = ({f, a, t}) => (
   <>
-    <Cam pos={[0.0, 1.45, -1.0]} look={[0.0, 1.0, 2.6]} fov={64} f={f} a={a} punch={4} />
+    <Cam pos={[0.0, 1.6, -0.25]} look={[0.0, 1.55, JZ]} fov={66} f={f} a={a} punch={4} />
     <ShowScene t={t} lights={0.3} />
     <Judges f={f} t={t} plaques={backOut(ramp(f, a + 1, a + 10))} />
   </>
@@ -311,8 +331,8 @@ const S10: React.FC<ShotProps> = ({f, a, t}) => (
   <>
     <Cam pos={[0.6, 1.75, 2.4]} look={[0, 1.4, -2.8]} fov={46} f={f} a={a} />
     <ShowScene t={t} lights={0.3} />
-    <Chule c={{pos: CH_STAGE, s: 0.8, t, pink: 1, mustache: 1, arms: "up", smile: 1, mouth: 0.5, blink: 0.5}} />
-    <Trophy p={[CH_STAGE[0] + 0.5, CH_STAGE[1] + 0.48, CH_STAGE[2] + 0.1]} s={1.4} />
+    <Chule c={{pos: CH_STAGE, s: 0.6, t, pink: 1, mustache: 1, arms: "up", smile: 1, mouth: 0.5, blink: 0.5}} />
+    <Trophy p={[CH_STAGE[0] + 0.37, CH_STAGE[1] + 0.3, CH_STAGE[2] + 0.08]} s={1.0} />
     <Judges f={f} t={t} plaques={1} />
   </>
 );
@@ -325,7 +345,7 @@ const S11: React.FC<ShotProps> = ({f, a, t}) => {
     <>
       <Cam pos={[2.2, 1.75, 1.6]} look={[2.5, 1.6, -0.9]} fov={46} f={f} a={a} punch={4} />
       <ShowScene t={t} />
-      <Chule c={{pos: CH_STAGE, s: 0.8, t, pink: 1, mustache: 1, arms: "up", smile: 1, blink: 0.5}} />
+      <Chule c={{pos: CH_STAGE, s: 0.6, t, pink: 1, mustache: 1, arms: "up", smile: 1, blink: 0.5}} />
       <Toy pose={boy} look={SUIT} palmRef={palm} headExtra={<Shades />} />
       <InHand palm={palm}>
         <Phone p={[0, -0.03, 0.04]} s={1.3} t={t} />
@@ -346,9 +366,9 @@ const S12: React.FC<ShotProps> = ({f, a, t}) => {
       <InHand palm={palm}>
         <Bill p={[0, -0.02, 0.06]} r={[0, 0, 0.3]} s={1.2} />
       </InHand>
-      <Chule c={{pos: [0.75, 1.55, -1.75], s: 0.6, t, pink: 1, mustache: 1, arms: "sign", smile: 1, blink: 0.5, look: [0.8, -0.6]}} />
-      <Toy pose={{...idle(f + 40), pos: [1.55, 0, -0.65], rotY: -0.9, rShoulder: [-1.3, 0, 0.1], rElbow: -0.5, smile: 1, eyeWide: 0.6}} look={PEOPLE[0]} />
-      <mesh position={[1.12, 1.3, -1.15]} rotation={[0, -0.9, 0.1]}>
+      <Chule c={{pos: [0.7, 1.5, -1.75], s: 0.55, t, pink: 1, mustache: 1, arms: "sign", smile: 1, blink: 0.5, look: [0.8, -0.6]}} />
+      <Toy pose={{...idle(f + 40), pos: [1.3, 0, -0.55], rotY: -0.9, rShoulder: [-1.3, 0, 0.1], rElbow: -0.5, smile: 1, eyeWide: 0.6}} look={PEOPLE[0]} />
+      <mesh position={[0.92, 1.3, -1.0]} rotation={[0, -0.9, 0.1]}>
         <planeGeometry args={[0.22, 0.3]} />
         <meshStandardMaterial color="#ffffff" side={THREE.DoubleSide} />
       </mesh>
@@ -383,7 +403,7 @@ const S13: React.FC<ShotProps> = ({f, a, t}) => {
     <>
       <Cam pos={[-1.0, 1.65, -0.9]} look={[-2.0, 1.5, -2.4]} fov={46} f={f} a={a} />
       <YardScene t={t} />
-      <SunFace p={[6, 20, -70]} r={5} t={t} band />
+      <SunFace p={[6, 20, -70]} r={5} t={t} band face={0} />
       <PosterChule t={t} />
       <PairOnSill backRot={-Math.PI / 2 + 0.3} alive={{alive: k, mood: jealous, arms: jealous > 0.5 ? "crossed" : "down", t, blink: blinkCurve(f + 9), look: [jealous > 0.3 ? -0.6 : 0.4, 0.2], wide: k > 0 && jealous < 0.3 ? 1 : 0}} />
     </>
@@ -409,7 +429,7 @@ const S14: React.FC<ShotProps> = ({f, a, t}) => {
   const x = skX(f);
   return (
     <>
-      <Cam pos={[x - 1.4, groundY(x) + 1.2, 4.6]} look={[x + 0.2, groundY(x) + 0.5, 0.6]} fov={46} f={f} a={a} />
+      <Cam pos={[x - 0.8, groundY(x) + 1.15, 4.0]} look={[x, groundY(x) + 0.45, 0.6]} fov={46} f={f} a={a} />
       <StreetScene t={t} target={[x, groundY(x), 0]} ext={7} />
       <SkaterOnRoad f={f} t={t} />
     </>
@@ -622,11 +642,11 @@ const StinkWave: React.FC<{f: number; from: number}> = ({f, from}) => {
 const partyChule = (f: number, t: number): ChuleP => {
   const fade = ramp(f, MAS10 + 6, at(10, "acaba") + 8);
   const singing = f < at(10, "acaba") + 4;
-  return {pos: CH_PARTY, s: 0.7, t, pink: 1 - fade, mustache: 1, arms: singing ? "mic" : "down", mouth: singing ? 0.35 + 0.5 * Math.abs(Math.sin(t * 5)) : 0, wide: fade, smile: singing ? 1 : 0, blink: singing ? 0.4 : 0, blush: f > DINO10 ? 0.8 : 0, sad: f > E10 ? 1 : 0};
+  return {face: 0, pos: CH_PARTY, s: 0.85, t, pink: 1 - fade, mustache: 1, arms: singing ? "mic" : "down", mouth: singing ? 0.35 + 0.5 * Math.abs(Math.sin(t * 5)) : 0, wide: fade, smile: singing ? 1 : 0, blink: singing ? 0.4 : 0, blush: f > DINO10 ? 0.8 : 0, sad: f > E10 ? 1 : 0};
 };
 const S20: React.FC<ShotProps> = ({f, a, t}) => (
   <>
-    <Cam pos={[PARTY[0] + 0.3, 2.9, PARTY[2] + 7.4]} look={[PARTY[0], 1.4, PARTY[2] + 0.3]} fov={54} f={f} a={a} />
+    <Cam pos={[PARTY[0] + 0.1, 3.0, PARTY[2] + 8.6]} look={[PARTY[0] - 0.2, 1.4, PARTY[2] + 0.4]} fov={58} f={f} a={a} />
     <HallScene t={t} target={[PARTY[0], 1, PARTY[2]]} />
     <Chule c={partyChule(f, t)} />
     {GUESTS.map((g, i) => (
@@ -636,7 +656,7 @@ const S20: React.FC<ShotProps> = ({f, a, t}) => (
 );
 const S21: React.FC<ShotProps> = ({f, a, t}) => (
   <>
-    <Cam pos={[PARTY[0] + 0.2, 2.45, PARTY[2] + 2.0]} look={[CH_PARTY[0], 2.35, CH_PARTY[2]]} fov={44} f={f} a={a} punch={4} />
+    <Cam pos={[PARTY[0] + 0.1, 2.7, PARTY[2] + 6.6]} look={[CH_PARTY[0] - 0.1, 1.7, CH_PARTY[2] + 0.8]} fov={58} f={f} a={a} punch={4} />
     <HallScene t={t} target={[PARTY[0], 1, PARTY[2]]} />
     <Chule c={partyChule(f, t)} />
     {GUESTS.filter((g) => g.kind !== "toy" || g.order !== 0).map((g, i) => (
@@ -677,7 +697,7 @@ const CHOVE = at(12, "e", 0);
 const growK = (f: number) => easeInOut(ramp(f, CRESCE - 6, NUVEM + 14));
 const streetChule = (f: number, t: number): ChuleP => {
   const g = growK(f);
-  return {pos: [FX + 1.0, lerp(3.0, 14.0, g), lerp(0.2, -6, g)], s: lerp(0.85, 9, g), t, smile: g > 0.5 ? 1 : 0, mouth: g > 0.3 && g < 0.95 ? 0.5 : 0, wide: f > ELES && g < 0.3 ? 1 : 0, look: [-0.5, -0.4]};
+  return {face: 0, pos: [FX + 1.0, lerp(3.0, 14.0, g), lerp(0.2, -6, g)], s: lerp(0.95, 9, g), t, smile: g > 0.5 ? 1 : 0, mouth: g > 0.3 && g < 0.95 ? 0.5 : 0, wide: f > ELES && g < 0.3 ? 1 : 0, look: [-0.5, -0.4]};
 };
 const truckX = (f: number) => lerp(FX - 16, FX - 4.2, easeOut(ramp(f, L(12) - 4, ELES - 4)));
 const Firefighters: React.FC<{f: number; t: number; spray: number}> = ({f, t, spray}) => (
@@ -703,7 +723,7 @@ const S24: React.FC<ShotProps> = ({f, a, t}) => (
 );
 const S25: React.FC<ShotProps> = ({f, a, t}) => (
   <>
-    <Cam pos={[FX - 1.2, 1.9, 7.8]} look={[FX - 0.9, 2.0, 0.6]} fov={56} f={f} a={a} />
+    <Cam pos={[FX - 1.0, 2.0, 9.2]} look={[FX - 1.0, 2.0, 0.6]} fov={58} f={f} a={a} />
     <StreetScene t={t} target={[FX - 1, 1, 0]} ext={8} />
     <FireTruck p={[FX - 4.2, 0, -0.4]} rotY={Math.PI / 2} t={t} />
     <Firefighters f={f} t={t} spray={ramp(f, a + 2, a + 10)} />
@@ -722,37 +742,44 @@ const S26: React.FC<ShotProps> = ({f, a, t}) => {
     </>
   );
 };
-const RAIN_PEOPLE: [number, number, number][] = [
-  [-2.2, 1.8, 0],
-  [-0.4, 2.6, 1],
-  [1.6, 1.4, 2],
-  [3.0, 2.8, 3],
-];
-const S27: React.FC<ShotProps> = ({f, a, t}) => (
-  <>
-    <Cam pos={[FX + 0.6, 2.6, 11.5]} look={[FX + 0.5, 4.2, 0]} fov={58} f={f} a={a} />
-    <StreetScene t={t} target={[FX, 1, 0]} ext={12} tint={1} />
-    <Chule c={{...streetChule(NUVEM + 20, t), smile: 1, mouth: 0}} />
-    <Rain c={[FX + 0.5, 0, 1]} size={[14, 12, 8]} t={t} k={ramp(f, a, a + 8)} n={320} />
-    {RAIN_PEOPLE.map(([x, z, i]) => {
-      const run = ((t * 1.6 + i * 0.7) % 4) - 2;
-      return (
-        <group key={i}>
-          <Toy pose={{...idle(f + i * 9), pos: [FX + x + run * (i % 2 ? 1 : -1), 0, z], rotY: i % 2 ? Math.PI / 2 : -Math.PI / 2, walk: t * 13, walkAmt: 1, rShoulder: [-2.6, 0, -0.15], rElbow: -0.4, eyeWide: 1, mouthOpen: 0.5}} look={PEOPLE[i]} />
-          <Umbrella p={[FX + x + run * (i % 2 ? 1 : -1), 1.75, z]} color={CLIPS[i]} />
-        </group>
-      );
-    })}
-  </>
+/** pessoa andando de verdade (posição avança na direção que ela olha) */
+const WALK_SPEED = 0.85; // m/s
+const walkerPos = (start: V3, rotY: number, sec: number): V3 => [start[0] + Math.sin(rotY) * WALK_SPEED * sec, 0, start[2] + Math.cos(rotY) * WALK_SPEED * sec];
+const UMB_HAND: V3 = [-0.264, 1.5, 0.333]; // mão direita na pose de segurar o guarda-chuva
+const RainWalker: React.FC<{start: V3; rotY: number; sec: number; look: ToyLook; f: number; color: string; i: number}> = ({start, rotY, sec, look, f, color, i}) => (
+  <group position={walkerPos(start, rotY, sec)} rotation={[0, rotY, 0]}>
+    <Toy pose={{...idle(f + i * 9), pos: [0, 0, 0], rotY: 0, walk: sec * 9, walkAmt: 1, rShoulder: [-1.3, 0, 0.35], rElbow: -1.5, eyeWide: 0.8, mouthOpen: 0.4, brow: 0.6}} look={look} />
+    <Umbrella p={UMB_HAND} color={color} />
+  </group>
 );
+const RAIN_PEOPLE: {start: V3; rotY: number}[] = [
+  {start: [FX - 2.6, 0, 2.4], rotY: 1.2},
+  {start: [FX + 2.4, 0, 1.6], rotY: -1.25},
+  {start: [FX - 0.9, 0, 0.4], rotY: 0.95},
+  {start: [FX + 1.2, 0, 3.0], rotY: -1.05},
+];
+const S27: React.FC<ShotProps> = ({f, a, t}) => {
+  const sec = (f - a) / FPS;
+  return (
+    <>
+      <Cam pos={[FX + 0.2, 2.4, 10.5]} look={[FX + 0.2, 3.6, 0]} fov={58} f={f} a={a} />
+      <StreetScene t={t} target={[FX, 1, 0]} ext={12} tint={1} />
+      <Chule c={{...streetChule(NUVEM + 20, t), smile: 1, mouth: 0}} />
+      <Rain c={[FX + 0.5, 0, 1]} size={[14, 12, 8]} t={t} k={ramp(f, a, a + 8)} n={320} />
+      {RAIN_PEOPLE.map((r, i) => (
+        <RainWalker key={i} start={r.start} rotY={r.rotY} sec={sec} look={PEOPLE[i]} f={f} color={CLIPS[i]} i={i} />
+      ))}
+    </>
+  );
+};
 /* título: METEOROLOGIA PODAL — a moça do tempo */
 const S28: React.FC<ShotProps> = ({f, a, t}) => (
   <>
-    <Cam pos={[0.2, 1.75, 4.6]} look={[0, 1.7, -2]} fov={54} f={f} a={a} />
+    <Cam pos={[0.45, 1.75, 4.6]} look={[0.3, 1.7, -2]} fov={54} f={f} a={a} />
     <hemisphereLight args={["#ffffff", "#3a4a6a", 0.95]} />
     <pointLight position={[0, 3, 2.2]} intensity={14} distance={12} decay={1.4} castShadow />
     <WeatherStudio />
-    <Toy pose={{...idle(f), pos: [1.35, 0, -0.5], rotY: -0.45, rShoulder: [-1.5, -0.6 + 0.15 * Math.sin(t * 3), 0], rElbow: 0, smile: 1, mouthOpen: 0.2 + 0.25 * Math.abs(Math.sin(t * 7))}} look={{...PEOPLE[0], hairStyle: "long"}} headExtra={<NoseClip color="#3a86ff" />} />
+    <Toy pose={{...idle(f), pos: [0.95, 0, -0.4], rotY: -0.45, rShoulder: [-1.5, -0.6 + 0.15 * Math.sin(t * 3), 0], rElbow: 0, smile: 1, mouthOpen: 0.2 + 0.25 * Math.abs(Math.sin(t * 7))}} look={{...PEOPLE[0], hairStyle: "long"}} headExtra={<NoseClip color="#3a86ff" />} />
   </>
 );
 
@@ -760,16 +787,25 @@ const S28: React.FC<ShotProps> = ({f, a, t}) => (
 const VIRA14 = at(14, "vira");
 const E14 = at(14, "e", 0);
 const PREND = at(14, "prendedor", 0);
+const CLIP_WALK: {start: V3; rotY: number}[] = [
+  {start: [FX - 1.9, 0, -0.6], rotY: 0.32},
+  {start: [FX + 1.8, 0, -0.9], rotY: -0.3},
+  {start: [FX - 0.35, 0, -1.6], rotY: 0.06},
+  {start: [FX + 0.75, 0, 0.3], rotY: -0.12},
+  {start: [FX - 1.0, 0, 1.0], rotY: 0.22},
+];
 const S29: React.FC<ShotProps> = ({f, a, t}) => {
+  const sec = (f - a) / FPS;
   const clip = (i: number) => f >= PREND - 6 + i * 4;
   return (
     <>
-      <Cam pos={[FX + 0.4, 1.8, 7.6]} look={[FX + 0.2, 1.4, 0.6]} fov={52} f={f} a={a} />
+      <Cam pos={[FX + 0.1, 1.75, 8.2]} look={[FX, 1.25, 0.8]} fov={52} f={f} a={a} />
       <StreetScene t={t} target={[FX, 1, 0]} ext={8} tint={1} />
-      {[0, 1, 2, 3, 4].map((i) => {
-        const x = FX - 2.4 + i * 1.2 + ((t * 0.5 * (i % 2 ? 1 : -1)) % 1) * 0.3;
-        return <Toy key={i} pose={{...idle(f + i * 11), pos: [x, 0, 1.0 + (i % 2) * 1.2], rotY: i % 2 ? 0.4 : -0.4, walk: t * 8, walkAmt: 0.6, brow: clip(i) ? -0.2 : 0.7, smile: clip(i) ? 0.8 : 0, mouthOpen: clip(i) ? 0 : 0.3, blink: clip(i) ? blinkCurve(f + i * 7) : 0.4}} look={PEOPLE[i]} headExtra={clip(i) ? <NoseClip color={CLIPS[i]} /> : undefined} />;
-      })}
+      {CLIP_WALK.map(({start, rotY}, i) => (
+        <group key={i} position={walkerPos(start, rotY, sec * 0.7)} rotation={[0, rotY, 0]}>
+          <Toy pose={{...idle(f + i * 11), pos: [0, 0, 0], rotY: 0, walk: sec * 0.7 * 9, walkAmt: 1, brow: clip(i) ? -0.2 : 0.7, smile: clip(i) ? 0.8 : 0, mouthOpen: clip(i) ? 0 : 0.3, blink: clip(i) ? blinkCurve(f + i * 7) : 0.4}} look={PEOPLE[i]} headExtra={clip(i) ? <NoseClip color={CLIPS[i]} s={1.4} /> : undefined} />
+        </group>
+      ))}
     </>
   );
 };
@@ -815,19 +851,19 @@ const MoneyStreet: React.FC<{f: number; a: number; t: number}> = ({f, a, t}) => 
       <MoneyPile p={[FX, 0, 0.6]} s={1.5} n={80} />
       <RichBoy f={f} a={a} t={t} pos={[FX, 0.45, 0.6]} />
       <MoneyRain c={[FX, 0, 0.6]} t={t} size={[5, 4]} />
-      <mesh position={[FX - 2.4, 2.4, -0.9]}>
+      <mesh position={[FX - 1.5, 2.7, -1.2]}>
         <planeGeometry args={[2.0, 0.62]} />
         <meshStandardMaterial map={signTex} emissive="#ffffff" emissiveMap={signTex} emissiveIntensity={0.3} />
       </mesh>
       {[0, 1, 2].map((i) => (
-        <Toy key={i} pose={{...idle(f + i * 17), pos: [FX - 3.2 + i * 0.75, 0, 1.6 + i * 0.25], rotY: 0.9, smile: 1, rShoulder: [-1.4, 0, 0.1], rElbow: -0.3}} look={PEOPLE[i + 2]} headExtra={<NoseClip color={CLIPS[i + 1]} />} />
+        <Toy key={i} pose={{...idle(f + i * 17), pos: [FX - 1.75 + i * 0.55, 0, 1.1 + i * 0.2], rotY: 0.8, smile: 1, rShoulder: [-1.4, 0, 0.1], rElbow: -0.3}} look={PEOPLE[i + 2]} headExtra={<NoseClip color={CLIPS[i + 1]} />} />
       ))}
     </>
   );
 };
 const S31: React.FC<ShotProps> = ({f, a, t}) => (
   <>
-    <Cam pos={[FX + 0.3, 2.1, 7.6]} look={[FX - 0.4, 1.6, 0.4]} fov={52} f={f} a={a} />
+    <Cam pos={[FX + 0.05, 2.1, 7.8]} look={[FX - 0.3, 1.6, 0.4]} fov={54} f={f} a={a} />
     <MoneyStreet f={f} a={a} t={t} />
   </>
 );
@@ -848,9 +884,9 @@ const S33: React.FC<ShotProps> = ({f, a, t}) => {
     <>
       <Cam pos={[0.3, 1.9, 4.2]} look={[-0.3, 1.5, -1.2]} fov={54} f={f} a={a} />
       <YardScene t={t} />
-      <SunFace p={[6, 20, -70]} r={5} t={t} band />
+      <SunFace p={[6, 20, -70]} r={5} t={t} band face={0} />
       <Toy pose={boy} look={SUIT} headExtra={<><Shades /><NoseClip gold /></>} />
-      <Chule c={{pos: [-1.4, 2.2, -1.4], s: 0.5, t, pink: 0.5, mustache: 1, arms: "up", smile: 1, mouth: 0.4}} />
+      <Chule c={{pos: [-1.1, 2.55, -1.6], s: 0.85, t, pink: 0.5, arms: "up", face: 0}} />
       <Sneaker p={[0.8, 0, 0.2]} r={[0, -0.4, 0]} s={0.7} c={{alive: 1, bowtie: true, smile: 1, arms: "up", hop: 1, t}} />
       <Chinelo p={[-0.95, 0, 0.2]} r={[0, 0.4, 0]} s={0.75} c={{alive: 1, veil: 1, smile: 1, blink: blinkCurve(f + 33)}} />
     </>
@@ -858,7 +894,7 @@ const S33: React.FC<ShotProps> = ({f, a, t}) => {
 };
 const S34: React.FC<ShotProps> = ({f, a, t}) => (
   <>
-    <Cam pos={[FX + 0.3, 2.1, 7.6]} look={[FX - 0.4, 1.6, 0.4]} fov={52} f={f} a={a} />
+    <Cam pos={[FX + 0.05, 2.1, 7.8]} look={[FX - 0.3, 1.6, 0.4]} fov={54} f={f} a={a} />
     <MoneyStreet f={f} a={a} t={t} />
   </>
 );
@@ -872,7 +908,7 @@ const S35: React.FC<ShotProps> = ({f, a, t}) => {
   const boy = physics("b35" + a, (fr) => ({...idle(fr), pos: BOY_ST, rotY: -0.45, rShoulder: [-1.2, 0, 0.2], rElbow: -0.4, lShoulder: [-0.4, 0, -0.2], lElbow: -0.6, smile: 1, eyeWide: 0.6, pupil: [0.6, -0.7], head: [0.25, -0.3, 0]}), a, f);
   return (
     <>
-      <Cam pos={[1.0, 1.65, 3.6]} look={[1.2, 1.1, -0.6]} fov={50} f={f} a={a} />
+      <Cam pos={[0.85, 1.65, 3.7]} look={[0.95, 1.15, -0.5]} fov={52} f={f} a={a} />
       <hemisphereLight args={["#ffffff", "#8a6a4a", 1.0]} />
       <pointLight position={[0.5, 3.6, 1.2]} intensity={12} distance={12} decay={1.4} castShadow />
       <ShoeStore />
@@ -912,7 +948,7 @@ const S37: React.FC<ShotProps> = ({f, a, t}) => {
       <pointLight position={[0.5, 3.6, 1.2]} intensity={12} distance={12} decay={1.4} castShadow />
       <ShoeStore />
       <Toy pose={boy} look={SUIT_GOLD} />
-      <Chule c={{pos: [BOY_ST[0] + 0.25, lerp(0.25, 0.75, sn), BOY_ST[2] + 0.35], s: 0.2 * sn, t, smile: 1, look: [0, 1]}} />
+      <Chule c={{pos: [BOY_ST[0] + 0.25, lerp(0.25, 0.75, sn), BOY_ST[2] + 0.35], s: 0.26 * sn, t, smile: 1, look: [0, 1], face: 1 - ramp(f, CHEIRO + 22, CHEIRO + 34)}} />
     </>
   );
 };
@@ -1149,7 +1185,6 @@ export const VideoChule: React.FC = () => {
       <SND src="sfx8/sniff.mp3" from={6} dur={40} v={FXV * 0.6} />
       <SND src="sfx8/sniff.mp3" from={at(0, "forte") - 4} dur={40} v={FXV * 0.6} />
       <SND src="sfx12/slip.mp3" from={DESMAIA + 4} dur={40} v={FXV * 0.5} />
-      <SND src="sfx14/grilos.mp3" from={ANOITECE + 6} dur={L(4) - ANOITECE - 6} v={FXV * 0.4} loop />
       <SND src="sfx11/water.mp3" from={PERF - 4} dur={36} v={FXV * 0.45} />
       <SND src="sfx14/spray.mp3" from={PERF + 4} dur={40} v={FXV * 0.4} />
       <SND src="sfx11/angels.mp3" from={OPERA - 2} dur={L(4) - OPERA + 2} v={FXV * 0.45} />
