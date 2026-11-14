@@ -232,6 +232,35 @@ export const ClosedStall: React.FC<{p: V3; rotY?: number; color?: string}> = ({p
   </group>
 );
 
+/** plaquinha "FECHADO" de calçada (cavalete pequeno) */
+export const ClosedSign: React.FC<{p: V3; rotY?: number; s?: number}> = ({p, rotY = 0, s = 1}) => {
+  const face = tm("fechado-cav", canvasTex("fechado-cavalete", 128, 160, (c) => {
+    c.fillStyle = "#ffffff";
+    c.fillRect(0, 0, 128, 160);
+    c.strokeStyle = "#e8262d";
+    c.lineWidth = 10;
+    c.strokeRect(6, 6, 116, 148);
+    c.fillStyle = "#e8262d";
+    c.font = "bold 30px sans-serif";
+    c.textAlign = "center";
+    c.textBaseline = "middle";
+    c.fillText("FECHADO", 64, 80);
+  }), 0.6);
+  const wood = sm("#6a4a32", 0.6);
+  return (
+    <group position={p} rotation={[0, rotY, 0]} scale={s}>
+      {[-1, 1].map((sd) => (
+        <group key={sd} position={[0, 0.34, 0.12 * sd]} rotation={[0.17 * sd, sd > 0 ? 0 : Math.PI, 0]}>
+          <mesh geometry={rbox(0.5, 0.68, 0.03, 0.01)} material={wood} castShadow />
+          <mesh position={[0, 0.02, 0.017]} material={face}>
+            <planeGeometry args={[0.42, 0.56]} />
+          </mesh>
+        </group>
+      ))}
+    </group>
+  );
+};
+
 /* ---------- cubo de gelo suando + ventilador ---------- */
 export const IceCube: React.FC<{p: V3; t: number; s?: number}> = ({p, t, s = 1}) => (
   <group position={p} scale={s}>

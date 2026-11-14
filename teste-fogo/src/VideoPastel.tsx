@@ -10,12 +10,13 @@ import {fontFamily} from "./Video";
 import {Sky, SunDisc, SunLight, Town, V3} from "./Sets5";
 import {WeddingPigeon} from "./Sets10";
 import {Dino} from "./Sets7";
+import {Cow} from "./Sets8";
 import {MoonSet, Rocket} from "./Sets9";
 import {ChefHat, Shades} from "./Sets11";
 import {Car, Octopus, Phone, FruitStall} from "./Sets12";
 import {Plaque, Trophy} from "./Sets13";
 import {EvaHelmet, EvaGear} from "./Sets14";
-import {Pastel, Girafa, NECK_TOP, Calendar, ClosedStall, IceCube, Fan, CookStudio, Meteor, Duck, Cap} from "./Sets15";
+import {Pastel, Girafa, NECK_TOP, Calendar, ClosedSign, IceCube, Fan, CookStudio, Meteor, Duck, Cap} from "./Sets15";
 import {Captions, StageTitle, Confetti, Sticker, Wd, clean} from "./Overlays";
 import {FPS, clamp, lerp, ramp, pop, easeInOut, easeOut} from "./util";
 import W from "./timingPastel.json";
@@ -85,9 +86,9 @@ const MoonScene: React.FC<{t: number}> = ({t}) => (
     <MoonSet t={t} />
   </>
 );
-const Astro: React.FC<{pose: Pose; pos: V3; rotY: number; t: number; palmRef?: React.Ref<THREE.Object3D>; hat?: React.ReactNode}> = ({pose, pos, rotY, t, palmRef, hat}) => (
+const Astro: React.FC<{pose: Pose; pos: V3; rotY: number; t: number; palmRef?: React.Ref<THREE.Object3D>; hat?: React.ReactNode; noHelmet?: boolean}> = ({pose, pos, rotY, t, palmRef, hat, noHelmet}) => (
   <>
-    <Toy pose={{...pose, pos, rotY}} look={ASTRO} palmRef={palmRef} headExtra={<><EvaHelmet open />{hat}</>} />
+    <Toy pose={{...pose, pos, rotY}} look={ASTRO} palmRef={palmRef} headExtra={<>{!noHelmet && <EvaHelmet open />}{hat}</>} />
     <EvaGear pos={pos} rotY={rotY} t={t} />
   </>
 );
@@ -99,8 +100,9 @@ const BOY0: V3 = [FX, 0.08, 2.1];
 const GIR: V3 = [FX + 0.6, 0, -1.6];
 const FeiraFechada: React.FC<{cal?: boolean}> = ({cal = true}) => (
   <>
-    <ClosedStall p={[FX - 1.8, 0, -1.4]} rotY={0.25} color="#e8414f" />
-    <ClosedStall p={[FX + 1.8, 0, -1.4]} rotY={-0.25} color="#2e86de" />
+    {[FX - 6.2, FX - 1.9, FX + 3.0, FX + 7.8].map((x, i) => (
+      <ClosedSign key={i} p={[x, 0.08, -2.15]} rotY={0} />
+    ))}
     {cal && <Calendar p={[FX - 1.05, 2.2, -0.2]} r={[0, 0.2, 0]} s={1.1} />}
   </>
 );
@@ -250,12 +252,13 @@ const CookCar: React.FC<{t: number; f: number; trophy?: boolean}> = ({t, trophy}
     {!trophy && <Pastel p={[0, 1.1, CZ + 1.05]} r={[0.35, 0, 0]} s={1.2} fry={1} />}
   </>
 );
-const JX = [-0.95, 0, 0.95];
+const JX = [-1.35, -0.45, 0.45, 1.35];
 const Judges: React.FC<{f: number; t: number; plaques: number}> = ({f, t, plaques}) => (
   <>
     <WeddingPigeon p={{pos: [JX[0], 0.45, 2.75], rotY: Math.PI, t, blink: blinkCurve(f + 3), chest: plaques}} s={2.4} />
     <Octopus o={{pos: [JX[1], 0.42, 2.85], rotY: Math.PI, t, shades: true, s: 0.72, mouth: 0.5 * plaques, wrench: false}} />
     <Dino p={{pos: [JX[2], 0, 2.85], rotY: Math.PI, t, blink: blinkCurve(f + 41), arms: 0.6 * plaques, jaw: 0.4 * plaques}} s={0.62} />
+    <Cow c={{pos: [JX[3], 0, 2.9], rotY: Math.PI, t, blink: blinkCurve(f + 23), arms: plaques > 0.3 ? "up" : "down", armK: 0.6, mouth: 0.4 * plaques, happy: plaques}} s={0.62} />
     {plaques > 0.01 &&
       JX.map((x, i) => <Plaque key={i} p={[x, lerp(0.5, 1.15, plaques), 2.05]} r={[0, Math.PI, 0.1 * Math.sin(t * 4 + i)]} s={1.15} />)}
   </>
@@ -277,7 +280,7 @@ const S8: React.FC<ShotProps> = ({f, a, t}) => (
 /* contraplano: os jurados dando 10 */
 const S8b: React.FC<ShotProps> = ({f, a, t}) => (
   <>
-    <Cam pos={[0, 1.7, -3.0]} look={[0, 1.05, 2.6]} fov={50} f={f} a={a} />
+    <Cam pos={[0, 1.75, -4.1]} look={[0, 1.05, 2.6]} fov={50} f={f} a={a} />
     <StudioScene desk />
     <mesh position={[0, 2.5, 4.4]} rotation={[0, Math.PI, 0]}>
       <planeGeometry args={[10, 5]} />
@@ -363,19 +366,71 @@ const S14: React.FC<ShotProps> = ({f, a, t}) => {
 
 /* =================== 4 — Parabéns, o pato e a girafa na janela =================== */
 const PB = L(12);
-const S15: React.FC<ShotProps> = ({f, a, t}) => {
-  const palm = useRef<THREE.Object3D>(null);
+const OLEO = at(12, "gasolina");
+const GELO = at(12, "gelo");
+const POEIRA = at(12, "poeira");
+/** partículas saindo do pastel (no espaço da cabeça) */
+const PastelFX: React.FC<{f: number; t: number}> = ({f, t}) => {
+  const on = (w: number) => clamp((f - w + 2) / 8);
+  const oil = on(OLEO), ice = on(GELO), dust = on(POEIRA);
   return (
-    <>
-      <Cam pos={[0.0, 1.9, 4.2]} look={[0, 1.6, 0.6]} fov={52} f={f} a={a} />
-      <MoonScene t={t} />
-      <Astro pose={{...idle(f), ...OFFER, lShoulder: [-2.9, 0, 0.35], lElbow: -0.2, smile: 1, mouthOpen: 0.3 + 0.2 * Math.abs(Math.sin(t * 6))}} pos={[0, 0, 0.6]} rotY={0} t={t} palmRef={palm} />
-      <InHand palm={palm}>
-        <Pastel p={[0, -0.12, 0.1]} r={[0, 0, 0]} s={1.2} fry={1} bite />
-      </InHand>
-    </>
+    <group position={[0.02, -0.17, 0.42]}>
+      {/* óleo do carro pingando */}
+      {oil > 0 &&
+        Array.from({length: 7}, (_, i) => {
+          const q = (t * 1.3 + i / 7) % 1;
+          return (
+            <mesh key={"o" + i} position={[-0.2 + 0.07 * i, -0.05 - q * 0.9, 0.05]} scale={[0.035, 0.05 + 0.02 * q, 0.035].map((v) => v * oil) as V3}>
+              <sphereGeometry args={[1, 10, 8]} />
+              <meshStandardMaterial color="#1a1208" roughness={0.1} metalness={0.4} />
+            </mesh>
+          );
+        })}
+      {/* gelo saindo (cristais e fumacinha fria) */}
+      {ice > 0 &&
+        Array.from({length: 8}, (_, i) => {
+          const q = (t * 0.9 + i / 8) % 1;
+          const a = (i / 8) * Math.PI * 2;
+          return (
+            <mesh key={"g" + i} position={[Math.cos(a) * (0.15 + 0.45 * q), 0.05 + Math.sin(a) * 0.12 + 0.35 * q, 0.1 + 0.15 * q]} rotation={[t * 2 + i, t * 3, 0]} scale={(0.04 + 0.03 * q) * ice}>
+              <octahedronGeometry args={[1, 0]} />
+              <meshStandardMaterial color="#cfefff" emissive="#9fd8ff" emissiveIntensity={0.6} transparent opacity={0.9 * (1 - q * 0.6)} />
+            </mesh>
+          );
+        })}
+      {/* poeira de Lua */}
+      {dust > 0 &&
+        Array.from({length: 9}, (_, i) => {
+          const q = (t * 0.7 + i / 9) % 1;
+          return (
+            <mesh key={"p" + i} position={[0.25 * Math.sin(i * 2.3) + (i % 2 ? 0.35 : -0.35) * q, 0.1 + 0.5 * q, 0.05 + 0.2 * q]} scale={(0.06 + 0.12 * q) * dust}>
+              <sphereGeometry args={[1, 10, 8]} />
+              <meshStandardMaterial color="#b9b4a4" roughness={1} transparent opacity={0.75 * (1 - q)} />
+            </mesh>
+          );
+        })}
+    </group>
   );
 };
+const S15: React.FC<ShotProps> = ({f, a, t}) => (
+  <>
+    <Cam pos={[0.0, 1.75, 3.5]} look={[0, 1.55, 0.6]} fov={50} f={f} a={a} />
+    <MoonScene t={t} />
+    <Astro
+      pose={{...idle(f), ...ARMS_UP, smile: 1, mouthOpen: 0.35, eyeWide: 0.4}}
+      pos={[0, 0, 0.6]}
+      rotY={0}
+      t={t}
+      noHelmet
+      hat={
+        <>
+          <Pastel p={[0.02, -0.17, 0.36]} r={[Math.PI / 2, 0, 0]} s={0.75} fry={1} bite />
+          <PastelFX f={f} t={t} />
+        </>
+      }
+    />
+  </>
+);
 /* 🌀 "E lembre-se: o pato não sabe que é pato." */
 const S16: React.FC<ShotProps> = ({f, a, b, t}) => {
   const k = clamp((f - a) / (b - a));
@@ -615,7 +670,7 @@ export const VideoPastel: React.FC = () => {
       <Ono from={QUARENTA + 10} to={L(5) - 3} text="TSSS!" x={560} y={640} size={110} color="#ff8a1f" />
       <Tag from={at(6, "orgulhoso") - 2} to={PROGRAMA - 5} text="CARRO ORGULHOSO" x={540} y={560} />
       <Tag from={PROGRAMA} to={GANHA - 3} text="CHEF CARRO" x={540} y={380} />
-      <BigNum from={GANHA + 4} to={L(7) - 3} text="10 · 10 · 10" y={330} size={110} />
+      <BigNum from={GANHA + 4} to={L(7) - 3} text="10 · 10 · 10 · 10" y={330} size={100} />
       <Confetti from={GANHA} to={GANHA + 50} />
       <BigNum from={LUA8} to={E8 - 2} text="384.000 KM" y={330} size={110} />
       <FastFwd from={L(8) + 10} to={E8 - 2} />
