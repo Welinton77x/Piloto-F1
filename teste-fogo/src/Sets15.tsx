@@ -241,7 +241,7 @@ export const ClosedSign: React.FC<{p: V3; rotY?: number; s?: number}> = ({p, rot
     c.lineWidth = 10;
     c.strokeRect(6, 6, 116, 148);
     c.fillStyle = "#e8262d";
-    c.font = "bold 30px sans-serif";
+    c.font = "bold 23px sans-serif";
     c.textAlign = "center";
     c.textBaseline = "middle";
     c.fillText("FECHADO", 64, 80);
