@@ -49,10 +49,12 @@ export type TamP = {
 export const TAM_TIP: V3 = [0, 0.62, 1.42]; // ponta do focinho (sem cabeça abaixada)
 export const Tamandua: React.FC<{p: V3; rotY?: number; s?: number; c?: TamP}> = ({p, rotY = 0, s = 1, c = {}}) => {
   const {t = 0, walk = 0, run = 1, blink = 0, sleep = 0, sniff = 0, belly = 0, tongue = null, headDown = 0, headYaw = 0, sneeze = 0, wifi = 0, lie = 0} = c;
-  const fur = sm("#8c7b66", 0.85);
-  const furL = sm("#c9b9a0", 0.85);
-  const black = sm("#1d1c1f", 0.7);
-  const white = sm("#eeeae0", 0.8);
+  // estilo "papercraft": facetado (flat shading), cinza, peito branco espetado, faixa preta, rabo em leque
+  const grey = sm("#8b8f96", 0.8, {flatShading: true});
+  const greyD = sm("#5b5f66", 0.85, {flatShading: true});
+  const dark = sm("#2e3035", 0.8, {flatShading: true});
+  const white = sm("#f2f0ea", 0.85, {flatShading: true});
+  const pink = sm("#e9a497", 0.7, {flatShading: true});
   const ph = t * 8 * run;
   const sw = (k: number) => 0.45 * Math.sin(ph + k) * walk;
   const bob = 0.025 * Math.abs(Math.sin(ph)) * walk;
@@ -60,92 +62,131 @@ export const Tamandua: React.FC<{p: V3; rotY?: number; s?: number; c?: TamP}> = 
   const sniffW = 1 + 0.15 * sniff * Math.abs(Math.sin(t * 26));
   const pitch = headDown * 0.55 - sneeze * 0.45 + 0.02 * sniff * Math.sin(t * 13);
   const bS = 1 + 0.35 * belly;
-  // cabeça: pivô no pescoço
   const neck: V3 = [0, 0.82, 0.52];
-  const tipLocal = new THREE.Vector3(0, -0.1, 0.92); // ponta do focinho em relação ao pescoço
+  const tipLocal = new THREE.Vector3(0, -0.1, 0.92);
   tipLocal.applyEuler(new THREE.Euler(pitch, headYaw, 0, "YXZ"));
   const tip: V3 = [neck[0] + tipLocal.x, neck[1] + tipLocal.y, neck[2] + tipLocal.z];
+  // direção do focinho (do pescoço até a ponta) no espaço da cabeça
+  const snoutDir = new THREE.Vector3(0, -0.1, 0.92).normalize();
+  const snoutQ = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), snoutDir);
   return (
     <group position={p} rotation={[0, rotY, 0]} scale={s}>
       <group rotation={[0, 0, lie * 1.35]}>
-      <group position={[0, bob - lie * 0.22, 0]}>
-        {/* corpo */}
-        <mesh position={[0, 0.78, 0]} scale={[0.34 * bS, 0.36 * bS, 0.72]} material={fur} castShadow receiveShadow>
-          <sphereGeometry args={[1, 28, 20]} />
-        </mesh>
-        {/* faixa preta com borda branca, em diagonal no ombro */}
-        <group position={[0, 0.8, 0.3]} rotation={[-0.75, 0, 0]} scale={[bS, bS * 1.05, 1]}>
-          <mesh position={[0, 0, -0.035]} material={white}>
-            <torusGeometry args={[0.315, 0.04, 8, 32]} />
+        <group position={[0, bob - lie * 0.22, 0]}>
+          {/* corpo: frente cinza clara, traseira cinza escura */}
+          <mesh position={[0, 0.8, 0.12]} scale={[0.33 * bS, 0.38 * bS, 0.5]} material={grey} castShadow receiveShadow>
+            <sphereGeometry args={[1, 9, 7]} />
           </mesh>
-          <mesh material={black}>
-            <torusGeometry args={[0.32, 0.045, 8, 32]} />
+          <mesh position={[0, 0.74, -0.38]} scale={[0.3 * bS, 0.34 * bS, 0.42]} material={greyD} castShadow receiveShadow>
+            <sphereGeometry args={[1, 9, 7]} />
           </mesh>
-        </group>
-        {/* rabo peludo enorme (leque) */}
-        <mesh position={[0, 0.82, -0.95]} rotation={[-0.35 + 0.05 * Math.sin(t * 3), 0, 0]} scale={[0.09, 0.42, 0.62]} material={fur} castShadow>
-          <sphereGeometry args={[1, 18, 14]} />
-        </mesh>
-        {/* patas */}
-        {(
-          [
-            [0.2, 0.42, 0, 1],
-            [-0.2, 0.42, Math.PI, 1],
-            [0.2, -0.42, Math.PI, 0],
-            [-0.2, -0.42, 0, 0],
-          ] as [number, number, number, number][]
-        ).map(([x, z, k, front], i) => (
-          <group key={i} position={[x, 0.62, z]} rotation={[sw(k), 0, 0]}>
-            <mesh position={[0, -0.3, 0]} material={front ? furL : fur} castShadow>
-              <capsuleGeometry args={[0.085, 0.42, 6, 10]} />
+          {/* faixa preta com borda branca, do peito subindo pelo ombro */}
+          <group position={[0, 0.84, 0.05]} rotation={[-0.9, 0, 0]} scale={[bS * 1.04, bS * 1.12, 1]}>
+            <mesh position={[0, 0, 0.05]} material={white}>
+              <torusGeometry args={[0.33, 0.03, 4, 14]} />
             </mesh>
-            {front === 1 && (
-              <mesh position={[0, -0.36, 0]} material={black}>
-                <cylinderGeometry args={[0.092, 0.092, 0.07, 14]} />
-              </mesh>
-            )}
-            <mesh position={[0, -0.58, 0.05]} scale={[1, 0.55, 1.4]} material={front ? furL : black} castShadow>
-              <sphereGeometry args={[0.095, 12, 10]} />
+            <mesh material={dark}>
+              <torusGeometry args={[0.335, 0.06, 4, 14]} />
             </mesh>
           </group>
-        ))}
-        {/* cabeça e focinho comprido */}
-        <group position={neck} rotation={[pitch, headYaw, 0, "YXZ"]}>
-          <mesh position={[0, 0, 0.08]} scale={[0.2, 0.2, 0.26]} material={furL} castShadow>
-            <sphereGeometry args={[1, 18, 14]} />
-          </mesh>
-          <mesh position={[0, -0.05, 0.5]} rotation={[Math.PI / 2 - 0.1, 0, 0]} material={furL} castShadow>
-            <cylinderGeometry args={[0.05, 0.16, 0.85, 16]} />
-          </mesh>
-          <mesh position={[0, -0.1, 0.92]} scale={[0.055 * sniffW, 0.045 * sniffW, 0.04]} material={black}>
-            <sphereGeometry args={[1, 10, 8]} />
-          </mesh>
-          {/* olhinhos */}
-          {[-1, 1].map((sd) => (
-            <group key={"e" + sd} position={[0.12 * sd, 0.06, 0.24]} rotation={[0, 0.5 * sd, 0]} scale={[1, eyeY, 1]}>
-              <mesh scale={[0.03, 0.034, 0.018]} material={black}>
-                <sphereGeometry args={[1, 10, 8]} />
+          {/* peito branco espetado (franja de pelo) */}
+          {Array.from({length: 9}, (_, i) => {
+            const a = (i / 8 - 0.5) * 2.2;
+            return (
+              <mesh key={"pf" + i} position={[Math.sin(a) * 0.32 * bS, 0.52 - 0.05 * Math.cos(a * 2), 0.34 + Math.cos(a) * 0.14]} rotation={[Math.PI + 0.45, 0, -a * 0.4]} material={white} castShadow>
+                <coneGeometry args={[0.09, 0.34, 4]} />
               </mesh>
-              <mesh position={[0.008, 0.012, 0.014]} scale={0.007} material={sm("#ffffff", 0.2)}>
-                <sphereGeometry args={[1, 6, 4]} />
+            );
+          })}
+          <mesh position={[0, 0.68, 0.46]} scale={[0.27 * bS, 0.26, 0.16]} material={white}>
+            <sphereGeometry args={[1, 8, 6]} />
+          </mesh>
+          {/* rabo em leque, cheio de pontas */}
+          <group position={[0, 0.85, -0.78]} rotation={[-0.55 + 0.05 * Math.sin(t * 3), 0, 0]}>
+            <mesh position={[0, 0.0, -0.32]} scale={[0.08, 0.36, 0.42]} material={greyD} castShadow>
+              <sphereGeometry args={[1, 6, 6]} />
+            </mesh>
+            {Array.from({length: 11}, (_, i) => {
+              const a = -0.2 + (i / 10) * 2.6;
+              return (
+                <mesh key={"r" + i} position={[0, -Math.cos(a) * 0.36, -0.32 - Math.sin(a) * 0.42]} rotation={[-a + Math.PI / 2, 0, 0]} material={i % 2 ? dark : greyD} castShadow>
+                  <coneGeometry args={[0.06, 0.26, 4]} />
+                </mesh>
+              );
+            })}
+          </group>
+          {/* patas: da frente brancas, de trás escuras */}
+          {(
+            [
+              [0.2, 0.32, 0, 1],
+              [-0.2, 0.32, Math.PI, 1],
+              [0.2, -0.45, Math.PI, 0],
+              [-0.2, -0.45, 0, 0],
+            ] as [number, number, number, number][]
+          ).map(([x, z, k, front], i) => (
+            <group key={i} position={[x, 0.62, z]} rotation={[sw(k), 0, 0]}>
+              <mesh position={[0, -0.3, 0]} material={front ? white : dark} castShadow>
+                <cylinderGeometry args={[0.1, 0.075, 0.5, 6]} />
+              </mesh>
+              {front === 1 && (
+                <mesh position={[0, -0.18, 0.05]} rotation={[Math.PI + 0.2, 0, 0]} material={white}>
+                  <coneGeometry args={[0.11, 0.2, 5]} />
+                </mesh>
+              )}
+              <mesh position={[0, -0.58, 0.05]} scale={[1, 0.5, 1.4]} material={dark} castShadow>
+                <sphereGeometry args={[0.09, 6, 5]} />
               </mesh>
             </group>
           ))}
-          {/* orelhinhas */}
-          {[-1, 1].map((sd) => (
-            <mesh key={"o" + sd} position={[0.14 * sd, 0.16, -0.02]} scale={[0.05, 0.06, 0.03]} material={fur}>
-              <sphereGeometry args={[1, 10, 8]} />
+          {/* cabeça: cone comprido que afina até a ponta escura */}
+          <group position={neck} rotation={[pitch, headYaw, 0, "YXZ"]}>
+            <mesh position={[0, 0.0, 0.0]} scale={[0.21, 0.22, 0.24]} material={grey} castShadow>
+              <sphereGeometry args={[1, 8, 6]} />
             </mesh>
-          ))}
+            <mesh position={[0, -0.05, 0.46]} quaternion={snoutQ} material={grey} castShadow>
+              <cylinderGeometry args={[0.05, 0.19, 0.86, 7]} />
+            </mesh>
+            <mesh position={[0, -0.095, 0.88]} quaternion={snoutQ} material={dark}>
+              <cylinderGeometry args={[0.035 * sniffW, 0.055 * sniffW, 0.1, 7]} />
+            </mesh>
+            {/* olhinho com mancha rosa */}
+            {[-1, 1].map((sd) => (
+              <group key={"e" + sd} position={[0.165 * sd, 0.06, 0.13]} rotation={[0, 0.9 * sd, 0]}>
+                <mesh scale={[0.06, 0.055, 0.015]} material={pink}>
+                  <sphereGeometry args={[1, 10, 8]} />
+                </mesh>
+                <group position={[0, 0, 0.012]} scale={[1, eyeY, 1]}>
+                  <mesh scale={[0.03, 0.03, 0.01]} material={sm("#7a1f1f", 0.3)}>
+                    <sphereGeometry args={[1, 10, 8]} />
+                  </mesh>
+                  <mesh position={[0, 0, 0.006]} scale={[0.015, 0.015, 0.006]} material={sm("#0c0c10", 0.2)}>
+                    <sphereGeometry args={[1, 8, 6]} />
+                  </mesh>
+                  <mesh position={[0.008, 0.01, 0.01]} scale={0.006} material={sm("#ffffff", 0.2)}>
+                    <sphereGeometry args={[1, 6, 4]} />
+                  </mesh>
+                </group>
+              </group>
+            ))}
+            {/* orelhinhas rosadas */}
+            {[-1, 1].map((sd) => (
+              <mesh key={"o" + sd} position={[0.13 * sd, 0.17, -0.06]} rotation={[0, 0, -0.3 * sd]} material={pink}>
+                <coneGeometry args={[0.04, 0.07, 4]} />
+              </mesh>
+            ))}
+            {/* listra de cima da cabeça */}
+            <mesh position={[0, 0.17, 0.1]} rotation={[-0.25, 0, 0]} scale={[0.03, 0.02, 0.22]} material={greyD}>
+              <sphereGeometry args={[1, 6, 4]} />
+            </mesh>
+          </group>
+          {/* língua comprida */}
+          {tongue && <Segment a={tip} b={tongue} r={0.025} mat={sm("#e2607a", 0.4)} />}
+          {tongue && (
+            <mesh position={tongue} material={sm("#e2607a", 0.4)}>
+              <sphereGeometry args={[0.04, 10, 8]} />
+            </mesh>
+          )}
         </group>
-        {/* língua comprida */}
-        {tongue && <Segment a={tip} b={tongue} r={0.025} mat={sm("#e2607a", 0.4)} />}
-        {tongue && (
-          <mesh position={tongue} material={sm("#e2607a", 0.4)}>
-            <sphereGeometry args={[0.04, 10, 8]} />
-          </mesh>
-        )}
-      </group>
       </group>
       {/* risquinhos de Wi-Fi */}
       {wifi > 0.01 && (
