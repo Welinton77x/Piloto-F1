@@ -788,11 +788,11 @@ const VIRA14 = at(14, "vira");
 const E14 = at(14, "e", 0);
 const PREND = at(14, "prendedor", 0);
 const CLIP_WALK: {start: V3; rotY: number}[] = [
-  {start: [FX - 1.9, 0, -0.6], rotY: 0.32},
-  {start: [FX + 1.8, 0, -0.9], rotY: -0.3},
-  {start: [FX - 0.35, 0, -1.6], rotY: 0.06},
-  {start: [FX + 0.75, 0, 0.3], rotY: -0.12},
-  {start: [FX - 1.0, 0, 1.0], rotY: 0.22},
+  {start: [FX - 1.9, 0, 0.2], rotY: Math.PI / 2 - 0.2},
+  {start: [FX + 1.9, 0, 0.9], rotY: -Math.PI / 2 + 0.2},
+  {start: [FX - 2.7, 0, 1.6], rotY: Math.PI / 2 - 0.2},
+  {start: [FX + 0.9, 0, -0.5], rotY: -Math.PI / 2 + 0.2},
+  {start: [FX + 2.7, 0, 2.2], rotY: -Math.PI / 2 + 0.2},
 ];
 const S29: React.FC<ShotProps> = ({f, a, t}) => {
   const sec = (f - a) / FPS;
