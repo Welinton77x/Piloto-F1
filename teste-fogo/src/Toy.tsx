@@ -28,11 +28,19 @@ export type ToyLook = {
   plaid?: string; // camisa xadrez: cor das listras
   belly?: number; // barriguinha (0..1)
   flipflop?: boolean; // chinelo de dedo (pé de fora; shoe = cor da tira, sole = cor do solado)
+  bareR?: boolean; // pé direito descalço (sem o chinelo)
+  socks?: string; // só de meia (cor da meia), sem tênis
 };
 
 const sm = (color: string, rough = 0.55, extra: Partial<THREE.MeshStandardMaterialParameters> = {}) =>
   new THREE.MeshStandardMaterial({color, roughness: rough, metalness: 0, ...extra});
 
+const sockCache = new Map<string, THREE.MeshStandardMaterial>();
+const sockMat = (c: string) => {
+  let m = sockCache.get(c);
+  if (!m) sockCache.set(c, (m = new THREE.MeshStandardMaterial({color: c, roughness: 0.9})));
+  return m;
+};
 const plaidCache = new Map<string, THREE.CanvasTexture>();
 const plaidTex = (base: string, line: string) => {
   const k = base + line;
@@ -690,7 +698,11 @@ export const Toy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; lPa
                 <cylinderGeometry args={[PANT_R + (look.flare ? 0.04 : 0.008), PANT_R + (look.flare ? 0.042 : 0.008), 0.045, 24]} />
               </mesh>
               <group position={[0, -SHIN, 0]} rotation={[foot, 0, 0]}>
-                {look.flipflop ? (
+                {look.socks ? (
+                  <mesh position={[0, -0.085, 0.045]} scale={[0.86, 0.75, 0.93]} geometry={geo.shoe} material={sockMat(look.socks)} castShadow />
+                ) : look.flipflop && look.bareR && sd < 0 ? (
+                  <mesh position={[0, -0.092, 0.05]} scale={[0.82, 0.62, 0.9]} geometry={geo.shoe} material={m.skin} castShadow />
+                ) : look.flipflop ? (
                   <>
                     <mesh position={[0, -0.07, 0.05]} scale={[0.82, 0.62, 0.9]} geometry={geo.shoe} material={m.skin} castShadow />
                     <mesh position={[0, -0.112, 0.05]} geometry={geo.sole} material={m.sole} />

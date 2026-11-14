@@ -16,6 +16,8 @@ import {VideoGta, TOTAL_GTA} from "./VideoGta";
 import {VideoCasamento, TOTAL_CASA} from "./VideoCasamento";
 import {BoloPreview} from "./BoloPreview";
 import {MecPreview} from "./MecPreview";
+import {ChulePreview} from "./ChulePreview";
+import {VideoChule, TOTAL_CHULE} from "./VideoChule";
 import {VideoMec, TOTAL_MEC} from "./VideoMec";
 import {VideoBolo, TOTAL_BOLO} from "./VideoBolo";
 
@@ -25,6 +27,8 @@ export const Root: React.FC = () => (
     <Composition id="Bolo" component={VideoBolo} durationInFrames={TOTAL_BOLO} fps={30} width={1080} height={1920} />
     <Composition id="BoloPreview" component={BoloPreview} durationInFrames={2} fps={30} width={1080} height={1920} />
     <Composition id="Mecanico" component={VideoMec} durationInFrames={TOTAL_MEC} fps={30} width={1080} height={1920} />
+    <Composition id="Chule" component={VideoChule} durationInFrames={TOTAL_CHULE} fps={30} width={1080} height={1920} />
+    <Composition id="ChulePreview" component={ChulePreview} durationInFrames={8} fps={30} width={1080} height={1920} />
     <Composition id="MecPreview" component={MecPreview} durationInFrames={6} fps={30} width={1080} height={1920} />
     <Composition id="Casamento" component={VideoCasamento} durationInFrames={TOTAL_CASA} fps={30} width={1080} height={1920} />
     <Composition id="Gta" component={VideoGta} durationInFrames={TOTAL_GTA} fps={30} width={1080} height={1920} />

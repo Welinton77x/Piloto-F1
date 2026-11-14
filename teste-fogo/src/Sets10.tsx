@@ -691,11 +691,13 @@ const Pew: React.FC<{p: V3; w: number}> = ({p, w}) => {
     </group>
   );
 };
-export const Church: React.FC<{t: number}> = ({t}) => {
+export type ChurchTheme = {wall?: string; carpet?: string; flowers?: [string, string, string]; vault?: string};
+export const Church: React.FC<{t: number; theme?: ChurchTheme}> = ({t, theme = {}}) => {
+  const TH = {wall: "#f3ead9", carpet: "#b3122d", flowers: ["#ffb3c6", "#ffffff", "#ffd1dc"] as [string, string, string], vault: "#f7f0e2", ...theme};
   const {x: X, z0, z1, wall} = CH;
   const L = z1 - z0;
   const zc = (z0 + z1) / 2;
-  const wallM = sm("#f3ead9", 0.85);
+  const wallM = sm(TH.wall, 0.85);
   const stone = sm("#e6dcc8", 0.75);
   const gold = sm("#e3b33b", 0.3, {metalness: 0.6});
   const vault = useMemo(() => {
@@ -724,7 +726,7 @@ export const Church: React.FC<{t: number}> = ({t}) => {
         <boxGeometry args={[2 * X + 0.4, wall + X, 0.2]} />
       </mesh>
       {/* abóbada */}
-      <mesh position={[0, wall, zc]} geometry={vault} material={sm("#f7f0e2", 0.85, {side: THREE.DoubleSide})} />
+      <mesh position={[0, wall, zc]} geometry={vault} material={sm(TH.vault, 0.85, {side: THREE.DoubleSide})} />
       {cols.map((z) => (
         <mesh key={"arco" + z} position={[0, wall, z]} material={stone}>
           <torusGeometry args={[X - 0.05, 0.12, 8, 40, Math.PI]} />
@@ -778,7 +780,7 @@ export const Church: React.FC<{t: number}> = ({t}) => {
       <mesh position={[0, CHURCH_PLAT / 4, -2.72]} material={stone} receiveShadow>
         <boxGeometry args={[7, CHURCH_PLAT / 2, 0.36]} />
       </mesh>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, CHURCH_PLAT + 0.005, -4.4]} material={sm("#b3122d", 0.8)} receiveShadow>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, CHURCH_PLAT + 0.005, -4.4]} material={sm(TH.carpet, 0.8)} receiveShadow>
         <planeGeometry args={[3.2, 3.0]} />
       </mesh>
       <group position={[0, CHURCH_PLAT, -5.3]}>
@@ -797,14 +799,14 @@ export const Church: React.FC<{t: number}> = ({t}) => {
           </group>
         ))}
         {[-0.15, 0, 0.15].map((x, i) => (
-          <mesh key={i} position={[x, 1.0 + (i === 1 ? 0.06 : 0), 0]} material={sm(["#ffb3c6", "#ffffff", "#ffd1dc"][i], 0.55)}>
+          <mesh key={i} position={[x, 1.0 + (i === 1 ? 0.06 : 0), 0]} material={sm(TH.flowers[i], 0.55)}>
             <sphereGeometry args={[0.12, 14, 10]} />
           </mesh>
         ))}
       </group>
       <FlowerArch p={[0, CHURCH_PLAT, -4.1]} />
       {/* tapete vermelho do corredor */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.006, (-2.55 + z1) / 2]} material={sm("#b3122d", 0.85)} receiveShadow>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.006, (-2.55 + z1) / 2]} material={sm(TH.carpet, 0.85)} receiveShadow>
         <planeGeometry args={[1.3, z1 + 2.55]} />
       </mesh>
       {/* bancos + lacinhos */}
@@ -818,7 +820,7 @@ export const Church: React.FC<{t: number}> = ({t}) => {
                   <coneGeometry args={[0.06, 0.13, 4]} />
                 </mesh>
               ))}
-              <mesh position={[0, -0.05, 0]} material={sm("#ffb3c6", 0.5)}>
+              <mesh position={[0, -0.05, 0]} material={sm(TH.flowers[0], 0.5)}>
                 <sphereGeometry args={[0.07, 12, 10]} />
               </mesh>
             </group>
@@ -867,14 +869,14 @@ const cortinaTex = () =>
     c.fillStyle = g;
     c.fillRect(0, 0, 128, 256);
   });
-export const Hall: React.FC<{t: number; hole?: number; holeAt?: [number, number]}> = ({t, hole = 0, holeAt = [PARTY[0], PARTY[2] - 0.8]}) => {
+export const Hall: React.FC<{t: number; hole?: number; holeAt?: [number, number]; wall?: string; lowerC?: string}> = ({t, hole = 0, holeAt = [PARTY[0], PARTY[2] - 0.8], wall = "#f6ead7", lowerC = "#d9c3a0"}) => {
   const {x0, x1, z0, z1, h} = HALL;
   const W = x1 - x0;
   const D = z1 - z0;
   const cx = (x0 + x1) / 2;
   const cz = (z0 + z1) / 2;
-  const wallM = sm("#f6ead7", 0.85);
-  const lower = sm("#d9c3a0", 0.7);
+  const wallM = sm(wall, 0.85);
+  const lower = sm(lowerC, 0.7);
   const gold = sm("#e3b33b", 0.3, {metalness: 0.6});
   const ceiling = useMemo(() => {
     const sh = new THREE.Shape();
