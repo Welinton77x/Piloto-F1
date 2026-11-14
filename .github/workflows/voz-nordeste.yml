@@ -1,0 +1,30 @@
+name: Gerar voz Liam (nordeste)
+on:
+  push:
+    paths: ["nordeste/VOZ.txt"]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency: voz-nordeste
+jobs:
+  voz:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Instalar ffmpeg
+        run: sudo apt-get update -y >/dev/null && sudo apt-get install -y ffmpeg >/dev/null
+      - name: Gerar narração (uma vez; pula se já existe)
+        env:
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+        run: |
+          ONLY=""; [ -f nordeste/VOZ_ONLY.txt ] && ONLY=$(cat nordeste/VOZ_ONLY.txt)
+          if [ -z "$ONLY" ] && [ -f nordeste/app/public/vo/s10.mp3 ]; then echo "voz já existe, nada a fazer"; exit 0; fi
+          TTS_ONLY="$ONLY" python nordeste/app/scripts/tts_elevenlabs.py
+          rm -f nordeste/VOZ_ONLY.txt
+      - name: Guardar no branch
+        run: |
+          git config user.name "claude-bot"; git config user.email "bot@users.noreply.github.com"
+          git add -A nordeste/
+          git commit -m "Voz Liam gerada (nordeste)" || exit 0
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"

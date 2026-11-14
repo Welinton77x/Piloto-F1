@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<style>
+  @font-face { font-family: "Montserrat"; font-weight: 900; src: url(fonts/montserrat-latin-900-normal.woff2); }
+  @font-face { font-family: "Montserrat"; font-weight: 800; src: url(fonts/montserrat-latin-800-normal.woff2); }
+  html, body { margin: 0; }
+  /* 2560x1440. Área segura (aparece em todos os aparelhos): 1546x423 no centro */
+  .banner {
+    width: 2560px; height: 1440px; position: relative; overflow: hidden;
+    background: linear-gradient(180deg, #17325c 0%, #0b1730 55%, #101820 100%);
+    font-family: "Montserrat", sans-serif;
+  }
+  .grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(77,208,255,.10) 2px, transparent 2px),
+      linear-gradient(90deg, rgba(77,208,255,.10) 2px, transparent 2px);
+    background-size: 96px 96px;
+  }
+  .glow {
+    position: absolute; left: 50%; top: 50%; width: 1900px; height: 700px;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(ellipse at center, rgba(77,208,255,.28), transparent 65%);
+  }
+  /* faixa de "scanner" atravessando o banner */
+  .scan {
+    position: absolute; left: 0; right: 0; top: 50%; height: 6px; margin-top: 250px;
+    background: linear-gradient(90deg, transparent, #4DD0FF 20%, #4DD0FF 80%, transparent);
+    opacity: .5;
+  }
+  .safe {
+    position: absolute; left: 50%; top: 50%; width: 1546px; height: 423px;
+    transform: translate(-50%, -50%);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; color: #fff;
+  }
+  .logo {
+    font-weight: 900; font-size: 150px; line-height: 1; letter-spacing: -2px; white-space: nowrap;
+    -webkit-text-stroke: 14px #101820; paint-order: stroke fill;
+  }
+  .logo span { color: #4DD0FF; }
+  .tag { margin-top: 22px; font-weight: 800; font-size: 58px; }
+  .tag b { color: #FFD400; }
+  .freq {
+    margin-top: 24px; padding: 8px 30px; border-radius: 14px;
+    background: #FFD400; color: #101820; font-weight: 900; font-size: 34px; letter-spacing: 3px;
+  }
+  .badge {
+    position: absolute; padding: 14px 30px; border-radius: 18px;
+    font-weight: 900; font-size: 44px; color: #fff; opacity: .85;
+  }
+</style>
+</head>
+<body>
+  <div class="banner">
+    <div class="grid"></div>
+    <div class="glow"></div>
+    <div class="scan"></div>
+    <!-- decoração fora da área segura (pode ser cortada em alguns aparelhos) -->
+    <div class="badge" style="left:110px; top:330px; background:#E53935; transform:rotate(-6deg)">✖ PROBLEMA</div>
+    <div class="badge" style="right:110px; top:330px; background:#2E9E4F; transform:rotate(6deg)">✔ SOLUÇÃO</div>
+    <div class="badge" style="left:160px; bottom:330px; background:#1E88E5; transform:rotate(4deg)">RAIO-X 3D</div>
+    <div class="badge" style="right:160px; bottom:330px; background:#FFC400; color:#1B1B1B; transform:rotate(-4deg)">? CURIOSIDADE</div>
+    <div class="safe">
+      <div class="logo">POR DENTRO <span>LAB</span></div>
+      <div class="tag">A gente abre. <b>Você entende.</b></div>
+      <div class="freq">CURIOSIDADES EM RAIO-X 3D · TODA SEMANA</div>
+    </div>
+  </div>
+<script>if (location.search.includes("safe")) document.querySelector(".safe").style.outline="4px dashed #f0f";</script>
+</body>
+</html>

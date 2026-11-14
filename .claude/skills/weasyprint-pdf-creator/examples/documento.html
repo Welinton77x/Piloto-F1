@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+</head>
+<body>
+
+    <header class="doc-header">
+        <div class="header-inner">
+            <span class="company-name">{{ company }}</span>
+            <span class="doc-meta">{{ title }}</span>
+        </div>
+    </header>
+
+    <section class="cover-page">
+        <h1>{{ title }}</h1>
+        <p class="subtitle">{{ subtitle }}</p>
+        <p class="author">Por: {{ author }}</p>
+    </section>
+
+    <section class="toc-section page-break">
+        <h2>Sumário</h2>
+        <ul class="toc-list">
+            {% for s in sections %}
+            <li class="toc-item">
+                <a href="#{{ s.id }}">
+                    <span class="toc-name">{{ s.title }}</span>
+                    <span class="toc-leader"></span>
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </section>
+
+    {% for s in sections %}
+    <section id="{{ s.id }}">
+        <h2 class="section-title">{{ s.title }}</h2>
+        <p>{{ s.body }}</p>
+    </section>
+    {% endfor %}
+
+</body>
+</html>

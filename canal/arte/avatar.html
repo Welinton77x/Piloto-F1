@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<style>
+  @font-face { font-family: "Montserrat"; font-weight: 900; src: url(fonts/montserrat-latin-900-normal.woff2); }
+  @font-face { font-family: "Montserrat"; font-weight: 800; src: url(fonts/montserrat-latin-800-normal.woff2); }
+  html, body { margin: 0; }
+  /* 800x800; as plataformas cortam em círculo, então tudo fica no centro */
+  .avatar {
+    width: 800px; height: 800px; position: relative; overflow: hidden;
+    background: radial-gradient(circle at 50% 40%, #1b3a6b 0%, #101820 70%);
+    font-family: "Montserrat", sans-serif;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
+  /* grade de "raio-x" */
+  .grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(77,208,255,.13) 2px, transparent 2px),
+      linear-gradient(90deg, rgba(77,208,255,.13) 2px, transparent 2px);
+    background-size: 80px 80px;
+  }
+  .ring {
+    position: absolute; width: 560px; height: 560px; border-radius: 50%;
+    border: 14px solid #4DD0FF; box-shadow: 0 0 60px rgba(77,208,255,.45);
+  }
+  .pd {
+    position: relative; font-weight: 900; font-size: 300px; line-height: .9;
+    color: #fff; letter-spacing: -12px;
+    -webkit-text-stroke: 10px #101820; paint-order: stroke fill;
+  }
+  .lab {
+    position: relative; margin-top: 18px; padding: 6px 34px 8px;
+    background: #4DD0FF; color: #101820; border-radius: 18px;
+    font-weight: 900; font-size: 84px; letter-spacing: 10px;
+  }
+</style>
+</head>
+<body>
+  <div class="avatar">
+    <div class="grid"></div>
+    <div class="ring"></div>
+    <div class="pd">PD</div>
+    <div class="lab">LAB</div>
+  </div>
+</body>
+</html>
