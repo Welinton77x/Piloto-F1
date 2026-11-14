@@ -80,7 +80,7 @@ const StreetScene: React.FC<{t: number; dark?: number; lit?: boolean}> = ({t, da
     {dark > 0.5 ? <Sky top="#05081c" bottom="#1a2050" /> : <Sky />}
     <fog attach="fog" args={[dark > 0.5 ? "#10142c" : "#cdeeff", 30, 130]} />
     {dark < 0.5 && <SunDisc p={[-40, 45, -110]} r={6} />}
-    <hemisphereLight args={[dark > 0.5 ? "#4a5aa0" : "#d6ecff", dark > 0.5 ? "#101020" : "#a08a5e", dark > 0.5 ? (lit ? 0.7 : 0.25) : 1.2]} />
+    <hemisphereLight args={[dark > 0.5 ? "#4a5aa0" : "#d6ecff", dark > 0.5 ? "#101020" : "#a08a5e", dark > 0.5 ? (lit ? 0.7 : 0.4) : 1.2]} />
     <SunLight target={[FX, 1, 0]} dir={[-6, 10, 7]} intensity={dark > 0.5 ? (lit ? 0.6 : 0.12) : 2.6} color={dark > 0.5 ? "#9fb4ff" : "#fff1d6"} ext={10} />
     <Town t={t} galo={false} variant="nova" dark={dark > 0.5} lit={lit ? () => true : undefined} lamps={dark < 0.5 || lit} />
   </>
@@ -111,7 +111,7 @@ const S0: React.FC<ShotProps> = ({f, a, t}) => {
   const pose: Pose = z ? {...idle(f), pos: BOY_SH, rotY: 0.15, ...SHOCK, torso: [0, 0, 0.06 * Math.sin(t * 50)]} : {...idle(f), pos: BOY_SH, rotY: 0.15, rShoulder: [-2.2, 0, 0.3], rElbow: -1.0, smile: f < CHOQUE0 ? 0.8 : 0, brow: f < CHOQUE0 ? 0 : 0.6, head: [-0.2, 0, 0]};
   return (
     <>
-      <Cam pos={[-0.55, 1.6, 2.4]} look={[-0.9, 1.5, -1.4]} fov={52} f={f} a={a} />
+      <Cam pos={[-1.0, 1.6, 2.4]} look={[-1.0, 1.5, -1.4]} fov={52} f={f} a={a} />
       <BathScene t={t} flicker={z} />
       <ElectricShower t={t} spark={z} shake={z} />
       <Boy pose={pose} />
@@ -119,7 +119,7 @@ const S0: React.FC<ShotProps> = ({f, a, t}) => {
     </>
   );
 };
-const AQ_IN = (f: number): V3 => [lerp(2.8, 0.75, easeOut(ramp(f, ENTAO0 + 30, PORAQUE0 + 2))), 0, -0.35];
+const AQ_IN = (f: number): V3 => [lerp(2.6, 0.05, easeOut(ramp(f, ENTAO0 + 30, PORAQUE0 + 2))), 0, -0.35];
 const PoraqueInTank: React.FC<{p: V3; rotY?: number; t: number; f: number; po?: PoraqueP; spin?: number}> = ({p, rotY = -Math.PI / 2, t, f, po = {}, spin = 0}) => (
   <Aquarium p={p} rotY={rotY} spin={spin}>
     <Poraque p={{pos: [0, 0, 0], t, blink: blinkCurve(f + 17), s: 0.85, ...po}} />
@@ -130,7 +130,7 @@ const S1: React.FC<ShotProps> = ({f, a, t}) => {
   const pose: Pose = {...idle(f), pos: BOY_SH, rotY: 0.6, rShoulder: [-0.3, 0, -0.3], lShoulder: [-0.3, 0, 0.3], hairLift: 1, brow: 0.6, pupil: [0.8, 0], head: [0, 0.5, 0]};
   return (
     <>
-      <Cam pos={[0.1, 1.4, 3.0]} look={[-0.15, 1.0, -0.8]} fov={62} f={f} a={a} />
+      <Cam pos={[-0.4, 1.4, 3.1]} look={[-0.4, 1.0, -0.8]} fov={60} f={f} a={a} />
       <BathScene t={t} />
       <ElectricShower t={t} />
       <Boy pose={pose} />
@@ -161,7 +161,7 @@ const S3: React.FC<ShotProps> = ({f, a, t}) => {
   const pose: Pose = {...idle(f), pos: [0.25, 0, -0.2], rotY: -0.4, ...SHOCK, heat: k};
   return (
     <>
-      <Cam pos={[0.1, 1.7, 3.4]} look={[-0.5, 1.6, -1.2]} fov={58} f={f} a={a} punch={4} />
+      <Cam pos={[0.15, 1.7, 3.3]} look={[0.15, 1.5, -0.6]} fov={58} f={f} a={a} punch={4} />
       <BathScene t={t} steam={k * 0.6} />
       <ElectricShower t={t} heat={1} shake={1} />
       <SteamJet p={[SHOWER_P[0], SHOWER_P[1] - 0.05, SHOWER_P[2] + 0.2]} k={k} t={t} spread={0.9} />
@@ -192,7 +192,7 @@ const S5: React.FC<ShotProps> = ({f, a, t}) => {
   const cooked = f >= at(3, "segundos");
   return (
     <>
-      <Cam pos={[-0.7, 1.75, 1.5]} look={[-1.0, 1.25, -1.5]} fov={52} f={f} a={a} />
+      <Cam pos={[-1.05, 1.75, 1.6]} look={[-1.05, 1.3, -1.5]} fov={52} f={f} a={a} />
       <BathScene t={t} steam={0.4} />
       <ElectricShower t={t} heat={1} />
       <SteamJet p={[SHOWER_P[0], SHOWER_P[1] - 0.05, SHOWER_P[2] + 0.2]} k={0.4} t={t} spread={0.5} />
@@ -214,7 +214,7 @@ const S6: React.FC<ShotProps> = ({f, a, t}) => {
   const k = clamp((f - a) / 90);
   return (
     <>
-      <Cam pos={[FX + 2.5, 2.4, 9.5]} look={[FX - 0.5, 1.2, 1.5]} fov={56} f={f} a={a} />
+      <Cam pos={[FX + 6.8, 1.9, 2.9]} look={[FX + 0.5, 1.15, 2.1]} fov={52} f={f} a={a} />
       <StreetScene t={t} />
       {Array.from({length: QUEUE_N}, (_, i) => {
         const x = FX + 3.4 - i * 1.0 + 0.25 * Math.sin(i * 2) + (i > 6 ? k * 0.3 : 0);
@@ -256,7 +256,7 @@ const Jam: React.FC<{t: number}> = ({t}) => (
 );
 const S7: React.FC<ShotProps> = ({f, a, t}) => (
   <>
-    <Cam pos={[FX + 0.5, 3.2, 10.5]} look={[FX, 1.0, 0.5]} fov={58} f={f} a={a} />
+    <Cam pos={[FX + 6.6, 2.1, 3.2]} look={[FX + 0.3, 1.1, 1.8]} fov={54} f={f} a={a} />
     <StreetScene t={t} />
     <Jam t={t} />
     {Array.from({length: 7}, (_, i) => (
@@ -266,14 +266,14 @@ const S7: React.FC<ShotProps> = ({f, a, t}) => (
 );
 const tucIn = (f: number): V3 => {
   const k = easeOut(ramp(f, ENTAO4, TUCANO4 - 2));
-  return [lerp(FX - 2.5, TUC[0], k), TUC[1] + 1.6 * Math.sin(k * Math.PI) * (1 - k) + 1.2 * (1 - k), TUC[2]];
+  return [lerp(TUC[0] - 1.2, TUC[0], k), TUC[1] + 1.4 * (1 - k), TUC[2]];
 };
 const S8: React.FC<ShotProps> = ({f, a, t}) => {
   const p = tucIn(f);
   const walking = f < TUCANO4 - 2;
   return (
     <>
-      <Cam pos={[FX + 0.9, 1.9, 6.2]} look={[FX + 1.2, 1.25, 2.1]} fov={52} f={f} a={a} />
+      <Cam pos={[TUC[0], 1.9, 6.0]} look={[TUC[0], 1.35, TUC[2]]} fov={52} f={f} a={a} />
       <StreetScene t={t} />
       <Jam t={t} />
       <LampPost p={POST} on />
@@ -293,7 +293,7 @@ const S9: React.FC<ShotProps> = ({f, a, t}) => {
   const hit = f >= POSTE5 && f < POSTE5 + 14;
   return (
     <>
-      <Cam pos={[FX + 1.3, 1.75, 5.0]} look={[FX + 1.6, 1.35, 2.1]} fov={50} f={f} a={a} />
+      <Cam pos={[TUC[0] - 0.1, 1.75, 5.0]} look={[TUC[0], 1.4, TUC[2]]} fov={50} f={f} a={a} />
       <StreetScene t={t} />
       <Jam t={t} />
       <LampPost p={POST} on />
@@ -307,7 +307,7 @@ const S10: React.FC<ShotProps> = ({f, a, t}) => {
   const out = f >= a + 6;
   return (
     <>
-      <Cam pos={[FX + 1.2, 2.2, 6.4]} look={[FX + 1.2, 1.7, 1.5]} fov={56} f={f} a={a} />
+      <Cam pos={[TUC[0], 2.0, 6.4]} look={[TUC[0], 1.5, TUC[2]]} fov={56} f={f} a={a} />
       <StreetScene t={t} dark={out ? 1 : 0} />
       <Jam t={t} />
       <LampPost p={POST} on={!out} />
@@ -336,12 +336,12 @@ const S12: React.FC<ShotProps> = ({f, a, t}) => {
   const g = ramp(f, ILUMINA - 4, ILUMINA + 4);
   return (
     <>
-      <Cam pos={[FX + 0.8, 2.6, 7.6]} look={[FX + 1.2, 2.2, 1.5]} fov={56} f={f} a={a} />
+      <Cam pos={[FX + 1.3, 2.4, 7.6]} look={[FX + 1.3, 2.0, 2.3]} fov={56} f={f} a={a} />
       <StreetScene t={t} dark={1} lit={lit} />
       <LampPost p={POST} on={false} />
       <PostPoraque f={f} t={t} glow={g} />
       {g > 0.01 && <pointLight position={[POST[0], 3.2, POST[2] + 0.4]} intensity={14 * g} distance={10} decay={1.5} color="#fff2a0" />}
-      <Toy pose={{...idle(f), pos: [FX + 0.6, 0.08, 2.4], rotY: 0.4, ...ARMS_UP, smile: 1, mouthOpen: 0.3}} look={BOYL} headExtra={<><ShowerCap /><TowelShoulder /></>} />
+      <Toy pose={{...idle(f), pos: [FX + 1.05, 0.08, 2.55], rotY: 0.4, ...ARMS_UP, smile: 1, mouthOpen: 0.3}} look={BOYL} headExtra={<><ShowerCap /><TowelShoulder /></>} />
     </>
   );
 };
@@ -367,20 +367,20 @@ const E9 = at(9, "e", 0);
 const ITAIPU = at(9, "itaipu");
 const S14: React.FC<ShotProps> = ({f, a, t}) => (
   <>
-    <Cam pos={[FX + 0.6, 1.6, 4.2]} look={[FX + 0.3, 0.95, 1.0]} fov={50} f={f} a={a} />
+    <Cam pos={[FX + 0.3, 1.7, 4.4]} look={[FX + 0.3, 1.1, 1.0]} fov={52} f={f} a={a} />
     <StreetScene t={t} />
     <PoraqueInTank p={[FX + 0.3, 0.08, 1.0]} rotY={0.15} t={t} f={f} po={{glow: 0.4, shades: true, helmet: false, smile: 1, mouth: 0.3 * Math.abs(Math.sin(t * 6))}} />
-    <Phone p={[FX - 0.05, 1.55, 1.75]} r={[0, 0.5, 0.15]} s={2.4} t={t} ring={0.4} />
+    <Phone p={[FX + 0.15, 1.75, 1.6]} r={[0, 0.3, 0.12]} s={2.2} t={t} ring={0.4} />
   </>
 );
 const S16: React.FC<ShotProps> = ({f, a, t}) => (
   <>
-    <Cam pos={[1.0, 2.4, 19.5]} look={[0, 4.6, -2]} fov={56} f={f} a={a} />
+    <Cam pos={[0.0, 2.2, 19.5]} look={[0.0, 3.4, -2]} fov={56} f={f} a={a} />
     <Sky />
     <hemisphereLight args={["#d6ecff", "#a08a5e", 1.2]} />
     <SunLight target={[0, 2, 0]} dir={[-6, 10, 7]} intensity={2.4} ext={12} />
     <Dam t={t} />
-    <PoraqueInTank p={[0.3, 0, 14.2]} rotY={0.25} t={t} f={f} po={{glow: 0.6, shades: true, helmet: false, smile: 1}} />
+    <PoraqueInTank p={[0.0, 0, 14.4]} rotY={0.0} t={t} f={f} po={{glow: 0.6, shades: true, helmet: false, smile: 1}} />
   </>
 );
 
@@ -405,7 +405,7 @@ const S17: React.FC<ShotProps> = ({f, a, t}) => {
   const z = zap(f, at(10, "choque"));
   return (
     <>
-      <Cam pos={[-0.55, 1.6, 2.4]} look={[-0.9, 1.5, -1.4]} fov={52} f={f} a={a} />
+      <Cam pos={[-1.0, 1.6, 2.4]} look={[-1.0, 1.5, -1.4]} fov={52} f={f} a={a} />
       <BathScene t={t} flicker={z} />
       <ElectricShower t={t} spark={z} shake={z} />
       <Boy pose={z ? {...idle(f), pos: BOY_SH, rotY: 0.15, ...SHOCK, torso: [0, 0, 0.06 * Math.sin(t * 50)]} : {...idle(f), pos: BOY_SH, rotY: 0.15, brow: 0.7, mouthOpen: 0.2, hairLift: 1}} />
@@ -417,7 +417,7 @@ const S18: React.FC<ShotProps> = ({f, a, t}) => {
   const hat = f >= CAPACETE - 2;
   return (
     <>
-      <Cam pos={[-0.6, 1.55, 2.2]} look={[-0.9, 1.35, -1.4]} fov={52} f={f} a={a} />
+      <Cam pos={[-1.0, 1.55, 2.2]} look={[-1.0, 1.35, -1.4]} fov={52} f={f} a={a} />
       <BathScene t={t} />
       <ElectricShower t={t} spark={0.4} />
       <Toy pose={{...idle(f), pos: BOY_SH, rotY: 0.15, rShoulder: [-0.6, 0, -0.5], lShoulder: [-0.6, 0, 0.5], rElbow: -0.8, lElbow: -0.8, brow: -0.3, smile: 0.4}} look={{hoodie: true, shoe: "#ffd21f", sole: "#2b2e3b"}} headExtra={hat ? <HardHat /> : <ShowerCap />} />
@@ -428,7 +428,7 @@ const S19: React.FC<ShotProps> = ({f, a, t}) => {
   const ff = f >= POR10;
   return (
     <>
-      <Cam pos={[-0.55, 1.65, 2.5]} look={[-0.9, 1.45, -1.4]} fov={52} f={f} a={a} />
+      <Cam pos={[-1.0, 1.65, 2.5]} look={[-1.0, 1.45, -1.4]} fov={52} f={f} a={a} />
       <BathScene t={t} steam={0.3} />
       <ElectricShower t={t} spark={1} heat={0.4} />
       <SteamJet p={[SHOWER_P[0], SHOWER_P[1] - 0.05, SHOWER_P[2] + 0.2]} k={0.35} t={t} spread={0.4} />
@@ -458,7 +458,7 @@ const S21: React.FC<ShotProps> = ({f, a, t}) => {
   const py = lerp(1.25, 1.66, peek);
   return (
     <>
-      <Cam pos={[0.35, 2.15, 1.5]} look={[WINDOW_B[0], WINDOW_B[1] - 0.15, WINDOW_B[2]]} fov={44} f={f} a={a} />
+      <Cam pos={[WINDOW_B[0], 2.15, 1.5]} look={[WINDOW_B[0], WINDOW_B[1] - 0.15, WINDOW_B[2]]} fov={44} f={f} a={a} />
       <BathScene t={t} dark={1} />
       <ElectricShower t={t} />
       <Poraque p={{pos: [WINDOW_B[0], py, WINDOW_B[2] - 0.62], rotY: 0, t, blink: blinkCurve(f + 17), s: 1.0, smile: 1, helmet: true, look: [0, -0.2], glow: 0.15, wiggle: 0.3}} />

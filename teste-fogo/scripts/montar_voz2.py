@@ -41,6 +41,9 @@ def bounds(x, path, cache, toks):
     pairs = [(i1 + d, j1 + d) for op, i1, i2, j1, j2 in m.get_opcodes() if op == "equal" or (op == "replace" and i2 - i1 == j2 - j1) for d in range(i2 - i1)]
     first = sw[pairs[0][1]] if pairs else sw[0]
     lastw = sw[max(j for _, j in pairs)] if pairs else sw[-1]
+    # se as últimas palavras do roteiro não casaram (ex.: "poraquê" ouvido como "por aqui"), vai até a última palavra ouvida
+    if pairs and max(i for i, _ in pairs) < len(A) - 1 and max(j for _, j in pairs) < len(B) - 1:
+        lastw = sw[-1]
     n = SR // 100
     fr = x[: len(x) // n * n].reshape(-1, n)
     db = 20 * np.log10(np.sqrt((fr ** 2).mean(1)) + 1e-9)
