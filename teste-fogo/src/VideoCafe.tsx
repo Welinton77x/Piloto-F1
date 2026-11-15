@@ -9,7 +9,9 @@ import {Post} from "./Post";
 import {fontFamily} from "./Video";
 import {Sky, SunLight, Town, Tree, Bus, V3} from "./Sets5";
 import {Pigeon} from "./Sets6";
-import {Dog, sm} from "./Sets9";
+import {Dog, sm, DizzyStars} from "./Sets9";
+import {Cap} from "./Sets15";
+import {Shades} from "./Sets11";
 import {DadHead} from "./Sets12";
 import {BigPhone, HeadGlasses, PilotCap} from "./Sets17";
 import {Granny} from "./Sets18";
@@ -610,32 +612,54 @@ const S15: React.FC<ShotProps> = ({f, a, t}) => {
 };
 
 /* =================== 21:00 — a cafeína acaba =================== */
-const FALL = 0.82;
+/** cabeça bate na mesa: o boneco tomba a partir dos pés e para quando a testa encosta no tampo */
+const HIT = 0.66;
+const PIVZ = -1.15;
+const PLATE: V3 = [-0.55, 0.84, -0.15];
+const fallAngle = (f: number) => {
+  const t0 = FRA16 + 14;
+  if (f < t0) return 0;
+  const k = clamp((f - t0) / 8);
+  if (k < 1) return HIT * k * k;
+  const b = f - t0 - 8;
+  return b < 8 ? HIT - 0.1 * Math.sin((b / 8) * Math.PI) * (1 - b / 8) : HIT;
+};
+const KnockedOut: React.FC<{f: number; t: number; ang: number; zzz?: boolean}> = ({f, t, ang, zzz}) => (
+  <>
+    <group position={[0, 0, PIVZ]} rotation={[ang, 0, 0]}>
+      <Toy pose={{pos: [0, 0, 0], rotY: 0, blink: 1, mouthOpen: 0.5, rShoulder: [-0.4, 0.2, -0.25], rElbow: -0.3, lShoulder: [-0.4, -0.2, 0.25], lElbow: -0.3}} look={BOY} />
+    </group>
+    <DizzyStars p={[0, 1.55, PIVZ + 1.05]} k={1} t={t} />
+    {zzz && null}
+  </>
+);
 const S16: React.FC<ShotProps> = ({f, a, t}) => {
   const frozen = f >= FRA16 + 4;
-  const fall = easeInOut(ramp(f, FRA16 + 14, FRA16 + 24));
-  const splat = ramp(f, FRA16 + 22, FRA16 + 30);
+  const ang = fallAngle(f);
+  const hit = f >= FRA16 + 22;
   return (
     <>
-      {f < FRA16 + 12 ? <Cam pos={[1.9, 1.55, 2.4]} look={[0.0, 1.05, -0.3]} fov={50} f={f} a={a} /> : <Cam pos={[3.3, 1.4, 0.15]} look={[0, 0.95, 0.15]} fov={50} f={f} a={FRA16 + 12} />}
+      {f < FRA16 + 12 ? <Cam pos={[1.9, 1.55, 2.4]} look={[0.0, 1.05, -0.4]} fov={50} f={f} a={a} /> : <Cam pos={[3.3, 1.4, -0.15]} look={[0, 1.0, -0.15]} fov={50} f={f} a={FRA16 + 12} />}
       <KitchenLights night />
       <CafeKitchen h={21} m={0} night />
-      <DinnerPlate p={[0, 0.84, 0.15]} splat={splat} />
-      <group position={[0, 0, -0.85]} rotation={[fall * FALL, 0, 0]}>
-        <Toy pose={{...idle(frozen ? FRA16 + 4 : f), pos: [0, 0, 0], rotY: 0, mouthOpen: frozen ? 0.5 : 0.2 + 0.4 * Math.abs(Math.sin(t * 12)), blink: fall > 0.5 ? 1 : 0, eyeWide: frozen ? 0.3 : 0.6, rShoulder: frozen ? [-1.0, 0.3, -0.2] : [-1.0 + 0.4 * Math.sin(t * 8), 0.3, -0.2], rElbow: -1.0}} look={BOY} />
-      </group>
+      <DinnerPlate p={PLATE} />
+      {hit ? (
+        <KnockedOut f={f} t={t} ang={ang} />
+      ) : (
+        <group position={[0, 0, PIVZ]} rotation={[ang, 0, 0]}>
+          <Toy pose={{...idle(frozen ? FRA16 + 4 : f), pos: [0, 0, 0], rotY: 0, mouthOpen: frozen ? 0.5 : 0.2 + 0.4 * Math.abs(Math.sin(t * 12)), blink: ang > 0.3 ? 1 : 0, eyeWide: frozen ? 0.3 : 0.6, rShoulder: frozen ? [-1.0, 0.3, -0.2] : [-1.0 + 0.4 * Math.sin(t * 8), 0.3, -0.2], rElbow: -1.0}} look={BOY} />
+        </group>
+      )}
     </>
   );
 };
 const S17: React.FC<ShotProps> = ({f, a, t}) => (
   <>
-    <Cam pos={[3.3, 1.4, 0.15]} look={[0, 0.95, 0.15]} fov={50} f={f} a={a} punch={0} />
+    <Cam pos={[3.3, 1.4, -0.15]} look={[0, 1.0, -0.15]} fov={50} f={f} a={a} punch={0} />
     <KitchenLights night />
     <CafeKitchen h={21} m={1} night />
-    <DinnerPlate p={[0, 0.84, 0.15]} splat={1} />
-    <group position={[0, 0, -0.85]} rotation={[FALL, 0, 0]}>
-      <Toy pose={{pos: [0, 0, 0], rotY: 0, blink: 1, mouthOpen: 0.5, rShoulder: [-1.0, 0.3, -0.2], rElbow: -1.0}} look={BOY} />
-    </group>
+    <DinnerPlate p={PLATE} />
+    <KnockedOut f={f} t={t} ang={HIT} />
   </>
 );
 
@@ -645,28 +669,37 @@ const S18: React.FC<ShotProps> = ({f, a, t}) => {
   const mug = easeOut(ramp(f, XICARA18 - 2, XICARA18 + 8));
   return (
     <>
-      <Cam pos={[0, 1.55, 3.0]} look={[0.15, 1.3, -0.4]} fov={50} f={f} a={a} />
+      <Cam pos={[0, 1.55, 3.0]} look={[0.15, 1.3, -0.5]} fov={50} f={f} a={a} />
       <KitchenLights />
       <CafeKitchen h={9} m={0} />
-      <DinnerPlate p={[0, 0.84, 0.15]} splat={1} />
-      <group position={[0, 0, -0.85]} rotation={[lift * FALL, 0, 0]}>
+      <DinnerPlate p={PLATE} />
+      <group position={[0, 0, PIVZ]} rotation={[lift * HIT, 0, 0]}>
         <Toy pose={{...idle(f), pos: [0, 0, 0], rotY: 0, blink: lift > 0.5 ? 1 : f >= XICARA18 ? 0 : blinkCurve(f), eyeWide: f >= XICARA18 + 6 ? 1 : 0, mouthOpen: f >= XICARA18 + 6 ? 0.4 : 0, head: f >= XICARA18 + 6 ? [0, -0.5, 0] : [0, 0, 0]}} look={BOY} />
       </group>
-      {mug > 0 && <Mug p={[0.55, 0.83, 0.2]} s={1.6 * mug} t={t} />}
-      {mug > 0 && mug < 1 && <Sparkles p={[0.55, 0.85, 0.2]} t={t} spread={0.3} n={6} />}
+      {mug > 0 && <Mug p={[-0.45, 0.83, 0.05]} s={1.6 * mug} t={t} />}
+      {mug > 0 && mug < 1 && <Sparkles p={[-0.45, 0.85, 0.05]} t={t} spread={0.3} n={6} />}
     </>
   );
 };
-/* final: a garrafa térmica */
-const S19: React.FC<ShotProps> = ({f, a, t}) => (
-  <>
-    <Cam pos={[0, 1.5, 3.3]} look={[0, 1.4, -0.4]} fov={52} f={f} a={a} />
-    <KitchenLights />
-    <CafeKitchen h={9} m={1} />
-    <Toy pose={{...idle(f), pos: [-0.25, 0, BOYZ], rotY: 0.2, rShoulder: [-1.4, 0.9, 0.1], rElbow: -0.3, smile: 1, brow: -0.6}} look={BOY} />
-    <Thermos p={[0.5, 0.83, -0.1]} r={[0, -0.4, 0]} s={1.7} />
-  </>
-);
+/* final: outra pessoa chega com a garrafa térmica */
+const MOCO: ToyLook = {shirt: "#ff8a1f", pants: "#3a3f4a", hairStyle: "buzz", hair: "#2a1a10", skin: "#c98f62"};
+const S19: React.FC<ShotProps> = ({f, a, t}) => {
+  const k = easeOut(ramp(f, a + 4, a + 34));
+  return (
+    <>
+      <Cam pos={[0.35, 1.5, 3.9]} look={[0.35, 1.3, -0.4]} fov={54} f={f} a={a} />
+      <KitchenLights />
+      <CafeKitchen h={9} m={1} />
+      <Toy pose={{...idle(f), pos: [-0.45, 0, BOYZ], rotY: 0.5, eyeWide: k > 0.5 ? 1 : 0.3, mouthOpen: k > 0.5 ? 0.7 : 0, brow: k > 0.5 ? 1 : 0, ...(k > 0.5 ? ARMS_UP : {})}} look={BOY} />
+      <HandToy
+        pose={{...idle(f + 7), pos: [lerp(3.4, 0.85, k), 0, 0.2], rotY: -0.55, walk: t * 8, walkAmt: k < 1 ? 1 : 0, rShoulder: [-0.55, 0.3, 0.05], rElbow: -0.9, smile: 1, brow: -0.7}}
+        look={MOCO}
+        headExtra={<><Cap color="#101018" /><Shades /></>}
+        item={<Thermos p={[0, 0.02, 0.1]} r={MUG_R} s={0.85} />}
+      />
+    </>
+  );
+};
 
 /* ---------- lista de cenas ---------- */
 const SHOTS: Shot[] = [
@@ -887,7 +920,7 @@ export const VideoCafe: React.FC = () => {
       <Ono from={FITA14 + 6} to={L(15) - 2} text="BOING!" color="#ffffff" />
       <Ono from={VIBRA15} to={L(16) - 2} text="BZZZZZ!" />
       <Battery from={FRA16 + 4} to={FRA16 + 22} />
-      <Ono from={FRA16 + 24} to={L(17) - 2} text="PLOFT!" color="#f6dc8a" />
+      <Ono from={FRA16 + 22} to={L(17) - 2} text="POC!" color="#ffffff" />
       <FastFwd from={L(18)} to={ACORDA18 + 20} text="DIA SEGUINTE" />
 
       <Captions words={words} keys={KEYS} />
@@ -928,7 +961,7 @@ export const VideoCafe: React.FC = () => {
       <SND src="sfx16/buzz.mp3" from={VIBRA15} dur={50} v={FXV * 0.6} />
       <SND src="sfx16/buzz.mp3" from={VIBRA15 + 50} dur={50} v={FXV * 0.6} />
       <SND src="sfx8/poweroff.mp3" from={FRA16 + 4} dur={30} v={FXV * 0.4} />
-      <SND src="sfx9/splat.mp3" from={FRA16 + 23} dur={25} v={FXV * 0.25} />
+      <SND src="sfx10/bonk.mp3" from={FRA16 + 21} dur={25} v={FXV * 0.4} />
       <SND src="sfx7/snore.mp3" from={L(17) + 6} dur={L(18) - L(17)} v={FXV * 0.3} />
       <SND src="sfx4/clocks.mp3" from={L(18)} dur={30} v={FXV * 0.25} />
       <SND src="sfx12/poof.mp3" from={XICARA18 - 2} dur={25} v={FXV * 0.35} />
