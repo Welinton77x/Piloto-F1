@@ -899,10 +899,10 @@ export const VideoCafe: React.FC = () => {
         <SND key={"w" + c} src="sfx7/whoosh.mp3" from={c - 3} dur={25} v={FXV * 0.15} />
       ))}
       {TITLES.map(([x]) => (
-        <SND key={"t" + x} src="sfx12/tada.mp3" from={x + 4} dur={40} v={FXV * 0.3} />
+        <SND key={"t" + x} src="sfx12/tada.mp3" from={x + 4} dur={40} v={FXV * 0.2} />
       ))}
       <SND src="sfx10/tick.mp3" from={4} dur={NOVE0} v={FXV * 0.35} />
-      <SND src="sfx16/glup.mp3" from={GOLE1} dur={15} v={FXV * 0.6} />
+      <SND src="sfx16/glup.mp3" from={GOLE1} dur={15} v={FXV * 0.35} />
       <SND src="sfx14/zap.mp3" from={OLHO1} dur={30} v={FXV * 0.3} />
       <SND src="sfx12/poof.mp3" from={CEREBRO1} dur={25} v={FXV * 0.3} />
       <SND src="sfx14/papel.mp3" from={PISCA2 + 2} dur={25} v={FXV * 0.4} />
@@ -928,7 +928,7 @@ export const VideoCafe: React.FC = () => {
       <SND src="sfx16/buzz.mp3" from={VIBRA15} dur={50} v={FXV * 0.6} />
       <SND src="sfx16/buzz.mp3" from={VIBRA15 + 50} dur={50} v={FXV * 0.6} />
       <SND src="sfx8/poweroff.mp3" from={FRA16 + 4} dur={30} v={FXV * 0.4} />
-      <SND src="sfx9/splat.mp3" from={FRA16 + 23} dur={25} v={FXV * 0.5} />
+      <SND src="sfx9/splat.mp3" from={FRA16 + 23} dur={25} v={FXV * 0.25} />
       <SND src="sfx7/snore.mp3" from={L(17) + 6} dur={L(18) - L(17)} v={FXV * 0.3} />
       <SND src="sfx4/clocks.mp3" from={L(18)} dur={30} v={FXV * 0.25} />
       <SND src="sfx12/poof.mp3" from={XICARA18 - 2} dur={25} v={FXV * 0.35} />
