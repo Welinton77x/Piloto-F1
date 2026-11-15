@@ -387,11 +387,28 @@ export const BigJet: React.FC<{p: V3; s?: number; children?: React.ReactNode}> =
       </mesh>
       {children}
       {/* asa e cauda */}
-      <mesh position={[0.2, -0.35, 1.2]} rotation={[0, -0.35, 0]} geometry={rbox(1.6, 0.1, 3.0, 0.03)} material={white} castShadow />
+      {[-1, 1].map((sd) => (
+        <group key={sd}>
+          <mesh position={[0.2, -0.35, 1.45 * sd]} rotation={[0, -0.35 * sd, 0]} geometry={rbox(1.6, 0.1, 3.0, 0.03)} material={white} castShadow />
+          {/* turbina embaixo da asa */}
+          <group position={[0.75, -0.75, 1.35 * sd]}>
+            <mesh rotation={[0, 0, Math.PI / 2]} material={sm("#c9ced6", 0.35, {metalness: 0.4})} castShadow>
+              <cylinderGeometry args={[0.32, 0.28, 1.1, 18]} />
+            </mesh>
+            <mesh position={[0.56, 0, 0]} rotation={[0, Math.PI / 2, 0]} material={sm("#2a2d33", 0.4)}>
+              <circleGeometry args={[0.27, 18]} />
+            </mesh>
+            <mesh position={[0.58, 0, 0]} rotation={[0, Math.PI / 2, 0]} material={sm("#8c919b", 0.3, {metalness: 0.6})}>
+              <circleGeometry args={[0.08, 10]} />
+            </mesh>
+            <mesh position={[0.1, 0.32, 0]} material={sm("#c9ced6", 0.35)}>
+              <boxGeometry args={[0.5, 0.12, 0.08]} />
+            </mesh>
+          </group>
+        </group>
+      ))}
       <mesh position={[-3.9, 1.2, 0]} rotation={[0, 0, 0.4]} geometry={rbox(1.2, 1.7, 0.12, 0.03)} material={blue} castShadow />
-      <mesh position={[0.6, -0.95, 1.2]} rotation={[0, 0, Math.PI / 2]} material={sm("#c9ced6", 0.4)}>
-        <cylinderGeometry args={[0.35, 0.3, 1.2, 14]} />
-      </mesh>
+
     </group>
   );
 };

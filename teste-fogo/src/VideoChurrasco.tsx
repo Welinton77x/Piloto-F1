@@ -7,7 +7,7 @@ import type {Pose} from "./Boy";
 import {Toy, ToyLook} from "./Toy";
 import {Post} from "./Post";
 import {fontFamily} from "./Video";
-import {Sky, SunLight, Town, V3} from "./Sets5";
+import {Sky, SunLight, Town, Tree, House, Sea, V3} from "./Sets5";
 import {Dog, sm, rbox, RoomShell, TV} from "./Sets9";
 import {Shades} from "./Sets11";
 import {DadHead} from "./Sets12";
@@ -15,8 +15,9 @@ import {Umbrella, FireTruck, FireHelmet, SunFace} from "./Sets13";
 import {Scooter} from "./Sets8";
 import {Airliner, HeadGlasses} from "./Sets17";
 import {Granny} from "./Sets18";
-import {SkyClouds, Yard} from "./Sets19";
-import {Bg, Grill, CoalBag, Skewer, Sausage, SausageRain, Volcano, VolcanoLand, CraterRim, Boat, Water, ZipLine, forecastTex, Baguette, VinaigretteJar, ExcavatorArm, GiantSteak, EarthBall, OrbitRing, LongTable, Hammock, FarofaHill, BigSpoon} from "./Sets20";
+import {SkyClouds, Yard, BigJet} from "./Sets19";
+import {PlaneCabin} from "./Sets16";
+import {Bg, Grill, CoalBag, Skewer, Sausage, SausageRain, Volcano, VolcanoLand, CraterRim, Boat, Water, ZipLine, forecastTex, Baguette, VinaigretteJar, ExcavatorArm, GiantSteak, EarthBall, OrbitRing, LongTable, Hammock, FarofaHill, BigSpoon, BlackCat, SpeedBoat, Island, Gull, Dolphin, Buoy, Ship} from "./Sets20";
 import {Captions, StageTitle, Confetti, Wd, clean} from "./Overlays";
 import {FPS, clamp, lerp, ramp, pop, easeInOut, easeOut, canvasTex, rng} from "./util";
 import W from "./timingChurrasco.json";
@@ -178,10 +179,27 @@ const SKEW_R: V3 = [Math.PI / 2, 0, 0];
 const Backyard: React.FC<{f: number; t: number; volcano?: number}> = ({f, t, volcano = 1}) => (
   <>
     <DayOut />
-    <Yard />
+    {/* bairro ao fundo: a rua e as casas ficam atrás do quintal */}
+    <group position={[0, 0, -9]}>
+      <Town t={t} galo={false} variant="nova" flat clouds />
+    </group>
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.005, 0]} material={sm("#7fcf5a", 0.95)} receiveShadow>
+      <planeGeometry args={[30, 12]} />
+    </mesh>
+    {/* a casa do menino */}
+    <House p={[-2.8, 0, -3.4]} w={3.4} h={2.7} d={3} wall="#ffd166" roof="#e8414f" />
+    {Array.from({length: 12}, (_, i) => (
+      <mesh key={i} position={[-0.6 + i * 0.5, 0.45, -3.0]} material={sm("#f2efe6", 0.7)} castShadow>
+        <boxGeometry args={[0.12, 0.9, 0.06]} />
+      </mesh>
+    ))}
+    <mesh position={[2.15, 0.65, -3.02]} material={sm("#f2efe6", 0.7)}>
+      <boxGeometry args={[5.6, 0.07, 0.05]} />
+    </mesh>
+    <Tree p={[2.6, 0, -1.6]} s={1.5} />
     <Grill p={[-0.95, 0, -0.9]} />
     <CoalBag p={[-1.9, 0, -0.4]} />
-    {volcano > 0 && <Volcano p={[5, 0, -40]} s={2.2} t={t} />}
+    {volcano > 0 && <Volcano p={[6, 0, -60]} s={4.5} t={t} />}
   </>
 );
 const S0: React.FC<ShotProps> = ({f, a, t}) => {
@@ -194,32 +212,49 @@ const S0: React.FC<ShotProps> = ({f, a, t}) => {
     </>
   );
 };
-/* avião → barco → tirolesa → cratera */
+/* avião (com turbinas) → embarcado na poltrona → mapa → barco → tirolesa → cratera */
+const CABIN1 = L(1) + 15;
+const MAP1 = L(1) + 31;
 const S1a: React.FC<ShotProps> = ({f, a, t}) => {
-  const s = (f - a) / FPS;
-  const x = s * 6;
+  const s2 = (f - a) / FPS;
+  const x = s2 * 5;
   return (
     <>
-      <Cam pos={[x + 0.5, 1.3, 7.5]} look={[x, 0.9, 0]} fov={54} f={f} a={a} punch={4} />
+      <Cam pos={[x + 5.2, 0.1, 6.4]} look={[x + 0.6, 0.85, 0]} fov={54} f={f} a={a} punch={4} />
       <SkyClouds x={x} />
       <hemisphereLight args={["#ffffff", "#9fc8ff", 1.2]} />
       <directionalLight position={[4, 8, 6]} intensity={2.2} />
-      <Airliner p={[x, 0, 0]} r={[0, Math.PI / 2, 0]} s={1.3} />
-      <HandToy pose={{...idle(f), pos: [x + 0.4, 0.62, 0], rotY: 0.6, legLift: 1, ...HOLD, smile: 1}} look={BOY} item={<Skewer p={[0, 0.02, 0.06]} r={SKEW_R} s={1.2} />} />
+      <BigJet p={[x, 1.0, -0.4]} s={0.75} />
     </>
   );
 };
+const S1a2: React.FC<ShotProps> = ({f, a, t}) => (
+  <>
+    <Cam pos={[0.45, 1.3, 3.0]} look={[0.35, 1.0, -0.3]} fov={50} f={f} a={a} />
+    <hemisphereLight args={["#ffffff", "#606878", 1.0]} />
+    <pointLight position={[0.5, 2.6, 1.5]} intensity={8} distance={8} decay={1.4} castShadow />
+    <PlaneCabin t={t} />
+    <HandToy pose={{...idle(f), pos: [0, -0.27, 0.05], rotY: 0, legLift: 1, ...HOLD, smile: 1, eyeWide: 0.4}} look={BOY} item={<Skewer p={[0, 0.02, 0.06]} r={SKEW_R} s={1.0} />} />
+  </>
+);
 const S1b: React.FC<ShotProps> = ({f, a, t}) => {
-  const s = (f - a) / FPS;
-  const x = s * 3;
+  const s2 = (f - a) / FPS;
+  const x = s2 * 4;
   return (
     <>
-      <Cam pos={[x + 0.8, 1.7, 5.2]} look={[x, 1.0, 0]} fov={54} f={f} a={a} punch={4} />
-      <Water t={t} />
+      <Cam pos={[x + 1.2, 2.2, 7.4]} look={[x + 0.2, 1.0, 0]} fov={56} f={f} a={a} punch={4} />
+      <Sky />
       <hemisphereLight args={["#ffffff", "#5a8aa8", 1.1]} />
       <directionalLight position={[4, 8, 6]} intensity={2.2} castShadow />
-      <Boat p={[x, 0, 0]} t={t} />
-      <HandToy pose={{...idle(f), pos: [x + 0.6, 0.55, 0], rotY: Math.PI / 2, rShoulder: [-1.6, 0, -0.1], rElbow: -0.2, smile: 1}} look={BOY} item={<Skewer p={[0, 0.02, 0.06]} r={SKEW_R} s={1.2} />} />
+      <Sea t={t} y={0} z={0} />
+      <SpeedBoat p={[x, 0, 0]} t={t} s={0.85} />
+      <HandToy pose={{...idle(f), pos: [x + 0.75, 0.62, 0], rotY: Math.PI / 2, rShoulder: [-1.6, 0, -0.1], rElbow: -0.2, smile: 1}} look={BOY} item={<Skewer p={[0, 0.02, 0.06]} r={SKEW_R} s={1.2} />} />
+      <Island p={[x - 6, 0, -9]} s={1.3} />
+      <Island p={[x + 9, 0, -14]} s={1.8} />
+      <Ship p={[x + 3, 0, -22]} s={1.2} />
+      <Buoy p={[x + 3.0, 0, 1.8]} t={t} />
+      <Dolphin p={[x - 1.6, 0, 2.2]} t={t} s={1.0} />
+      {[0, 1, 2].map((i) => <Gull key={i} p={[x - 1 + i * 1.1 + Math.sin(t + i) * 0.3, 3.2 + i * 0.3, -1.5 - i]} t={t + i} s={1.4} />)}
     </>
   );
 };
@@ -345,6 +380,12 @@ const S7b: React.FC<ShotProps> = ({f, a, t}) => {
         const col = (i % 4) - 1.5;
         const z = -6 + row * 1.6 + ((s * 4.5) % 1.6);
         return <Dog key={i} d={{pos: [col * 0.95 + (row % 2) * 0.3, 0, z], rotY: 0, walk: 1, run: 3, t: t + i * 0.21, tail: 1, tongue: 0.7, mouth: 0.3}} />;
+      })}
+      {/* gatos pretos de olhos amarelos no meio da correria */}
+      {Array.from({length: 7}, (_, i) => {
+        const row = Math.floor(i / 3);
+        const z = -5.2 + row * 1.6 + ((s * 4.5 + 0.8) % 1.6);
+        return <BlackCat key={"g" + i} p={[-1.4 + (i % 3) * 1.4 + (row % 2) * 0.45, 0, z]} rotY={0} t={t + i * 0.3} run={1} s={1.5} />;
       })}
     </>
   );
@@ -530,6 +571,8 @@ const S15: React.FC<ShotProps> = ({f, a, t}) => (
 const SHOTS: Shot[] = [
   {from: 0, Comp: S0},
   {from: L(1), Comp: S1a},
+  {from: CABIN1, Comp: S1a2},
+  {from: MAP1, Comp: Blank},
   {from: BARCO1 - 3, Comp: S1b},
   {from: TIROLESA1 - 3, Comp: S1c},
   {from: CRATERA1 - 6, Comp: S1d},
@@ -622,6 +665,39 @@ const FastFwd: React.FC<{from: number; to: number; text: string}> = ({from, to, 
 const BR: [number, number][] = [[-73.9, -7.3], [-70, -4], [-69.9, 1.7], [-64, 2], [-60, 4.5], [-60, 5.2], [-56, 2], [-51.6, 4.3], [-50, 1.8], [-48, -1.4], [-44.5, -2.6], [-41, -2.9], [-38, -3.7], [-35.2, -5.5], [-34.8, -7.5], [-35.3, -9.5], [-37.5, -12], [-39, -14.8], [-39.2, -17.7], [-40.7, -21.5], [-42, -23], [-44.6, -23.3], [-47, -24.5], [-48.5, -26.2], [-48.6, -28.5], [-50, -30.5], [-52, -32.5], [-53.4, -33.7], [-53.6, -31.8], [-55.6, -30.8], [-57.6, -30.2], [-56, -28], [-54.6, -25.6], [-54.3, -24], [-55.5, -23.9], [-57.8, -22.1], [-58, -20], [-57.5, -18], [-60.2, -16.3], [-60.4, -13.8], [-62, -12.8], [-65, -11.8], [-65.3, -9.8], [-68, -10.7], [-70.6, -11], [-72.5, -9.5]];
 const projBR = (lon: number, lat: number): [number, number] => [100 + (lon + 75) * 22, 330 + (6 - lat) * 22];
 
+const CONTS: [number, number][][] = [
+  [[-168, 66], [-140, 70], [-95, 72], [-80, 63], [-60, 55], [-55, 48], [-70, 43], [-76, 35], [-81, 25], [-97, 26], [-105, 20], [-90, 15], [-83, 9], [-78, 8], [-92, 15], [-105, 22], [-117, 32], [-124, 40], [-124, 48], [-135, 58], [-150, 60], [-165, 60]],
+  [[-78, 8], [-60, 10], [-50, 0], [-35, -6], [-40, -22], [-48, -28], [-58, -35], [-65, -42], [-68, -52], [-72, -50], [-74, -40], [-71, -30], [-70, -18], [-76, -12], [-81, -5], [-80, 0]],
+  [[-10, 36], [-9, 43], [-2, 44], [-5, 48], [2, 51], [8, 54], [10, 58], [5, 62], [14, 67], [25, 71], [40, 68], [45, 55], [40, 45], [28, 41], [22, 38], [15, 40], [12, 44], [5, 43], [0, 38]],
+  [[-17, 15], [-17, 21], [-10, 30], [-5, 36], [10, 37], [20, 32], [32, 31], [35, 28], [43, 12], [51, 11], [42, 0], [40, -15], [35, -25], [20, -35], [15, -28], [12, -15], [9, -1], [8, 4], [-8, 4], [-13, 8]],
+  [[40, 45], [45, 55], [40, 68], [60, 70], [80, 73], [110, 77], [140, 72], [170, 68], [180, 65], [160, 58], [140, 52], [135, 43], [128, 35], [121, 30], [120, 22], [108, 20], [105, 10], [100, 13], [98, 8], [100, 2], [95, 15], [90, 22], [80, 15], [77, 8], [72, 20], [66, 25], [57, 25], [52, 27], [48, 30], [35, 32], [35, 37]],
+  [[130, 31], [135, 34], [140, 36], [142, 40], [141, 44], [145, 44], [141, 38], [136, 33]],
+  [[114, -22], [122, -18], [130, -12], [137, -12], [142, -11], [146, -18], [153, -26], [150, -37], [140, -38], [131, -32], [115, -34]],
+  [[-180, -68], [-120, -72], [-60, -64], [0, -70], [60, -67], [120, -66], [180, -68], [180, -80], [-180, -80]],
+];
+const projW = (lon: number, lat: number): [number, number] => [540 + lon * 2.85, 760 - lat * 3.3];
+const PlaneMap: React.FC<{from: number; to: number}> = ({from, to}) => {
+  const f = useCurrentFrame();
+  if (f < from || f > to) return null;
+  const A = projW(-46.6, -23.5), B = projW(-155.5, 19.5);
+  const cx = (A[0] + B[0]) / 2, cy = Math.min(A[1], B[1]) - 260;
+  const k = easeInOut(clamp((f - from - 2) / (to - from - 6)));
+  const px = (1 - k) * (1 - k) * A[0] + 2 * (1 - k) * k * cx + k * k * B[0];
+  const py = (1 - k) * (1 - k) * A[1] + 2 * (1 - k) * k * cy + k * k * B[1];
+  return (
+    <AbsoluteFill style={{background: "#7fc8ff"}}>
+      <svg width={1080} height={1920}>
+        {CONTS.map((pts, i) => (
+          <path key={i} d={pts.map(([lo, la], q) => `${q ? "L" : "M"} ${projW(lo, la)[0].toFixed(0)} ${projW(lo, la)[1].toFixed(0)}`).join(" ") + " Z"} fill={i === 7 ? "#f4f8fc" : "#ffc35a"} stroke="#c9822a" strokeWidth={4} strokeLinejoin="round" />
+        ))}
+        <path d={`M ${A[0]} ${A[1]} Q ${cx} ${cy} ${B[0]} ${B[1]}`} fill="none" stroke="#ffffff" strokeWidth={7} strokeDasharray="16 12" />
+      </svg>
+      <div style={{position: "absolute", left: A[0], top: A[1], transform: "translate(-50%,-100%)", fontSize: 70}}>🏠</div>
+      <div style={{position: "absolute", left: B[0], top: B[1], transform: "translate(-50%,-100%)", fontSize: 80}}>🌋</div>
+      <div style={{position: "absolute", left: px, top: py, transform: `translate(-50%,-50%) rotate(${-150 + 60 * k}deg)`, fontSize: 100}}>✈️</div>
+    </AbsoluteFill>
+  );
+};
 const MapDogs: React.FC<{from: number; to: number}> = ({from, to}) => {
   const f = useCurrentFrame();
   if (f < from || f > to) return null;
@@ -700,7 +776,8 @@ export const VideoChurrasco: React.FC = () => {
       <Ono from={4} to={VULCAO0 - 4} text="?" x={540} y={470} size={200} color="#ffd21f" rot={8} />
       <Tag from={at(0, "carvao") + 2} to={VULCAO0 - 3} text="SEM CARVÃO" />
       <Ono from={VULCAO0 + 4} to={L(1) - 2} text="!" x={540} y={470} size={220} color="#ff5a3a" rot={-6} />
-      <FastFwd from={L(1) + 2} to={CRATERA1 - 8} text="ATÉ O VULCÃO" />
+      <PlaneMap from={MAP1} to={BARCO1 - 4} />
+      <FastFwd from={BARCO1} to={CRATERA1 - 8} text="ATÉ O VULCÃO" />
       <BigNum from={DOIS2} to={CHEIRO2 - 5} text="2 SEG" size={160} />
       <Ono from={DOIS2 + 2} to={CHEIRO2 - 5} text="TSSSS!" y={640} size={110} color="#ffffff" />
       <Ono from={ERUPCAO4} to={FRANGO4 - 3} text="BUUUM!" color="#ff8a1f" />

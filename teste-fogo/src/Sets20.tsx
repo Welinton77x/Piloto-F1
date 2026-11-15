@@ -494,3 +494,193 @@ export const BigSpoon: React.FC<{p?: V3; r?: V3; s?: number}> = ({p = [0, 0, 0],
     </mesh>
   </group>
 );
+
+/* ---------- gato preto de olhos amarelos (normal) ---------- */
+export const BlackCat: React.FC<{p: V3; rotY?: number; s?: number; t?: number; run?: number}> = ({p, rotY = 0, s = 1, t = 0, run = 0}) => {
+  const fur = sm("#141418", 0.7);
+  const eye = sm("#ffd21f", 0.2, {emissive: "#ffc400", emissiveIntensity: 0.9});
+  const ph = t * 14;
+  const bob = run ? Math.abs(Math.sin(ph)) * 0.05 : 0;
+  return (
+    <group position={[p[0], p[1] + bob, p[2]]} rotation={[0, rotY, 0]} scale={s}>
+      <mesh position={[0, 0.3, 0]} scale={[0.15, 0.14, 0.3]} material={fur} castShadow>
+        <sphereGeometry args={[1, 16, 12]} />
+      </mesh>
+      <group position={[0, 0.45, 0.3]}>
+        <mesh scale={[0.13, 0.12, 0.12]} material={fur} castShadow>
+          <sphereGeometry args={[1, 16, 12]} />
+        </mesh>
+        {[-1, 1].map((sd) => (
+          <group key={sd}>
+            <mesh position={[0.075 * sd, 0.12, -0.01]} rotation={[0, 0, -0.25 * sd]} material={fur}>
+              <coneGeometry args={[0.045, 0.1, 4]} />
+            </mesh>
+            <mesh position={[0.05 * sd, 0.02, 0.105]} scale={[0.032, 0.035, 0.015]} material={eye}>
+              <sphereGeometry args={[1, 10, 8]} />
+            </mesh>
+            <mesh position={[0.05 * sd, 0.02, 0.118]} scale={[0.008, 0.028, 0.006]} material={sm("#000000", 0.3)}>
+              <sphereGeometry args={[1, 6, 6]} />
+            </mesh>
+          </group>
+        ))}
+        <mesh position={[0, -0.03, 0.12]} scale={[0.015, 0.01, 0.01]} material={sm("#e2607a", 0.4)}>
+          <sphereGeometry args={[1, 6, 4]} />
+        </mesh>
+      </group>
+      {(
+        [
+          [0.08, 0.18, 0],
+          [-0.08, 0.18, Math.PI],
+          [0.08, -0.18, Math.PI],
+          [-0.08, -0.18, 0],
+        ] as [number, number, number][]
+      ).map(([x, z, k], i) => (
+        <mesh key={i} position={[x, 0.12, z]} rotation={[0.7 * Math.sin(ph + k) * run, 0, 0]} material={fur}>
+          <capsuleGeometry args={[0.03, 0.16, 4, 6]} />
+        </mesh>
+      ))}
+      <mesh position={[0, 0.48, -0.36]} rotation={[-0.6 + 0.2 * Math.sin(t * 6), 0, 0]} material={fur}>
+        <capsuleGeometry args={[0.022, 0.32, 4, 6]} />
+      </mesh>
+    </group>
+  );
+};
+
+/* ---------- barco melhor: lancha com cabine, para-brisa, grade e bandeira ---------- */
+export const SpeedBoat: React.FC<{p: V3; rotY?: number; s?: number; t?: number}> = ({p, rotY = 0, s = 1, t = 0}) => {
+  const hull = sm("#ffffff", 0.35);
+  const red = sm("#e8262d", 0.4);
+  return (
+    <group position={[p[0], p[1] + 0.06 * Math.sin(t * 3), p[2]]} rotation={[0.03 * Math.sin(t * 2.4), rotY, 0.04 * Math.sin(t * 2)]} scale={s}>
+      {/* casco */}
+      <mesh position={[0, 0.35, 0]} geometry={rbox(3.4, 0.7, 1.4, 0.25)} material={hull} castShadow />
+      <mesh position={[1.75, 0.42, 0]} rotation={[0, 0, -Math.PI / 2]} scale={[1, 1, 0.7]} material={hull} castShadow>
+        <coneGeometry args={[0.7, 1.0, 4]} />
+      </mesh>
+      <mesh position={[0.2, 0.12, 0]} geometry={rbox(3.6, 0.18, 1.42, 0.08)} material={sm("#2e6fd8", 0.4)} />
+      <mesh position={[0.2, 0.55, 0.715]} material={red}>
+        <boxGeometry args={[3.2, 0.06, 0.01]} />
+      </mesh>
+      <mesh position={[0.2, 0.55, -0.715]} material={red}>
+        <boxGeometry args={[3.2, 0.06, 0.01]} />
+      </mesh>
+      {/* convés de madeira */}
+      <mesh position={[-0.1, 0.71, 0]} geometry={rbox(2.9, 0.04, 1.25, 0.02)} material={sm("#c8874a", 0.6)} />
+      {/* cabine */}
+      <mesh position={[-0.6, 1.05, 0]} geometry={rbox(1.1, 0.65, 1.1, 0.08)} material={hull} castShadow />
+      <mesh position={[-0.04, 1.12, 0]} rotation={[0, 0, -0.5]} material={sm("#7fc8ff", 0.1, {transparent: true, opacity: 0.6})}>
+        <boxGeometry args={[0.04, 0.55, 1.05]} />
+      </mesh>
+      <mesh position={[-0.6, 1.4, 0]} geometry={rbox(1.2, 0.08, 1.2, 0.03)} material={red} />
+      {/* grade */}
+      {[-0.6, 0.6].map((z) => (
+        <mesh key={z} position={[0.9, 0.98, z]} material={sm("#cfd4da", 0.25, {metalness: 0.7})}>
+          <boxGeometry args={[1.4, 0.03, 0.03]} />
+        </mesh>
+      ))}
+      {[0.3, 0.9, 1.5].flatMap((x) => [-0.6, 0.6].map((z) => (
+        <mesh key={x + "" + z} position={[x, 0.86, z]} material={sm("#cfd4da", 0.25, {metalness: 0.7})}>
+          <cylinderGeometry args={[0.015, 0.015, 0.26, 6]} />
+        </mesh>
+      )))}
+      {/* motor e bandeira */}
+      <mesh position={[-1.85, 0.6, 0]} geometry={rbox(0.35, 0.6, 0.4, 0.06)} material={sm("#1d1f27", 0.4)} castShadow />
+      <mesh position={[-1.1, 1.75, 0]} material={sm("#cfd4da", 0.3)}>
+        <cylinderGeometry args={[0.015, 0.015, 0.7, 6]} />
+      </mesh>
+      <mesh position={[-1.32, 1.95, 0]} rotation={[0, 0.2 * Math.sin(t * 6), 0]} material={sm("#2ecc71", 0.6, {side: THREE.DoubleSide})}>
+        <planeGeometry args={[0.42, 0.26]} />
+      </mesh>
+      {/* espuma da esteira */}
+      {[0, 1, 2, 3].map((i) => {
+        const q = (t * 1.5 + i / 4) % 1;
+        return (
+          <mesh key={i} position={[-2.1 - q * 2.5, 0.05, (i % 2 ? 1 : -1) * (0.3 + q * 0.6)]} rotation={[-Math.PI / 2, 0, 0]} scale={0.3 + q * 0.5}>
+            <circleGeometry args={[1, 14]} />
+            <meshBasicMaterial color="#ffffff" transparent opacity={(1 - q) * 0.7} />
+          </mesh>
+        );
+      })}
+    </group>
+  );
+};
+/* ---------- coisas do mar: ilhas, gaivotas, golfinho, boia, navio ao longe ---------- */
+export const Island: React.FC<{p: V3; s?: number}> = ({p, s = 1}) => (
+  <group position={p} scale={s}>
+    <mesh position={[0, 0.1, 0]} scale={[1, 0.3, 1]} material={sm("#f3d9a0", 0.95)}>
+      <sphereGeometry args={[1.6, 18, 10, 0, Math.PI * 2, 0, Math.PI / 2]} />
+    </mesh>
+    {[[-0.4, 0.2, 2.6], [0.5, -0.3, 2.2]].map(([x, z, h], i) => (
+      <group key={i} position={[x, 0.3, z]}>
+        <mesh position={[0, h / 2, 0]} rotation={[0, 0, 0.12 * (i ? -1 : 1)]} material={sm("#8a6a4a", 0.8)}>
+          <cylinderGeometry args={[0.06, 0.09, h, 6]} />
+        </mesh>
+        {Array.from({length: 6}, (_, k) => (
+          <mesh key={k} position={[0, h, 0]} rotation={[0.9, (k / 6) * Math.PI * 2, 0]} material={sm("#3f9a35", 0.8, {side: THREE.DoubleSide})}>
+            <coneGeometry args={[0.18, 0.9, 4, 1, true]} />
+          </mesh>
+        ))}
+      </group>
+    ))}
+  </group>
+);
+export const Gull: React.FC<{p: V3; t: number; s?: number}> = ({p, t, s = 1}) => {
+  const f = Math.sin(t * 8) * 0.5;
+  return (
+    <group position={p} scale={s}>
+      <mesh scale={[0.18, 0.08, 0.08]} material={sm("#ffffff", 0.6)}>
+        <sphereGeometry args={[1, 10, 8]} />
+      </mesh>
+      {[-1, 1].map((sd) => (
+        <mesh key={sd} position={[0, 0.02, 0.18 * sd]} rotation={[sd * f, 0, 0]} material={sm("#e6e6e6", 0.6, {side: THREE.DoubleSide})}>
+          <boxGeometry args={[0.14, 0.01, 0.36]} />
+        </mesh>
+      ))}
+      <mesh position={[0.2, 0.02, 0]} rotation={[0, 0, -Math.PI / 2]} material={sm("#f2a32b", 0.5)}>
+        <coneGeometry args={[0.025, 0.08, 6]} />
+      </mesh>
+    </group>
+  );
+};
+export const Dolphin: React.FC<{p: V3; t: number; s?: number}> = ({p, t, s = 1}) => {
+  const q = (t * 0.5) % 1;
+  const a = q * Math.PI;
+  return (
+    <group position={[p[0] + (q - 0.5) * 2, p[1] + Math.sin(a) * 1.2 - 0.3, p[2]]} rotation={[0, 0, Math.PI / 2 - a]} scale={s}>
+      <mesh scale={[0.18, 0.55, 0.16]} material={sm("#7a8fa8", 0.4)}>
+        <sphereGeometry args={[1, 14, 10]} />
+      </mesh>
+      <mesh position={[0.12, 0.05, 0]} rotation={[0, 0, -0.6]} material={sm("#7a8fa8", 0.4)}>
+        <coneGeometry args={[0.07, 0.2, 4]} />
+      </mesh>
+      <mesh position={[0, -0.55, 0]} rotation={[0, Math.PI / 2, 0]} scale={[1, 0.3, 1]} material={sm("#7a8fa8", 0.4)}>
+        <coneGeometry args={[0.18, 0.16, 3]} />
+      </mesh>
+    </group>
+  );
+};
+export const Buoy: React.FC<{p: V3; t: number}> = ({p, t}) => (
+  <group position={[p[0], p[1] + 0.05 * Math.sin(t * 2.5), p[2]]} rotation={[0.08 * Math.sin(t * 2), 0, 0]}>
+    <mesh position={[0, 0.2, 0]} material={sm("#e8262d", 0.4)}>
+      <cylinderGeometry args={[0.16, 0.25, 0.5, 14]} />
+    </mesh>
+    <mesh position={[0, 0.25, 0]} material={sm("#ffffff", 0.4)}>
+      <cylinderGeometry args={[0.2, 0.2, 0.1, 14]} />
+    </mesh>
+    <mesh position={[0, 0.6, 0]} material={sm("#ffd21f", 0.3, {emissive: "#ffd21f", emissiveIntensity: Math.floor(t * 2) % 2 ? 1.2 : 0.2})}>
+      <sphereGeometry args={[0.07, 10, 8]} />
+    </mesh>
+  </group>
+);
+export const Ship: React.FC<{p: V3; s?: number}> = ({p, s = 1}) => (
+  <group position={p} scale={s}>
+    <mesh position={[0, 0.5, 0]} geometry={rbox(6, 1.0, 1.4, 0.2)} material={sm("#c0392b", 0.5)} />
+    <mesh position={[-1.5, 1.3, 0]} geometry={rbox(1.6, 0.8, 1.2, 0.08)} material={sm("#ffffff", 0.5)} />
+    {[0, 1.3].map((x) => (
+      <mesh key={x} position={[x, 1.2, 0]} geometry={rbox(1.1, 0.6, 1.1, 0.04)} material={sm(x ? "#2e86de" : "#ffd21f", 0.6)} />
+    ))}
+    <mesh position={[-1.5, 2.0, 0]} material={sm("#1d1f27", 0.5)}>
+      <cylinderGeometry args={[0.2, 0.25, 0.7, 10]} />
+    </mesh>
+  </group>
+);
