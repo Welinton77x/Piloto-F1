@@ -22,6 +22,7 @@ import {VideoPastel, TOTAL_PASTEL} from "./VideoPastel";
 import {VideoControle, TOTAL_CONTROLE} from "./VideoControle";
 import {VideoTamandua, TOTAL_TAMANDUA} from "./VideoTamandua";
 import {VideoFutebol, TOTAL_FUTEBOL} from "./VideoFutebol";
+import {VideoCafe, TOTAL_CAFE} from "./VideoCafe";
 import {VideoChule, TOTAL_CHULE} from "./VideoChule";
 import {VideoMec, TOTAL_MEC} from "./VideoMec";
 import {VideoBolo, TOTAL_BOLO} from "./VideoBolo";
@@ -38,6 +39,7 @@ export const Root: React.FC = () => (
     <Composition id="Controle" component={VideoControle} durationInFrames={TOTAL_CONTROLE} fps={30} width={1080} height={1920} />
     <Composition id="Tamandua" component={VideoTamandua} durationInFrames={TOTAL_TAMANDUA} fps={30} width={1080} height={1920} />
     <Composition id="Futebol" component={VideoFutebol} durationInFrames={TOTAL_FUTEBOL} fps={30} width={1080} height={1920} />
+    <Composition id="Cafe" component={VideoCafe} durationInFrames={TOTAL_CAFE} fps={30} width={1080} height={1920} />
     <Composition id="ChulePreview" component={ChulePreview} durationInFrames={8} fps={30} width={1080} height={1920} />
     <Composition id="MecPreview" component={MecPreview} durationInFrames={6} fps={30} width={1080} height={1920} />
     <Composition id="Casamento" component={VideoCasamento} durationInFrames={TOTAL_CASA} fps={30} width={1080} height={1920} />
