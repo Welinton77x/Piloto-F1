@@ -375,17 +375,16 @@ const S7b: React.FC<ShotProps> = ({f, a, t}) => {
       <Cam pos={[0, 1.2, 6.5 - s * 0.6]} look={[0, 0.6, 0]} fov={56} f={f} a={a} />
       <DayOut />
       <Town t={t} galo={false} variant="nova" flat clouds />
-      {Array.from({length: 14}, (_, i) => {
-        const row = Math.floor(i / 4);
-        const col = (i % 4) - 1.5;
-        const z = -6 + row * 1.6 + ((s * 4.5) % 1.6);
-        return <Dog key={i} d={{pos: [col * 0.95 + (row % 2) * 0.3, 0, z], rotY: 0, walk: 1, run: 3, t: t + i * 0.21, tail: 1, tongue: 0.7, mouth: 0.3}} />;
+      {/* 6 cachorros em 3 fileiras, e os gatos pretos nos espaços entre as fileiras */}
+      {Array.from({length: 6}, (_, i) => {
+        const row = Math.floor(i / 2);
+        const z = -6 + row * 2.4 + ((s * 4.5) % 2.4);
+        return <Dog key={i} d={{pos: [(i % 2 ? 0.75 : -0.75) + (row % 2) * 0.2, 0, z], rotY: 0, walk: 1, run: 3, t: t + i * 0.21, tail: 1, tongue: 0.7, mouth: 0.3}} />;
       })}
-      {/* gatos pretos de olhos amarelos no meio da correria */}
-      {Array.from({length: 7}, (_, i) => {
-        const row = Math.floor(i / 3);
-        const z = -5.2 + row * 1.6 + ((s * 4.5 + 0.8) % 1.6);
-        return <BlackCat key={"g" + i} p={[-1.4 + (i % 3) * 1.4 + (row % 2) * 0.45, 0, z]} rotY={0} t={t + i * 0.3} run={1} s={1.5} />;
+      {Array.from({length: 4}, (_, i) => {
+        const row = Math.floor(i / 2);
+        const z = -4.8 + row * 2.4 + ((s * 4.5) % 2.4);
+        return <BlackCat key={"g" + i} p={[(i % 2 ? 1.4 : -1.4) - (row % 2) * 0.15, 0, z]} rotY={0} t={t + i * 0.3} run={1} s={1.5} />;
       })}
     </>
   );
