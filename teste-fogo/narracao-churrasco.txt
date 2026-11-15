@@ -1,5 +1,5 @@
 [mischievously] Se você quer fazer churrasco... mas acabou o carvão... | [excited] então você leva a picanha até um vulcão.
-[excited] Você pega um avião, depois um barco, depois uma tirolesa... | [amused] e chega na beira da cratera com o espeto na mão.
+[excited] Você pega um avião... | [excited] depois um barco... | [amused] depois uma tirolesa... | [amused] e chega na beira da cratera, com o espeto na mão.
 [excited] A picanha fica no ponto em dois segundos. | [mischievously] O vulcão sente o cheiro... e fica com fome.
 [proudly] Esse é o churrasco geológico!
 [excited] Mas o vulcão gosta tanto que entra em erupção... de linguiça. | [amused] Toscana, calabresa e uma de frango, que ninguém pediu.

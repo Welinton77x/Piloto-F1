@@ -213,8 +213,9 @@ const S0: React.FC<ShotProps> = ({f, a, t}) => {
   );
 };
 /* avião (com turbinas) → embarcado na poltrona → mapa → barco → tirolesa → cratera */
-const CABIN1 = L(1) + 15;
-const MAP1 = L(1) + 31;
+const AVIAO1 = at(1, "aviao");
+const CABIN1 = AVIAO1 + 6;
+const MAP1 = CABIN1 + 22;
 const S1a: React.FC<ShotProps> = ({f, a, t}) => {
   const s2 = (f - a) / FPS;
   const x = s2 * 5;
