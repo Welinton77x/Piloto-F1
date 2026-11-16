@@ -201,12 +201,22 @@ const S1: React.FC<ShotProps> = ({f, a, t}) => {
   const cpf = easeOut(ramp(f, CPF1 - 2, CPF1 + 10));
   return (
     <>
-      <Cam pos={[1.2, 1.45, 3.3]} look={[-0.15, 0.85, 0]} fov={54} f={f} a={a} />
+      <Cam pos={[0.3, 1.45, 3.5]} look={[-0.75, 0.85, 0]} fov={54} f={f} a={a} />
       <Sertao />
-      {bite < 0.85 && <Watermelon p={[0.55, 0.42, 0]} s={1} open={1} bite={bite * 0.9} />}
-      {bite < 0.3 && <Boleto p={[0.55, 1.05, 0.05]} r={[-0.1, 0, 0]} s={0.85} t={t} cry={1} mood="scared" />}
-      <Goat p={[-0.95, 0, 0.1]} rotY={Math.PI / 2 - 0.2} s={1.2} t={t} blink={blinkCurve(f)} chew={f >= COME1 ? 1 : 0} gloves />
-      {cpf > 0 && <CpfCard p={[-0.3, 1.9 + 0.05 * Math.sin(t * 3), 0.3]} r={[0, -0.4, 0]} s={1.4 * cpf} />}
+      {bite < 0.85 && <Watermelon p={[-0.3, 0.42, 0]} s={1} open={1} bite={bite * 0.9} />}
+      {f < COME1 - 6 && <Boleto p={[-0.3, 1.05, 0.05]} r={[-0.1, -0.6, 0]} s={0.85} t={t} cry={1} mood="scared" />}
+      <Goat
+        p={[-1.38, 0, 0.0]}
+        rotY={Math.PI / 2}
+        s={1.2}
+        t={t}
+        blink={blinkCurve(f)}
+        chew={f >= COME1 ? 1 : 0}
+        gloves
+        headDown={f < COME1 + 30 ? easeInOut(ramp(f, COME1 - 14, COME1 - 4)) * (1 - easeInOut(ramp(f, COME1 + 18, COME1 + 30))) : 0}
+        mouthItem={f >= COME1 - 6 && f < COME1 + 44 ? <Boleto p={[-0.1, 0.0, 0.2]} r={[0, -Math.PI / 2 + 0.3, 0]} s={0.6 * (1 - clamp((f - COME1 - 30) / 14))} t={t} cry={1} mood="scared" /> : undefined}
+      />
+      {cpf > 0 && <CpfCard p={[-0.8, 1.9 + 0.05 * Math.sin(t * 3), 0.3]} r={[0, -0.4, 0]} s={1.4 * cpf} />}
     </>
   );
 };
@@ -282,8 +292,7 @@ const S11: React.FC<ShotProps> = ({f, a, t}) => (
     <Cam pos={[0.2, 1.45, 4.3]} look={[0, 1.1, 0]} fov={52} f={f} a={a} />
     <DayOut />
     <House p={[0, 0, -1.8]} w={3.6} h={2.8} d={3} wall="#ffd166" roof="#e8414f" />
-    <Goat p={[0.3, 0, 0.2]} rotY={-0.4} s={1.2} t={t} blink={blinkCurve(f)} tie />
-    <Boleto p={[0.08, 1.3, 1.0]} r={[0, -0.3, 0]} s={0.6} t={t} mood="scared" />
+    <Goat p={[0.3, 0, 0.2]} rotY={-0.4} s={1.2} t={t} blink={blinkCurve(f)} tie mouthItem={<Boleto p={[0, -0.08, 0.15]} r={[0.2, 0, 0]} s={0.6} t={t} mood="scared" />} />
   </>
 );
 

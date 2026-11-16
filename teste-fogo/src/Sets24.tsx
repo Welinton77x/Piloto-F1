@@ -4,6 +4,7 @@ import type {V3} from "./Sets5";
 import {sm, rbox} from "./Sets9";
 import {canvasTex, rng} from "./util";
 import {ObjFace} from "./Sets22";
+import {WaterJet} from "./Sets13";
 
 /* ===== Objetos do vídeo "Se você quer devolver a panela da sua tia, mas a panela virou vereadora" ===== */
 
@@ -188,11 +189,20 @@ export const GuaranaSplash: React.FC<{p: V3; k: number}> = ({p, k}) => {
 };
 
 /* ---------- elefante bombeiro (normal, com capacete) ---------- */
-export const Elephant: React.FC<{p: V3; rotY?: number; s?: number; t?: number; trunkUp?: number; helmet?: boolean; blink?: number}> = ({p, rotY = 0, s = 1, t = 0, trunkUp = 0, helmet = true, blink = 0}) => {
+export const Elephant: React.FC<{p: V3; rotY?: number; s?: number; t?: number; trunkUp?: number; helmet?: boolean; blink?: number; jet?: V3}> = ({p, rotY = 0, s = 1, t = 0, trunkUp = 0, helmet = true, blink = 0, jet}) => {
   const skin = sm("#9aa0aa", 0.8);
   const eyeY = Math.max(0.1, 1 - blink);
+  /* ponta da tromba (no espaço do elefante) */
+  let ty = -0.1, tz = 0.45;
+  for (let k = 0; k < 6; k++) {
+    const aa = -0.5 - k * (0.2 - trunkUp * 0.45);
+    ty += Math.sin(aa) * 0.18;
+    tz += Math.cos(aa) * 0.18;
+  }
+  const tip: V3 = [0, 1.7 + ty, 1.05 + tz];
   return (
     <group position={p} rotation={[0, rotY, 0]} scale={s}>
+      {jet && <WaterJet a={tip} b={jet} k={1} t={t} />}
       <mesh position={[0, 1.3, 0]} scale={[0.8, 0.75, 1.1]} material={skin} castShadow receiveShadow>
         <sphereGeometry args={[1, 20, 16]} />
       </mesh>

@@ -290,8 +290,7 @@ const PaulistaScene: React.FC<{f: number; a: number; t: number; burst?: number; 
         })}
       {elephant && (
         <>
-          <Elephant p={[-1.1, 0, -2.0]} rotY={0.6} s={0.95} t={t} trunkUp={f >= BANHO6 ? 1 : 0.4} blink={blinkCurve(f)} />
-          <WaterJet a={[-0.45, 2.0, -0.9]} b={f >= BANHO6 ? [-1.0, 3.0, -2.0] : [1.8, 0, 2.5]} k={1} t={t} />
+          <Elephant p={[-1.1, 0, -2.0]} rotY={0.6} s={0.95} t={t} trunkUp={f >= BANHO6 ? 1 : 0.4} blink={blinkCurve(f)} jet={f >= BANHO6 ? [0, 3.0, -0.6] : [0, 0, 5.0]} />
         </>
       )}
       {foam > 0 && <SoapFoam p={[0, 0, 0]} n={40} spread={5} t={t} k={foam} />}

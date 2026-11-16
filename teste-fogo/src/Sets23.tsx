@@ -73,7 +73,7 @@ export const Watermelon: React.FC<{p: V3; s?: number; open?: number; bite?: numb
 );
 
 /* ---------- bode (normal) com luvas de goleiro aposentado ---------- */
-export const Goat: React.FC<{p: V3; rotY?: number; s?: number; t?: number; chew?: number; blink?: number; walk?: number; gloves?: boolean; tie?: boolean; stamp?: number}> = ({p, rotY = 0, s = 1, t = 0, chew = 0, blink = 0, walk = 0, gloves = false, tie = false, stamp = 0}) => {
+export const Goat: React.FC<{p: V3; rotY?: number; s?: number; t?: number; chew?: number; blink?: number; walk?: number; gloves?: boolean; tie?: boolean; stamp?: number; headDown?: number; mouthItem?: React.ReactNode}> = ({p, rotY = 0, s = 1, t = 0, chew = 0, blink = 0, walk = 0, gloves = false, tie = false, stamp = 0, headDown = 0, mouthItem}) => {
   const fur = sm("#f2ede2", 0.85);
   const dark = sm("#8a6a4a", 0.7);
   const ph = t * 6;
@@ -84,7 +84,7 @@ export const Goat: React.FC<{p: V3; rotY?: number; s?: number; t?: number; chew?
         <sphereGeometry args={[1, 18, 14]} />
       </mesh>
       {/* cabeça */}
-      <group position={[0, 1.1, 0.55]} rotation={[0.3, 0, 0]}>
+      <group position={[0, 1.1 - headDown * 0.25, 0.55 + headDown * 0.1]} rotation={[0.3 + headDown * 0.9, 0, 0]}>
         <mesh scale={[0.17, 0.18, 0.26]} material={fur} castShadow>
           <sphereGeometry args={[1, 14, 12]} />
         </mesh>
@@ -112,6 +112,7 @@ export const Goat: React.FC<{p: V3; rotY?: number; s?: number; t?: number; chew?
             </mesh>
           </group>
         ))}
+        {mouthItem && <group position={[0, -0.1, 0.27]}>{mouthItem}</group>}
         {tie && (
           <group position={[0, -0.28, -0.05]}>
             <mesh geometry={rbox(0.07, 0.05, 0.04, 0.01)} material={sm("#e8262d", 0.5)} />
