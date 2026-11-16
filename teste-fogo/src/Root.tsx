@@ -28,6 +28,7 @@ import {VideoDespertador, TOTAL_DESPERTADOR} from "./VideoDespertador";
 import {VideoTravesseiro, TOTAL_TRAVESSEIRO} from "./VideoTravesseiro";
 import {VideoBoleto, TOTAL_BOLETO} from "./VideoBoleto";
 import {VideoPanela, TOTAL_PANELA} from "./VideoPanela";
+import {VideoBanho, TOTAL_BANHO} from "./VideoBanho";
 import {VideoChule, TOTAL_CHULE} from "./VideoChule";
 import {VideoMec, TOTAL_MEC} from "./VideoMec";
 import {VideoBolo, TOTAL_BOLO} from "./VideoBolo";
@@ -50,6 +51,7 @@ export const Root: React.FC = () => (
     <Composition id="Travesseiro" component={VideoTravesseiro} durationInFrames={TOTAL_TRAVESSEIRO} fps={30} width={1080} height={1920} />
     <Composition id="Boleto" component={VideoBoleto} durationInFrames={TOTAL_BOLETO} fps={30} width={1080} height={1920} />
     <Composition id="Panela" component={VideoPanela} durationInFrames={TOTAL_PANELA} fps={30} width={1080} height={1920} />
+    <Composition id="Banho" component={VideoBanho} durationInFrames={TOTAL_BANHO} fps={30} width={1080} height={1920} />
     <Composition id="ChulePreview" component={ChulePreview} durationInFrames={8} fps={30} width={1080} height={1920} />
     <Composition id="MecPreview" component={MecPreview} durationInFrames={6} fps={30} width={1080} height={1920} />
     <Composition id="Casamento" component={VideoCasamento} durationInFrames={TOTAL_CASA} fps={30} width={1080} height={1920} />
