@@ -239,28 +239,38 @@ const Item1c: React.FC<ShotProps> = ({f, a, t}) => {
 };
 
 /* ② trio elétrico de espuma */
+/* bico da máquina de espuma (no mundo): trio em [0.9, 0, -5.2], virado de lado pra câmera */
+const NOZZLE: V3 = [0.8, 3.34, -4.05];
 const Item2: React.FC<ShotProps> = ({f, a, t}) => {
-  const foam = f >= MAS[2] ? easeOut(ramp(f, MAS[2], MAS[2] + 70)) : 0;
+  const on = f >= MAS[2];
+  const foam = on ? easeOut(ramp(f, MAS[2] + 10, MAS[2] + 80)) : 0;
   return (
     <>
-      <Cam pos={[0.6, 2.6 + foam * 1.5, 7.6]} look={[0.6, 1.4, -0.5]} fov={58} f={f} a={a} />
-      <Yard2 t={t} />
-      <TrioEletrico p={[4.0, 0, -0.5]} rotY={0} s={0.8} t={t} />
-      <HandToy pose={{...idle(f), pos: [-0.75, 0, 0.3], rotY: 0.6, rShoulder: [-0.25, 0.1, -0.15], rElbow: -0.3, eyeWide: 1, mouthOpen: 0.4}} look={BOY} item={<Bucket p={[0, -0.05, 0.05]} r={[Math.PI, 0, 0]} s={1.3} />} />
-      <Dog d={{pos: DOGP, rotY: 0.6, t, blink: blinkCurve(f + 7), tail: 1, tongue: 0.4, legs: "down"}} />
-      {f >= MAS[2] && (
-        <>
-          {Array.from({length: 10}, (_, i) => {
-            const q = (t * 0.9 + i / 10) % 1;
-            return (
-              <mesh key={i} position={[3.0 - q * 4, 3.2 + Math.sin(q * Math.PI) * 1.2, 1.3 - q * 1.5 + (i % 3) * 0.3]} scale={0.25 + q * 0.6} material={sm("#ffffff", 0.9)}>
-                <icosahedronGeometry args={[1, 1]} />
-              </mesh>
-            );
-          })}
-          <FoamFlood level={foam * 2.4} w={14} d={9} t={t} c={[0, 0, -0.5]} />
-        </>
+      {!on ? (
+        <Cam pos={[0.4, 3.4, 3.0]} look={[1.3, 2.7, -5.0]} fov={56} f={f} a={a} />
+      ) : f < MAS[2] + 40 ? (
+        <Cam pos={[3.0, 4.4, 0.6]} look={[0.4, 2.7, -4.0]} fov={56} f={f} a={MAS[2]} />
+      ) : (
+        <Cam pos={[0.6, 2.8 + foam * 1.2, 8.2]} look={[0.6, 1.8, -2.0]} fov={60} f={f} a={MAS[2] + 40} />
       )}
+      <Yard2 t={t} />
+      <TrioEletrico p={[1.6, 0, -5.2]} rotY={-Math.PI / 2} s={0.8} t={t} />
+      <HandToy pose={{...idle(f), pos: [-0.75, 0, 0.3], rotY: 0.2, rShoulder: [-0.25, 0.1, -0.15], rElbow: -0.3, eyeWide: 1, mouthOpen: 0.4, head: [-0.25, 0, 0]}} look={BOY} item={<Bucket p={[0, -0.05, 0.05]} r={[Math.PI, 0, 0]} s={1.3} />} />
+      <Dog d={{pos: DOGP, rotY: -0.2, t, blink: blinkCurve(f + 7), tail: 1, tongue: 0.4, legs: "down", head: [-0.3, 0, 0]}} />
+      {/* jato de espuma saindo do bico em arco até o quintal */}
+      {on &&
+        Array.from({length: 18}, (_, i) => {
+          const q = (t * 0.8 + i / 18) % 1;
+          const x = lerp(NOZZLE[0], -0.2 + (i % 3) * 0.4, q);
+          const y = NOZZLE[1] + Math.sin(q * Math.PI) * 1.4 - q * 2.2;
+          const z = lerp(NOZZLE[2], 0.6, q);
+          return (
+            <mesh key={i} position={[x, y, z]} scale={0.18 + q * 0.45} material={sm("#ffffff", 0.9)}>
+              <icosahedronGeometry args={[1, 1]} />
+            </mesh>
+          );
+        })}
+      {on && <FoamFlood level={foam * 2.2} w={14} d={9} t={t} c={[0, 0, -0.2]} />}
     </>
   );
 };
@@ -553,7 +563,7 @@ const TimerCard: React.FC<{from: number; to: number; big: string; small: string}
     <div style={{display: "flex", alignItems: "center", gap: 26}}>
       <div style={{fontSize: 96}}>⏱️</div>
       <div style={{textAlign: "left"}}>
-        <div style={{fontWeight: 900, fontSize: 90, lineHeight: 1}}>{big}</div>
+        <div style={{fontWeight: 900, fontSize: 90, lineHeight: 1, whiteSpace: "nowrap"}}>{big}</div>
         <div style={{fontWeight: 600, fontSize: 34, color: "#7a7f8a"}}>{small}</div>
       </div>
     </div>

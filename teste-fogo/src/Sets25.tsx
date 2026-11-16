@@ -217,11 +217,23 @@ export const TrioEletrico: React.FC<{p: V3; rotY?: number; s?: number; t: number
     <mesh position={[1.22, 0.85, 0]} rotation={[0, Math.PI / 2, 0]} material={tm("faixa-trio", label("faixa-trio", "TRIO DA ESPUMA", "#ffd21f", "#9b2a8a", 46), 0.5)}>
       <planeGeometry args={[4.4, 0.8]} />
     </mesh>
-    {/* canhão de espuma */}
-    <group position={[0.9, 3.0, 2.2]} rotation={[0, 0, -0.5]}>
-      <mesh rotation={[0, 0, Math.PI / 2]} material={sm("#cfd4da", 0.3, {metalness: 0.5})}>
-        <cylinderGeometry args={[0.18, 0.25, 0.9, 14]} />
+    {/* máquina de espuma no teto (aponta pra fora, lado +x) */}
+    <group position={[0.2, 3.25, 1.0]}>
+      <mesh geometry={rbox(1.1, 0.9, 1.3, 0.1)} material={sm("#ff4d8d", 0.4)} castShadow />
+      <mesh position={[0.56, 0.05, 0]} rotation={[0, Math.PI / 2, 0]} material={tm("maquina-espuma", label("maquina-espuma", "ESPUMA", "#ffffff", "#ff4d8d", 70, 256, 96), 0.5)}>
+        <planeGeometry args={[1.0, 0.38]} />
       </mesh>
+      <mesh position={[0, 0.05, -0.66]} rotation={[0, Math.PI, 0]} material={tm("maquina-espuma", label("maquina-espuma", "ESPUMA", "#ffffff", "#ff4d8d", 70, 256, 96), 0.5)}>
+        <planeGeometry args={[1.0, 0.38]} />
+      </mesh>
+      <group position={[0.75, 0.75, 0]} rotation={[0, 0, -Math.PI / 2 + 0.35]}>
+        <mesh material={sm("#cfd4da", 0.3, {metalness: 0.5})}>
+          <cylinderGeometry args={[0.32, 0.22, 1.0, 18]} />
+        </mesh>
+        <mesh position={[0, 0.52, 0]} material={sm("#1d1f27", 0.4)}>
+          <cylinderGeometry args={[0.33, 0.33, 0.06, 18]} />
+        </mesh>
+      </group>
     </group>
   </group>
 );
