@@ -45,5 +45,5 @@ subprocess.run(["ffmpeg","-v","error","-y",*inp,"-filter_complex",fc,"-map","0:v
 import re
 r=subprocess.run(["ffmpeg","-nostats","-i",mix,"-af","ebur128","-f","null","-"],capture_output=True,text=True).stderr
 I=float(re.findall(r"I:\s+(-?[\d.]+) LUFS",r)[-1]); g=-16-I
-subprocess.run(["ffmpeg","-v","error","-y","-i",mix,"-c:v","copy","-af",f"volume={g:.2f}dB,alimiter=limit=0.84:level=false","-c:a","aac","-b:a","192k","-movflags","+faststart",OUT],check=True)
+subprocess.run(["ffmpeg","-v","error","-y","-i",mix,"-c:v","copy","-af",f"volume={g:.2f}dB,alimiter=limit=0.7:level=false","-c:a","aac","-b:a","192k","-movflags","+faststart",OUT],check=True)
 print("loudness ajustado", I, "->", -16)

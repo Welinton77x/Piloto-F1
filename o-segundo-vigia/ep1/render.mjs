@@ -16,7 +16,7 @@ if (mode === 'stills') {
   for (const F of arg.split(',').map(Number)) fs.writeFileSync(path.join(dir, 'stills', `f${F}.jpg`), Buffer.from(await grab(F), 'base64'));
 } else {
   const start = Number(startArg || 0);
-  const ff = spawn('ffmpeg', ['-v', 'error', '-y', '-f', 'image2pipe', '-framerate', '30', '-c:v', 'mjpeg', '-i', '-', '-c:v', 'libx264', '-preset', 'medium', '-crf', '18', '-pix_fmt', 'yuv420p', '-r', '30', arg], { stdio: ['pipe', 'inherit', 'inherit'] });
+  const ff = spawn('ffmpeg', ['-v', 'error', '-y', '-f', 'image2pipe', '-framerate', '30', '-c:v', 'mjpeg', '-i', '-', '-c:v', 'libx264', '-preset', 'medium', '-crf', '21', '-maxrate', '8M', '-bufsize', '16M', '-pix_fmt', 'yuv420p', '-r', '30', arg], { stdio: ['pipe', 'inherit', 'inherit'] });
   for (let F = start; F < total; F++) {
     const b = Buffer.from(await grab(F), 'base64');
     if (!ff.stdin.write(b)) await new Promise(r => ff.stdin.once('drain', r));
