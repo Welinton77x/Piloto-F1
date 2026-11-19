@@ -404,7 +404,7 @@ const S7: React.FC<ShotProps> = ({f, a, t}) => {
       <Lata p={[0.3, 5.0 + (1 - rip) * 4, -5.5 + rip * 0.5]} r={[t * 4, 0, t * 3]} s={1.3} t={t} scared={1} arms={1} />
       <PBoy id="s7" a={a} f={f} pose={(fr) => {
         const run = fr >= FURA7 + 8;
-        return {...idle(fr), pos: [-0.6 - (run ? clamp((fr - FURA7 - 8) / 30) * 0.3 : 0), hop(fr, FURA7, 12, 0.35), 1.2], rotY: run ? -1.0 : 0.2, head: [-0.6, 0, 0], eyeWide: 1, mouthOpen: 0.5, brow: 1, ...(run ? RUN(tf(fr)) : {rShoulder: [-2.7, 0, -0.7], rElbow: -2.0, lShoulder: [-2.7, 0, 0.7], lElbow: -2.0})};
+        return {...idle(fr), pos: [-0.1 - (run ? clamp((fr - FURA7 - 8) / 30) * 0.3 : 0), hop(fr, FURA7, 12, 0.35), 0.6], rotY: run ? -1.0 : 0.2, head: [-0.6, 0, 0], eyeWide: 1, mouthOpen: 0.5, brow: 1, ...(run ? RUN(tf(fr)) : {rShoulder: [-2.7, 0, -0.7], rElbow: -2.0, lShoulder: [-2.7, 0, 0.7], lElbow: -2.0})};
       }} />
     </>
   );
