@@ -1,0 +1,8 @@
+[excited] Vai jogar GTA 6 pela primeira vez? | [mischievously] Então não faça isso. | [amused] Se você esperou treze anos por esse jogo... presta atenção.
+[mischievously] Não baixe o jogo com a antena de uma estação espacial. | [amused] Eu sei que a sua internet é lenta... | [excited] mas a antena baixa cento e cinquenta gigas por segundo, e os astronautas ficam sem wi-fi. E mandam reclamação pra sua mãe.
+[mischievously] Não acorde pra jogar com a sirene de um navio. | [amused] Eu sei que o jogo lança de madrugada... | [excited] mas a sirene chega a cento e cinquenta decibéis, e o bairro inteiro acorda achando que é carnaval.
+[mischievously] Não jogue no telão de um estádio de futebol. | [amused] Eu sei que a TV do seu quarto é pequena... | [excited] mas o telão tem cento e vinte metros quadrados, e quarenta mil pessoas compram ingresso pra ver você bater o carro no primeiro poste.
+[mischievously] Não peça o lanche com um helicóptero. | [amused] Eu sei que você não quer pausar o jogo... | [excited] mas o helicóptero entrega trezentas pizzas no telhado, e agora o seu quarto é uma pizzaria com CNPJ.
+[mischievously] Não carregue o controle com a usina de Itaipu. | [amused] Eu sei que a bateria acaba no melhor momento... | [excited] mas a usina produz catorze mil megawatts, e o controle liga até a TV do vizinho. E a conta de luz chega em guarani paraguaio.
+[amused] O mais seguro é fazer igual todo mundo: jogar no seu quarto, na sua TV... | [mischievously] e dizer pra sua mãe que você tá estudando.
+[mischievously] E se você não seguir o perfil... o seu save vai sumir. Bem na última missão.
