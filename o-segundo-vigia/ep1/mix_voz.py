@@ -1,6 +1,7 @@
 # uso: python3 mix_voz.py <video_sem_ou_com_audio_novo.mp4> <audio_de_efeitos.mp4> <saida.mp4>
 # Vozes ElevenLabs (eleven_v3) em vozes/. Caio (protagonista) = Davi Andrei, outro vigia = Wesley Bessa,
 # Central = Thiago (filtro de rádio), regras vermelhas = Nassif (grave + camada + impacto).
+# Outro vigia: tom 0.76, 12% mais lento, camada uma oitava abaixo, sussurro dobrado, eco reverso antes da fala.
 import subprocess, sys, os, tempfile
 D = os.path.dirname(os.path.abspath(__file__)); VID, BG, OUT = sys.argv[1:4]
 T = tempfile.mkdtemp()
@@ -15,9 +16,18 @@ RULE = ("[0:a]highpass=f=60,acompressor=threshold=-20dB:ratio=4:attack=5:release
         "[l]asetrate=44100*0.84,aresample=44100,atempo=1.19,lowpass=f=2500,volume=0.45[low];"
         "[m][low]amix=inputs=2:normalize=0,aecho=0.8:0.7:90|180:0.3|0.18,"
         "alimiter=limit=0.9[o]")
+PRE = 0.5  # segundos de eco reverso antes da fala do outro vigia
+GHOST = ("[0:a]adelay=500|500,apad=pad_dur=0.6,asplit=4[a][b][c][d];"
+  "[a]rubberband=pitch=0.76:tempo=0.88,vibrato=f=4.5:d=0.06,acompressor=threshold=-20dB:ratio=4,volume=1.3[main];"
+  "[b]rubberband=pitch=0.5:tempo=0.88,lowpass=f=700,volume=0.7[sub];"
+  "[c]rubberband=pitch=1.0:tempo=0.88,highpass=f=2200,adelay=28|45,volume=0.45[air];"
+  "[d]rubberband=pitch=0.76:tempo=0.88,areverse,aecho=0.8:0.9:110|240|380:0.55|0.38|0.22,areverse,highpass=f=200,volume=0.6[rev];"
+  "[main][sub][air][rev]amix=inputs=4:normalize=0,asoftclip=type=tanh,"
+  "aecho=0.8:0.55:85|190:0.28|0.16,lowpass=f=6500,highpass=f=45,alimiter=limit=0.9[o]")
+GT = {"09c": 1.0}  # fala com o nome: sem desacelerar, para caber
 # (arquivo, quem, início em s, velocidade)
 L = [("01","P",2.95,1),("02","P",5.75,1),("R1","R",8.77,1),("03","P",13.25,1),("04b","C",16.30,1.08),
-     ("05","P",18.68,1),("06","O",22.70,1),("07","P",28.05,1),("08","O",31.30,1),("09b","O",35.55,1),
+     ("05","P",18.68,1),("06","O",22.70,1),("07","P",28.05,1),("08","O",31.30,1),("09c","O",34.45,1.0),
      ("R2","R",38.97,1),("10","P",42.60,1),("11b","C",46.20,1),("12","P",50.00,1)]
 files = []
 for n,w,st,sp in L:
@@ -25,6 +35,7 @@ for n,w,st,sp in L:
     subprocess.run(["ffmpeg","-v","error","-y","-i",f"{D}/vozes/{n}.mp3","-af",TRIM,"-ar","44100",t],check=True)
     pre = f"atempo={sp}," if sp!=1 else ""
     if w=="R": subprocess.run(["ffmpeg","-v","error","-y","-i",t,"-filter_complex",RULE.replace("[0:a]","[0:a]"+pre),"-map","[o]","-ac","2","-ar","48000",o],check=True)
+    elif w=="O": subprocess.run(["ffmpeg","-v","error","-y","-i",t,"-filter_complex",GHOST.replace("tempo=0.88", f"tempo={GT.get(n, 0.88)}"),"-map","[o]","-ac","2","-ar","48000",o],check=True); st -= PRE
     else: subprocess.run(["ffmpeg","-v","error","-y","-i",t,"-af",pre+FX[w]+",aformat=channel_layouts=stereo","-ar","48000",o],check=True)
     files.append((o,st,w)); print(f"{n} {w} {st:.2f} -> {st+dur(o):.2f}")
 # impacto grave no início de cada regra

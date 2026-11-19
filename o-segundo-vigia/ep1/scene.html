@@ -96,7 +96,16 @@ void main(){ vec4 p = uMV*vec4(aP,1.); vP = p.xyz; vN = mat3(uMV)*aN; vU = aU; g
 precision highp float; in vec3 vP; in vec3 vN; in vec2 vU; out vec4 o;
 uniform vec3 uC; uniform float uE; uniform sampler2D uT; uniform int uHT; uniform vec3 uUp;
 uniform vec3 uLP[${NL}]; uniform vec3 uLC[${NL}]; uniform float uLR[${NL}]; uniform vec3 uAmb; uniform vec3 uFog; uniform float uFD;
+uniform int uCV; uniform float uFr;
+float hh(vec2 q){ return fract(sin(dot(q, vec2(12.9898,78.233)) + uFr*1.731)*43758.5453); }
 void main(){
+  if (uCV==1) { // tela das câmeras: P&B esverdeado, linhas, chiado; quadrante 3 sem sinal
+    vec2 q = vU; vec3 s = texture(uT, q).rgb; float l = dot(s, vec3(.3,.59,.11));
+    float nz = hh(floor(q*vec2(256.,192.)));
+    if (q.x < .5 && q.y < .5) l = nz*0.55 + 0.05*sin(q.y*900.+uFr);
+    l = l*1.25 + (nz-.5)*0.12; l *= 0.82 + 0.18*sin(q.y*384.*3.14159);
+    if (abs(q.x-.5) < .004 || abs(q.y-.5) < .006) l = 0.;
+    vec3 c = vec3(0.78,1.0,0.86)*l*0.95; o = vec4(c, 1.); return; }
   vec4 tc = uHT==1 ? texture(uT, vU) : vec4(1.);
   if (tc.a < 0.5) discard;
   vec3 base = pow(uC*tc.rgb, vec3(2.2));
@@ -132,6 +141,12 @@ gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParamet
 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 gl.bindRenderbuffer(gl.RENDERBUFFER, rbo); gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT24, W, H);
 gl.bindFramebuffer(gl.FRAMEBUFFER, fbo); gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, ftex, 0); gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, rbo);
+const CW = 512, CH = 384, cfbo = gl.createFramebuffer(), ctex = gl.createTexture(), crbo = gl.createRenderbuffer();
+gl.bindTexture(gl.TEXTURE_2D, ctex); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, CW, CH, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+gl.bindRenderbuffer(gl.RENDERBUFFER, crbo); gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT24, CW, CH);
+gl.bindFramebuffer(gl.FRAMEBUFFER, cfbo); gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, ctex, 0); gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, crbo);
 const quadVAO = gl.createVertexArray(); gl.bindVertexArray(quadVAO); const qb = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, qb);
 gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, 1,1, -1,-1, 1,1, -1,1]), gl.STATIC_DRAW);
 const lpp = gl.getAttribLocation(PP, 'aP'); gl.enableVertexAttribArray(lpp); gl.vertexAttribPointer(lpp, 2, gl.FLOAT, false, 0, 0);
@@ -172,6 +187,13 @@ function makeTextures() {
     x.fillStyle = '#222'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.font = `800 30px ${FONT}`;
     for (let i = 1; i <= 12; i++) { const a = i / 12 * Math.PI * 2; x.fillText(String(i), 128 + Math.sin(a) * 96, 128 - Math.cos(a) * 96); }
   });
+  TX.cctvLabel = texFrom(512, 384, (x, w, h) => {
+    x.clearRect(0, 0, w, h); x.textBaseline = 'top'; x.font = `800 19px ${FONT}`;
+    const Q = [[0, 0, 'CAM 01 · PORTÃO B'], [256, 0, 'CAM 02 · CORREDOR B'], [0, 192, 'CAM 03 · ESCADA'], [256, 192, 'CAM 04 · CORREDOR A']];
+    for (const [qx, qy, t] of Q) { x.fillStyle = '#fff'; x.textAlign = 'left'; x.fillText(t, qx + 12, qy + 10); x.textAlign = 'right'; x.fillText('03:07', qx + 244, qy + 162); }
+    x.fillStyle = '#ff2a2a'; x.beginPath(); x.arc(20, 170, 7, 0, 7); x.fill(); x.font = `900 16px ${FONT}`; x.textAlign = 'left'; x.fillText('REC', 32, 163);
+    x.fillStyle = '#fff'; x.textAlign = 'center'; x.font = `900 30px ${FONT}`; x.fillText('SEM SINAL', 128, 192 + 80);
+  });
   TX.tagOld = texFrom(256, 96, (x, w, h) => { x.fillStyle = '#d8c25a'; rr(x, 0, 0, w, h, 14); x.fill(); x.fillStyle = '#1b1b1b'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.font = `900 58px ${FONT}`; x.fillText('VIGIA', w/2, h/2 + 3); });
   TX.card = texFrom(400, 560, (x, w, h) => {
     x.fillStyle = '#f7f7f2'; rr(x, 0, 0, w, h, 26); x.fill();
@@ -191,7 +213,7 @@ function makeTextures() {
 
 /* ---------- scene ---------- */
 const objs = []; // {g, col, e, model(f)->mat|null, cam, tex}
-function add(geom, col, model, o = {}) { objs.push({ g: upload(geom), col: hex(col), e: o.e || 0, model: typeof model === 'function' ? model : () => model, cam: !!o.cam, tex: o.tex || null, light: o.light, led: o.ledRadio }); }
+function add(geom, col, model, o = {}) { objs.push({ g: upload(geom), col: hex(col), e: o.e || 0, model: typeof model === 'function' ? model : () => model, cam: !!o.cam, tex: o.tex || null, light: o.light, led: o.ledRadio, cctv: !!o.cctv, label: !!o.label }); }
 const GATE_Z = -4.6, CAM = [0.12, 1.5, 0.15];
 function build() {
   // floor tiles
@@ -225,9 +247,17 @@ function build() {
   add(cyl(0.3, 0.07, 14), '#2a2a2a', M(T(-1.46, 2.25, -1.7), RZ(Math.PI/2)));
   add(plane(0.54, 0.54), '#ffffff', M(T(-1.42, 2.25, -1.7), RY(Math.PI/2)), { tex: 'clock', e: 0.1 });
   const hand = (len, wid, ang) => M(T(-1.41, 2.25, -1.7), RX(-ang), T(0, len/2 - 0.03, 0));
-  add(box(0.008, 0.15, 0.03), '#111', f => hand(0.15, 0.03, (3 + 7/60) / 12 * Math.PI * 2 + clockMin(f) / 720 * Math.PI * 2));
-  add(box(0.008, 0.22, 0.02), '#111', f => hand(0.22, 0.02, (7 + clockMin(f)) / 60 * Math.PI * 2));
+  add(box(0.008, 0.15, 0.03), '#111111', f => hand(0.15, 0.03, (3 + 7/60) / 12 * Math.PI * 2 + clockMin(f) / 720 * Math.PI * 2));
+  add(box(0.008, 0.22, 0.02), '#111111', f => hand(0.22, 0.02, (7 + clockMin(f)) / 60 * Math.PI * 2));
   add(box(0.008, 0.24, 0.008), '#c0262d', f => hand(0.24, 0.01, (12 + Math.floor(f / 30)) / 60 * Math.PI * 2));
+  // TV de segurança pendurada no teto
+  const TVP = [-1.08, 2.32, -2.25], TVM = M(T(...TVP), RY(0.48), RX(0.27));
+  add(box(0.035, 0.62, 0.035), '#2a2e2d', T(TVP[0], 2.68, TVP[2]));
+  add(box(0.2, 0.06, 0.12), '#2a2e2d', M(T(TVP[0], 2.42, TVP[2]), RY(0.48)));
+  add(box(0.6, 0.38, 0.1), '#161a19', TVM);
+  add(plane(0.54, 0.32), '#ffffff', M(TVM, T(0, 0.005, 0.052)), { cctv: true });
+  add(plane(0.54, 0.32), '#ffffff', M(TVM, T(0, 0.005, 0.054)), { tex: 'cctvLabel', e: 1.6, label: true });
+  add(box(0.02, 0.02, 0.01), '#ff2a2a', M(TVM, T(0.25, -0.175, 0.052)), { e: 2 });
   // desk
   add(box(1.5, 0.06, 0.75), '#56665f', T(0.15, 0.82, -0.62));
   add(box(1.5, 0.78, 0.04), '#46544e', T(0.15, 0.4, -0.98));
@@ -281,7 +311,10 @@ const FL1 = [548, 566], FL2 = [1440, 1470], DARK = 1470, GHOST_IN = 564, GHOST_O
 function clockMin(f) { return 0; }
 function gateOpen(f) { if (f < GHOST_OUT) return 0; return -0.55 - Math.sin((f - GHOST_OUT) * 0.05) * 0.04; }
 function radioTalk(f) { return (f >= 410 && f < 480) || (f >= 1303 && f < 1402); }
+let CCTV_PASS = false;
+const CCTV_GHOST = [360, 392];
 function ghostState(f) {
+  if (CCTV_PASS && f >= CCTV_GHOST[0] && f < CCTV_GHOST[1]) return { vis: true, x: 0.25, z: GATE_Z - 2.9, yaw: 0, tilt: 0.3, nod: 0.12, arm: 0 };
   const vis = f >= GHOST_IN && f < GHOST_OUT;
   let z = GATE_Z - 0.9, x = 0.15;
   z = lerp(z, GATE_Z - 0.32, ease(seg(f, 845, 910)));
@@ -313,11 +346,12 @@ function handState(f) {
   return r;
 }
 function aim(t) { const dx = t[0] - CAM[0], dy = t[1] - CAM[1], dz = t[2] - CAM[2]; return [Math.atan2(-dx, -dz), Math.atan2(dy, Math.hypot(dx, dz))]; }
-const SIGN = aim([1.45, 2.0, -2.0]), CLOCK = aim([-1.42, 2.25, -1.7]), GATE = aim([0.1, 1.45, GATE_Z]), FACE = aim([0.15, 1.55, GATE_Z]), RADIO = aim([-0.35, 0.95, -0.85]), HANDB = aim([0.3, 1.0, GATE_Z]);
+const SIGN = aim([1.45, 2.0, -2.0]), CLOCK = aim([-1.42, 2.25, -1.7]), GATE = aim([0.1, 1.45, GATE_Z]), FACE = aim([0.15, 1.55, GATE_Z]), RADIO = aim([-0.35, 0.95, -0.85]), HANDB = aim([0.3, 1.0, GATE_Z]), TVAIM = aim([-1.08, 2.32, -2.25]);
 const KF = [
   [0, 0.02, -0.42, 78], [150, 0.02, -0.42, 64],
   [185, SIGN[0] + 0.05, SIGN[1] - 0.04, 74], [280, SIGN[0] - 0.03, SIGN[1], 66],
-  [310, CLOCK[0] - 0.06, CLOCK[1] - 0.05, 66], [385, CLOCK[0] + 0.02, CLOCK[1] - 0.02, 58],
+  [310, CLOCK[0] - 0.12, CLOCK[1] - 0.04, 64], [338, CLOCK[0] - 0.14, CLOCK[1] - 0.03, 60],
+  [356, TVAIM[0], TVAIM[1] - 0.01, 30], [392, TVAIM[0] + 0.005, TVAIM[1], 25],
   [410, RADIO[0], RADIO[1] + 0.05, 70], [530, RADIO[0] + 0.03, RADIO[1] + 0.06, 62],
   [552, GATE[0], GATE[1] - 0.06, 78], [740, GATE[0] + 0.01, GATE[1] - 0.06, 56],
   [760, GATE[0], GATE[1] - 0.12, 64], [835, GATE[0] + 0.01, GATE[1] - 0.12, 60],
@@ -351,14 +385,14 @@ const SUBS = [
   [10, 84, 'Primeira noite como vigia.', '#ffffff', false, 440],
   [96, 176, 'Regras estranhas... mas tudo bem.', '#ffffff', false, 440],
   [188, 316, 'NUNCA ABRA O PORTÃO DEPOIS DAS 3H.', '#ff3b3b', false, 1480],
-  [321, 390, '3h07... tudo calmo.', '#ffffff'],
+  [321, 390, '3h07... tudo calmo.', '#ffffff', false, 1500],
   [414, 484, '[RÁDIO] Central chamando, Caio. Tudo certo aí?', '#5ec8ff'],
   [485, 534, 'Tudo certo. Nenhum movimento.', '#ffffff'],
   [534, 568, '[batidas no portão]', '#b9c9c1', true],
   [600, 736, 'Ei... abre aqui pra mim?', '#FFD21F'],
   [764, 836, 'Quem é você?', '#ffffff'],
   [862, 950, 'Sou o vigia da noite.', '#FFD21F'],
-  [990, 1076, 'Você esqueceu a regra três, Caio?', '#FFD21F'],
+  [958, 1092, 'Você esqueceu a regra três... Caio?', '#FFD21F'],
   [1094, 1190, 'SÓ EXISTE UM VIGIA NO PRÉDIO.', '#ff3b3b', false, 440],
   [1194, 1284, '...mas o vigia sou eu.', '#ffffff', false, 560],
   [1308, 1400, '[RÁDIO] Caio? Seu turno ainda nem começou...', '#5ec8ff'],
@@ -436,20 +470,19 @@ function drawOverlay(x, f) {
 /* ---------- render ---------- */
 const U = n => gl.getUniformLocation(P3, n);
 const out = document.getElementById('out'), ox = out.getContext('2d');
-function renderFrame(fo, intro) {
-  const f = fo;
-  const c = camAt(f);
-  const view = M(RZ(-c.roll), RX(-c.pitch), RY(-c.yaw), T(-CAM[0], -CAM[1], -CAM[2]));
-  const proj = persp(c.fov * Math.PI / 180, W / H, 0.03, 40);
-  gl.bindFramebuffer(gl.FRAMEBUFFER, fbo); gl.viewport(0, 0, W, H);
-  gl.clearColor(0.05, 0.08, 0.07, 1); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); gl.enable(gl.DEPTH_TEST); gl.disable(gl.CULL_FACE);
-  gl.useProgram(P3); gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, TX.sign); gl.uniform1i(U('uT'), 0);
+function lookFrom(e, t) { const dx = t[0]-e[0], dy = t[1]-e[1], dz = t[2]-e[2]; const yaw = Math.atan2(-dx, -dz), pitch = Math.atan2(dy, Math.hypot(dx, dz)); return M(RX(-pitch), RY(-yaw), T(-e[0], -e[1], -e[2])); }
+const CCTV_VIEWS = [ // [viewport x, y] (y=192 é a metade de cima), olho, alvo
+  [0, 192, [1.25, 2.8, -1.7], [0.0, 1.1, -4.6]],
+  [256, 192, [-1.25, 2.8, -5.0], [0.3, 0.9, -10.5]],
+  [256, 0, [-1.2, 2.75, -0.9], [1.45, 1.6, -2.4]],
+];
+function drawScene(view, proj, f, cctv) {
+  gl.useProgram(P3); gl.uniform1i(U('uCV'), 0); gl.uniform1f(U('uFr'), f);
+  gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, TX.sign); gl.uniform1i(U('uT'), 0);
   gl.uniformMatrix4fv(U('uP'), false, proj);
-  // lights
   const lz = [-0.8, -3.2, -6.6, -10]; const LP = [], LC = [], LR = [];
   const tv = p => { const v = view; return [v[0]*p[0]+v[4]*p[1]+v[8]*p[2]+v[12], v[1]*p[0]+v[5]*p[1]+v[9]*p[2]+v[13], v[2]*p[0]+v[6]*p[1]+v[10]*p[2]+v[14]]; };
   lz.forEach((z, i) => { const l = lampLevel(f, i); LP.push(...tv([0, 2.6, z])); const k = (i === 3 ? 1.6 : 2.4) * l; LC.push(0.82 * k, 1.0 * k, 0.9 * k); LR.push(3.2); });
-  // red sign glow + fill near camera
   const dark = f >= DARK ? 0 : 1;
   LP.push(...tv([1.2, 2.0, -2.0])); LC.push(0.35 * dark, 0.02 * dark, 0.02 * dark); LR.push(1.4);
   LP.push(...tv([0.1, 1.4, 0.4])); LC.push(0.25 * dark, 0.3 * dark, 0.28 * dark); LR.push(1.6);
@@ -459,15 +492,39 @@ function renderFrame(fo, intro) {
   gl.uniform3fv(U('uUp'), [view[4], view[5], view[6]]);
   const fogc = f >= DARK ? [0, 0, 0] : [0.12, 0.19, 0.16]; gl.uniform3fv(U('uFog'), fogc); gl.uniform1f(U('uFD'), 0.09);
   for (const o of objs) {
+    if (cctv && (o.cam || o.cctv || o.label)) continue;
     const m = o.model(f); if (!m) continue;
     const mv = o.cam ? m : mul(view, m);
     gl.uniformMatrix4fv(U('uMV'), false, mv);
     let e = o.e; if (o.light !== undefined) { const idx = [-0.8, -3.2, -6.6, -10].indexOf(o.light); e = 1.2 * lampLevel(f, idx); }
     if (o.led) e = radioTalk(f) && (Math.floor(f / 3) % 2) ? 2.5 : 0.1;
+    if (o.label && f >= DARK) continue;
     gl.uniform3fv(U('uC'), o.col); gl.uniform1f(U('uE'), e);
-    if (o.tex) { gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, TX[o.tex]); gl.uniform1i(U('uT'), 0); gl.uniform1i(U('uHT'), 1); } else gl.uniform1i(U('uHT'), 0);
+    if (o.cctv) { gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, ctex); gl.uniform1i(U('uT'), 0); gl.uniform1i(U('uHT'), 1); gl.uniform1i(U('uCV'), f >= DARK ? 0 : 1); if (f >= DARK) gl.uniform3fv(U('uC'), [0.02, 0.02, 0.02]); }
+    else if (o.tex) { gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, TX[o.tex]); gl.uniform1i(U('uT'), 0); gl.uniform1i(U('uHT'), 1); } else gl.uniform1i(U('uHT'), 0);
     gl.bindVertexArray(o.g.vao); gl.drawArrays(gl.TRIANGLES, 0, o.g.n);
+    if (o.cctv) gl.uniform1i(U('uCV'), 0);
   }
+}
+function tvOnScreen(view, proj) { // a TV aparece no quadro?
+  const p = [-1.08, 2.32, -2.25, 1]; const vm = mul(proj, view); const c = [0, 1, 2, 3].map(r => vm[r]*p[0] + vm[4+r]*p[1] + vm[8+r]*p[2] + vm[12+r]);
+  return c[3] > 0 && Math.abs(c[0] / c[3]) < 1.6 && Math.abs(c[1] / c[3]) < 1.4;
+}
+function renderFrame(fo, intro) {
+  const f = fo;
+  const c = camAt(f);
+  const view = M(RZ(-c.roll), RX(-c.pitch), RY(-c.yaw), T(-CAM[0], -CAM[1], -CAM[2]));
+  const proj = persp(c.fov * Math.PI / 180, W / H, 0.03, 40);
+  gl.enable(gl.DEPTH_TEST); gl.disable(gl.CULL_FACE);
+  if (f < DARK && tvOnScreen(view, proj)) { // passada das câmeras de segurança
+    CCTV_PASS = true; gl.bindFramebuffer(gl.FRAMEBUFFER, cfbo); gl.viewport(0, 0, CW, CH); gl.clearColor(0.05, 0.08, 0.07, 1); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    const cproj = persp(68 * Math.PI / 180, 256 / 192, 0.05, 40);
+    for (const [vx, vy, e, t] of CCTV_VIEWS) { gl.viewport(vx, vy, 256, 192); drawScene(lookFrom(e, t), cproj, f, true); }
+    CCTV_PASS = false;
+  }
+  gl.bindFramebuffer(gl.FRAMEBUFFER, fbo); gl.viewport(0, 0, W, H);
+  gl.clearColor(0.05, 0.08, 0.07, 1); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  drawScene(view, proj, f, false);
   // post
   gl.bindFramebuffer(gl.FRAMEBUFFER, null); gl.viewport(0, 0, W, H); gl.disable(gl.DEPTH_TEST); gl.useProgram(PP);
   gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, ftex); gl.uniform1i(gl.getUniformLocation(PP, 'uS'), 0);
