@@ -18,6 +18,7 @@ import {SkyClouds} from "./Sets19";
 import {Bg} from "./Sets20";
 import {Lata, TiaGeladeira, PrimoBatedeira, Lula, Bambolete, Pudim, BrigMonster, Panela, SprinklePile, Cushion, SprinkleCart, Toboga, StairQueue, ChocoBath, LunaGround, JellyWorld, SkyRip, WaterPark} from "./Sets28";
 import {Captions, StageTitle, Confetti, Wd, clean} from "./Overlays";
+import {physics} from "./Physics";
 import {FPS, clamp, lerp, ramp, pop, easeInOut, easeOut, canvasTex, rng} from "./util";
 import W from "./timingBrig.json";
 
@@ -173,6 +174,27 @@ const PAN_ITEM = (
 const HOLD_PAN: Pose = {rShoulder: [-0.9, 0.3, 0.05], rElbow: -1.1};
 const SHRUG: Pose = {rShoulder: [-0.4, 0.2, -0.9], rElbow: -1.2, lShoulder: [-0.4, -0.2, 0.9], lElbow: -1.2};
 
+
+/* ---------- física e movimento do menino ---------- */
+const tf = (fr: number) => fr / FPS;
+/** pulinho (arco) começando em `from` */
+const hop = (fr: number, from: number, dur = 16, h = 0.4) => {
+  const k = (fr - from) / dur;
+  return k > 0 && k < 1 ? Math.sin(k * Math.PI) * h : 0;
+};
+/** amassadinha ao pousar */
+const land = (fr: number, at: number, d = 8) => {
+  const k = (fr - at) / d;
+  return k > 0 && k < 1 ? Math.sin(k * Math.PI) * 0.1 : 0;
+};
+/** pulos repetidos (gravidade baixa da Lua) */
+const bounce = (fr: number, period = 34, h = 0.3) => Math.abs(Math.sin((fr / period) * Math.PI)) * h;
+const WAVE = (fr: number): Pose => ({lShoulder: [-2.7, 0, 0.45], lElbow: -0.6 + 0.45 * Math.sin(tf(fr) * 14)});
+const PBoy: React.FC<{id: string; a: number; f: number; pose: (fr: number) => Pose; item?: React.ReactNode; look?: ToyLook; headExtra?: React.ReactNode}> = ({id, a, f, pose, item, look = BOY, headExtra}) => {
+  const p = physics(id + ":" + a, pose, a, f);
+  return item !== undefined ? <HandToy pose={p} look={look} headExtra={headExtra} item={item} /> : <Toy pose={p} look={look} headExtra={headExtra} />;
+};
+
 /* fundo de cor chapada + chão de cor chapada (igual à referência) */
 const Flat: React.FC<{bg: string; ground: string; light?: number}> = ({bg, ground, light = 1}) => (
   <>
@@ -192,8 +214,16 @@ const S0: React.FC<ShotProps> = ({f, a, t}) => {
     <>
       <Cam pos={[0.25, 1.5, 5.3]} look={[0.25, 0.95, 0]} fov={50} f={f} a={a} />
       <Flat bg="#ffb04a" ground="#ff8f3a" />
-      <HandToy pose={{...idle(f), pos: [-0.35, 0, 0], rotY: 0.25, ...HOLD_PAN, smile: scared ? 0 : 1, eyeWide: scared ? 0.6 : 0.2, head: scared ? [0.25, 0.35, 0] : [0, 0, 0]}} look={BOY} item={PAN_ITEM} />
-      <Lata p={[scared ? 0.25 : 0.8, 0, scared ? 0.35 : 0.2]} rotY={-0.3} s={1.1} t={t} scared={scared} arms={scared} />
+      <PBoy id="s0" a={a} f={f} item={PAN_ITEM} pose={(fr) => {
+        const w = clamp(fr / 40);
+        const sc = fr >= MAS0;
+        const shake = fr >= ALTURA0 ? 0.25 * Math.sin(tf(fr) * 16) * (1 - clamp((fr - ALTURA0) / 24)) : 0;
+        return {...idle(fr), pos: [lerp(-1.7, -0.35, easeOut(w)), hop(fr, MAS0, 14, 0.3), 0], rotY: w < 1 ? 1.2 : 0.25, walk: tf(fr) * 9, walkAmt: w < 1 ? 1 : 0, ...HOLD_PAN, smile: sc ? 0 : 1, eyeWide: sc ? 0.9 : 0.2, brow: sc ? 1 : 0, mouthOpen: sc && fr < MAS0 + 30 ? 0.5 : 0, squash: land(fr, MAS0 + 14), head: sc ? [0.3, 0.45 + shake, 0] : [0, 0.15 * Math.sin(tf(fr) * 2), 0], ...(sc ? {lShoulder: [-1.8, 0, 0.5], lElbow: -1.0} : {})};
+      }} />
+      {(() => {
+        const j = clamp((f - MAS0) / 12);
+        return <Lata p={[lerp(0.9, 0.2, j), Math.sin(j * Math.PI) * 0.6 + (f < MAS0 ? Math.abs(Math.sin(t * 6)) * 0.05 : 0), lerp(0.2, 0.35, j)]} rotY={-0.3} s={1.1} t={t} scared={scared} arms={scared} walk={f < MAS0 ? 1 : 0} />;
+      })()}
     </>
   );
 };
@@ -215,7 +245,13 @@ const S1: React.FC<ShotProps> = ({f, a, t}) => {
       <WaterPark t={t} />
       <Toboga p={TOB_P} h={30} />
       <TiaGeladeira p={[-0.5, 0, -1.0]} rotY={0.15} s={1.0} open={open} mouth={f >= TIA1 && f < TIA1 + 20 ? 0.4 : 0} blink={blinkCurve(f + 3)} />
-      <HandToy pose={{...idle(f), pos: [0.7, 0, 0.6], rotY: -0.5, ...HOLD_PAN, smile: 1, mouthOpen: f >= PEDIR1 && f < FRANCES1 + 20 ? 0.5 : 0}} look={BOY} item={PAN_ITEM} />
+      <PBoy id="s1" a={a} f={f} item={PAN_ITEM} pose={(fr) => {
+        const w = clamp((fr - a) / 45);
+        const look = fr >= OITO1 - 4 && fr < MAS1;
+        const bow = fr >= PEDIR1 && fr < FRANCES1 + 8 ? Math.sin(clamp((fr - PEDIR1) / (FRANCES1 + 8 - PEDIR1)) * Math.PI) : 0;
+        const happy = fr >= FRANCES1 + 6;
+        return {...idle(fr), pos: [lerp(2.4, 0.7, easeOut(w)), hop(fr, FRANCES1 + 8, 14, 0.35) + hop(fr, FRANCES1 + 24, 14, 0.3), lerp(1.4, 0.6, w)], rotY: w < 1 ? -1.4 : -0.5, walk: tf(fr) * 9, walkAmt: w < 1 ? 1 : 0, ...HOLD_PAN, smile: 1, mouthOpen: fr >= PEDIR1 && fr < FRANCES1 + 20 ? 0.3 + 0.3 * Math.abs(Math.sin(tf(fr) * 10)) : 0, torso: [bow * 0.45 - (look ? 0.15 : 0), 0, 0], head: look ? [-0.7, 0.2, 0] : [0, 0, 0], eyeWide: look ? 1 : 0.2, ...(fr >= TIA1 && fr < TIA1 + 40 ? WAVE(fr) : happy ? {lShoulder: [-2.7, 0, 0.4], lElbow: -0.3} : bow > 0 ? {lShoulder: [-0.8, -0.6, 0], lElbow: -1.8} : {})};
+      }} />
       <Lata p={[1.3, 0, 0.8]} rotY={-0.4} s={1.0} t={t} scared={0.4} />
     </>
   );
@@ -232,6 +268,11 @@ const S2: React.FC<ShotProps> = ({f, a, t}) => {
       )}
       <Flat bg="#7fd0ff" ground="#f2e3c9" />
       <StairQueue p={[0, 0.05, 0]} n={18} t={t} gap={6} />
+      {close && (
+        <group position={[-0.05, 6 * 0.32 - 0.05, -6 * 0.38]} scale={0.42}>
+          <PBoy id="s2" a={INCLUSIVE2 - 4} f={f} pose={(fr) => ({...idle(fr), pos: [0, hop(fr, INCLUSIVE2 - 2, 12, 0.5), 0], rotY: 0.45, rShoulder: [-1.55, 0.25, -0.05], rElbow: -0.1, lShoulder: [-0.4, 0, 0.5], lElbow: -1.6, smile: 1, mouthOpen: fr < INCLUSIVE2 + 30 ? 0.3 + 0.3 * Math.abs(Math.sin(tf(fr) * 10)) : 0, head: [0.05, 0.25, 0.1 * Math.sin(tf(fr) * 4)], blink: fr > INCLUSIVE2 + 20 && fr < INCLUSIVE2 + 34 ? 1 : 0})} />
+        </group>
+      )}
       {close && (
         <group position={[0.45, 6 * 0.32 + 0.3, -6 * 0.38]}>
           <mesh position={[0, -0.2, 0]} material={sm("#8a6a4a", 0.6)}>
@@ -257,7 +298,11 @@ const S3: React.FC<ShotProps> = ({f, a, t}) => {
       <SkyClouds x={0} />
       <mesh position={[0, 30.0, 0]} geometry={rbox(4, 0.3, 2.6, 0.05)} material={sm("#c9ccd3", 0.5)} receiveShadow />
       <PrimoBatedeira p={[-1.0, 30.15, -0.2]} rotY={0.4} s={1.3} t={t} spin={push > 0 ? 3 : 1} mouth={push > 0 ? 0.5 : 0} />
-      <HandToy pose={{...idle(f), pos: [1.3, 30.15, 0.1], rotY: -0.4, ...HOLD_PAN, eyeWide: launched ? 1 : 0.3, mouthOpen: launched ? 0.5 : 0, head: launched ? [-0.5, 0, 0] : [0, 0, 0]}} look={BOY} item={PAN_ITEM} />
+      <PBoy id="s3" a={a} f={f} item={PAN_ITEM} pose={(fr) => {
+        const l = fr >= DECOLA3 - 6;
+        const pushing = fr >= EMPURRA3 && !l;
+        return {...idle(fr), pos: [1.3, 30.15 + hop(fr, DECOLA3 - 4, 14, 0.45) + hop(fr, DECOLA3 + 12, 12, 0.3), 0.1], rotY: -0.4, ...HOLD_PAN, eyeWide: l ? 1 : pushing ? 0.7 : 0.3, mouthOpen: l ? 0.5 : 0, brow: pushing || l ? 1 : 0, torso: [pushing ? 0.25 : l ? -0.2 : 0, 0, 0], head: l ? [-0.7, 0.2, 0] : pushing ? [0.2, -0.3, 0] : [0, 0, 0], ...(l ? WAVE(fr) : {}), squash: land(fr, DECOLA3 + 10)};
+      }} />
       <Lata p={[lerp(0.1, 0.4, push), 30.15 + lk * lk * 12, lerp(0.2, -0.4, push)]} r={[launched ? -lk * 4 : 0, 0, launched ? lk * 2 : 0]} s={1.0} t={t} scared={1} arms={1} />
     </>
   );
@@ -308,7 +353,12 @@ const S5: React.FC<ShotProps> = ({f, a, t}) => {
       )}
       {lula > 0 && <Lula p={[lerp(4, 1.15, lula), 0, -0.4]} rotY={-0.6} s={1.0} t={t} mouth={f >= COBRA5 ? 0.4 : 0} reach={f >= COBRA5 ? 1 : 0} blink={blinkCurve(f)} />}
       {spray && <WaterJet a={[0.9, 0.55, 0.0]} b={[PAN_P[0], 0.4, PAN_P[2]]} k={1} t={t} size={1.2} />}
-      <Toy pose={{...idle(f), pos: [-1.1, 0, 0.3], rotY: 0.5, ...(shrug ? SHRUG : {}), eyeWide: shrug ? 0.6 : 0.3, brow: shrug ? 1 : 0, mouthOpen: shrug ? 0.2 : 0}} look={BOY} />
+      <PBoy id="s5" a={a} f={f} pose={(fr) => {
+        const w = clamp((fr - a) / 60);
+        const sh = fr >= SO5;
+        const back = fr >= APAGA5 && fr < APAGA5 + 30;
+        return {...idle(fr), pos: [lerp(-2.6, -1.1, w), w < 1 ? bounce(fr - a, 20, 0.45) : hop(fr, APAGA5, 16, 0.3), 0.3], rotY: w < 1 ? 1.2 : 0.5, walk: tf(fr) * 6, walkAmt: w < 1 ? 0.6 : 0, ...(sh ? SHRUG : back ? {rShoulder: [-1.4, 0.5, 0], rElbow: -1.6, lShoulder: [-1.4, -0.5, 0], lElbow: -1.6} : {}), eyeWide: sh || back ? 0.9 : 0.3, brow: sh ? 1 : 0, mouthOpen: back ? 0.5 : sh ? 0.2 : 0, torso: [back ? -0.25 : 0, 0, 0], head: [0, fr >= LULA5 ? 0.4 : 0, sh ? 0.15 * Math.sin(tf(fr) * 9) : 0], squash: land(fr, a + 60) + land(fr, APAGA5 + 16)};
+      }} />
       <Lata p={[-0.4, 0, 0.9]} rotY={0.2} s={0.9} t={t} scared={0.3} />
     </>
   );
@@ -333,7 +383,12 @@ const S6: React.FC<ShotProps> = ({f, a, t}) => {
         <Penguin p={[0.05, 0.22, 0]} rotY={-Math.PI / 2 + 0.6} t={t} s={0.9} />
         <SprinkleCart p={[0.95, 0, 0]} rotY={0} />
       </group>
-      <Toy pose={{...idle(f), pos: [-1.1, 0, 0.3], rotY: 0.6, eyeWide: 0.5}} look={BOY} />
+      <PBoy id="s6" a={a} f={f} pose={(fr) => {
+        const pen = clamp(4.5 - ((fr - PINGUIM6) / FPS) * 3.0, 0.9, 6);
+        const earth = fr >= TERRA6 - 4 && fr < FIADO6;
+        const ok = fr >= FIADO6;
+        return {...idle(fr), pos: [-1.1, bounce(fr, 40, 0.12) + hop(fr, FIADO6 + 4, 16, 0.5), 0.3], rotY: 0.6, head: [earth ? -0.6 : 0, earth ? -0.3 : (pen - 2) * 0.12, 0], eyeWide: 0.6, smile: ok ? 1 : 0, ...(earth ? {lShoulder: [-2.5, 0, 0.8], lElbow: -0.1} : ok ? ARMS_UP : {rShoulder: [-0.6, 0, -0.3], rElbow: -1.8})};
+      }} />
       <Lata p={[-0.4, 0, 0.9]} rotY={0.4} s={0.9} t={t} scared={0.3} />
     </>
   );
@@ -347,7 +402,10 @@ const S7: React.FC<ShotProps> = ({f, a, t}) => {
       <Moon t={t} />
       <SkyRip p={[0.3, 5.0, -6]} k={rip * 1.6} t={t} />
       <Lata p={[0.3, 5.0 + (1 - rip) * 4, -5.5 + rip * 0.5]} r={[t * 4, 0, t * 3]} s={1.3} t={t} scared={1} arms={1} />
-      <Toy pose={{...idle(f), pos: [-0.8, 0, 1.2], rotY: 0.2, head: [-0.5, 0, 0], eyeWide: 1, mouthOpen: 0.5}} look={BOY} />
+      <PBoy id="s7" a={a} f={f} pose={(fr) => {
+        const run = fr >= FURA7 + 8;
+        return {...idle(fr), pos: [-0.6 - (run ? clamp((fr - FURA7 - 8) / 30) * 0.3 : 0), hop(fr, FURA7, 12, 0.35), 1.2], rotY: run ? -1.0 : 0.2, head: [-0.6, 0, 0], eyeWide: 1, mouthOpen: 0.5, brow: 1, ...(run ? RUN(tf(fr)) : {rShoulder: [-2.7, 0, -0.7], rElbow: -2.0, lShoulder: [-2.7, 0, 0.7], lElbow: -2.0})};
+      }} />
     </>
   );
 };
@@ -367,7 +425,11 @@ const S7b: React.FC<ShotProps> = ({f, a, t}) => {
       <Cam pos={[0.2, 1.8, 6.6]} look={[0.2, 0.95, -0.5]} fov={58} f={f} a={bite ? BRIG7 - 2 : a} />
       <JellyLights />
       <JellyWorld t={t} />
-      <Toy pose={{...idle(f), pos: [-0.7, 0.05 * Math.abs(Math.sin(t * 8)), 0.4], rotY: 0.4, eyeWide: 1, mouthOpen: bite ? 0.7 : 0.3, brow: 1, squash: 0.05 * Math.sin(t * 12), ...(bite ? ARMS_UP : {})}} look={BOY} />
+      <PBoy id="s7b" a={a} f={f} pose={(fr) => {
+        const b = fr >= BRIG7 - 2;
+        const k = (fr - a) % 22;
+        return {...idle(fr), pos: [-0.55 - (b ? clamp((fr - BRIG7) / 30) * 0.25 : 0), hop(k, 0, 16, 0.4), 0.4], rotY: b ? -0.6 : 0.4, eyeWide: 1, mouthOpen: b ? 0.7 : 0.3, brow: 1, squash: k > 16 ? 0.12 * Math.sin(((k - 16) / 6) * Math.PI) : -0.05 * Math.sin((k / 16) * Math.PI), ...(b ? ARMS_UP : {rShoulder: [-1.2, 0.3, -0.6 + 0.4 * Math.sin(tf(fr) * 9)], rElbow: -0.4, lShoulder: [-1.2, -0.3, 0.6 - 0.4 * Math.sin(tf(fr) * 9)], lElbow: -0.4})};
+      }} />
       <Lata p={[0.2, (1 - land) * 5 + Math.abs(Math.sin(t * 7)) * 0.3, 0.8]} rotY={-0.3} s={0.9} t={t} scared={1} arms={1} />
       {f >= GELATINA7 && <BrigMonster p={[0.95, 0, -0.4]} s={1.3} t={t} bite={bite} />}
     </>
@@ -384,7 +446,12 @@ const S8: React.FC<ShotProps> = ({f, a, t}) => {
       <JellyLights pudim={world} />
       <JellyWorld t={t} pudim={world} />
       <Bambolete p={[0.7, pudim ? 0 : 0.9 + 0.1 * Math.sin(t * 4), -0.2]} s={1.0} t={t} spin={spin} pudim={pudim} />
-      <Toy pose={{...idle(f), pos: [-0.8, 0, 0.3], rotY: 0.6, ...(spin && !pudim ? {rShoulder: [-1.6 + 0.4 * Math.sin(t * 12), 0.4, 0], rElbow: -0.5} : {}), eyeWide: pudim ? 1 : 0.4, mouthOpen: pudim ? 0.5 : 0.1}} look={BOY} />
+      <PBoy id="s8" a={a} f={f} pose={(fr) => {
+        const sp = fr >= FLIGORAR8 && fr < PLOFT8 + 2;
+        const pd = fr >= PLOFT8 + 2;
+        const tt = tf(fr);
+        return {...idle(fr), pos: [-0.65 - (pd ? clamp((fr - PLOFT8) / 12) * 0.15 : 0), hop(fr, PLOFT8 + 2, 14, 0.45), 0.3], rotY: 0.6, ...(sp ? {rShoulder: [-1.5 + 0.5 * Math.sin(tt * 14), 0.4 * Math.cos(tt * 14), 0], rElbow: -0.5, lShoulder: [-1.5 + 0.5 * Math.cos(tt * 14), -0.4 * Math.sin(tt * 14), 0], lElbow: -0.5, torso: [0, 0.15 * Math.sin(tt * 14), 0]} : pd ? ARMS_UP : {}), eyeWide: pd ? 1 : 0.4, mouthOpen: pd ? 0.6 : 0.1, brow: pd ? 1 : 0, squash: land(fr, PLOFT8 + 16)};
+      }} />
       {world > 0 && <Pudim p={[-2.4, 0, -2.5]} s={1.6} t={t} face={false} />}
       {world > 0 && <Pudim p={[2.8, 0, -3.5]} s={2.0} t={t + 1} face={false} />}
     </>
@@ -398,7 +465,7 @@ const S9: React.FC<ShotProps> = ({f, a, t}) => (
     <Pudim p={[0.7, 0, -0.2]} s={0.9} t={t} />
     <Pudim p={[-2.4, 0, -2.5]} s={1.6} t={t} face={false} />
     <Pudim p={[2.8, 0, -3.5]} s={2.0} t={t + 1} face={false} />
-    <Toy pose={{...idle(f), pos: [-0.8, 0, 0.3], rotY: 0.4, ...ARMS_UP, smile: 1, mouthOpen: 0.4}} look={BOY} />
+    <PBoy id="s9" a={a} f={f} pose={(fr) => ({...idle(fr), pos: [-0.8, bounce(fr - a, 16, 0.4), 0.3], rotY: 0.4 + 0.3 * Math.sin(tf(fr) * 4), ...ARMS_UP, smile: 1, mouthOpen: 0.4})} />
   </>
 );
 /* 10 — de volta na Lua: choque de tentáculo, a batedeira mexe, só sai granulado */
@@ -424,7 +491,10 @@ const S10: React.FC<ShotProps> = ({f, a, t}) => {
       <Lula p={[1.25, 0, -0.5]} rotY={-0.9} s={1.0} t={t} zap={zap} reach={zap ? 1 : 0} blink={blinkCurve(f)} />
       {zap && <Bolt a={[1.1, 0.5, -0.1]} b={[PAN_P[0] + 0.2, 0.3, PAN_P[2]]} k={1} t={t} />}
       <PrimoBatedeira p={stir ? [-0.25, 0, -0.95] : [-1.6, 0, -1.0]} rotY={stir ? 0.25 : 0.5} s={1.2} t={t} spin={stir ? 3 : 0.5} mouth={stir ? 0.3 : 0} tilt={stir ? 0.25 : 0} />
-      {!spit && <Toy pose={{...idle(f), pos: [-1.3, 0, 0.8], rotY: 0.5, eyeWide: 0.6}} look={BOY} />}
+      {!spit && <PBoy id="s10" a={a} f={f} pose={(fr) => {
+        const z = fr >= CHOQUE10 - 4 && fr < CHOQUE10 + 26;
+        return {...idle(fr), pos: [-1.1 - (z ? 0.12 : 0), hop(fr, CHOQUE10 - 2, 12, 0.35), 0.8], rotY: 0.5, eyeWide: z ? 1 : 0.6, brow: z ? 1 : 0, mouthOpen: z ? 0.5 : 0, torso: [z ? -0.25 : fr >= MEXE10 ? 0.25 : 0, 0, 0], head: [fr >= MEXE10 ? 0.25 : 0, 0.3, 0], ...(z ? {rShoulder: [-1.5, 0.4, 0], rElbow: -1.8, lShoulder: [-1.5, -0.4, 0], lElbow: -1.8} : {})};
+      }} />}
     </>
   );
 };
@@ -459,7 +529,12 @@ const S12: React.FC<ShotProps> = ({f, a, t}) => {
       <Panela p={[0.3, 0, -1.6]} s={0.9} />
       <Penguin p={[1.9, 0, 0.1]} rotY={-1.2} t={t} s={1.0} dance={step1 ? 0 : 0.3} />
       <Lula p={[1.0, 0, -0.3]} rotY={step2 ? -1.0 : 1.0} s={0.95} t={t} reach={step2 ? 1 : 0} mouth={step1 && !step2 ? 0.4 : 0} blink={blinkCurve(f)} />
-      <HandToy pose={{...idle(f), pos: [-0.5, 0, 0.5], rotY: 0.9, ...(pay ? {rShoulder: [-1.15, 0.5, 0.1], rElbow: -0.3} : {}), eyeWide: step2 ? 0.8 : 0.3, smile: pay ? 0.6 : 0}} look={BOY} item={pay ? <group rotation={[Math.PI / 2, 0, 0]}><Cushion p={[0, -0.05, 0.08]} s={1.1} /></group> : null} />
+      <PBoy id="s12" a={a} f={f} item={pay ? <group rotation={[Math.PI / 2, 0, 0]}><Cushion p={[0, -0.05, 0.08]} s={1.1} /></group> : null} pose={(fr) => {
+        const s2b = fr >= COBRA12B - 4;
+        const py = fr >= UNICO12 - 6;
+        const step = clamp((fr - COBRA12B) / 24);
+        return {...idle(fr), pos: [lerp(-0.9, -0.5, step), 0, lerp(0.6, 0.5, step)], rotY: 0.9, walk: tf(fr) * 9, walkAmt: step > 0 && step < 1 ? 1 : 0, ...(py ? {rShoulder: [-1.15, 0.5, 0.1], rElbow: -0.3} : s2b ? {rShoulder: [-0.3, 0, -0.5], rElbow: -1.4, lShoulder: [-0.3, 0, 0.5], lElbow: -1.4} : {}), eyeWide: s2b ? 0.8 : 0.3, smile: py ? 0.6 : 0, brow: s2b && !py ? 1 : 0, head: [s2b && !py ? 0.3 : 0, 0.2, 0]};
+      }} />
     </>
   );
 };
@@ -468,7 +543,7 @@ const S13: React.FC<ShotProps> = ({f, a, t}) => (
   <>
     <Cam pos={[0.3, 2.1, 7.4]} look={[0.3, 1.1, -0.4]} fov={60} f={f} a={a} />
     <Moon t={t} />
-    <HandToy pose={{...idle(f), pos: [0.0, 0, 0.6], rotY: 0, rShoulder: [-1.7, 0.3, 0], rElbow: -0.4, smile: 1, mouthOpen: 0.3}} look={BOY} item={<group rotation={[Math.PI / 2, 0, 0]}><Panela p={[0, -0.12, 0.05]} s={0.45} t={t} spit={1} /></group>} />
+    <PBoy id="s13" a={a} f={f} item={<group rotation={[Math.PI / 2, 0, 0]}><Panela p={[0, -0.12, 0.05]} s={0.45} t={t} spit={1} /></group>} pose={(fr) => ({...idle(fr), pos: [0.0, bounce(fr - a, 15, 0.35), 0.6], rotY: 0.35 * Math.sin(tf(fr) * 5), rShoulder: [-2.4 + 0.3 * Math.sin(tf(fr) * 10), 0.3, 0], rElbow: -0.4, lShoulder: [-2.5, 0, 0.5 + 0.3 * Math.sin(tf(fr) * 10)], lElbow: -0.3, torso: [0, 0, 0.12 * Math.sin(tf(fr) * 5)], smile: 1, mouthOpen: 0.4})} />
     <TiaGeladeira p={[-1.7, 0, -1.2]} rotY={0.35} s={0.9} mouth={0.3} />
     <PrimoBatedeira p={[1.6, 0, -1.0]} rotY={-0.4} s={1.1} t={t} spin={1} />
     <Lula p={[2.1, 0, -0.7]} rotY={-0.6} s={0.9} t={t} />
