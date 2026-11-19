@@ -286,9 +286,9 @@ const NightRoom: React.FC<{t: number; f: number}> = ({t, f}) => {
       <hemisphereLight args={["#9fb0ff", "#403050", 0.55]} />
       <pointLight position={[0.6, 1.8, -0.4]} intensity={4} distance={6} decay={1.5} color="#bfd0ff" castShadow />
       <Nightstand p={[-1.35, 0, -1.6]} mark={false} />
-      <DigitalClock p={[-1.5, 0.6, -1.5]} rotY={0.5} s={1.0} time={midnight ? "00:00" : "23:59"} ring={midnight ? 1 : 0} t={t} />
-      <ShipHorn p={[-1.15, 0.6, -1.7]} rotY={0.6} s={0.9} blow={midnight ? 1 : 0} t={t} />
-      {midnight && <SoundRings p={[-1.0, 0.95, -1.35]} t={t} color="#ffd21f" size={1.4} />}
+      <DigitalClock p={[-1.6, 0.6, -1.42]} rotY={0.55} s={1.0} time={midnight ? "00:00" : "23:59"} ring={midnight ? 1 : 0} t={t} />
+      <ShipHorn p={[-1.12, 0.6, -1.7]} rotY={0.55} s={1.0} up blow={midnight ? 1 : 0} t={t} />
+      {midnight && <SoundRings p={[-1.1, 1.45, -1.5]} t={t} color="#ffd21f" size={0.5} />}
       <GameTV p={[1.9, 0, -1.3]} rotY={-0.6} mode={midnight ? "clock" : "off"} s={0.8} />
     </>
   );
@@ -299,14 +299,15 @@ const Sleeper: React.FC<{f: number; awake: number}> = ({f, awake}) => (
     <Toy pose={{...idle(f), pos: [0, 0, 0], rotY: 0, blink: awake > 0 ? 0 : 1, eyeWide: awake > 0 ? 1 : 0, brow: awake > 0 ? 1 : 0, mouthOpen: awake > 0 ? 0.6 : 0.15, hairLift: awake > 0 ? 1 : 0, head: awake > 0 ? [0, 0, 0] : [0, 0.45, 0], ...(awake > 0 ? ARMS_UP : {})}} look={PIJAMA} />
   </group>
 );
+const JUMP2 = MAS[2] + 30;
 const Item2: React.FC<ShotProps> = ({f, a, t}) => {
   const blow = f >= MAS[2];
-  const up = blow ? easeOut(clamp((f - MAS[2] - 4) / 12)) : 0;
-  const hop = blow ? Math.abs(Math.sin(clamp((f - MAS[2] - 4) / 30) * Math.PI)) * 0.5 : 0;
+  const up = blow ? easeOut(clamp((f - JUMP2 - 2) / 12)) : 0;
+  const hop = blow ? Math.abs(Math.sin(clamp((f - JUMP2 - 2) / 30) * Math.PI)) * 0.5 : 0;
   return (
     <>
       {blow ? (
-        <Cam pos={[1.9, 1.9, 2.3]} look={[-0.35, 1.55, -1.0]} fov={64} f={f} a={MAS[2] - 3} />
+        <Cam pos={[1.9, 1.9, 2.3]} look={[-0.35, 1.55, -1.0]} fov={64} f={f} a={JUMP2} />
       ) : (
         <Cam pos={[2.9, 2.1, -0.75]} look={[-0.2, 0.8, -1.15]} fov={62} f={f} a={a} />
       )}
@@ -321,7 +322,7 @@ const Item2: React.FC<ShotProps> = ({f, a, t}) => {
 };
 const Item2b: React.FC<ShotProps> = ({f, a, t}) => (
   <>
-    <Cam pos={[-0.55, 1.05, -0.6]} look={[-1.45, 0.72, -1.55]} fov={46} f={f} a={a} />
+    <Cam pos={[0.3, 1.45, 0.35]} look={[-1.33, 0.9, -1.6]} fov={48} f={f} a={a} />
     <NightRoom t={t} f={f} />
     <Sleeper f={f} awake={0} />
   </>
@@ -521,7 +522,8 @@ const SHOTS: Shot[] = [
   {from: MANDAM1 - 3, Comp: Item1d},
   {from: L(2), Comp: Item2},
   {from: EU[2] - 3, Comp: Item2b},
-  {from: MAS[2] - 3, Comp: Item2},
+  {from: MAS[2] - 3, Comp: Item2b},
+  {from: JUMP2, Comp: Item2},
   {from: BAIRRO2, Comp: Item2c},
   {from: L(3), Comp: Item3},
   {from: EU[3] - 3, Comp: Item3b},

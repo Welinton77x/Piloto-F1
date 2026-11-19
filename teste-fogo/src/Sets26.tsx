@@ -362,7 +362,7 @@ export const LightBill: React.FC<{p?: V3; r?: V3; s?: number}> = ({p = [0, 0, 0]
 );
 
 /* ---------- sirene (buzina) de navio ---------- */
-export const ShipHorn: React.FC<{p: V3; rotY?: number; s?: number; blow?: number; t?: number}> = ({p, rotY = 0, s = 1, blow = 0, t = 0}) => {
+export const ShipHorn: React.FC<{p: V3; rotY?: number; s?: number; blow?: number; t?: number; up?: boolean}> = ({p, rotY = 0, s = 1, blow = 0, t = 0, up = false}) => {
   const red = sm("#d8262d", 0.35);
   const chrome = sm("#dfe3ea", 0.15, {metalness: 0.8});
   const shake = blow * 0.03 * Math.sin(t * 60);
@@ -370,7 +370,7 @@ export const ShipHorn: React.FC<{p: V3; rotY?: number; s?: number; blow?: number
     <group position={[p[0] + shake, p[1], p[2]]} rotation={[0, rotY, 0]} scale={s}>
       <mesh position={[0, 0.08, 0]} geometry={rbox(0.5, 0.16, 0.36, 0.03)} material={sm("#2a2e3b", 0.5)} castShadow />
       {[-0.11, 0.11].map((x, i) => (
-        <group key={i} position={[x, 0.3, 0]} rotation={[Math.PI / 2 - 0.25, 0, 0]}>
+        <group key={i} position={[x, up ? 0.2 : 0.3, 0]} rotation={[up ? 0.3 : Math.PI / 2 - 0.25, 0, (up ? 0.12 : 0) * (i ? -1 : 1)]}>
           <mesh position={[0, -0.05, 0]} material={chrome} castShadow>
             <cylinderGeometry args={[0.035, 0.05, 0.3, 14]} />
           </mesh>
