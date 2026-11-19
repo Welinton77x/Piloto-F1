@@ -615,3 +615,63 @@ export const GameBoxVI: React.FC<{p?: V3; r?: V3; s?: number; glow?: number}> = 
     {glow > 0.01 && <pointLight position={[0, 0.2, 0.6]} intensity={0.8 * glow} distance={2} decay={2} color="#ff8fd0" />}
   </group>
 );
+
+/* ---------- despertador digital (23:59 → 00:00) ---------- */
+const clockTex = (txt: string) =>
+  canvasTex("relogio-" + txt, 256, 128, (c) => {
+    c.fillStyle = "#0a0a10";
+    c.fillRect(0, 0, 256, 128);
+    c.font = "bold 92px monospace";
+    c.textAlign = "center";
+    c.fillStyle = "#ff3b3b";
+    c.shadowColor = "#ff3b3b";
+    c.shadowBlur = 16;
+    c.fillText(txt, 128, 98);
+  });
+export const DigitalClock: React.FC<{p: V3; rotY?: number; s?: number; time: string; ring?: number; t?: number}> = ({p, rotY = 0, s = 1, time, ring = 0, t = 0}) => {
+  const sh = ring * 0.025 * Math.sin(t * 70);
+  return (
+    <group position={[p[0] + sh, p[1] + Math.abs(sh), p[2]]} rotation={[0, rotY, ring * 0.08 * Math.sin(t * 55)]} scale={s}>
+      <mesh position={[0, 0.09, 0]} geometry={rbox(0.36, 0.18, 0.14, 0.03)} material={sm("#2a2e3b", 0.4)} castShadow />
+      <mesh position={[0, 0.095, 0.071]} material={glowMat("relogio-" + time, clockTex(time), 1.2)}>
+        <planeGeometry args={[0.31, 0.15]} />
+      </mesh>
+      <mesh position={[0, 0.19, 0]} material={sm(ring > 0 ? "#ff3b3b" : "#5a5f6a", 0.4, {emissive: ring > 0 ? "#ff3b3b" : "#000000", emissiveIntensity: ring})}>
+        <boxGeometry args={[0.1, 0.03, 0.06]} />
+      </mesh>
+    </group>
+  );
+};
+
+/* ---------- livro aberto, fino (capas pra fora, páginas pra quem lê) ---------- */
+const bookLabel = (key: string, text: string, size: number) =>
+  canvasTex(key, 256, 340, (c) => {
+    c.fillStyle = "#c0262d";
+    c.fillRect(0, 0, 256, 340);
+    c.strokeStyle = "#ffd21f";
+    c.lineWidth = 8;
+    c.strokeRect(14, 14, 228, 312);
+    c.fillStyle = "#ffd21f";
+    c.font = `bold ${size}px sans-serif`;
+    c.textAlign = "center";
+    c.fillText(text, 128, 180);
+  });
+export const OpenBook: React.FC<{p: V3; r?: V3; s?: number; open?: number}> = ({p, r = [0, 0, 0], s = 1, open = 0.5}) => {
+  const page = sm("#fbf7ee", 0.8);
+  const cover = sm("#c0262d", 0.5);
+  return (
+    <group position={p} rotation={r} scale={s}>
+      {[-1, 1].map((sd) => (
+        <group key={sd} rotation={[0, sd * open, 0]}>
+          <mesh position={[0.105 * sd, 0, 0]} geometry={rbox(0.21, 0.29, 0.012, 0.004)} material={cover} castShadow />
+          <mesh position={[0.1 * sd, 0, -0.012]} material={page}>
+            <boxGeometry args={[0.195, 0.27, 0.014]} />
+          </mesh>
+          <mesh position={[0.105 * sd, 0, 0.0065]} material={tm("livro-" + sd, sd > 0 ? bookLabel("livro-1", "MATEMÁTICA", 34) : bookLabel("livro--1", "+ − × ÷", 52), 0.6)}>
+            <planeGeometry args={[0.2, 0.28]} />
+          </mesh>
+        </group>
+      ))}
+    </group>
+  );
+};

@@ -8,7 +8,7 @@ import {Toy, ToyLook} from "./Toy";
 import {Post} from "./Post";
 import {fontFamily} from "./Video";
 import {Sky, SunLight, Town, Tree, House, V3} from "./Sets5";
-import {Dog, sm, rbox, Controller, RoomShell, Sofa, SOFA_SEAT, MathBook} from "./Sets9";
+import {Dog, sm, rbox, Controller, RoomShell, Sofa, SOFA_SEAT} from "./Sets9";
 import {ChefHat} from "./Sets11";
 import {PaperHat} from "./Sets12";
 import {Sparks, Bolt, EvaHelmet, Dam} from "./Sets14";
@@ -16,9 +16,9 @@ import {Stadium} from "./Sets17";
 import {Space} from "./Sets18";
 import {BedroomC, Mug} from "./Sets19";
 import {Bg} from "./Sets20";
-import {AlarmClock, SoundRings, Nightstand} from "./Sets21";
+import {SoundRings, Nightstand} from "./Sets21";
 import {Helicopter, Pizza} from "./Sets22";
-import {GameTV, ScreenMode, GiantDish, SpaceStation, Letter, LightBill, ShipHorn, BigScreen, PizzaBox, PizzaStack, PizzeriaSet, PowerCable, YearCal, Confetti3D, ItaipuSign, GameBoxVI} from "./Sets26";
+import {GameTV, ScreenMode, GiantDish, SpaceStation, Letter, LightBill, ShipHorn, BigScreen, PizzaBox, PizzaStack, PizzeriaSet, PowerCable, YearCal, Confetti3D, ItaipuSign, GameBoxVI, DigitalClock, OpenBook} from "./Sets26";
 import {Captions, Wd, clean} from "./Overlays";
 import {FPS, clamp, lerp, ramp, pop, easeInOut, easeOut} from "./util";
 import W from "./timingGta6.json";
@@ -278,34 +278,52 @@ const Item1d: React.FC<ShotProps> = ({f, a, t}) => (
 );
 
 /* ② sirene de navio */
-const NightRoom: React.FC<{t: number}> = ({t}) => (
-  <>
-    <BedroomC night />
-    <hemisphereLight args={["#9fb0ff", "#403050", 0.55]} />
-    <pointLight position={[1.4, 1.6, -0.6]} intensity={4} distance={6} decay={1.5} color="#bfd0ff" castShadow />
-    <Nightstand p={[1.35, 0, -1.6]} />
-    <AlarmClock p={[1.5, 0.6, -1.55]} rotY={-0.4} s={0.7} t={t} />
-    <GameTV p={[-1.8, 0, -1.6]} rotY={0.5} mode="clock" s={0.8} />
-  </>
-);
-const Item2: React.FC<ShotProps> = ({f, a, t}) => {
-  const blow = f >= MAS[2] ? 1 : 0;
-  const jump = blow ? Math.sin(clamp((f - MAS[2] - 6) / 22) * Math.PI) : 0;
+const NightRoom: React.FC<{t: number; f: number}> = ({t, f}) => {
+  const midnight = f >= MAS[2];
   return (
     <>
-      <Cam pos={[2.4, 1.9, 1.5]} look={[0.4, 1.25, -1.0]} fov={62} f={f} a={blow ? MAS[2] - 3 : a} />
-      <NightRoom t={t} />
-      <ShipHorn p={[1.2, 0.6, -1.55]} rotY={-0.5} s={1.0} blow={blow} t={t} />
-      {blow > 0 && <SoundRings p={[1.05, 0.95, -1.25]} t={t} color="#ffd21f" size={1.4} />}
-      <Toy pose={{...idle(f), pos: [0, 0.32 + jump * 0.8, -1.2], rotY: 0.3, legLift: 1, blink: blow ? 0 : 1, eyeWide: blow ? 1 : 0, brow: blow ? 1 : 0, mouthOpen: blow ? 0.6 : 0.15, hairLift: blow ? 1 : 0, head: blow ? [0, 0, 0] : [0.35, 0, 0.35], ...(blow ? ARMS_UP : {rShoulder: [0, 0, -0.1], lShoulder: [0, 0, 0.1]})}} look={PIJAMA} />
+      <BedroomC night />
+      <hemisphereLight args={["#9fb0ff", "#403050", 0.55]} />
+      <pointLight position={[0.6, 1.8, -0.4]} intensity={4} distance={6} decay={1.5} color="#bfd0ff" castShadow />
+      <Nightstand p={[-1.35, 0, -1.6]} mark={false} />
+      <DigitalClock p={[-1.5, 0.6, -1.5]} rotY={0.5} s={1.0} time={midnight ? "00:00" : "23:59"} ring={midnight ? 1 : 0} t={t} />
+      <ShipHorn p={[-1.15, 0.6, -1.7]} rotY={0.6} s={0.9} blow={midnight ? 1 : 0} t={t} />
+      {midnight && <SoundRings p={[-1.0, 0.95, -1.35]} t={t} color="#ffd21f" size={1.4} />}
+      <GameTV p={[1.9, 0, -1.3]} rotY={-0.6} mode={midnight ? "clock" : "off"} s={0.8} />
+    </>
+  );
+};
+/* menino deitado (barriga pra cima, cabeça no travesseiro) */
+const Sleeper: React.FC<{f: number; awake: number}> = ({f, awake}) => (
+  <group position={[0, 0.84 + awake * 0.9, -0.2]} rotation={[-Math.PI / 2 * (1 - awake), 0, 0]}>
+    <Toy pose={{...idle(f), pos: [0, 0, 0], rotY: 0, blink: awake > 0 ? 0 : 1, eyeWide: awake > 0 ? 1 : 0, brow: awake > 0 ? 1 : 0, mouthOpen: awake > 0 ? 0.6 : 0.15, hairLift: awake > 0 ? 1 : 0, head: awake > 0 ? [0, 0, 0] : [0, 0.45, 0], ...(awake > 0 ? ARMS_UP : {})}} look={PIJAMA} />
+  </group>
+);
+const Item2: React.FC<ShotProps> = ({f, a, t}) => {
+  const blow = f >= MAS[2];
+  const up = blow ? easeOut(clamp((f - MAS[2] - 4) / 12)) : 0;
+  const hop = blow ? Math.abs(Math.sin(clamp((f - MAS[2] - 4) / 30) * Math.PI)) * 0.5 : 0;
+  return (
+    <>
+      {blow ? (
+        <Cam pos={[1.9, 1.9, 2.3]} look={[-0.35, 1.55, -1.0]} fov={64} f={f} a={MAS[2] - 3} />
+      ) : (
+        <Cam pos={[2.9, 2.1, -0.75]} look={[-0.2, 0.8, -1.15]} fov={62} f={f} a={a} />
+      )}
+      <NightRoom t={t} f={f} />
+      {blow ? (
+        <Toy pose={{...idle(f), pos: [0, 0.62 + hop, -0.9], rotY: 0.4, eyeWide: 1, brow: 1, mouthOpen: 0.6, hairLift: 1, ...ARMS_UP}} look={PIJAMA} />
+      ) : (
+        <Sleeper f={f} awake={up} />
+      )}
     </>
   );
 };
 const Item2b: React.FC<ShotProps> = ({f, a, t}) => (
   <>
-    <Cam pos={[-0.7, 1.3, 0.5]} look={[-1.8, 1.05, -1.6]} fov={50} f={f} a={a} />
-    <NightRoom t={t} />
-    <ShipHorn p={[1.2, 0.6, -1.55]} rotY={-0.5} s={1.0} />
+    <Cam pos={[-0.55, 1.05, -0.6]} look={[-1.45, 0.72, -1.55]} fov={46} f={f} a={a} />
+    <NightRoom t={t} f={f} />
+    <Sleeper f={f} awake={0} />
   </>
 );
 const Item2c: React.FC<ShotProps> = ({f, a, t}) => (
@@ -473,7 +491,7 @@ const S6: React.FC<ShotProps> = ({f, a, t}) => {
       ) : (
         <Player f={f} t={t} look={PIJAMA} extra={{smile: 1}} />
       )}
-      {book && <MathBook p={[0.35, 1.05, 1.05]} r={[-0.9, 0.7, 0]} s={0.9} open={1} />}
+      {book && <OpenBook p={[0.27, 1.12, 1.0]} r={[0.15, 0.7, 0]} s={1.0} open={0.45} />}
       {mom > 0 && <Toy pose={{...idle(f + 5), pos: [lerp(-3.4, -1.0, mom), 0, 0.6], rotY: 0.9, walk: t * 8, walkAmt: mom < 1 ? 1 : 0, brow: -0.6, ...(f > MAE6 + 12 ? {rShoulder: [-0.4, 0, -0.5], rElbow: -1.6, lShoulder: [-0.4, 0, 0.5], lElbow: -1.6} : {})}} look={MAE} />}
     </>
   );
@@ -586,10 +604,10 @@ const TimerCard: React.FC<{from: number; to: number; big: string; small: string}
     </div>
   </Card>
 );
-const CheckCard: React.FC<{from: number; to: number; title: string; items: string[]; step?: number}> = ({from, to, title, items, step = 14}) => {
+const CheckCard: React.FC<{from: number; to: number; title: string; items: string[]; step?: number; y?: number}> = ({from, to, title, items, step = 14, y = 820}) => {
   const f = useCurrentFrame();
   return (
-    <Card from={from} to={to}>
+    <Card from={from} to={to} y={y}>
       <div style={{fontWeight: 900, fontSize: 46, color: "#2e6fd8", textAlign: "left", marginBottom: 10}}>{title}</div>
       {items.map((it, i) =>
         f >= from + 8 + i * step ? (
@@ -711,7 +729,7 @@ export const VideoGta6: React.FC = () => {
       <Bubble from={SEM1} to={MANDAM1 - 4} text="SEM WI-FI AQUI! 📵" y={420} size={54} />
       <Tag from={MANDAM1} to={L(2) - 2} text="RECLAMAÇÃO DO ESPAÇO 🚀" y={330} />
       <InfoCard from={CENTO2} to={BAIRRO2 - 3} big="150" unit="DECIBÉIS" small="o seu despertador: 60" />
-      <CheckCard from={BAIRRO2 + 4} to={L(3) - 2} title="ACORDARAM:" items={["você", "o bairro", "o cachorro do vizinho"]} step={12} />
+      <CheckCard from={BAIRRO2 + 4} to={L(3) - 2} title="ACORDARAM:" items={["você", "o bairro", "o cachorro do vizinho"]} step={12} y={540} />
       <InfoCard from={CENTO3} to={QUARENTA3 - 4} big="120 m²" unit="DE TELÃO" small="a sua TV: meio metro" />
       <InfoCard from={QUARENTA3} to={BATER3 - 2} big="40.000" unit="PESSOAS" small="na sua sala: 1 cachorro" />
       <Ono from={POSTE3} to={L(4) - 2} text="UUUH!" y={420} size={130} color="#ffffff" />
