@@ -12,4 +12,4 @@
 [amused] Ele jura que o chocolate tá vindo. | [mischievously] O chocolate ficou na dimensão mole... tomando banho de pudim.
 [excited] Os três minutos acabam. | [amused] O pinguim cobra a lula... a lula cobra você... | [mischievously] e você paga com o único granulado que saiu.
 [excited] Parabéns! | [amused] Você fez brigadeiro na Lua... e até agora só saiu granulado.
-[mischievously] Agora segue o sábio. Se não seguir, a minha tia geladeira vai trancar o seu sorvete. Pra sempre.
+[excited] Agora me segueee... | [excited] me segueee agora! | [mischievously] Se não seguir, a minha tia geladeira vai trancar o seu sorvete. Pra sempre.

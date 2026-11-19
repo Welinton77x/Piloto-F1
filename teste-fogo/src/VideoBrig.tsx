@@ -164,6 +164,9 @@ const UNICO12 = at(12, "unico");
 const PARABENS13 = at(13, "parabens");
 const SAIU13 = at(13, "saiu");
 const TRANCAR14 = at(14, "trancar");
+const SEGUE14 = at(14, "segueee");
+const SEGUE14B = at(14, "segueee", 1);
+const SE14 = at(14, "se");
 const SEMPRE14 = at(14, "sempre");
 
 const PAN_ITEM = (
@@ -551,6 +554,30 @@ const S13: React.FC<ShotProps> = ({f, a, t}) => (
     <SprinklePile p={[0.6, 0, 1.2]} n={60} r={0.6} />
   </>
 );
+/* 14 — "me segueee": o menino vem correndo pra cima de você */
+const S14a: React.FC<ShotProps> = ({f, a, t}) => {
+  const k = clamp((f - a) / (SE14 - a));
+  const z = lerp(-9, 1.6, k);
+  const shake = 0.04 * Math.sin(t * 37);
+  return (
+    <>
+      <Cam pos={[0.15 + shake, 1.15 + shake * 0.5, lerp(4.2, 4.6, k)]} look={[0, 1.15, z - 2]} fov={52} f={f} a={a} punch={4} />
+      <Flat bg="#ff5a3a" ground="#c8402a" light={0.9} />
+      {Array.from({length: 8}, (_, i) => (
+        <mesh key={i} position={[(i % 2 ? 1 : -1) * (1.2 + (i % 3) * 0.5), 0.6 + (i % 4) * 0.5, z - 1 - ((t * 12 + i * 1.7) % 6)]}>
+          <boxGeometry args={[0.03, 0.03, 1.2]} />
+          <meshBasicMaterial color="#ffffff" transparent opacity={0.6} />
+        </mesh>
+      ))}
+      <PBoy id="s14a" a={a} f={f} pose={(fr) => {
+        const tt = tf(fr);
+        const yell = (fr >= SEGUE14 - 2 && fr < SEGUE14 + 24) || (fr >= SEGUE14B - 2 && fr < SEGUE14B + 20);
+        return {...idle(fr), pos: [0.08 * Math.sin(tt * 8), Math.abs(Math.sin(tt * 8)) * 0.12, lerp(-9, 1.6, clamp((fr - a) / (SE14 - a)))], rotY: 0, ...RUN(tt * 0.6), rShoulder: [-1.55 + 0.12 * Math.sin(tt * 16), 0.15, -0.1], rElbow: -0.15, lShoulder: [-1.55 - 0.12 * Math.sin(tt * 16), -0.15, 0.1], lElbow: -0.15, torso: [0.22, 0, 0.05 * Math.sin(tt * 8)], head: [-0.15, 0.08 * Math.sin(tt * 5), 0], brow: -1, eyeWide: 1, mouthOpen: yell ? 0.8 : 0.35, blink: 0};
+      }} />
+    </>
+  );
+};
+
 /* 14 — a tia geladeira tranca o sorvete */
 const S14: React.FC<ShotProps> = ({f, a, t}) => {
   const lock = f >= TRANCAR14 - 4 ? easeOut(clamp((f - TRANCAR14 + 4) / 10)) : 0;
@@ -581,7 +608,8 @@ const SHOTS: Shot[] = [
   {from: CHOCO11 - 3, Comp: S11b},
   {from: L(12), Comp: S12},
   {from: L(13), Comp: S13},
-  {from: L(14), Comp: S14},
+  {from: L(14), Comp: S14a},
+  {from: SE14 - 3, Comp: S14},
 ];
 
 const Scene: React.FC<{f: number}> = ({f}) => {
@@ -598,7 +626,7 @@ const Scene: React.FC<{f: number}> = ({f}) => {
 };
 
 /* ======================= camadas 2D ======================= */
-const KEYS = new Set(["brigadeiro", "lua", "leite", "condensado", "lata", "toboga", "medo", "altura", "tia", "geladeira", "oito", "mil", "metros", "favor", "frances", "fila", "quinhentas", "cinquenta", "seguidores", "segue", "primo", "batedeira", "oculos", "escuros", "decola", "espacial", "fogao", "lula", "bombeira", "apaga", "granulado", "pinguim", "patinete", "moeda", "chocolate", "terra", "fiado", "tres", "minutos", "fura", "espaco", "dimensao", "mole", "gelatina", "come", "fligorar", "bambolete", "ploft", "pudim", "fligoramento", "gelatinoso", "choque", "tentaculo", "mexe", "jura", "banho", "acabam", "unico", "parabens", "sabio", "trancar", "sorvete", "sempre"]);
+const KEYS = new Set(["brigadeiro", "lua", "leite", "condensado", "lata", "toboga", "medo", "altura", "tia", "geladeira", "oito", "mil", "metros", "favor", "frances", "fila", "quinhentas", "cinquenta", "seguidores", "segue", "primo", "batedeira", "oculos", "escuros", "decola", "espacial", "fogao", "lula", "bombeira", "apaga", "granulado", "pinguim", "patinete", "moeda", "chocolate", "terra", "fiado", "tres", "minutos", "fura", "espaco", "dimensao", "mole", "gelatina", "come", "fligorar", "bambolete", "ploft", "pudim", "fligoramento", "gelatinoso", "choque", "tentaculo", "mexe", "jura", "banho", "acabam", "unico", "parabens", "segueee", "agora", "trancar", "sorvete", "sempre"]);
 const Tag: React.FC<{from: number; to: number; text: string; x?: number; y?: number}> = ({from, to, text, x = 540, y = 420}) => {
   const f = useCurrentFrame();
   if (f < from || f > to) return null;
@@ -766,7 +794,8 @@ export const VideoBrig: React.FC = () => {
       <Tag from={UNICO12} to={L(13) - 2} text="ÚNICO GRANULADO" />
       <Confetti from={PARABENS13} to={PARABENS13 + 70} />
       <TopTitle from={SAIU13} to={L(14) - 2} text="SÓ SAIU GRANULADO" size={80} />
-      <TopTitle from={L(14)} to={TRANCAR14 - 3} text="SEGUE O SÁBIO" />
+      <Ono from={SEGUE14} to={SEGUE14B - 4} text="ME SEGUEEE!" y={420} size={140} color="#ffd21f" rot={-6 + 3 * Math.sin(f / 2)} />
+      <Ono from={SEGUE14B} to={SE14 - 3} text="ME SEGUEEE AGORA!" y={420} size={88} color="#ff4d6d" rot={5 + 3 * Math.sin(f / 2)} />
 
       <Captions words={words} keys={KEYS} />
       <FollowCard from={FOLLOW_FROM} to={TOTAL_BRIG - 1} tap={FOLLOW_TAP} />
@@ -799,6 +828,8 @@ export const VideoBrig: React.FC = () => {
       <SND src="sfx7/cash.mp3" from={UNICO12} dur={30} v={FXV * 0.35} />
       <SND src="sfx7/confetti.mp3" from={PARABENS13} dur={50} v={FXV * 0.4} />
       <SND src="sfx9/yay.mp3" from={PARABENS13} dur={50} v={FXV * 0.3} />
+      <SND src="sfx2/steps.mp3" from={L(14)} dur={SE14 - L(14)} v={FXV * 0.4} />
+      <SND src="sfx11/drama.mp3" from={L(14)} dur={40} v={FXV * 0.3} />
       <SND src="sfx11/lock.mp3" from={TRANCAR14} dur={30} v={FXV * 0.45} />
       <SND src="sfx2/click.mp3" from={FOLLOW_TAP - 2} dur={20} v={FXV * 0.8} />
     </AbsoluteFill>
