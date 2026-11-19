@@ -1,7 +1,7 @@
 # uso: python3 mix_voz.py <video_sem_ou_com_audio_novo.mp4> <audio_de_efeitos.mp4> <saida.mp4>
 # Vozes ElevenLabs (eleven_v3) em vozes/. Caio (protagonista) = Davi Andrei, outro vigia = Wesley Bessa,
 # Central = Thiago (filtro de rádio), regras vermelhas = Nassif (grave + camada + impacto).
-# Outro vigia: tom 0.76, 12% mais lento, camada uma oitava abaixo, sussurro dobrado, eco reverso antes da fala.
+# Outro vigia: tom 0.87, 6% mais lento, camada grave leve, eco reverso suave antes da fala.
 import subprocess, sys, os, tempfile
 D = os.path.dirname(os.path.abspath(__file__)); VID, BG, OUT = sys.argv[1:4]
 T = tempfile.mkdtemp()
@@ -17,14 +17,13 @@ RULE = ("[0:a]highpass=f=60,acompressor=threshold=-20dB:ratio=4:attack=5:release
         "[m][low]amix=inputs=2:normalize=0,aecho=0.8:0.7:90|180:0.3|0.18,"
         "alimiter=limit=0.9[o]")
 PRE = 0.5  # segundos de eco reverso antes da fala do outro vigia
-GHOST = ("[0:a]adelay=500|500,apad=pad_dur=0.6,asplit=4[a][b][c][d];"
-  "[a]rubberband=pitch=0.76:tempo=0.88,vibrato=f=4.5:d=0.06,acompressor=threshold=-20dB:ratio=4,volume=1.3[main];"
-  "[b]rubberband=pitch=0.5:tempo=0.88,lowpass=f=700,volume=0.7[sub];"
-  "[c]rubberband=pitch=1.0:tempo=0.88,highpass=f=2200,adelay=28|45,volume=0.45[air];"
-  "[d]rubberband=pitch=0.76:tempo=0.88,areverse,aecho=0.8:0.9:110|240|380:0.55|0.38|0.22,areverse,highpass=f=200,volume=0.6[rev];"
-  "[main][sub][air][rev]amix=inputs=4:normalize=0,asoftclip=type=tanh,"
-  "aecho=0.8:0.55:85|190:0.28|0.16,lowpass=f=6500,highpass=f=45,alimiter=limit=0.9[o]")
-GT = {"09c": 1.0}  # fala com o nome: sem desacelerar, para caber
+GHOST = ("[0:a]adelay=500|500,apad=pad_dur=0.5,asplit=3[a][b][d];"
+  "[a]rubberband=pitch=0.87:tempo=0.94,acompressor=threshold=-20dB:ratio=3,volume=1.25[main];"
+  "[b]rubberband=pitch=0.6:tempo=0.94,lowpass=f=600,volume=0.22[sub];"
+  "[d]rubberband=pitch=0.87:tempo=0.94,areverse,aecho=0.8:0.85:120|260:0.4|0.22,areverse,highpass=f=250,volume=0.32[rev];"
+  "[main][sub][rev]amix=inputs=3:normalize=0,"
+  "aecho=0.8:0.45:75|170:0.22|0.12,lowpass=f=7500,highpass=f=50,alimiter=limit=0.9[o]")
+GT = {"09c": 1.04}  # fala com o nome: sem desacelerar, para caber
 # (arquivo, quem, início em s, velocidade)
 L = [("01","P",2.95,1),("02","P",5.75,1),("R1","R",8.77,1),("03","P",13.25,1),("04b","C",16.30,1.08),
      ("05","P",18.68,1),("06","O",22.70,1),("07","P",28.05,1),("08","O",31.30,1),("09c","O",34.45,1.0),

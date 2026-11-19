@@ -312,9 +312,7 @@ function clockMin(f) { return 0; }
 function gateOpen(f) { if (f < GHOST_OUT) return 0; return -0.55 - Math.sin((f - GHOST_OUT) * 0.05) * 0.04; }
 function radioTalk(f) { return (f >= 410 && f < 480) || (f >= 1303 && f < 1402); }
 let CCTV_PASS = false;
-const CCTV_GHOST = [360, 392];
 function ghostState(f) {
-  if (CCTV_PASS && f >= CCTV_GHOST[0] && f < CCTV_GHOST[1]) return { vis: true, x: 0.25, z: GATE_Z - 2.9, yaw: 0, tilt: 0.3, nod: 0.12, arm: 0 };
   const vis = f >= GHOST_IN && f < GHOST_OUT;
   let z = GATE_Z - 0.9, x = 0.15;
   z = lerp(z, GATE_Z - 0.32, ease(seg(f, 845, 910)));
@@ -353,7 +351,9 @@ const KF = [
   [310, CLOCK[0] - 0.12, CLOCK[1] - 0.04, 64], [338, CLOCK[0] - 0.14, CLOCK[1] - 0.03, 60],
   [356, TVAIM[0], TVAIM[1] - 0.01, 30], [392, TVAIM[0] + 0.005, TVAIM[1], 25],
   [410, RADIO[0], RADIO[1] + 0.05, 70], [530, RADIO[0] + 0.03, RADIO[1] + 0.06, 62],
-  [552, GATE[0], GATE[1] - 0.06, 78], [740, GATE[0] + 0.01, GATE[1] - 0.06, 56],
+  [552, GATE[0], GATE[1] - 0.06, 78], [592, GATE[0], GATE[1] - 0.06, 70],
+  [610, TVAIM[0], TVAIM[1] - 0.01, 30], [676, TVAIM[0] + 0.005, TVAIM[1], 26],
+  [696, GATE[0] + 0.01, GATE[1] - 0.06, 60], [740, GATE[0] + 0.01, GATE[1] - 0.06, 56],
   [760, GATE[0], GATE[1] - 0.12, 64], [835, GATE[0] + 0.01, GATE[1] - 0.12, 60],
   [858, FACE[0], FACE[1] - 0.06, 34], [955, FACE[0], FACE[1] - 0.04, 28],
   [975, FACE[0] - 0.02, FACE[1] - 0.08, 30], [1074, FACE[0] - 0.02, FACE[1] - 0.06, 22],
@@ -389,7 +389,7 @@ const SUBS = [
   [414, 484, '[RÁDIO] Central chamando, Caio. Tudo certo aí?', '#5ec8ff'],
   [485, 534, 'Tudo certo. Nenhum movimento.', '#ffffff'],
   [534, 568, '[batidas no portão]', '#b9c9c1', true],
-  [600, 736, 'Ei... abre aqui pra mim?', '#FFD21F'],
+  [600, 736, 'Ei... abre aqui pra mim?', '#FFD21F', false, 1500],
   [764, 836, 'Quem é você?', '#ffffff'],
   [862, 950, 'Sou o vigia da noite.', '#FFD21F'],
   [958, 1092, 'Você esqueceu a regra três... Caio?', '#FFD21F'],
@@ -472,7 +472,7 @@ const U = n => gl.getUniformLocation(P3, n);
 const out = document.getElementById('out'), ox = out.getContext('2d');
 function lookFrom(e, t) { const dx = t[0]-e[0], dy = t[1]-e[1], dz = t[2]-e[2]; const yaw = Math.atan2(-dx, -dz), pitch = Math.atan2(dy, Math.hypot(dx, dz)); return M(RX(-pitch), RY(-yaw), T(-e[0], -e[1], -e[2])); }
 const CCTV_VIEWS = [ // [viewport x, y] (y=192 é a metade de cima), olho, alvo
-  [0, 192, [1.25, 2.8, -1.7], [0.0, 1.1, -4.6]],
+  [0, 192, [1.2, 2.75, -2.9], [0.1, 1.15, -5.4]],
   [256, 192, [-1.25, 2.8, -5.0], [0.3, 0.9, -10.5]],
   [256, 0, [-1.2, 2.75, -0.9], [1.45, 1.6, -2.4]],
 ];
