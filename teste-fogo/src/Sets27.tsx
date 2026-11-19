@@ -99,7 +99,7 @@ export const SchoolBus: React.FC<{p: V3; rotY?: number; s?: number; spin?: numbe
 };
 
 /* ---------- canguru (bicho normal, com a plaquinha de 5 estrelas) ---------- */
-export const Kangaroo: React.FC<{p: V3; rotY?: number; s?: number; t?: number; blink?: number; tired?: number; squash?: number; plaque?: boolean; pouch?: React.ReactNode; legs?: number}> = ({p, rotY = 0, s = 1, t = 0, blink = 0, tired = 0, squash = 0, plaque = true, pouch, legs = 0}) => {
+export const Kangaroo: React.FC<{p: V3; rotY?: number; s?: number; t?: number; blink?: number; tired?: number; squash?: number; plaque?: boolean; pouch?: React.ReactNode; legs?: number; hold?: React.ReactNode; tilt?: number}> = ({p, rotY = 0, s = 1, t = 0, blink = 0, tired = 0, squash = 0, plaque = true, pouch, legs = 0, hold, tilt = 0}) => {
   const fur = sm("#c98a4b", 0.75);
   const belly = sm("#ecc597", 0.8);
   const dark = sm("#6b4426", 0.7);
@@ -137,13 +137,20 @@ export const Kangaroo: React.FC<{p: V3; rotY?: number; s?: number; t?: number; b
       </mesh>
       {pouch && <group position={[0, 0.95, 0.32]}>{pouch}</group>}
       {/* bracinhos */}
-      {[-1, 1].map((sd) => (
-        <mesh key={"a" + sd} position={[0.3 * sd, 1.45, 0.33]} rotation={[1.1, 0, 0.2 * sd]} material={fur} castShadow>
-          <capsuleGeometry args={[0.06, 0.3, 4, 8]} />
-        </mesh>
-      ))}
+      {[-1, 1].map((sd) =>
+        hold ? (
+          <mesh key={"a" + sd} position={[0.17 * sd, 1.66, 0.5]} rotation={[1.35, 0, -0.55 * sd]} material={fur} castShadow>
+            <capsuleGeometry args={[0.06, 0.34, 4, 8]} />
+          </mesh>
+        ) : (
+          <mesh key={"a" + sd} position={[0.3 * sd, 1.45, 0.33]} rotation={[1.1, 0, 0.2 * sd]} material={fur} castShadow>
+            <capsuleGeometry args={[0.06, 0.3, 4, 8]} />
+          </mesh>
+        ),
+      )}
+      {hold && <group position={[0, 1.86, 0.74]}>{hold}</group>}
       {/* cabeça */}
-      <group position={[0, 1.98, 0.14]} rotation={[tired * 0.35, 0, 0]}>
+      <group position={[0, 1.98, 0.14]} rotation={[tired * 0.35 - tilt * 0.45, 0, 0]}>
         <mesh scale={[0.27, 0.27, 0.28]} material={fur} castShadow>
           <sphereGeometry args={[1, 20, 16]} />
         </mesh>
@@ -231,18 +238,20 @@ export const SchoolHouse: React.FC<{p: V3; rotY?: number}> = ({p, rotY = 0}) => 
 
 /* ---------- gorro de Papai Noel (espaço da cabeça) ---------- */
 export const SantaHat: React.FC<{k?: number}> = ({k = 1}) => (
-  <group position={[0, 0.3, -0.02]} scale={k}>
-    <mesh position={[0, 0.0, 0]} material={sm("#ffffff", 0.9)}>
-      <torusGeometry args={[0.3, 0.08, 10, 26]} />
+  <group position={[0, 0.2, -0.03]} rotation={[-0.22, 0, 0.06]} scale={k}>
+    {/* aba branca abraçando o cabelo */}
+    <mesh rotation={[Math.PI / 2, 0, 0]} scale={[1, 0.94, 1]} material={sm("#ffffff", 0.95)} castShadow>
+      <torusGeometry args={[0.36, 0.085, 12, 32]} />
     </mesh>
-    <mesh position={[0, 0.0, 0]} rotation={[Math.PI / 2, 0, 0]} material={sm("#d8262d", 0.7)}>
-      <circleGeometry args={[0.3, 24]} />
+    {/* corpo vermelho cobrindo o topo da cabeça */}
+    <mesh position={[0, 0.03, 0]} scale={[1, 0.55, 0.94]} material={sm("#d8262d", 0.7)} castShadow>
+      <sphereGeometry args={[0.35, 26, 14, 0, Math.PI * 2, 0, Math.PI / 2]} />
     </mesh>
-    <mesh position={[0.08, 0.28, -0.04]} rotation={[0.2, 0, -0.35]} material={sm("#d8262d", 0.7)} castShadow>
-      <coneGeometry args={[0.3, 0.6, 22]} />
+    <mesh position={[0.06, 0.32, -0.05]} rotation={[0.25, 0, -0.45]} material={sm("#d8262d", 0.7)} castShadow>
+      <coneGeometry args={[0.24, 0.5, 22]} />
     </mesh>
-    <mesh position={[0.24, 0.5, -0.1]} material={sm("#ffffff", 0.9)}>
-      <sphereGeometry args={[0.08, 12, 10]} />
+    <mesh position={[0.2, 0.52, -0.12]} material={sm("#ffffff", 0.95)} castShadow>
+      <sphereGeometry args={[0.075, 14, 10]} />
     </mesh>
   </group>
 );

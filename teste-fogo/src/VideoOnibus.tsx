@@ -386,7 +386,7 @@ const S6: React.FC<ShotProps> = ({f, a, t}) => {
   const inPouch = hop >= 1;
   const tired = f >= MAS6 - 3 ? 1 : 0;
   const coffee = f >= TOMA6 - 3;
-  const drink = coffee ? clamp((f - TOMA6) / 30) : 0;
+  const drink = coffee ? clamp((f - TOMA6 + 3) / 40) : 0;
   const wired = f >= PULA6B - 20;
   const up = clamp((f - PULA6B + 6) / 12);
   const kp: V3 = [lerp(KANG_O[0], HOLE[0], up), up * up * 8, lerp(KANG_O[2], HOLE[2], up)];
@@ -396,9 +396,8 @@ const S6: React.FC<ShotProps> = ({f, a, t}) => {
       <OfficeLights />
       <DirectorOffice broken={1} t={t} />
       <Toy pose={{...idle(f), pos: DIR_O, rotY: 0.3, eyeWide: 1, brow: 1, mouthOpen: up > 0 ? 0.6 : 0.2, head: [up > 0 ? -0.5 : 0, 0.3, 0]}} look={DIRETORA} headExtra={<HeadGlasses />} />
-      <Kangaroo p={kp} rotY={-0.4} s={K_IN} t={t} tired={wired ? 0 : tired} squash={wired && up <= 0 ? 0.06 * Math.sin(t * 40) : up > 0 ? -0.2 : 0} legs={up > 0 ? 1 : 0} pouch={inPouch ? <InPouch f={f} extra={{eyeWide: wired ? 1 : 0.5, mouthOpen: wired ? 0.5 : 0}} headExtra={<SantaHat />} /> : undefined} />
+      <Kangaroo p={kp} rotY={coffee && !wired && up <= 0 ? -1.2 : -0.4} s={K_IN} t={t} tired={wired || (coffee && up <= 0) ? 0 : tired} squash={wired && up <= 0 ? 0.06 * Math.sin(t * 40) : up > 0 ? -0.2 : 0} legs={up > 0 ? 1 : 0} tilt={coffee && !wired ? Math.sin(drink * Math.PI) : 0} hold={coffee && up <= 0 && !wired ? <group rotation={[-Math.sin(drink * Math.PI) * 1.1, 0, 0]}><BigCoffee p={[0, -0.23, 0]} s={1.15} /></group> : undefined} pouch={inPouch ? <InPouch f={f} extra={{eyeWide: wired ? 1 : 0.5, mouthOpen: wired ? 0.5 : 0}} headExtra={<SantaHat />} /> : undefined} />
       {!inPouch && <Toy pose={{...idle(f), pos: [lerp(BOY_O[0], KANG_O[0], hop), Math.sin(hop * Math.PI) * 0.8, lerp(BOY_O[2], KANG_O[2] + 0.3, hop)], rotY: 0.8, ...(f >= PULA6 ? ARMS_UP : {}), eyeWide: 0.8}} look={BAG} headExtra={<SantaHat />} />}
-      {coffee && up <= 0 && <BigCoffee p={[KANG_O[0] + 0.1, 2.05 * K_IN + drink * 0.12, KANG_O[2] + 0.55 * K_IN]} r={[-drink * 1.0, -0.4, 0]} s={1.5} />}
     </>
   );
 };
