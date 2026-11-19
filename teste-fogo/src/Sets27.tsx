@@ -258,7 +258,7 @@ export const GiftBox: React.FC<{p?: V3; r?: V3; s?: number; open?: number}> = ({
         <boxGeometry args={[0.37, 0.31, 0.07]} />
         <meshStandardMaterial color="#ffd21f" roughness={0.4} />
       </mesh>
-      <group position={[0, 0.31 + open * 0.35, 0]} rotation={[-open * 0.9, 0, 0]}>
+      <group position={[open * 0.45, 0.31 + open * 0.1, 0]} rotation={[0, 0, -open * 1.3]}>
         <mesh geometry={rbox(0.4, 0.07, 0.4, 0.02)} material={red} castShadow />
         <mesh position={[0, 0.0, 0]} material={ribbon}>
           <boxGeometry args={[0.41, 0.075, 0.07]} />
@@ -522,3 +522,165 @@ export const NightWindow: React.FC<{p: V3; w?: number; h?: number}> = ({p, w = 1
     ))}
   </group>
 );
+
+/* ---------- rachadura (decal) ---------- */
+const crackTex = () =>
+  canvasTex("rachadura", 512, 512, (c) => {
+    c.clearRect(0, 0, 512, 512);
+    c.strokeStyle = "rgba(30,20,15,0.95)";
+    c.lineCap = "round";
+    const branch = (x: number, y: number, a: number, len: number, w: number, d: number) => {
+      if (d > 4 || len < 12) return;
+      let px = x, py = y;
+      const steps = 5;
+      c.lineWidth = w;
+      c.beginPath();
+      c.moveTo(px, py);
+      for (let i = 0; i < steps; i++) {
+        a += (Math.sin(x * 0.37 + y * 0.11 + i * 1.7 + d) * 0.6);
+        px += Math.cos(a) * len / steps;
+        py += Math.sin(a) * len / steps;
+        c.lineTo(px, py);
+      }
+      c.stroke();
+      branch(px, py, a + 0.7, len * 0.6, w * 0.65, d + 1);
+      branch(px, py, a - 0.6, len * 0.55, w * 0.65, d + 1);
+    };
+    for (let k = 0; k < 7; k++) branch(256, 256, (k / 7) * Math.PI * 2, 150, 9, 0);
+  });
+export const Crack: React.FC<{p: V3; r?: V3; s?: number}> = ({p, r = [-Math.PI / 2, 0, 0], s = 1}) => (
+  <mesh position={p} rotation={r} scale={s} material={tm("rachadura", crackTex(), 0.9, {transparent: true, depthWrite: false})}>
+    <planeGeometry args={[1, 1]} />
+  </mesh>
+);
+
+/* ---------- sala da diretora (com teto que quebra) ---------- */
+export const OFFICE_H = 3.6;
+export const HOLE: V3 = [0.9, OFFICE_H, 0.4];
+export const DirectorOffice: React.FC<{broken?: number; crack?: number; t?: number}> = ({broken = 0, crack = 0, t = 0}) => {
+  const wall = sm("#e9dcc3", 0.85);
+  const H = OFFICE_H;
+  const hw = 1.0; // metade do buraco
+  const shake = crack > 0 && broken < 1 ? 0.01 * Math.sin(t * 60) * crack : 0;
+  return (
+    <group>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} material={sm("#8a5a3a", 0.7)} receiveShadow>
+        <planeGeometry args={[9, 9]} />
+      </mesh>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.005, -0.6]} material={sm("#7a2a3a", 0.9)} receiveShadow>
+        <planeGeometry args={[4.2, 3.2]} />
+      </mesh>
+      <mesh position={[0, H / 2, -3.1]} material={wall} receiveShadow>
+        <boxGeometry args={[9, H, 0.2]} />
+      </mesh>
+      {[-1, 1].map((sd) => (
+        <mesh key={sd} position={[3.6 * sd, H / 2, 0.5]} material={wall} receiveShadow>
+          <boxGeometry args={[0.2, H, 7.4]} />
+        </mesh>
+      ))}
+      {/* teto com o buraco no meio (quatro pedaços) */}
+      <group position={[shake, 0, 0]}>
+        {(
+          [
+            [(-4.5 + HOLE[0] - hw) / 2, HOLE[2], HOLE[0] - hw + 4.5, 2 * hw],
+            [(HOLE[0] + hw + 4.5) / 2, HOLE[2], 4.5 - HOLE[0] - hw, 2 * hw],
+            [0, (-3.2 + HOLE[2] - hw) / 2, 9, HOLE[2] - hw + 3.2],
+            [0, (HOLE[2] + hw + 4.2) / 2, 9, 4.2 - HOLE[2] - hw],
+          ] as [number, number, number, number][]
+        ).map(([x, z, w, d], i) => (
+          <mesh key={i} position={[x, H + 0.1, z]} material={sm("#f4f0e6", 0.9)}>
+            <boxGeometry args={[w, 0.2, d]} />
+          </mesh>
+        ))}
+        {broken < 0.5 && (
+          <mesh position={[HOLE[0], H + 0.1, HOLE[2]]} material={sm("#f4f0e6", 0.9)}>
+            <boxGeometry args={[2 * hw, 0.2, 2 * hw]} />
+          </mesh>
+        )}
+        {crack > 0.01 && broken < 0.5 && <Crack p={[HOLE[0], H - 0.005, HOLE[2]]} r={[Math.PI / 2, 0, 0]} s={0.6 + crack * 2.0} />}
+        {broken >= 0.5 && (
+          <mesh position={[HOLE[0], H + 1.5, HOLE[2]]} rotation={[Math.PI / 2, 0, 0]}>
+            <planeGeometry args={[2 * hw, 2 * hw]} />
+            <meshBasicMaterial color="#8fd0ff" />
+          </mesh>
+        )}
+      </group>
+      {/* janela, quadro e estante */}
+      <mesh position={[-2.2, 2.0, -2.99]} material={sm("#9fd8ff", 0.2, {emissive: "#bfe6ff", emissiveIntensity: 0.5})}>
+        <planeGeometry args={[1.4, 1.1]} />
+      </mesh>
+      <mesh position={[1.8, 2.3, -2.99]} geometry={rbox(1.0, 0.7, 0.04, 0.02)} material={sm("#c9a26a", 0.5)} />
+      <mesh position={[1.8, 2.3, -2.965]} material={tm("quadro-diploma", label("quadro-diploma", "DIPLOMA", "#fbf3dc", "#7a5230", 60, 512, 320), 0.6)}>
+        <planeGeometry args={[0.9, 0.6]} />
+      </mesh>
+      <group position={[3.2, 0, -1.6]}>
+        <mesh position={[0, 1.1, 0]} geometry={rbox(0.5, 2.2, 1.6, 0.03)} material={sm("#7a5230", 0.6)} castShadow />
+        {[0.5, 1.1, 1.7].map((y) =>
+          Array.from({length: 5}, (_, i) => (
+            <mesh key={y + "" + i} position={[-0.1, y + 0.18, -0.6 + i * 0.28]} material={sm(["#e8414f", "#2e86de", "#2ecc71", "#ffd21f", "#8e44ad"][i], 0.6)}>
+              <boxGeometry args={[0.3, 0.36, 0.2]} />
+            </mesh>
+          )),
+        )}
+      </group>
+      {/* mesa da diretora com plaquinha */}
+      <group position={[-0.5, 0, -1.5]}>
+        <mesh position={[0, 0.76, 0]} geometry={rbox(2.0, 0.08, 0.95, 0.02)} material={sm("#6b4426", 0.5)} castShadow receiveShadow />
+        <mesh position={[0, 0.38, 0.0]} geometry={rbox(1.9, 0.72, 0.85, 0.02)} material={sm("#5a3820", 0.6)} castShadow />
+        <group position={[0.45, 0.85, 0.32]} rotation={[-0.35, 0, 0]}>
+          <mesh geometry={rbox(0.62, 0.15, 0.05, 0.01)} material={sm("#d9b25a", 0.3, {metalness: 0.6})} />
+          <mesh position={[0, 0, 0.027]} material={tm("placa-diretora", label("placa-diretora", "DIRETORA", "#d9b25a", "#101018", 70, 512, 120), 0.4)}>
+            <planeGeometry args={[0.58, 0.13]} />
+          </mesh>
+        </group>
+        {[[-0.6, 0.85, -0.1], [-0.45, 0.85, -0.05]].map((q, i) => (
+          <mesh key={i} position={q as V3} rotation={[0, 0.2 * i, 0]} material={sm(i ? "#ffffff" : "#f2efe6", 0.8)}>
+            <boxGeometry args={[0.3, 0.04 + i * 0.04, 0.4]} />
+          </mesh>
+        ))}
+      </group>
+      {/* cadeira */}
+      <group position={[-0.5, 0, -2.3]}>
+        <mesh position={[0, 0.5, 0]} geometry={rbox(0.6, 0.1, 0.6, 0.03)} material={sm("#1d1f27", 0.5)} />
+        <mesh position={[0, 0.95, -0.28]} geometry={rbox(0.6, 0.85, 0.08, 0.03)} material={sm("#1d1f27", 0.5)} />
+      </group>
+      {/* vaso de planta */}
+      <group position={[-3.1, 0, -2.5]}>
+        <mesh position={[0, 0.25, 0]} material={sm("#c0623a", 0.7)} castShadow>
+          <cylinderGeometry args={[0.25, 0.2, 0.5, 14]} />
+        </mesh>
+        <mesh position={[0, 0.85, 0]} scale={[0.45, 0.6, 0.45]} material={sm("#3e9a4a", 0.8)} castShadow>
+          <icosahedronGeometry args={[1, 1]} />
+        </mesh>
+      </group>
+    </group>
+  );
+};
+/** pedaços do teto caindo + poeira */
+export const Debris: React.FC<{k: number; at: V3}> = ({k, at}) => {
+  if (k <= 0 || k >= 1.6) return null;
+  const q = Math.min(1, k);
+  return (
+    <group position={at}>
+      {Array.from({length: 14}, (_, i) => {
+        const a = Math.sin(i * 12.9898) * 43758.5453;
+        const r1 = a - Math.floor(a);
+        const b = Math.sin(i * 78.233) * 12345.678;
+        const r2 = b - Math.floor(b);
+        const y = Math.max(0.08, -q * q * at[1] * (0.9 + r1 * 0.3));
+        return (
+          <mesh key={i} position={[(r1 - 0.5) * 1.8 * (0.5 + q), y, (r2 - 0.5) * 1.8 * (0.5 + q)]} rotation={[q * 6 + i, q * 4 + i, 0]} material={sm("#f4f0e6", 0.9)} castShadow>
+            <boxGeometry args={[0.18 + r2 * 0.25, 0.08, 0.15 + r1 * 0.2]} />
+          </mesh>
+        );
+      })}
+      {k > 0.6 &&
+        Array.from({length: 10}, (_, i) => (
+          <mesh key={"p" + i} position={[Math.cos(i * 0.63) * (0.5 + (k - 0.6) * 1.5), -at[1] + 0.4, Math.sin(i * 0.63) * (0.5 + (k - 0.6) * 1.5)]} scale={0.35 + (k - 0.6) * 0.6}>
+            <sphereGeometry args={[1, 10, 8]} />
+            <meshStandardMaterial color="#e8e0d0" transparent opacity={Math.max(0, 0.6 - (k - 0.6) * 0.6)} depthWrite={false} />
+          </mesh>
+        ))}
+    </group>
+  );
+};

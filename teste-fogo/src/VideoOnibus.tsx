@@ -15,7 +15,7 @@ import {HeadGlasses} from "./Sets17";
 import {BigJet, SkyClouds, BedroomC} from "./Sets19";
 import {Bg} from "./Sets20";
 import {Beach} from "./Sets21";
-import {SchoolBus, Kangaroo, SchoolHouse, SantaHat, GiftBox, SurpriseTest, Koala, KoalaClass, Medal, DuckRing, Diploma, CardMachine, BigCoffee, NightWindow} from "./Sets27";
+import {SchoolBus, Kangaroo, SchoolHouse, SantaHat, GiftBox, SurpriseTest, Koala, KoalaClass, Medal, DuckRing, Diploma, CardMachine, BigCoffee, NightWindow, Crack, DirectorOffice, Debris, OFFICE_H, HOLE} from "./Sets27";
 import {Captions, StageTitle, Confetti, Zzz, Wd, clean} from "./Overlays";
 import {FPS, clamp, lerp, ramp, pop, easeInOut, easeOut, canvasTex, rng} from "./util";
 import W from "./timingOnibus.json";
@@ -132,6 +132,7 @@ const PULA1 = at(1, "pula");
 const ATRAVESSA1 = at(1, "atravessa");
 const POUSA1 = at(1, "pousa");
 const ENXERGA3 = at(3, "enxerga");
+const ACHA3 = at(3, "acha");
 const PAPAI3 = at(3, "papai");
 const TERCA3 = at(3, "tercafeira");
 const PRESENTE4 = at(4, "presente");
@@ -159,7 +160,7 @@ const CANGURU12 = at(12, "canguru");
 const CINCO12 = at(12, "cinco");
 
 const BAG: ToyLook = {hoodie: true, backpack: "#2e86de"};
-const DIRETORA: ToyLook = {shirt: "#8e44ad", pants: "#3a3f4a", hairStyle: "bun", hair: "#5a3a20", lips: "#c0392b", skin: "#e0b08a"};
+const DIRETORA: ToyLook = {suit: true, shirt: "#24345a", pants: "#24345a", shoe: "#101018", hairStyle: "bun", hair: "#5a3a20", lips: "#c0392b", skin: "#e0b08a", lashes: true};
 const MOTORISTA: ToyLook = {shirt: "#ffffff", pants: "#1f2a44", hairStyle: "buzz", hair: "#3a2a1a", belly: 0.6, skin: "#c68a5a"};
 const K_S = 1.3;
 const PHONE = <mesh position={[0, 0.02, 0.06]} rotation={[Math.PI / 2, 0, 0]} geometry={rbox(0.12, 0.22, 0.02, 0.01)} material={sm("#1d1f27", 0.3)} />;
@@ -301,56 +302,68 @@ const S2: React.FC<ShotProps> = ({f, a, t}) => (
     <SchoolYard t={t} />
     <Kangaroo p={[0.8, ROOF_Y, -3.4]} rotY={-0.3} s={K_S} t={t} />
     <Toy pose={{...idle(f), pos: [-0.7, ROOF_Y, -2.6], rotY: 0.3, ...ARMS_UP, smile: 1, mouthOpen: 0.4, hairLift: 0.6}} look={BAG} />
+    <Crack p={[0.1, ROOF_Y + 0.01, -3.0]} s={0.5 + 2.2 * clamp((f - a - 20) / 50)} />
   </>
 );
-/* 3 — a diretora olha pra cima */
+/* =================== 3–6 — dentro da sala da diretora =================== */
+const OfficeLights: React.FC = () => (
+  <>
+    <Bg c="#e9dcc3" />
+    <hemisphereLight args={["#fff6e6", "#8a6a4a", 1.0]} />
+    <pointLight position={[0.2, 3.2, 1.2]} intensity={10} distance={12} decay={1.4} color="#fff4e0" castShadow />
+  </>
+);
+const K_IN = 1.05;
+const KANG_O: V3 = [1.45, 0, 0.3];
+const BOY_O: V3 = [0.1, 0, 0.75];
+const DIR_O: V3 = [-0.5, 0, -2.05];
+/* a diretora na mesa, o teto racha e quebra; os dois caem dentro da sala */
 const S3: React.FC<ShotProps> = ({f, a, t}) => {
-  const hat = f >= PAPAI3 - 4 ? easeOut(clamp((f - PAPAI3 + 4) / 8)) : 0;
+  const crack = clamp((f - ENXERGA3 + 10) / 50);
+  const fall = f >= ACHA3 - 4 ? clamp((f - ACHA3 + 4) / 14) : -1;
+  const broken = fall >= 0 ? 1 : 0;
+  const land = f - (ACHA3 + 10);
+  const sq = land >= 0 && land < 10 ? Math.sin((land / 10) * Math.PI) : 0;
   const close = f >= PAPAI3 - 4;
+  const hat = close ? easeOut(clamp((f - PAPAI3 + 4) / 8)) : 0;
+  const y = fall < 0 ? 99 : (1 - fall * fall) * (OFFICE_H + 0.5);
   return (
     <>
       {close ? (
-        <Cam pos={[-0.2, ROOF_Y + 1.5, 0.2]} look={[-0.7, ROOF_Y + 1.35, -2.6]} fov={48} f={f} a={PAPAI3 - 4} />
+        <Cam pos={[0.3, 1.45, 3.6]} look={[0.15, 1.25, BOY_O[2]]} fov={48} f={f} a={PAPAI3 - 4} />
       ) : (
-        <Cam pos={[1.8, 1.3, 6.5]} look={[-0.3, 3.4, -2.6]} fov={62} f={f} a={a} />
+        <Cam pos={[0.3, 1.8, 4.6]} look={[0.2, 1.7, -0.8]} fov={62} f={f} a={broken ? ACHA3 - 4 : a} punch={broken ? 10 : 7} />
       )}
-      <SchoolYard t={t} />
-      <Kangaroo p={[0.8, ROOF_Y, -3.4]} rotY={-0.3} s={K_S} t={t} />
-      <Toy pose={{...idle(f), pos: [-0.7, ROOF_Y, -2.6], rotY: 0.3, smile: close ? 0.6 : 0, eyeWide: close ? 0.8 : 0.3, ...(close ? {} : {rShoulder: [-2.6, 0, -0.3], rElbow: -0.2})}} look={BAG} headExtra={hat > 0 ? <SantaHat k={hat} /> : undefined} />
-      {!close && <Toy pose={{...idle(f + 4), pos: [1.3, 0, 2.6], rotY: Math.PI + 0.2, head: [-0.55, 0, 0], ...(f >= ENXERGA3 ? {rShoulder: [-2.4, 0, -0.3], rElbow: -0.1, eyeWide: 1, mouthOpen: 0.5} : {})}} look={DIRETORA} headExtra={<HeadGlasses />} />}
+      <OfficeLights />
+      <DirectorOffice broken={broken} crack={crack} t={t} />
+      <Debris k={fall < 0 ? 0 : (f - ACHA3 + 4) / 22} at={[HOLE[0], OFFICE_H, HOLE[2]]} />
+      <Toy pose={{...idle(f), pos: DIR_O, rotY: 0.15, head: [-0.5, 0, 0], eyeWide: crack > 0 ? 1 : 0.3, mouthOpen: broken ? 0.7 : crack > 0.3 ? 0.3 : 0, brow: crack > 0 ? 1 : 0, ...(broken ? ARMS_UP : {})}} look={DIRETORA} headExtra={<HeadGlasses />} />
+      {fall >= 0 && (
+        <>
+          <Kangaroo p={[KANG_O[0], y, KANG_O[2]]} rotY={-0.4} s={K_IN} t={t} squash={sq} legs={fall < 1 ? 1 : 0} />
+          <Toy pose={{...idle(f), pos: [BOY_O[0], y, BOY_O[2]], rotY: 0, eyeWide: close ? 0.8 : 1, mouthOpen: close ? 0.1 : 0.6, smile: close ? 0.8 : 0, hairLift: fall < 1 ? 1 : 0, ...(fall < 1 ? ARMS_UP : {})}} look={BAG} headExtra={hat > 0 ? <SantaHat k={hat} /> : undefined} />
+        </>
+      )}
     </>
   );
 };
-/* 4 — o presente (a diretora sobe a escada) */
+/* 4 — o presente por cima da mesa */
 const S4: React.FC<ShotProps> = ({f, a, t}) => {
   const opened = f >= ABRE4;
   const lid = opened ? easeOut(clamp((f - ABRE4) / 10)) : 0;
   const fly = f >= PROVA4 - 6 ? easeOut(clamp((f - PROVA4 + 6) / 12)) : 0;
-  const giftP: V3 = opened ? [-0.35, ROOF_Y + 0.95, -2.15] : [0.1, ROOF_Y + 0.85, -1.95];
+  const give = easeInOut(clamp((f - PRESENTE4) / 20));
+  const giftP: V3 = opened ? [BOY_O[0], 1.0, BOY_O[2] + 0.42] : [lerp(-0.5, -0.1, give), 0.86, lerp(-1.6, -0.6, give)];
   return (
     <>
-      <Cam pos={opened ? [1.2, ROOF_Y + 1.6, 1.2] : [-2.7, ROOF_Y + 2.0, 1.7]} look={opened ? [-0.3, ROOF_Y + 1.15, -2.2] : [0.1, ROOF_Y + 1.0, -2.1]} fov={opened ? 56 : 62} f={f} a={opened ? ABRE4 - 3 : a} />
-      <SchoolYard t={t} />
-      <Kangaroo p={[0.9, ROOF_Y, -3.5]} rotY={-0.3} s={K_S} t={t} />
-      <Toy pose={{...idle(f), pos: [-0.4, ROOF_Y, -2.6], rotY: 0.2, rShoulder: [-1.2, 0.35, 0.1], rElbow: -0.9, lShoulder: [-1.2, -0.35, -0.1], lElbow: -0.9, eyeWide: fly > 0 ? 1 : 0.4, mouthOpen: fly > 0 ? 0.7 : 0.1, brow: fly > 0 ? 1 : 0, smile: fly > 0 ? 0 : 1}} look={BAG} headExtra={<SantaHat />} />
-      {!opened && <Toy pose={{...idle(f + 4), pos: [0.5, ROOF_Y - 1.1, -1.35], rotY: Math.PI + 0.5, rShoulder: [-1.6, 0.2, 0], rElbow: -0.4, smile: 1}} look={DIRETORA} headExtra={<HeadGlasses />} />}
+      <Cam pos={opened ? [0.5, 1.6, 3.5] : [-2.6, 2.0, 3.4]} look={opened ? [0.1, 1.3, BOY_O[2]] : [0.4, 1.1, -0.5]} fov={opened ? 52 : 60} f={f} a={opened ? ABRE4 - 3 : a} />
+      <OfficeLights />
+      <DirectorOffice broken={1} t={t} />
+      <Kangaroo p={KANG_O} rotY={-0.4} s={K_IN} t={t} />
+      <Toy pose={{...idle(f), pos: BOY_O, rotY: opened ? 0 : Math.PI - 0.3, rShoulder: [-1.2, 0.35, 0.1], rElbow: -0.9, lShoulder: [-1.2, -0.35, -0.1], lElbow: -0.9, eyeWide: fly > 0 ? 1 : 0.4, mouthOpen: fly > 0 ? 0.7 : 0.1, brow: fly > 0 ? 1 : 0, smile: fly > 0 ? 0 : 1}} look={BAG} headExtra={<SantaHat />} />
+      {!opened && <Toy pose={{...idle(f + 4), pos: [-0.5, 0, -1.15], rotY: 0.15, rShoulder: [-1.5, 0.2, 0], rElbow: -0.3, lShoulder: [-1.5, -0.2, 0], lElbow: -0.3, smile: 1}} look={DIRETORA} headExtra={<HeadGlasses />} />}
       <GiftBox p={giftP} s={1.0} open={lid} />
-      {fly > 0 && <SurpriseTest p={[-0.35, ROOF_Y + 1.15 + fly * 0.55, -2.1 + fly * 0.25]} r={[-0.2, 0.2, 0.08 * Math.sin(t * 5)]} s={1.6} />}
-      {/* escada encostada na escola */}
-      {!opened && (
-        <group position={[0.5, 0, -0.9]} rotation={[-0.18, 0, 0]}>
-          {[-0.25, 0.25].map((x) => (
-            <mesh key={x} position={[x, 2.2, 0]} material={sm("#c9a26a", 0.7)}>
-              <boxGeometry args={[0.06, 4.4, 0.06]} />
-            </mesh>
-          ))}
-          {Array.from({length: 10}, (_, i) => (
-            <mesh key={i} position={[0, 0.3 + i * 0.42, 0]} material={sm("#c9a26a", 0.7)}>
-              <boxGeometry args={[0.5, 0.04, 0.04]} />
-            </mesh>
-          ))}
-        </group>
-      )}
+      {fly > 0 && <SurpriseTest p={[BOY_O[0], 1.3 + fly * 0.45, BOY_O[2] + 0.45 + fly * 0.1]} r={[0, 0, 0.08 * Math.sin(t * 5)]} s={1.6} />}
     </>
   );
 };
@@ -359,15 +372,15 @@ const S5: React.FC<ShotProps> = ({f, a, t}) => {
   const k = clamp((f - a) / 60);
   return (
     <>
-      <Cam pos={[0.1, ROOF_Y + 1.35, lerp(-0.6, -1.0, k)]} look={[-0.35, ROOF_Y + 1.35, -2.6]} fov={46} f={f} a={a} />
-      <SchoolYard t={t} />
-      <Toy pose={{...idle(f), pos: [-0.4, ROOF_Y, -2.6], rotY: 0.2, rShoulder: [-1.4, 0.3, 0.1], rElbow: -0.8, lShoulder: [-1.4, -0.3, -0.1], lElbow: -0.8, eyeWide: 1, mouthOpen: 0.7, brow: 1}} look={BAG} headExtra={<SantaHat />} />
-      <SurpriseTest p={[-0.33, ROOF_Y + 1.2, -2.0]} r={[0, 0.2, 0.05 * Math.sin(t * 8)]} s={1.4} />
+      <Cam pos={[0.1, 1.5, lerp(2.8, 2.3, k)]} look={[0.1, 1.4, BOY_O[2]]} fov={46} f={f} a={a} />
+      <OfficeLights />
+      <DirectorOffice broken={1} t={t} />
+      <Toy pose={{...idle(f), pos: BOY_O, rotY: 0, rShoulder: [-1.4, 0.3, 0.1], rElbow: -0.8, lShoulder: [-1.4, -0.3, -0.1], lElbow: -0.8, eyeWide: 1, mouthOpen: 0.7, brow: 1}} look={BAG} headExtra={<SantaHat />} />
+      <SurpriseTest p={[BOY_O[0], 1.22, BOY_O[2] + 0.55]} r={[0, 0, 0.05 * Math.sin(t * 8)]} s={1.4} />
     </>
   );
 };
-
-/* =================== 6 — de volta na bolsa, o café e o pulo =================== */
+/* 6 — de volta na bolsa, o café, e o pulo pelo buraco do teto */
 const S6: React.FC<ShotProps> = ({f, a, t}) => {
   const hop = clamp((f - PULA6) / 16);
   const inPouch = hop >= 1;
@@ -375,13 +388,17 @@ const S6: React.FC<ShotProps> = ({f, a, t}) => {
   const coffee = f >= TOMA6 - 3;
   const drink = coffee ? clamp((f - TOMA6) / 30) : 0;
   const wired = f >= PULA6B - 20;
+  const up = clamp((f - PULA6B + 6) / 12);
+  const kp: V3 = [lerp(KANG_O[0], HOLE[0], up), up * up * 8, lerp(KANG_O[2], HOLE[2], up)];
   return (
     <>
-      <Cam pos={[0.4, ROOF_Y + 2.0, 3.0]} look={[0.0, ROOF_Y + 1.6, -3]} fov={58} f={f} a={coffee ? TOMA6 - 3 : a} />
-      <SchoolYard t={t} />
-      <Kangaroo p={[0.5, ROOF_Y, -3.2]} rotY={-0.15} s={K_S} t={t} tired={wired ? 0 : tired} blink={wired ? 0 : 0} squash={wired ? 0.06 * Math.sin(t * 40) : 0} pouch={inPouch ? <InPouch f={f} extra={{eyeWide: wired ? 1 : 0.5, mouthOpen: wired ? 0.5 : 0}} headExtra={<SantaHat />} /> : undefined} />
-      {!inPouch && <Toy pose={{...idle(f), pos: [lerp(-0.9, 0.5, hop), ROOF_Y + Math.sin(hop * Math.PI) * 0.8, lerp(-2.6, -2.75, hop)], rotY: 0.6, ...(f >= PULA6 ? ARMS_UP : {}), eyeWide: 0.8}} look={BAG} headExtra={<SantaHat />} />}
-      {coffee && <BigCoffee p={[0.5, ROOF_Y + 2.3 + drink * 0.15, -3.2 + 0.62 * K_S]} r={[-drink * 1.0, 0, 0]} s={1.7} />}
+      <Cam pos={[0.2, 1.9, 4.6]} look={[0.6, 1.8, -0.4]} fov={62} f={f} a={coffee ? TOMA6 - 3 : a} />
+      <OfficeLights />
+      <DirectorOffice broken={1} t={t} />
+      <Toy pose={{...idle(f), pos: DIR_O, rotY: 0.3, eyeWide: 1, brow: 1, mouthOpen: up > 0 ? 0.6 : 0.2, head: [up > 0 ? -0.5 : 0, 0.3, 0]}} look={DIRETORA} headExtra={<HeadGlasses />} />
+      <Kangaroo p={kp} rotY={-0.4} s={K_IN} t={t} tired={wired ? 0 : tired} squash={wired && up <= 0 ? 0.06 * Math.sin(t * 40) : up > 0 ? -0.2 : 0} legs={up > 0 ? 1 : 0} pouch={inPouch ? <InPouch f={f} extra={{eyeWide: wired ? 1 : 0.5, mouthOpen: wired ? 0.5 : 0}} headExtra={<SantaHat />} /> : undefined} />
+      {!inPouch && <Toy pose={{...idle(f), pos: [lerp(BOY_O[0], KANG_O[0], hop), Math.sin(hop * Math.PI) * 0.8, lerp(BOY_O[2], KANG_O[2] + 0.3, hop)], rotY: 0.8, ...(f >= PULA6 ? ARMS_UP : {}), eyeWide: 0.8}} look={BAG} headExtra={<SantaHat />} />}
+      {coffee && up <= 0 && <BigCoffee p={[KANG_O[0] + 0.1, 2.05 * K_IN + drink * 0.12, KANG_O[2] + 0.55 * K_IN]} r={[-drink * 1.0, -0.4, 0]} s={1.5} />}
     </>
   );
 };
@@ -661,30 +678,31 @@ const AppCard: React.FC<{from: number; to: number}> = ({from, to}) => {
     </div>
   );
 };
-/* ---------- mapa-múndi: o pulo do Brasil até a Austrália ---------- */
+/* ---------- mapa-múndi (o mapa que você mandou): o pulo do Brasil até a Austrália ---------- */
 const WorldHop: React.FC<{from: number; to: number}> = ({from, to}) => {
   const f = useCurrentFrame();
   if (f < from || f > to) return null;
   const k = easeInOut(clamp((f - from - 8) / (to - from - 22)));
-  const A = [330, 1120], B = [880, 1150];
+  const M = {x: 20, y: 560, s: 1040 / 696};
+  const A = [M.x + 226 * M.s, M.y + 252 * M.s];
+  const B = [M.x + 581 * M.s, M.y + 277 * M.s];
   const x = lerp(A[0], B[0], k);
-  const y = lerp(A[1], B[1], k) - Math.sin(k * Math.PI) * 520;
+  const y = lerp(A[1], B[1], k) - Math.sin(k * Math.PI) * 420;
+  const pin = (P: number[], txt: string, dx: number) => (
+    <>
+      <div style={{position: "absolute", left: P[0] - 26, top: P[1] - 26, width: 52, height: 52, borderRadius: 26, background: "#ffd21f", border: "6px solid #101018"}} />
+      <div style={{position: "absolute", left: P[0] + dx, top: P[1] + 40, transform: "translateX(-50%)", background: "#ffffff", border: "5px solid #101018", fontFamily, fontWeight: 900, fontSize: 44, padding: "4px 16px", whiteSpace: "nowrap"}}>{txt}</div>
+    </>
+  );
   return (
-    <AbsoluteFill style={{background: "#5fb8ef"}}>
-      <div style={{position: "absolute", left: 0, top: -260, width: 1080, height: 1920}}>
-      <svg width={1080} height={1920}>
-        <ellipse cx={250} cy={760} rx={150} ry={170} fill="#7fdc8a" />
-        <path d="M 260 960 L 420 1000 L 400 1180 L 330 1330 L 290 1200 L 240 1050 Z" fill="#ffc35a" stroke="#c9822a" strokeWidth={8} />
-        <ellipse cx={560} cy={760} rx={90} ry={80} fill="#7fdc8a" />
-        <ellipse cx={590} cy={1000} rx={120} ry={170} fill="#7fdc8a" />
-        <ellipse cx={780} cy={780} rx={190} ry={130} fill="#7fdc8a" />
-        <path d="M 790 1080 L 960 1070 L 990 1180 L 900 1250 L 800 1220 L 770 1140 Z" fill="#ffc35a" stroke="#c9822a" strokeWidth={8} />
-        <path d={`M ${A[0]} ${A[1]} Q ${(A[0] + B[0]) / 2} ${A[1] - 1040} ${B[0]} ${B[1]}`} fill="none" stroke="#e8262d" strokeWidth={8} strokeDasharray="22 16" />
+    <AbsoluteFill style={{background: "#4fa8e8"}}>
+      <Img src={staticFile("mapa-mundi.png")} style={{position: "absolute", left: M.x, top: M.y, width: 1040}} />
+      <svg width={1080} height={1920} style={{position: "absolute", left: 0, top: 0}}>
+        <path d={`M ${A[0]} ${A[1]} Q ${(A[0] + B[0]) / 2} ${A[1] - 840} ${B[0]} ${B[1]}`} fill="none" stroke="#e8262d" strokeWidth={9} strokeDasharray="24 16" />
       </svg>
-      <div style={{position: "absolute", left: 250, top: 1360, background: "#ffffff", border: "5px solid #101018", fontFamily, fontWeight: 900, fontSize: 44, padding: "4px 16px"}}>BRASIL</div>
-      <div style={{position: "absolute", left: 660, top: 1290, background: "#ffffff", border: "5px solid #101018", fontFamily, fontWeight: 900, fontSize: 44, padding: "4px 16px"}}>AUSTRÁLIA</div>
-      <div style={{position: "absolute", left: x, top: y, transform: `translate(-50%,-50%) rotate(${-20 + k * 40}deg)`, fontSize: 170}}>🦘</div>
-      </div>
+      {pin(A, "BRASIL", 0)}
+      {pin(B, "AUSTRÁLIA", -60)}
+      <div style={{position: "absolute", left: x, top: y, transform: `translate(-50%,-50%) rotate(${-20 + k * 40}deg)`, fontSize: 150}}>🦘</div>
     </AbsoluteFill>
   );
 };
