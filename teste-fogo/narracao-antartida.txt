@@ -11,4 +11,4 @@
 [amused] A foca jura que o recheio tá vindo. | [mischievously] O recheio ficou na dimensão crocante... patinando com os pinguins.
 [excited] Então a foca cobra a conta. | [amused] Os pinguins cobram a foca... | [mischievously] e você paga com o único pastel de vento... que sai voando.
 [excited] Parabéns! | [amused] Você comeu pastel na Antártida... e até agora só saiu pastel de vento.
-[excited] Agora me segueee... | [excited] me segueee agora! | [mischievously] Se não seguir, a minha vó fritadeira vai fritar o seu celular.
+[mischievously] E se você não seguir o perfil... a minha vó fritadeira vai fritar o seu celular.

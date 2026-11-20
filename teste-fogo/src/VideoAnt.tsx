@@ -153,9 +153,6 @@ const PAGA11 = at(11, "paga");
 const VOANDO11 = at(11, "voando");
 const PARABENS12 = at(12, "parabens");
 const SAIU12 = at(12, "saiu");
-const SEGUE13 = at(13, "segueee");
-const SEGUE13B = at(13, "segueee", 1);
-const SE13 = at(13, "se");
 const FRITAR13 = at(13, "fritar");
 const CELULAR13 = at(13, "celular");
 
@@ -539,29 +536,6 @@ const S12: React.FC<ShotProps> = ({f, a, t}) => {
   );
 };
 
-/* 13 — "me segueee": o menino vem correndo pra cima de você */
-const S13a: React.FC<ShotProps> = ({f, a, t}) => {
-  const k = clamp((f - a) / (SE13 - a));
-  const z = lerp(-9, 1.6, k);
-  const shake = 0.04 * Math.sin(t * 37);
-  return (
-    <>
-      <Cam pos={[0.15 + shake, 1.15 + shake * 0.5, lerp(4.2, 4.6, k)]} look={[0, 1.15, z - 2]} fov={52} f={f} a={a} punch={4} />
-      <Flat bg="#ff5a3a" ground="#c8402a" light={0.9} />
-      {Array.from({length: 8}, (_, i) => (
-        <mesh key={i} position={[(i % 2 ? 1 : -1) * (1.2 + (i % 3) * 0.5), 0.6 + (i % 4) * 0.5, z - 1 - ((t * 12 + i * 1.7) % 6)]}>
-          <boxGeometry args={[0.03, 0.03, 1.2]} />
-          <meshBasicMaterial color="#ffffff" transparent opacity={0.6} />
-        </mesh>
-      ))}
-      <PBoy id="a13" a={a} f={f} pose={(fr) => {
-        const tt = tf(fr);
-        const yell = (fr >= SEGUE13 - 2 && fr < SEGUE13 + 24) || (fr >= SEGUE13B - 2 && fr < SEGUE13B + 20);
-        return {...idle(fr), pos: [0.08 * Math.sin(tt * 8), Math.abs(Math.sin(tt * 8)) * 0.12, lerp(-9, 1.6, clamp((fr - a) / (SE13 - a)))], rotY: 0, ...RUN(tt * 0.6), rShoulder: [-1.55 + 0.12 * Math.sin(tt * 16), 0.15, -0.1], rElbow: -0.15, lShoulder: [-1.55 - 0.12 * Math.sin(tt * 16), -0.15, 0.1], lElbow: -0.15, torso: [0.22, 0, 0.05 * Math.sin(tt * 8)], head: [-0.15, 0.08 * Math.sin(tt * 5), 0], brow: -1, eyeWide: 1, mouthOpen: yell ? 0.8 : 0.35, blink: 0};
-      }} />
-    </>
-  );
-};
 /* a vó fritadeira frita o celular */
 const S13b: React.FC<ShotProps> = ({f, a, t}) => {
   const drop = f >= FRITAR13 ? clamp((f - FRITAR13) / 14) : 0;
@@ -569,7 +543,7 @@ const S13b: React.FC<ShotProps> = ({f, a, t}) => {
     <>
       <Cam pos={[0.2, 1.7, 3.6]} look={[0.0, 1.0, 0]} fov={52} f={f} a={a} />
       <Flat bg="#ffb04a" ground="#ff8f3a" />
-      <VoFritadeira p={[0, 0, -0.3]} s={1.1} t={t} boil={1} phone={Math.max(0.02, drop)} wink={f >= CELULAR13 + 10 ? 1 : 0} mouth={f < FRITAR13 ? 0.3 * Math.abs(Math.sin(t * 8)) : 0} />
+      <VoFritadeira p={[0, 0, -0.3]} s={1.1} t={t} boil={1} phone={f >= FRITAR13 - 15 ? Math.max(0.02, drop) : 0} wink={f >= CELULAR13 + 10 ? 1 : 0} mouth={f < FRITAR13 ? 0.3 * Math.abs(Math.sin(t * 8)) : 0} />
       {drop >= 1 &&
         Array.from({length: 10}, (_, i) => {
           const q = ((t * 1.6 + i / 10) % 1);
@@ -599,8 +573,7 @@ const SHOTS: Shot[] = [
   {from: RECHEIO10B - 3, Comp: S10b},
   {from: L(11), Comp: S11},
   {from: L(12), Comp: S12},
-  {from: L(13), Comp: S13a},
-  {from: SE13 - 3, Comp: S13b},
+  {from: L(13), Comp: S13b},
 ];
 
 const Scene: React.FC<{f: number}> = ({f}) => {
@@ -782,8 +755,6 @@ export const VideoAnt: React.FC = () => {
       <Ono from={VOANDO11} to={L(12) - 2} text="FIUUU!" size={150} color="#ffffff" />
       <Confetti from={PARABENS12} to={PARABENS12 + 70} />
       <TopTitle from={SAIU12} to={L(13) - 2} text="SÓ SAIU PASTEL DE VENTO" size={72} />
-      <Ono from={SEGUE13} to={SEGUE13B - 4} text="ME SEGUEEE!" y={420} size={140} color="#ffd21f" rot={-6 + 3 * Math.sin(f / 2)} />
-      <Ono from={SEGUE13B} to={SE13 - 3} text="ME SEGUEEE AGORA!" y={420} size={88} color="#ff4d6d" rot={5 + 3 * Math.sin(f / 2)} />
 
       <Captions words={words} keys={KEYS} />
       <FollowCard from={FOLLOW_FROM} to={TOTAL_ANT - 1} tap={FOLLOW_TAP} />
@@ -805,7 +776,6 @@ export const VideoAnt: React.FC = () => {
       <SND src="sfx14/forro.mp3" from={CANTAR1} dur={L(2) - CANTAR1} v={FXV * 0.25} />
       <SND src="sfx2/wind.mp3" from={L(2)} dur={INCLUSIVE2 - L(2)} v={FXV * 0.3} />
       <SND src="sfx10/plim.mp3" from={NOTICIA2} dur={30} v={FXV * 0.35} />
-      <SND src="sfx12/aww.mp3" from={AMIGO3} dur={50} v={FXV * 0.35} />
       <SND src="sfx10/bubble.mp3" from={ESQUENTA5} dur={DERRETE5 - ESQUENTA5} v={FXV * 0.3} />
       <SND src="sfx3/crack.mp3" from={CAI5} dur={30} v={FXV * 0.45} />
       <SND src="sfx3/crack.mp3" from={CREC7} dur={20} v={FXV * 0.5} />
@@ -816,8 +786,6 @@ export const VideoAnt: React.FC = () => {
       <SND src="sfx7/whoosh.mp3" from={VOANDO11} dur={30} v={FXV * 0.45} />
       <SND src="sfx7/confetti.mp3" from={PARABENS12} dur={50} v={FXV * 0.4} />
       <SND src="sfx9/yay.mp3" from={PARABENS12} dur={50} v={FXV * 0.3} />
-      <SND src="sfx2/steps.mp3" from={L(13)} dur={SE13 - L(13)} v={FXV * 0.4} />
-      <SND src="sfx11/drama.mp3" from={L(13)} dur={40} v={FXV * 0.3} />
       <SND src="sfx10/bubble.mp3" from={FRITAR13} dur={40} v={FXV * 0.4} />
       <SND src="sfx2/click.mp3" from={FOLLOW_TAP - 2} dur={20} v={FXV * 0.8} />
     </AbsoluteFill>
