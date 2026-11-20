@@ -404,18 +404,28 @@ export const QueijoPresunto: React.FC<{p: V3; t?: number}> = ({p, t = 0}) => {
 /** Antártida: gelo, icebergs ao fundo */
 export const Antarctica: React.FC<{t?: number; hole?: number; melt?: number}> = ({t = 0, hole = 0, melt = 0}) => (
   <group>
-    <mesh rotation={[-Math.PI / 2, 0, 0]} material={sm("#eaf6ff", 0.6)} receiveShadow>
-      <planeGeometry args={[80, 80]} />
-    </mesh>
+    {hole > 0 ? (
+      <>
+        {/* buraco de verdade: chão em anel + paredes do poço */}
+        <mesh rotation={[-Math.PI / 2, 0, 0]} material={sm("#eaf6ff", 0.6, {side: THREE.DoubleSide})} receiveShadow>
+          <ringGeometry args={[hole * 2.2, 40, 64]} />
+        </mesh>
+        <mesh position={[0, -4, 0]} material={sm("#24456a", 0.6, {side: THREE.BackSide})}>
+          <cylinderGeometry args={[hole * 2.2, hole * 2.2, 8, 48, 1, true]} />
+        </mesh>
+        <mesh position={[0, -8, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <circleGeometry args={[hole * 2.2, 48]} />
+          <meshBasicMaterial color="#0b1530" />
+        </mesh>
+      </>
+    ) : (
+      <mesh rotation={[-Math.PI / 2, 0, 0]} material={sm("#eaf6ff", 0.6)} receiveShadow>
+        <planeGeometry args={[80, 80]} />
+      </mesh>
+    )}
     {melt > 0 && (
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]} material={sm("#7fd0ff", 0.1, {transparent: true, opacity: 0.6 * melt})}>
         <circleGeometry args={[1.2 + melt * 1.4, 32]} />
-      </mesh>
-    )}
-    {hole > 0 && (
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, 0]}>
-        <circleGeometry args={[hole * 2.2, 32]} />
-        <meshBasicMaterial color="#0b1530" />
       </mesh>
     )}
     {[[-6, -12, 3], [5, -15, 4], [-12, -20, 5], [12, -22, 6], [0, -26, 5]].map(([x, z, s], i) => (

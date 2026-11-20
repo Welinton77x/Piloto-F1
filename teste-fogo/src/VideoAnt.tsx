@@ -216,10 +216,19 @@ const PenguinTeam: React.FC<{t: number; run?: number}> = ({t, run = 0}) => (
       );
     })}
     {[-1, 1].map((sd) => (
-      <mesh key={sd} position={[0.35 * sd, 0.35, 3.6]} material={sm("#8a5a33", 0.6)}>
-        <boxGeometry args={[0.02, 0.02, 4.4]} />
+      <mesh key={sd} position={[0.68 * sd, 0.3, 3.3]} material={sm("#8a5a33", 0.6)}>
+        <boxGeometry args={[0.025, 0.025, 4.6]} />
       </mesh>
     ))}
+    {Array.from({length: 12}, (_, i) => {
+      const row = Math.floor(i / 2);
+      const sd = i % 2 ? 1 : -1;
+      return (
+        <mesh key={"c" + i} position={[0.53 * sd, 0.3, 1.4 + row * 0.75]} material={sm("#8a5a33", 0.6)}>
+          <boxGeometry args={[0.3, 0.02, 0.02]} />
+        </mesh>
+      );
+    })}
   </>
 );
 
@@ -294,7 +303,10 @@ const S2: React.FC<ShotProps> = ({f, a, t}) => {
       ) : (
         <Cam pos={[3.2, 2.4, z + 5.5]} look={[0.0, 0.8, z + 1.0]} fov={58} f={f} a={a} />
       )}
-      <Ice t={t} />
+      <Flat bg="#9fd8ff" />
+      <group position={[0, 0, z]}>
+        <Antarctica t={t} />
+      </group>
       <group position={[0, 0, z]} rotation={[0, Math.PI, 0]}>
         <Treno p={[0, 0, 0]} />
         <PenguinTeam t={t} run={1} />
@@ -352,7 +364,7 @@ const S5: React.FC<ShotProps> = ({f, a, t}) => {
   const fall = f >= CAI5 ? clamp((f - CAI5) / 18) : 0;
   return (
     <>
-      <Cam pos={[0.3, 2.3 + fall * 1.5, 5.6]} look={[0.0, 0.8 - fall * 1.5, 0]} fov={56} f={f} a={a} />
+      <Cam pos={[0.3, 2.3 + fall * 2.2, 5.6 - fall * 2.0]} look={[0.0, 0.8 - fall * 3.0, -0.3]} fov={56} f={f} a={a} />
       <Ice t={t} melt={melt} hole={hole} />
       <group position={[0, -fall * fall * 6, 0]}>
         <VoFritadeira p={[0.0, 0, -0.6]} s={1.1} t={t} boil={f >= ESQUENTA5 ? 1 : 0} mouth={0.2} />
