@@ -127,7 +127,7 @@ const VO1 = at(1, "vo");
 const DOZE1 = at(1, "doze");
 const CANTAR1 = at(1, "cantar");
 const SERTANEJO1 = at(1, "sertanejo");
-const QUINHENTOS2 = at(2, "quinhentos");
+const NOTICIA2 = at(2, "noticia");
 const INCLUSIVE2 = at(2, "inclusive");
 const FOCA3 = at(3, "foca");
 const PEIXE3 = at(3, "peixe");
@@ -605,7 +605,7 @@ const Scene: React.FC<{f: number}> = ({f}) => {
 };
 
 /* ======================= camadas 2D ======================= */
-const KEYS = new Set(["pastel", "antartida", "oleo", "treno", "medo", "aviao", "vo", "fritadeira", "touca", "doze", "pinguins", "patins", "cantar", "sertanejo", "patinam", "noticia", "quinhentos", "cinquenta", "seguidores", "inclusive", "segue", "ai", "garcom", "foca", "gravata", "borboleta", "peixe", "peixinho", "aquario", "amigo", "dilema", "aquatico", "esquenta", "quente", "derrete", "gelo", "buraco", "dimensao", "crocante", "estala", "silencio", "crec", "esmigalhar", "crocoto", "farofa", "esmigalhamento", "farofistico", "frita", "panela", "vento", "recheio", "patinando", "conta", "cobram", "unico", "voando", "parabens", "segueee", "agora", "fritar", "celular"]);
+const KEYS = new Set(["pastel", "antartida", "oleo", "treno", "medo", "aviao", "vo", "fritadeira", "touca", "doze", "pinguins", "patins", "cantar", "sertanejo", "patinam", "noticia", "jornal", "inclusive", "segue", "ai", "garcom", "foca", "gravata", "borboleta", "peixe", "peixinho", "aquario", "amigo", "dilema", "aquatico", "esquenta", "quente", "derrete", "gelo", "buraco", "dimensao", "crocante", "estala", "silencio", "crec", "esmigalhar", "crocoto", "farofa", "esmigalhamento", "farofistico", "frita", "panela", "vento", "recheio", "patinando", "conta", "cobram", "unico", "voando", "parabens", "segueee", "agora", "fritar", "celular"]);
 const Tag: React.FC<{from: number; to: number; text: string; x?: number; y?: number}> = ({from, to, text, x = 540, y = 420}) => {
   const f = useCurrentFrame();
   if (f < from || f > to) return null;
@@ -716,24 +716,6 @@ const FiadoClock: React.FC<{from: number; to: number; end: number; start?: numbe
     </div>
   );
 };
-/* ---------- celular com o perfil dos pinguins ---------- */
-const PhoneCard: React.FC<{from: number; to: number}> = ({from, to}) => {
-  const f = useCurrentFrame();
-  if (f < from || f > to) return null;
-  const s = pop(f, from, 10) * (1 - ramp(f, to - 5, to));
-  const n = Math.round(lerp(480, 550, clamp((f - from) / 25)));
-  return (
-    <div style={{position: "absolute", left: 540, top: 760, transform: `translate(-50%,-50%) scale(${s}) rotate(4deg)`, width: 400, height: 560, borderRadius: 48, background: "#15151c", padding: 18, boxShadow: "0 12px 0 rgba(0,0,0,0.25)"}}>
-      <div style={{width: "100%", height: "100%", borderRadius: 32, background: "#ffffff", fontFamily, textAlign: "center", paddingTop: 50}}>
-        <div style={{fontSize: 130}}>🐧</div>
-        <div style={{fontWeight: 900, fontSize: 38, color: "#101018", marginTop: 6}}>@pinguins.de.patins</div>
-        <div style={{fontWeight: 900, fontSize: 92, color: "#101018", marginTop: 26}}>{n}</div>
-        <div style={{fontWeight: 700, fontSize: 36, color: "#7a7f8a"}}>seguidores</div>
-        <div style={{margin: "26px auto 0", width: 240, background: "#2e6fd8", color: "#ffffff", fontWeight: 900, fontSize: 34, borderRadius: 18, padding: "10px 0"}}>Seguindo ✓</div>
-      </div>
-    </div>
-  );
-};
 
 /* ======================= vídeo ======================= */
 const FXV = 0.3;
@@ -768,7 +750,7 @@ export const VideoAnt: React.FC = () => {
       <TopTitle from={VO1} to={DOZE1 - 3} text="VÓ FRITADEIRA" />
       <BigNum from={DOZE1} to={CANTAR1 - 4} text="12 PINGUINS" size={130} />
       <Ono from={CANTAR1} to={L(2) - 2} text="♪ ♫ ♪" y={420} size={130} color="#ff4d6d" />
-      <PhoneCard from={QUINHENTOS2 - 6} to={INCLUSIVE2 - 4} />
+      <Plaque from={NOTICIA2} to={INCLUSIVE2 - 4} text={"VIRARAM NOTÍCIA 📰"} x={540} y={600} size={58} />
       <Plaque from={INCLUSIVE2} to={L(3) - 2} text={"SEGUE AÍ 👉"} x={700} y={980} size={60} />
       <TopTitle from={FOCA3} to={PEIXE3 - 3} text="FOCA GARÇOM" />
       <Tag from={PEIXE3} to={PEIXINHO3 - 3} text="SÓ ACEITA PEIXE 🐟" y={330} />
@@ -810,7 +792,7 @@ export const VideoAnt: React.FC = () => {
       <SND src="sfx3/bell.mp3" from={DOZE1} dur={40} v={FXV * 0.3} />
       <SND src="sfx14/forro.mp3" from={CANTAR1} dur={L(2) - CANTAR1} v={FXV * 0.25} />
       <SND src="sfx2/wind.mp3" from={L(2)} dur={INCLUSIVE2 - L(2)} v={FXV * 0.3} />
-      <SND src="sfx10/plim.mp3" from={QUINHENTOS2} dur={30} v={FXV * 0.35} />
+      <SND src="sfx10/plim.mp3" from={NOTICIA2} dur={30} v={FXV * 0.35} />
       <SND src="sfx12/aww.mp3" from={AMIGO3} dur={50} v={FXV * 0.35} />
       <SND src="sfx10/bubble.mp3" from={ESQUENTA5} dur={DERRETE5 - ESQUENTA5} v={FXV * 0.3} />
       <SND src="sfx3/crack.mp3" from={CAI5} dur={30} v={FXV * 0.45} />
