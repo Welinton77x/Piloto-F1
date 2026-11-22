@@ -11,11 +11,27 @@ STAB = float(os.environ.get("STAB", "0.5"))
 lines = [l.strip() for l in (ROOT / os.environ.get("NARR", "narracao-90s.txt")).read_text(encoding="utf-8").splitlines() if l.strip()]
 out = ROOT / os.environ.get("VODIR", "public/vo90"); out.mkdir(parents=True, exist_ok=True)
 
+MODEL = os.environ.get("MODEL", "eleven_v3")
+STYLE = float(os.environ.get("STYLE", "0.6"))
+SPEED = os.environ.get("SPEED")
+
+def body(text):
+    """Pedido de voz. Com MODEL=eleven_multilingual_v2 (a "voz 2", igual à referência do banho quente)
+    as marcações [tag] não existem: são tiradas do texto, e SPEED deixa a fala mais lenta."""
+    if MODEL != "eleven_v3":
+        text = re.sub(r"\[[^\]]*\]\s*", "", text).strip()
+    vs = {"stability": STAB, "similarity_boost": 0.8, "style": STYLE, "use_speaker_boost": True}
+    if SPEED:
+        vs["speed"] = float(SPEED)
+    b = {"text": text, "model_id": MODEL, "voice_settings": vs}
+    if MODEL == "eleven_v3":
+        b["language_code"] = "pt"
+    return b
+
 def tts(text):
     req = urllib.request.Request(
         f"https://api.elevenlabs.io/v1/text-to-speech/{VOICE}/with-timestamps?output_format=mp3_44100_128",
-        data=json.dumps({"text": text, "model_id": "eleven_v3", "language_code": "pt",
-                         "voice_settings": {"stability": STAB, "similarity_boost": 0.8, "style": 0.6, "use_speaker_boost": True}}).encode(),
+        data=json.dumps(body(text)).encode(),
         headers={"xi-api-key": os.environ.get("ELEVENLABS_API_KEY", "proxy-injected"), "Content-Type": "application/json"})
     return json.load(urllib.request.urlopen(req, timeout=180))
 
