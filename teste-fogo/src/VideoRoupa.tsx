@@ -242,10 +242,10 @@ const S5: React.FC<ShotProps> = ({f, a, t}) => {
   const fold = f >= L(6);
   return (
     <>
-      <Cam pos={fold ? [0.6, 1.5, 4.4] : [0.5, 1.8, 4.8]} look={fold ? [1.0, 0.8, 0.3] : [0.6, 1.1, 0.3]} fov={56} f={f} a={fold ? L(6) : a} />
+      <Cam pos={fold ? [0.6, 1.5, 4.4] : [0.6, 1.9, 5.7]} look={fold ? [1.0, 0.8, 0.3] : [0.6, 1.1, 0.3]} fov={56} f={f} a={fold ? L(6) : a} />
       <Room />
       <Sabio p={[1.2, 0, 0.4]} rotY={-0.3} s={1.0} t={t} mouth={f < CAPA5 + 30 ? 0.3 + 0.3 * Math.abs(Math.sin(t * 9)) : 0} />
-      <Caranguejo p={[2.0, 0, 0.9]} rotY={-1.0} s={1.4} t={t} fold={fold ? 1 : 0} work={fold ? 1 : 0} />
+      <Caranguejo p={[1.45, 0, 1.1]} rotY={-1.0} s={1.25} t={t} fold={fold ? 1 : 0} work={fold ? 1 : 0} />
       <PBoy id="r5" a={a} f={f} item={MEIA_ITEM} pose={(fr) => ({...idle(fr), pos: [-0.3, 0, 0.8], rotY: 0.8, rShoulder: [-1.1, 0.3, 0.05], rElbow: -1.0, head: [0, 0.2, fr >= NENHUMA5 ? 0.15 * Math.sin(tf(fr) * 8) : 0], eyeWide: fr >= QUATRO5 ? 0.9 : 0.3, brow: fr >= NENHUMA5 ? 1 : 0})} />
     </>
   );
@@ -340,7 +340,7 @@ const S11: React.FC<ShotProps> = ({f, a, t}) => {
   const car = f >= CARANGUEJO11 - 4;
   return (
     <>
-      <Cam pos={car ? [1.6, 0.9, 2.6] : sab ? [0.3, 1.6, 3.4] : [0.2, 1.6, 4.8]} look={car ? [1.2, 0.3, 0.6] : sab ? [0.2, 1.3, -0.3] : [0.3, 0.9, -0.8]} fov={52} f={f} a={car ? CARANGUEJO11 - 4 : sab ? SABIO11 - 4 : a} />
+      <Cam pos={car ? [1.6, 0.9, 2.6] : sab ? [0.3, 1.7, 5.3] : [0.2, 1.6, 4.8]} look={car ? [1.2, 0.3, 0.6] : sab ? [0.3, 1.1, -0.3] : [0.3, 0.9, -0.8]} fov={52} f={f} a={car ? CARANGUEJO11 - 4 : sab ? SABIO11 - 4 : a} />
       <Room />
       <Maquina p={MAQ} s={1.1} t={t} mood="happy" />
       <Sabio p={[0.2, 0, -0.3]} rotY={0} s={0.95} t={t} mouth={sab ? 0.3 + 0.3 * Math.abs(Math.sin(t * 9)) : 0} arms={sab ? 1 : 0} />
@@ -351,7 +351,7 @@ const S11: React.FC<ShotProps> = ({f, a, t}) => {
         <ringGeometry args={[0.32, 0.6, 24]} />
         <meshStandardMaterial color="#9aa1ad" />
       </mesh>
-      <PBoy id="r11" a={a} f={f} pose={(fr) => ({...idle(fr), pos: [-0.6, 0, 0.4], rotY: 0.5, ...(fr < PAZES11 + 20 && fr >= PAZES11 - 6 ? {rShoulder: [-1.4, 0.3, 0], rElbow: -0.2} : {}), smile: 1})} />
+      <PBoy id="r11" a={a} f={f} pose={(fr) => ({...idle(fr), pos: [-0.5, 0, 0.3], rotY: 0.5, ...(fr < PAZES11 + 20 && fr >= PAZES11 - 6 ? {rShoulder: [-1.4, 0.3, 0], rElbow: -0.2} : {}), smile: 1})} />
     </>
   );
 };
