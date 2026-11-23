@@ -1,11 +1,17 @@
-# Voz do canal (atualizada em 23/11/2026)
+# Voz do canal (escolhida em 23/11/2026 — opção A)
 
-**Will - Deep, Smooth and Affectionate** (`CstacWqMhJQlnfLPxRG4`), modelo **eleven_v3**, animado e engraçado,
-no nível do vídeo de referência do "pudim na geladeira".
+**Will - Social media** (`r3KkFedJ4n8aabIZ0RFQ`), modelo **eleven_v3**, gerada **numa chamada só** (texto inteiro),
+nunca frase por frase.
 
-- stability 0.0 · similarity 0.8 · style 0.8
-- ritmo ~2,9 palavras/s: frases longas e corridas, POUCAS pausas, sem "..." picotando
-- uma tag de emoção por frase ([excited], [amused], [laughing], [mischievously])
-- fórmula: "Se você ..., isso é facinho de resolver. Primeiro, ..."
+- stability 0.0 · similarity 0.8 · style 0.8 · language_code pt
+- uma tag de emoção por frase ([excited], [amused], [laughing], [mischievously], [proudly])
+- frases corridas, poucas pausas, sem "..." picotando
 
-Amostra aprovada: `out/teste-voz/8-will-deep-animado-a.mp3`.
+Comando:
+
+```
+VOICE_ID=r3KkFedJ4n8aabIZ0RFQ MODEL=eleven_v3 STAB=0.0 STYLE=0.8 \
+NARR=narracao-X.txt VOMP3=public/vozX.mp3 VOJSON=src/timingX.json python3 scripts/voz_corrida.py
+```
+
+Amostra aprovada: `out/teste-voz/10-will-animado-A.mp3`.
