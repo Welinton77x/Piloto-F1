@@ -4,7 +4,7 @@ import {ThreeCanvas} from "@remotion/three";
 import {useThree} from "@react-three/fiber";
 import * as THREE from "three";
 import {Sky, SunLight, Town} from "./Sets5";
-import {Toy} from "./Toy";
+import {BlockToy} from "./BlockToy";
 import {Post} from "./Post";
 
 const CamSet: React.FC = () => {
@@ -30,9 +30,9 @@ export const BlockTest: React.FC = () => {
         <group position={[0, 0, -3]}>
           <Town t={t} galo={false} variant="nova" flat clouds />
         </group>
-        <Toy look={BOY} pose={{pos: [-1.2, 0, 0.5], rotY: 0.3, smile: 1}} />
-        <Toy look={BOY} pose={{pos: [0, 0, 0.8], rotY: 0, rShoulder: [-2.9, 0, -0.35], rElbow: -0.2, lShoulder: [-2.9, 0, 0.35], lElbow: -0.2, mouthOpen: 0.7, eyeWide: 1, brow: 1}} />
-        <Toy look={BOY} pose={{pos: [1.2, 0, 0.5], rotY: -0.6, walk: 1.0, walkAmt: 1, rShoulder: [-0.8, 0, -0.15], rElbow: -1.2, lShoulder: [0.8, 0, 0.15], lElbow: -1.2, blink: 1}} />
+        <BlockToy look={BOY} pose={{pos: [-1.2, 0, 0.5], rotY: 0.3, smile: 1}} />
+        <BlockToy look={BOY} pose={{pos: [0, 0, 0.8], rotY: 0, rShoulder: [-2.9, 0, -0.35], rElbow: -0.2, lShoulder: [-2.9, 0, 0.35], lElbow: -0.2, mouthOpen: 0.7, eyeWide: 1, brow: 1}} />
+        <BlockToy look={BOY} pose={{pos: [1.2, 0, 0.5], rotY: -0.6, walk: 1.0, walkAmt: 1, rShoulder: [-0.8, 0, -0.15], rElbow: -1.2, lShoulder: [0.8, 0, 0.15], lElbow: -1.2, blink: 1}} />
         <Post bloom={0.4} />
       </ThreeCanvas>
     </AbsoluteFill>
