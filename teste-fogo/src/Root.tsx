@@ -1,3 +1,4 @@
+import {BlockTest} from "./BlockTest";
 import React from "react";
 import {Composition} from "remotion";
 import {Video, TOTAL} from "./Video";
@@ -81,6 +82,7 @@ export const Root: React.FC = () => (
     <Composition id="Filtro" component={VideoFiltro} durationInFrames={TOTAL_FILTRO} fps={30} width={1080} height={1920} />
     <Composition id="Fuga2" component={VideoFuga2} durationInFrames={TOTAL_FUGA2} fps={30} width={1080} height={1920} />
     <Composition id="Cama" component={VideoCama} durationInFrames={TOTAL_CAMA} fps={30} width={1080} height={1920} />
+    <Composition id="BlockTest" component={BlockTest} durationInFrames={30} fps={30} width={1080} height={1920} />
     <Composition id="ChulePreview" component={ChulePreview} durationInFrames={8} fps={30} width={1080} height={1920} />
     <Composition id="MecPreview" component={MecPreview} durationInFrames={6} fps={30} width={1080} height={1920} />
     <Composition id="Casamento" component={VideoCasamento} durationInFrames={TOTAL_CASA} fps={30} width={1080} height={1920} />
