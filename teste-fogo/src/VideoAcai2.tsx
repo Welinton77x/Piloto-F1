@@ -17,7 +17,7 @@ import {Bg} from "./Sets20";
 import {Bear} from "./Sets21";
 import {TiaGeladeira} from "./Sets28";
 import {AcaiCup} from "./Sets31";
-import {Whale, Pepino, VibeShop} from "./Sets32";
+import {Whale, Pepino, VibeShop, Garrafinha, Sabor} from "./Sets32";
 import {Captions, Confetti, Wd, clean} from "./Overlays";
 import {physics} from "./Physics";
 import {FPS, clamp, lerp, ramp, pop, easeInOut, easeOut, canvasTex, rng} from "./util";
@@ -382,16 +382,72 @@ const phoneTex = () =>
     c.fillText("CARDÁPIO", 220, 620);
   });
 
+
+/* ---------- vitrine 3D dos sabores ---------- */
+const HeroSet: React.FC<{f: number; a: number; t: number; children: React.ReactNode}> = ({f, a, t, children}) => (
+  <>
+    <Cam pos={[0, 1.3, 3.4]} look={[0, 0.95, 0]} fov={46} f={f} a={a} punch={14} />
+    <Bg c="#2a0a3a" />
+    <hemisphereLight args={["#ffe6ff", "#3a1050", 0.9]} />
+    <pointLight position={[1.5, 3, 2.5]} intensity={14} distance={12} decay={1.4} color="#fff2e0" castShadow />
+    <pointLight position={[-2, 1.5, -1]} intensity={8} distance={8} color="#c86bfa" />
+    <mesh position={[0, -0.1, 0]} receiveShadow>
+      <cylinderGeometry args={[1.0, 1.1, 0.2, 40]} />
+      <meshStandardMaterial color="#f4ecf8" />
+    </mesh>
+    {Array.from({length: 14}, (_, i) => {
+      const k = ((t * 0.5 + i / 14) % 1);
+      return (
+        <mesh key={i} position={[Math.cos(i * 2.4) * (1.2 + k), 0.2 + k * 2.5, Math.sin(i * 2.4) * (1.2 + k) - 0.6]} scale={0.04 * (1 - k)}>
+          <octahedronGeometry args={[1, 0]} />
+          <meshBasicMaterial color={i % 2 ? "#ffd21f" : "#ffffff"} toneMapped={false} />
+        </mesh>
+      );
+    })}
+    <group position={[0, 0, 0]} rotation={[0, (f - a) * 0.05, 0]} scale={0.75 + 0.25 * easeOut(clamp((f - a) / 10))}>
+      {children}
+    </group>
+    <Sparkles p={[0, 1.4, 0]} t={t} spread={1.2} n={8} />
+  </>
+);
+const hero = (sabor: Sabor | "copo"): React.FC<ShotProps> => {
+  const H: React.FC<ShotProps> = ({f, a, t}) => (
+    <HeroSet f={f} a={a} t={t}>
+      {sabor === "copo" ? (
+        <>
+          <AcaiCup p={[-0.42, 0, 0]} s={0.75} logo={false} />
+          <AcaiCup p={[0.42, 0, 0]} s={0.75} logo={false} />
+        </>
+      ) : (
+        <Garrafinha sabor={sabor} s={1.05} glow={1} />
+      )}
+    </HeroSet>
+  );
+  return H;
+};
+const HNinho = hero("ninho");
+const HNutella = hero("nutella");
+const HMorango = hero("morango");
+const HCopo = hero("copo");
+const HPacoca = hero("pacoca");
+
 const SHOTS: Shot[] = [
   {from: 0, Comp: K0},
   {from: L(2), Comp: K2},
   {from: L(4), Comp: K4},
+  {from: NINHO4 - 2, Comp: HNinho},
   {from: L(5), Comp: K5},
+  {from: NUTELLA5 - 2, Comp: HNutella},
+  {from: NUNCA5 - 2, Comp: K5},
   {from: L(6), Comp: K6},
+  {from: MORANGO6 - 2, Comp: HMorango},
+  {from: L(7), Comp: K6},
   {from: L(8), Comp: K8},
+  {from: TENTACAO8 - 2, Comp: HCopo},
   {from: BIO8 - 4, Comp: SFoto},
   {from: L(9), Comp: K9},
   {from: L(10), Comp: K10},
+  {from: PACOCA10 - 2, Comp: HPacoca},
   {from: L(11), Comp: K11},
   {from: SEGUIR12 - 4, Comp: SFoto},
 ];
@@ -524,16 +580,13 @@ const PURPLE = "#7a2a9a";
 const IG = "@vibegourmetacai";
 const PH: Record<string, [number, number]> = {p1: [1086, 1448], p2: [1200, 1600], p3: [1080, 1440]};
 /** foto preenchendo uma caixa, com foco (cx, cy) e zoom */
-const Photo: React.FC<{src: string; w?: number; h?: number; cx?: number; cy?: number; zoom?: number; style?: React.CSSProperties}> = ({src, w = 1080, h = 1920, cx = 0.5, cy = 0.5, zoom = 1, style}) => {
-  const [iw, ih] = PH[src];
-  const base = Math.max(w / iw, h / ih) * zoom;
-  const dw = iw * base;
-  const dh = ih * base;
-  const left = Math.min(0, Math.max(w - dw, w / 2 - cx * dw));
-  const top = Math.min(0, Math.max(h - dh, h / 2 - cy * dh));
+const TILE: Record<string, [string, string, string]> = {p1: ["#8a5636", "#f6bfcc", "🍫"], p2: ["#f7f1de", "#3a0c3c", "🥛"], p3: ["#3a0c3c", "#f7f1de", "🍓"]};
+const Photo: React.FC<{src: string; w?: number; h?: number; cx?: number; cy?: number; zoom?: number; style?: React.CSSProperties}> = ({src, w = 1080, h = 1920, cx = 0.5, style}) => {
+  const [c1, c2, e] = TILE[src];
+  const em = cx < 0.2 ? "🍫" : cx < 0.4 && cx > 0.2 ? "🍓" : cx > 0.4 && cx < 0.6 && src === "p1" ? "🥜" : cx > 0.8 ? "💛" : e;
   return (
-    <div style={{position: "absolute", overflow: "hidden", width: w, height: h, ...style}}>
-      <Img src={staticFile(`acai/${src}.jpg`)} style={{position: "absolute", left, top, width: dw, height: dh}} />
+    <div style={{position: "absolute", overflow: "hidden", width: w, height: h, background: `radial-gradient(circle at 30% 30%, ${c2} 0%, ${c1} 55%, #2a0a3a 100%)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: Math.min(w, h) * 0.5, ...style}}>
+      {em}
     </div>
   );
 };
@@ -644,7 +697,7 @@ const EndCard: React.FC<{from: number; to: number}> = ({from, to}) => {
   return (
     <AbsoluteFill>
       <div style={{position: "absolute", inset: -40, filter: "blur(18px) brightness(0.45)"}}>
-        <Photo src="p1" w={1160} h={2000} />
+        <div style={{position: "absolute", inset: 0, background: "radial-gradient(circle at 50% 30%, #8a3aaa, #1a0626)"}} />
       </div>
       <Img src={staticFile("acai/logo.png")} style={{position: "absolute", left: 540 - 230, top: 170, width: 460, height: 460, borderRadius: 230, border: "10px solid #ffffff", boxShadow: "0 0 60px #c86bfa", transform: `scale(${pop(f, from, 14)}) rotate(${sp}deg)`}} />
       <div style={{position: "absolute", left: 0, right: 0, top: 680, textAlign: "center", transform: `scale(${pop(f, from + 4, 10)})`, fontFamily, fontWeight: 900, fontSize: 84, color: "#ffffff", WebkitTextStroke: "10px #2a0a3a", paintOrder: "stroke fill"}}>VIBE GOURMET AÇAÍ 💜</div>
@@ -671,8 +724,14 @@ const Watermark: React.FC = () => (
 );
 
 
-/* foto de verdade estilo polaroid */
-const PhotoCard: React.FC<{from: number; to: number; src: string; cx?: number; cy?: number; zoom?: number; label: string; rot?: number; color?: string}> = ({from, to, src, cx = 0.5, cy = 0.5, zoom = 1, label, rot = -4, color = "#ffd21f"}) => {
+const ProdLabel: React.FC<{from: number; to: number; text: string}> = ({from, to, text}) => {
+  const f = useCurrentFrame();
+  if (f < from - 2 || f >= to) return null;
+  return <Label text={text} from={from - 2} y={330} size={text.length > 16 ? 84 : 100} />;
+};
+/* foto de verdade estilo polaroid (não usada) */
+// eslint-disable-next-line
+const _PhotoCard: React.FC<{from: number; to: number; src: string; cx?: number; cy?: number; zoom?: number; label: string; rot?: number; color?: string}> = ({from, to, src, cx = 0.5, cy = 0.5, zoom = 1, label, rot = -4, color = "#ffd21f"}) => {
   const f = useCurrentFrame();
   if (f < from || f > to) return null;
   const s = pop(f, from, 12) * (1 - ramp(f, to - 5, to));
@@ -729,15 +788,15 @@ export const VideoAcai2: React.FC = () => {
       <Ono from={PEPINO1} to={L(2) - 2} text="SÓ PEPINO!" size={130} color="#7ed957" />
       <TopTitle from={L(3)} to={L(4) - 2} text="CONSULTOR GLACIAL" />
       <Ono from={DERRETE4} to={BALEIA4 - 6} text="DERRETEU!" size={130} color="#7fd0ff" />
-      <PhotoCard from={NINHO4} to={L(5) - 2} src="p2" cy={0.5} zoom={1.05} label="NINHO SENSAÇÃO" />
-      <PhotoCard from={NUTELLA5} to={NUNCA5 - 2} src="p1" cx={0.12} cy={0.6} zoom={2.2} label="EXPLOSÃO DE NUTELLA" rot={4} color="#ffb37a" />
+      <ProdLabel from={NINHO4} to={L(5) - 2} text="NINHO SENSAÇÃO" />
+      <ProdLabel from={NUTELLA5} to={NUNCA5 - 3} text="EXPLOSÃO DE NUTELLA" />
       <Tag from={NUNCA5 + 4} to={L(6) - 2} text="ELA É UMA BALEIA 🐋" y={330} />
-      <PhotoCard from={MORANGO6} to={L(7) - 2} src="p1" cx={0.3} cy={0.55} zoom={2.2} label="MORANGO DOS SONHOS" color="#ff6b8b" />
+      <ProdLabel from={MORANGO6} to={L(7) - 2} text="MORANGO DOS SONHOS" />
       <TopTitle from={at(7, "desvio") - 2} to={L(8) - 2} text="DESVIO POMBÍSTICO" />
-      <PhotoCard from={TENTACAO8} to={BIO8 - 6} src="p3" cy={0.45} zoom={1.1} label="COPO TENTAÇÃO ×2" rot={3} />
+      <ProdLabel from={TENTACAO8} to={BIO8 - 5} text="COPO TENTAÇÃO ×2" />
       <PhoneUI from={BIO8 - 4} to={L(9)} />
       <Plaque from={VOLTA9} to={L(10) - 2} text={"A FILA DÁ A VOLTA\nEM ITUMBIARA"} x={540} y={560} size={56} />
-      <PhotoCard from={PACOCA10} to={L(11) - 2} src="p1" cx={0.48} cy={0.5} zoom={2.2} label="SONHO DE PAÇOCA" rot={-3} />
+      <ProdLabel from={PACOCA10} to={L(11) - 2} text="SONHO DE PAÇOCA" />
       <Plaque from={WHATS11} to={PARABENS12 - 2} text={"📲 (64) 99252-0622"} x={540} y={420} size={60} />
       <Confetti from={PARABENS12} to={PARABENS12 + 60} />
       <PhoneUI from={SEGUIR12 - 4} to={INSTA_TO} insta />

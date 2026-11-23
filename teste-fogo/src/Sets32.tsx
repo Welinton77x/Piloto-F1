@@ -112,3 +112,77 @@ export const VibeShop: React.FC<{p: V3; rotY?: number; s?: number}> = ({p, rotY 
     <mesh position={[0.75, 1.05, 1.01]} geometry={rbox(1.4, 1.0, 0.04, 0.02)} material={sm("#bfe6ff", 0.1, {emissive: "#bfe6ff", emissiveIntensity: 0.3})} />
   </group>
 );
+
+/* ---------- garrafinha de açaí (sabores) ---------- */
+export type Sabor = "ninho" | "nutella" | "morango" | "pacoca";
+const SABOR: Record<Sabor, {cream: string; top: string}> = {
+  ninho: {cream: "#f7f1de", top: "#ffffff"},
+  nutella: {cream: "#8a5636", top: "#4a2614"},
+  morango: {cream: "#f6bfcc", top: "#e8262d"},
+  pacoca: {cream: "#e8cf9a", top: "#b98a4e"},
+};
+export const Garrafinha: React.FC<{p?: V3; r?: V3; s?: number; sabor: Sabor; glow?: number}> = ({p = [0, 0, 0], r = [0, 0, 0], s = 1, sabor, glow = 0}) => {
+  const c = SABOR[sabor];
+  const acai = sm("#3a0c3c", 0.5, {emissive: "#4a1050", emissiveIntensity: 0.05 + glow * 0.1});
+  const cream = sm(c.cream, 0.5);
+  const shell = sm("#ffffff", 0.05, {transparent: true, opacity: 0.12});
+  return (
+    <group position={p} rotation={r} scale={s}>
+      {/* recheio em camadas tortas (efeito marmorizado) */}
+      {Array.from({length: 9}, (_, i) => (
+        <mesh key={i} position={[0, 0.08 + i * 0.12, 0]} rotation={[0.35 * Math.sin(i * 1.7), i * 0.8, 0.35 * Math.cos(i * 2.3)]} material={i % 3 === 1 ? cream : acai}>
+          <cylinderGeometry args={[0.285, 0.285, 0.13, 24]} />
+        </mesh>
+      ))}
+      {/* manchas de creme na parede da garrafa (marmorizado) */}
+      {Array.from({length: 22}, (_, i) => {
+        const a = i * 2.39;
+        const y = 0.12 + ((i * 0.37) % 1) * 1.05;
+        return (
+          <mesh key={"b" + i} position={[Math.cos(a) * 0.295, y, Math.sin(a) * 0.295]} rotation={[0, -a + Math.PI / 2, 0.6 * Math.sin(i * 1.3)]} scale={[0.13 + (i % 3) * 0.04, 0.07 + (i % 2) * 0.05, 0.03]} material={i % 4 === 3 ? acai : cream}>
+            <sphereGeometry args={[1, 12, 8]} />
+          </mesh>
+        );
+      })}
+      {/* garrafa transparente: corpo, ombro e gargalo */}
+      <mesh position={[0, 0.62, 0]} material={shell}>
+        <cylinderGeometry args={[0.33, 0.33, 1.22, 24, 1, true]} />
+      </mesh>
+      <mesh position={[0, 1.28, 0]} material={sm(c.cream, 0.5)}>
+        <cylinderGeometry args={[0.18, 0.31, 0.14, 24]} />
+      </mesh>
+      <mesh position={[0, 1.43, 0]} material={sm("#ffffff", 0.1, {transparent: true, opacity: 0.35})}>
+        <cylinderGeometry args={[0.18, 0.18, 0.18, 20, 1, true]} />
+      </mesh>
+      <mesh position={[0, 1.42, 0]} material={cream}>
+        <cylinderGeometry args={[0.17, 0.17, 0.16, 20]} />
+      </mesh>
+      {/* cobertura transbordando */}
+      <mesh position={[0, 1.53, 0]} scale={[1, 0.55, 1]} material={sm(c.top, 0.6)}>
+        <sphereGeometry args={[0.19, 16, 10, 0, Math.PI * 2, 0, Math.PI / 2]} />
+      </mesh>
+      {sabor === "morango" && (
+        <group position={[0, 1.7, 0]} rotation={[Math.PI, 0, 0.2]}>
+          <mesh material={sm("#e8262d", 0.35)}>
+            <coneGeometry args={[0.1, 0.22, 10]} />
+          </mesh>
+          <mesh position={[0, -0.12, 0]} material={sm("#2e9e3a", 0.6)}>
+            <coneGeometry args={[0.08, 0.05, 6]} />
+          </mesh>
+        </group>
+      )}
+      {(sabor === "pacoca" || sabor === "ninho") &&
+        Array.from({length: 8}, (_, i) => (
+          <mesh key={i} position={[Math.cos(i * 0.8) * 0.1, 1.6 + (i % 3) * 0.02, Math.sin(i * 0.8) * 0.1]} material={sm(sabor === "pacoca" ? "#c99a5a" : "#fffdf5", 0.8)}>
+            <boxGeometry args={[0.05, 0.04, 0.05]} />
+          </mesh>
+        ))}
+      {sabor === "nutella" &&
+        Array.from({length: 5}, (_, i) => (
+          <mesh key={i} position={[Math.cos(i * 1.3) * 0.17, 1.38 - (i % 2) * 0.12, Math.sin(i * 1.3) * 0.17]} material={sm("#4a2614", 0.3)}>
+            <capsuleGeometry args={[0.03, 0.18 + (i % 2) * 0.1, 4, 8]} />
+          </mesh>
+        ))}
+    </group>
+  );
+};
