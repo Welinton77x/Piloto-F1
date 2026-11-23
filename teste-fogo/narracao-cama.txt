@@ -1,12 +1,12 @@
 [mischievously] Se você acordou... e a sua cama tava no telhado do vizinho... | [excited] isso é facinho de resolver.
-[amused] Primeiro, você precisa descobrir o que deu errado. | [mischievously] Você roncou tão alto essa noite... | [excited] que os pombos acharam que era um pombo gigante chamando pra reunião.
-[amused] Eles vieram em bando, levantaram a sua cama com você dormindo... | [excited] e levaram pro telhado do vizinho, porque lá eles tão construindo um hotel cinco estrelas pra pombos. | [amused] A sua cama virou a suíte presidencial.
+[laughing] Primeiro, você precisa descobrir o que deu errado. | [mischievously] Você roncou tão alto essa noite... | [excited] que os pombos acharam que era um pombo gigante chamando pra reunião.
+[amused] Eles vieram em bando, levantaram a sua cama com você dormindo... | [excited] e levaram pro telhado do vizinho, porque lá eles tão construindo um hotel cinco estrelas pra pombos. | [laughing] A sua cama virou a suíte presidencial.
 [proudly] Esse é o sequestro hoteleiro!
 [mischievously] Então você tenta descer... mas o gerente do hotel é um pombo de gravata. | [amused] E ele diz que você só sai depois de pagar a diária. | [excited] A diária custa quinhentas migalhas de pão.
-[amused] Você liga pra padaria... | [mischievously] mas o padeiro tá dormindo, porque ainda são três da manhã.
+[laughing] Você liga pra padaria... | [mischievously] mas o padeiro tá dormindo, porque ainda são três da manhã.
 [excited] Aí você acorda o vizinho batendo no telhado... | [amused] e ele sobe a escada de pijama, com um balde de pipoca, achando que é show.
-[excited] Os pombos veem a pipoca... abandonam o hotel e atacam o balde! | [amused] O vizinho sai correndo pela rua com quarenta pombos atrás dele... | [mischievously] e o bairro inteiro acorda achando que é desfile.
+[excited] Os pombos veem a pipoca... abandonam o hotel e atacam o balde! | [laughing] O vizinho sai correndo pela rua com quarenta pombos atrás dele... | [mischievously] e o bairro inteiro acorda achando que é desfile.
 [proudly] Essa é a perseguição pipoqueira!
 [amused] Enquanto isso, a sua cama escorrega do telhado... | [excited] passa pela janela da sua casa... e cai certinho no seu quarto.
-[excited] Parabéns! Você voltou pra sua cama. | [mischievously] Mas agora ela é patrimônio dos pombos... | [amused] e eles cobram aluguel toda manhã.
+[excited] Parabéns! Você voltou pra sua cama. | [mischievously] Mas agora ela é patrimônio dos pombos... | [laughing] e eles cobram aluguel toda manhã.
 [mischievously] E se você não seguir o perfil... | [amused] os pombos vão construir o próximo hotel no seu travesseiro.
