@@ -7,7 +7,7 @@ import {sm} from "./Sets9";
 const flat = (c: string, r = 0.8) => sm(c, r, {flatShading: true});
 export const LowHead: React.FC<{pose: Pose; look: ToyLook}> = ({pose, look}) => {
   const {blink = 0, eyeWide = 0, brow = 0, mouthOpen = 0, smile = 0} = pose;
-  const skin = flat(look.skin ?? "#e8b48a", 0.75);
+  const skin = flat(look.skin ?? "#f2cfa8", 0.75);
   const hairM = flat(look.hair ?? "#5a3a1e", 0.85);
   const black = sm("#0c0c10", 0.4);
   const eyeH = Math.max(0.1, 1 - blink) * (1 + eyeWide * 0.3);
@@ -52,9 +52,12 @@ export const LowHead: React.FC<{pose: Pose; look: ToyLook}> = ({pose, look}) => 
           </mesh>
         </group>
       ) : (
-        <group position={[0, -0.18, 0.295]}>
-          <mesh material={sm(look.lips ?? "#c0302a", 0.6)}>
-            <boxGeometry args={[0.11 + smile * 0.03, 0.03, 0.015]} />
+        <group position={[0, -0.17, 0.295]}>
+          <mesh material={sm("#3a0c0c", 0.6)}>
+            <boxGeometry args={[0.15 + smile * 0.03, 0.07, 0.012]} />
+          </mesh>
+          <mesh position={[0, 0, 0.007]} material={sm(look.lips ?? "#d8302a", 0.6)}>
+            <boxGeometry args={[0.12 + smile * 0.03, 0.045, 0.01]} />
           </mesh>
         </group>
       )}

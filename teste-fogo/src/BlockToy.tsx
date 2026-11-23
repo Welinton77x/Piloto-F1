@@ -12,10 +12,10 @@ type V3 = [number, number, number];
 const flat = (c: string, r = 0.8) => sm(c, r, {flatShading: true});
 
 const Arm: React.FC<{side: 1 | -1; shoulder: V3; elbow: number; sleeve: THREE.Material; skin: THREE.Material; palmRef?: React.Ref<THREE.Object3D>}> = ({side, shoulder, elbow, sleeve, skin, palmRef}) => (
-  <group position={[0.22 * side, 1.27, 0]} rotation={shoulder}>
+  <group position={[0.27 * side, 1.27, 0]} rotation={shoulder}>
     {/* manga bufante facetada */}
     <mesh position={[0.01 * side, -0.06, 0]} scale={[1, 1.1, 1]} material={sleeve} castShadow>
-      <icosahedronGeometry args={[0.1, 0]} />
+      <icosahedronGeometry args={[0.12, 0]} />
     </mesh>
     <mesh position={[0, -0.2, 0]} material={skin} castShadow>
       <cylinderGeometry args={[0.032, 0.03, 0.26, 6]} />
@@ -26,7 +26,7 @@ const Arm: React.FC<{side: 1 | -1; shoulder: V3; elbow: number; sleeve: THREE.Ma
       </mesh>
       <group position={[0, -0.33, 0]}>
         <mesh material={skin} castShadow>
-          <icosahedronGeometry args={[0.07, 0]} />
+          <icosahedronGeometry args={[0.095, 1]} />
         </mesh>
         <object3D ref={palmRef} position={[0, -0.03, 0]} />
       </group>
@@ -35,13 +35,13 @@ const Arm: React.FC<{side: 1 | -1; shoulder: V3; elbow: number; sleeve: THREE.Ma
 );
 
 /* barra em zigue-zague (pontas triangulares) */
-const Jagged: React.FC<{r: number; y: number; mat: THREE.Material; n?: number; h?: number}> = ({r, y, mat, n = 9, h = 0.07}) => (
+const Jagged: React.FC<{r: number; y: number; mat: THREE.Material; n?: number; h?: number}> = ({r, y, mat, n = 12, h = 0.045}) => (
   <>
     {Array.from({length: n}, (_, i) => {
       const a = (i / n) * Math.PI * 2;
       return (
-        <mesh key={i} position={[Math.sin(a) * r, y - h / 2 - (i % 2) * 0.02, Math.cos(a) * r]} rotation={[0, a, Math.PI]} material={mat}>
-          <coneGeometry args={[0.055, h + (i % 2) * 0.03, 3]} />
+        <mesh key={i} position={[Math.sin(a) * r * 0.97, y - h / 2, Math.cos(a) * r * 0.97]} rotation={[0, a, Math.PI]} scale={[1, 1, 0.35]} material={mat}>
+          <coneGeometry args={[0.045, h, 3]} />
         </mesh>
       );
     })}
@@ -70,7 +70,7 @@ export const BlockToy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>
     squash = 0,
   } = pose;
   const hoodie = look.hoodie ?? false;
-  const skin = flat(look.skin ?? "#e8b48a", 0.75);
+  const skin = flat(look.skin ?? "#f2cfa8", 0.75);
   const shirt = flat(look.shirt ?? (hoodie ? "#ffcd2e" : "#3a86ff"), 0.8);
   const pants = flat(look.pants ?? "#2a4aa8", 0.85);
   const hairM = flat(look.hair ?? "#4a2e16", 0.85);
@@ -87,7 +87,7 @@ export const BlockToy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>
     <group position={[pos[0], pos[1] + bob, pos[2]]} rotation={[0, rotY, 0]} scale={[1 + squash * 0.06, sq, 1 + squash * 0.06]}>
       {/* short facetado com barra em pontas */}
       <mesh position={[0, 0.7, 0]} material={pants} castShadow>
-        <cylinderGeometry args={[0.2, 0.22, 0.2, 7]} />
+        <cylinderGeometry args={[0.24, 0.25, 0.2, 6]} />
       </mesh>
       {[1, -1].map((sd) => {
         const sw = sd === 1 ? legSwing : -legSwing;
@@ -96,7 +96,7 @@ export const BlockToy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>
             <mesh position={[0, -0.1, 0]} material={pants} castShadow>
               <cylinderGeometry args={[0.1, 0.11, 0.18, 6]} />
             </mesh>
-            <Jagged r={0.1} y={-0.19} mat={pants} n={6} h={0.06} />
+            <Jagged r={0.1} y={-0.19} mat={pants} n={7} h={0.04} />
             <mesh position={[0, -0.3, 0]} material={skin} castShadow>
               <cylinderGeometry args={[0.035, 0.033, 0.24, 6]} />
             </mesh>
@@ -118,24 +118,9 @@ export const BlockToy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>
       <group position={[0, 0.74, 0]} rotation={torso}>
         <group scale={[1 + breathe * 0.015, 1 + breathe * 0.02, 1]}>
           <mesh position={[0, 0.3, 0]} material={shirt} castShadow>
-            <cylinderGeometry args={[0.2, 0.25, 0.52, 7]} />
+            <cylinderGeometry args={[0.24, 0.28, 0.52, 6]} />
           </mesh>
-          <Jagged r={0.24} y={0.04} mat={shirt} n={11} h={0.08} />
-          {hoodie && (
-            <>
-              <mesh position={[0, 0.5, -0.12]} scale={[1, 0.55, 0.6]} material={shirt}>
-                <icosahedronGeometry args={[0.16, 0]} />
-              </mesh>
-              <mesh position={[0, 0.16, 0.225]} rotation={[-0.08, 0, 0]} material={flat("#e8b41a", 0.8)}>
-                <boxGeometry args={[0.2, 0.1, 0.02]} />
-              </mesh>
-              {[-1, 1].map((sd) => (
-                <mesh key={sd} position={[0.045 * sd, 0.44, 0.2]} material={black}>
-                  <boxGeometry args={[0.014, 0.12, 0.01]} />
-                </mesh>
-              ))}
-            </>
-          )}
+          <Jagged r={0.27} y={0.04} mat={shirt} n={12} h={0.05} />
           {look.suit && <mesh position={[0, 0.4, 0.17]} material={flat("#ffffff", 0.6)}><boxGeometry args={[0.1, 0.26, 0.01]} /></mesh>}
           {look.apron && <mesh position={[0, 0.2, 0.18]} material={flat("#f8f8f5", 0.6)}><boxGeometry args={[0.32, 0.46, 0.02]} /></mesh>}
         </group>
@@ -148,7 +133,7 @@ export const BlockToy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>
           <mesh position={[0, 0.04, 0]} material={skin}>
             <cylinderGeometry args={[0.05, 0.06, 0.08, 6]} />
           </mesh>
-          <group position={[0, 0.33, 0]}>
+          <group position={[0, 0.4, 0]} scale={1.3}>
             <LowHead pose={pose} look={look} />
             {headExtra && <group position={[0, -0.1, 0]}>{headExtra}</group>}
           </group>
