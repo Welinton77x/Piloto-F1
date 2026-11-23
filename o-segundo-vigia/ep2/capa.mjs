@@ -20,15 +20,15 @@ const shot = async (F, cover) => page.evaluate(([F, cover]) => {
   x.textAlign = 'center'; x.textBaseline = 'middle'; x.lineJoin = 'round';
   const txt = (t, y, size, fill, lw, rot = 0) => { x.save(); x.translate(540, y); x.rotate(rot); x.font = `900 ${size}px ${FONT}`; x.lineWidth = lw; x.strokeStyle = '#000'; x.strokeText(t, 0, 0); x.fillStyle = fill; x.fillText(t, 0, 0); x.restore(); };
   // gancho no topo
-  x.save(); x.translate(540, 250); x.rotate(-0.03); x.font = `900 58px ${FONT}`; const hw = x.measureText('NÃO ABRA O PORTÃO').width + 70;
+  x.save(); x.translate(540, 250); x.rotate(-0.03); x.font = `900 58px ${FONT}`; const hw = x.measureText('NÃO OLHE PRA TRÁS').width + 70;
   x.fillStyle = '#c4161c'; x.beginPath(); x.roundRect(-hw/2, -50, hw, 100, 14); x.fill(); x.strokeStyle = '#fff'; x.lineWidth = 6; x.stroke();
-  x.fillStyle = '#fff'; x.fillText('NÃO ABRA O PORTÃO', 0, 4); x.restore();
+  x.fillStyle = '#fff'; x.fillText('NÃO OLHE PRA TRÁS', 0, 4); x.restore();
   // título
   txt('O SEGUNDO', 1420, 104, '#ffffff', 18);
   txt('VIGIA', 1600, 260, '#FFD21F', 30);
   // pílula EP1
-  x.font = `900 76px ${FONT}`; const tw = x.measureText('EP1').width + 80;
-  x.fillStyle = '#fff'; x.beginPath(); x.roundRect(540 - tw/2, 1750, tw, 112, 22); x.fill(); x.fillStyle = '#111'; x.fillText('EP1', 540, 1809);
+  x.font = `900 76px ${FONT}`; const tw = x.measureText('EP2').width + 80;
+  x.fillStyle = '#fff'; x.beginPath(); x.roundRect(540 - tw/2, 1750, tw, 112, 22); x.fill(); x.fillStyle = '#111'; x.fillText('EP2', 540, 1809);
   return document.getElementById('out').toDataURL('image/jpeg', 0.94).split(',')[1];
 }, [F, cover]);
 if (mode === 'teste') { fs.mkdirSync(path.join(dir, 'stills'), { recursive: true }); for (const F of arg.split(',').map(Number)) fs.writeFileSync(path.join(dir, 'stills', `c${F}.jpg`), Buffer.from(await shot(F, false), 'base64')); }
