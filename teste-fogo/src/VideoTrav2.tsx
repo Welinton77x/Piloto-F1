@@ -14,6 +14,7 @@ import {Bg} from "./Sets20";
 import {Sheep} from "./Sets21";
 import {Pillow, Helicopter} from "./Sets22";
 import {PicketSign} from "./Sets33";
+import {Crack, Debris} from "./Sets27";
 import {Sloth, Briefcase, RichShades} from "./Sets36";
 import {Captions, StageTitle, Confetti, Wd, clean} from "./Overlays";
 import {physics} from "./Physics";
@@ -193,6 +194,25 @@ const Room: React.FC<{office?: number}> = ({office = 0}) => (
   </>
 );
 
+/* casa do menino no meio da cidade dos vídeos antigos */
+const HW = 3.4;
+const HH = 2.7;
+const HZ = -0.6;
+const PEAK = HH + HW * 0.4;
+const HouseOut: React.FC<{f: number; t: number; heli: V3; heliRot?: number; spin?: number; crack?: number; debris?: number}> = ({f, t, heli, heliRot = 0.3, spin = 6, crack = 0, debris = 0}) => (
+  <>
+    <DayOut />
+    <group position={[0, 0, -5]}>
+      <Town t={t} galo={false} variant="nova" flat clouds />
+    </group>
+    <House p={[0, 0, HZ]} w={HW} h={HH} d={3} wall="#f6d9a8" roof="#e8412c" />
+    {crack > 0 && <Crack p={[0, HH + 0.55, HZ + 1.77]} r={[0, 0, 0]} s={1.3 * crack} />}
+    {crack > 0 && <Crack p={[0.4, HH + 0.35, HZ + 1.77]} r={[0, 0, 1.2]} s={0.9 * crack} />}
+    <Debris k={debris} at={[0, PEAK, HZ]} />
+    <Helicopter p={heli} rotY={heliRot} s={1.0} t={t * spin} />
+  </>
+);
+
 /* 0–2 — demitir o travesseiro empresário */
 const T0: React.FC<ShotProps> = ({f, a, t}) => (
   <>
@@ -232,6 +252,15 @@ const T6: React.FC<ShotProps> = ({f, a, t}) => {
 };
 /* 9–11 — o travesseiro volta rico de helicóptero e vira o quarto escritório */
 const T9: React.FC<ShotProps> = ({f, a, t}) => {
+  if (f >= HELI9 - 6 && f < ESCRITORIO10) {
+    const k = easeOut(clamp((f - HELI9 + 6) / 34));
+    return (
+      <>
+        <Cam pos={[0.5, 3.4, 11]} look={[0, 2.6, HZ]} fov={56} f={f} a={HELI9 - 6} />
+        <HouseOut f={f} t={t} heli={[0, lerp(9, PEAK + 0.45, k), HZ]} heliRot={0.3 + (1 - k) * 1.5} />
+      </>
+    );
+  }
   const land = f >= HELI9 - 6 ? easeOut(clamp((f - HELI9 + 6) / 30)) : 0;
   const office = f >= ESCRITORIO10 ? 1 : 0;
   return (
@@ -249,17 +278,12 @@ const T9: React.FC<ShotProps> = ({f, a, t}) => {
 const T12: React.FC<ShotProps> = ({f, a, t}) => {
   const out = f >= TELHADO12 - 6;
   if (out) {
-    const k = clamp((f - TELHADO12 + 6) / 20);
+    const cr = clamp((f - TELHADO12 + 4) / 10);
+    const fall = f >= TELHADO12 + 10 ? easeInOut(clamp((f - TELHADO12 - 10) / 18)) : 0;
     return (
       <>
-        <Cam pos={[0, 3.2, 10]} look={[0, 2.2, 0]} fov={54} f={f} a={TELHADO12 - 6} punch={12} />
-        <DayOut />
-        <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-          <planeGeometry args={[40, 40]} />
-          <meshStandardMaterial color="#7ec850" />
-        </mesh>
-        <House p={[0, 0, -1]} w={4} h={3} d={3} wall="#f6d9a8" roof="#e8412c" />
-        <Helicopter p={[0.3, lerp(7, 4.2, k), -1]} rotY={0.4 + k * 0.6} s={1.0} t={t * (k < 1 ? 6 : 0.3)} />
+        <Cam pos={[0.5, 3.4, 11]} look={[0, 2.6, HZ]} fov={56} f={f} a={TELHADO12 - 6} punch={12} />
+        <HouseOut f={f} t={t} heli={[0, PEAK + 0.45 - fall * 2.6 + 0.04 * Math.sin(t * 40) * cr, HZ]} heliRot={0.3 + fall * 0.4} spin={0.3} crack={cr} debris={fall > 0 ? fall * 1.5 : 0} />
       </>
     );
   }
