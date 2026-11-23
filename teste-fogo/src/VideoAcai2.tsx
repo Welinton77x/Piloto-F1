@@ -595,6 +595,7 @@ const PH: Record<string, [number, number]> = {p1: [1086, 1448], p2: [1200, 1600]
 /** foto preenchendo uma caixa, com foco (cx, cy) e zoom */
 const TILE: Record<string, [string, string, string]> = {p1: ["#8a5636", "#f6bfcc", "🍫"], p2: ["#f7f1de", "#3a0c3c", "🥛"], p3: ["#3a0c3c", "#f7f1de", "🍓"]};
 const Photo: React.FC<{src: string; w?: number; h?: number; cx?: number; cy?: number; zoom?: number; style?: React.CSSProperties}> = ({src, w = 1080, h = 1920, cx = 0.5, style}) => {
+  if (src.startsWith("3d-")) return <Img src={staticFile(`acai/${src}.png`)} style={{position: "absolute", width: w, height: h, objectFit: "cover", ...style}} />;
   const [c1, c2, e] = TILE[src];
   const em = cx < 0.2 ? "🍫" : cx < 0.4 && cx > 0.2 ? "🍓" : cx > 0.4 && cx < 0.6 && src === "p1" ? "🥜" : cx > 0.8 ? "💛" : e;
   return (
@@ -619,12 +620,12 @@ const Flash: React.FC<{at: number}> = ({at}) => {
 };
 /* ---------- celular: cardápio e Instagram ---------- */
 const MENU: [string, string, string, number, number, number][] = [
-  ["Copo Tentação", "🔥 O favorito!", "p3", 0.5, 0.4, 1.3],
-  ["Ninho Sensação", "Creme de Ninho artesanal", "p2", 0.5, 0.5, 1.4],
-  ["Explosão de Nutella", "Creme artesanal de Nutella", "p1", 0.11, 0.6, 3.2],
-  ["Morango dos Sonhos", "Creme de morango", "p1", 0.3, 0.5, 3.2],
-  ["Sonho de Paçoca", "Muita paçoca", "p1", 0.48, 0.5, 3.2],
-  ["Maracujá Divino", "Creme de maracujá", "p1", 0.88, 0.55, 3.2],
+  ["Copo Tentação", "🔥 O favorito!", "3d-copo", 0, 0, 1],
+  ["Ninho Sensação", "Creme de Ninho artesanal", "3d-ninho", 0, 0, 1],
+  ["Explosão de Nutella", "Creme artesanal de Nutella", "3d-nutella", 0, 0, 1],
+  ["Morango dos Sonhos", "Creme de morango", "3d-morango", 0, 0, 1],
+  ["Sonho de Paçoca", "Muita paçoca", "3d-pacoca", 0, 0, 1],
+  ["Maracujá Divino", "Creme de maracujá", "3d-maracuja", 0, 0, 1],
 ];
 const PRICE = ["R$ 20,90", "R$ 19,90", "R$ 19,90", "R$ 19,90", "R$ 19,90", "R$ 19,90"];
 const MenuScreen: React.FC<{k: number; tap: number}> = ({k, tap}) => {
@@ -665,7 +666,7 @@ const InstaScreen: React.FC<{f: number; from: number}> = ({f, from}) => {
   const tap = from + 26;
   const done = f >= tap + 2;
   const press = 1 - 0.08 * Math.sin(clamp((f - tap + 3) / 6) * Math.PI);
-  const grid: [string, number, number, number][] = [["p3", 0.5, 0.4, 1], ["p2", 0.5, 0.5, 1], ["p1", 0.5, 0.55, 1], ["p1", 0.13, 0.6, 2.4], ["p1", 0.3, 0.55, 2.4], ["p1", 0.88, 0.55, 2.4]];
+  const grid: [string, number, number, number][] = [["3d-copo", 0, 0, 1], ["3d-ninho", 0, 0, 1], ["3d-nutella", 0, 0, 1], ["3d-morango", 0, 0, 1], ["3d-pacoca", 0, 0, 1], ["3d-maracuja", 0, 0, 1]];
   return (
     <div style={{position: "absolute", inset: 0, background: "#ffffff", fontFamily, color: "#101018"}}>
       <div style={{height: 70, marginTop: 50, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900, fontSize: 30, borderBottom: "2px solid #eee"}}>vibegourmetacai</div>
@@ -838,6 +839,22 @@ export const VideoAcai2: React.FC = () => {
       <SND src="sfx2/click.mp3" from={SEGUIR12 + 24} dur={20} v={FXV * 0.8} />
       <SND src="sfx2/click.mp3" from={CARDAPIO12 + 18} dur={20} v={FXV * 0.8} />
       <SND src="sfx12/tada.mp3" from={INSTA_TO} dur={40} v={FXV * 0.3} />
+    </AbsoluteFill>
+  );
+};
+
+const PRODS: (Sabor | "copo")[] = ["copo", "ninho", "nutella", "morango", "pacoca", "maracuja"];
+export const AcaiProd: React.FC = () => {
+  const f = useCurrentFrame();
+  const sabor = PRODS[Math.min(f, PRODS.length - 1)];
+  return (
+    <AbsoluteFill style={{background: "#2a0a3a"}}>
+      <ThreeCanvas width={1080} height={1350} shadows gl={{antialias: true}} dpr={1}>
+        <HeroSet f={14} a={0} t={0.3}>
+          {sabor === "copo" ? <AcaiCup p={[0, 0, 0]} s={1.0} logo={false} /> : <Garrafinha sabor={sabor} s={1.05} glow={1} />}
+        </HeroSet>
+        <Post bloom={0.4} />
+      </ThreeCanvas>
     </AbsoluteFill>
   );
 };

@@ -35,7 +35,7 @@ import {VideoBrig, TOTAL_BRIG} from "./VideoBrig";
 import {VideoAnt, TOTAL_ANT} from "./VideoAnt";
 import {VideoRoupa, TOTAL_ROUPA} from "./VideoRoupa";
 import {VideoAcai, TOTAL_ACAI} from "./VideoAcai";
-import {VideoAcai2, TOTAL_ACAI2} from "./VideoAcai2";
+import {VideoAcai2, TOTAL_ACAI2, AcaiProd} from "./VideoAcai2";
 import {VideoChule, TOTAL_CHULE} from "./VideoChule";
 import {VideoMec, TOTAL_MEC} from "./VideoMec";
 import {VideoBolo, TOTAL_BOLO} from "./VideoBolo";
@@ -66,6 +66,7 @@ export const Root: React.FC = () => (
     <Composition id="Roupa" component={VideoRoupa} durationInFrames={TOTAL_ROUPA} fps={30} width={1080} height={1920} />
     <Composition id="Acai" component={VideoAcai} durationInFrames={TOTAL_ACAI} fps={30} width={1080} height={1920} />
     <Composition id="Acai2" component={VideoAcai2} durationInFrames={TOTAL_ACAI2} fps={30} width={1080} height={1920} />
+    <Composition id="AcaiProd" component={AcaiProd} durationInFrames={6} fps={30} width={1080} height={1350} />
     <Composition id="ChulePreview" component={ChulePreview} durationInFrames={8} fps={30} width={1080} height={1920} />
     <Composition id="MecPreview" component={MecPreview} durationInFrames={6} fps={30} width={1080} height={1920} />
     <Composition id="Casamento" component={VideoCasamento} durationInFrames={TOTAL_CASA} fps={30} width={1080} height={1920} />

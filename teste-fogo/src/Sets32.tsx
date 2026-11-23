@@ -114,12 +114,13 @@ export const VibeShop: React.FC<{p: V3; rotY?: number; s?: number}> = ({p, rotY 
 );
 
 /* ---------- garrafinha de açaí (sabores) ---------- */
-export type Sabor = "ninho" | "nutella" | "morango" | "pacoca";
+export type Sabor = "ninho" | "nutella" | "morango" | "pacoca" | "maracuja";
 const SABOR: Record<Sabor, {cream: string; top: string}> = {
   ninho: {cream: "#f7f1de", top: "#ffffff"},
   nutella: {cream: "#8a5636", top: "#4a2614"},
   morango: {cream: "#f6bfcc", top: "#e8262d"},
   pacoca: {cream: "#e8cf9a", top: "#b98a4e"},
+  maracuja: {cream: "#f7d94a", top: "#e8a820"},
 };
 const marbleTex = (sabor: Sabor) =>
   canvasTex("marble-" + sabor, 512, 1024, (c, r) => {
