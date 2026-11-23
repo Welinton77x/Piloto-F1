@@ -1,6 +1,6 @@
 [excited] Se você quiser tomar um açaí em Itumbiara, primeiro você precisa acalmar a sua geladeira.
 [mischievously] Ela descobriu que você só abre ela pra procurar açaí, e ficou com ciúmes. | [dramatic] Agora ela só gela pepino.
-[excited] Então você chama um especialista em sobremesa, que é um urso polar, porque ele entende de coisa gelada.
+[excited] Então você liga pra um especialista em sobremesa, que é um urso polar, porque ele entende de coisa gelada.
 [proudly] Esse é o consultor glacial!
 [dramatic] Mas o urso fica com tanta vontade de açaí que derrete o Polo Norte inteiro. | [excited] E de lá sai uma baleia gritando: Ninho Sensação!
 [serious] A baleia só sai do caminho se você trouxer uma Explosão de Nutella. | [laughing] Ela nunca provou. Ela é uma baleia.
