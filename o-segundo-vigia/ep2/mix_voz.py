@@ -1,4 +1,4 @@
-# EP2 — uso: python3 mix_voz.py <video.mp4> <efeitos.wav (sfx.py)> <saida.mp4>
+# EP2 (93 s) — uso: python3 mix_voz.py <video.mp4> <efeitos.wav (sfx.py)> <saida.mp4>
 # Vozes ElevenLabs (eleven_v3) em vozes/, sons extras (ElevenLabs sound effects) em sfx_gen/.
 # Caio = Davi Andrei, Central = Thiago (rádio), regras = Nassif (grave + camada + impacto).
 # Outro vigia = Wesley Bessa SUSSURRANDO, seco, colado no ouvido direito (efeito "tá do seu lado" no fone).
@@ -23,9 +23,9 @@ EAR = ("[0:a]highpass=f=80,equalizer=f=160:t=q:w=1:g=5,equalizer=f=5000:t=q:w=1.
 L = [("01","P",3.0,1),("02","P",8.0,1),("03","P",13.0,1),("04","P",16.1,1),("05","P",20.3,1),
      ("06","C",26.2,1.06),("07","P",31.8,1),("08","C",34.6,1),("09","R",41.2,1),("10","W",45.6,1),
      ("11","P",52.0,1),("12","W",55.8,1),("13","P",61.0,1),("14","P",68.6,1),("15","P",73.5,1),
-     ("16","P",76.6,1),("17","W",80.7,1)]
+     ("16","P",76.6,1),("17","W",84.7,1)]
 # sons extras: (arquivo, início, duração, ganho, lado) lado: 'R' = ouvido direito, 'C' = centro
-X = [("respira", 43.9, 1.6, 1.6, "R"), ("respira", 54.2, 1.5, 1.6, "R"), ("respira", 62.2, 2.0, 1.3, "R"), ("respira", 79.2, 1.4, 1.8, "R"),
+X = [("respira", 43.9, 1.6, 1.6, "R"), ("respira", 54.2, 1.5, 1.6, "R"), ("respira", 62.2, 2.0, 1.3, "R"), ("respira", 82.7, 1.5, 1.8, "R"), ("respira", 83.6, 1.0, 1.4, "R"),
      ("drone", 36.0, 22.0, 0.55, "C"), ("zumbido", 60.2, 3.6, 0.22, "C")]
 files = []
 for n,w,st,sp in L:
@@ -53,9 +53,9 @@ for (o,st,w) in [f for f in files if f[2]=="R"]:
 for (o,st) in xf:
     inp+=["-i",o]; ms=int(st*1000); parts.append(f"[{k}:a]adelay={ms}|{ms}[e{k}]"); el.append(f"[e{k}]"); k+=1
 # efeitos 5 dB mais baixos e "silêncio" antes de cada sussurro
-dips = "+".join(f"between(t,{a},{b})" for a,b in [(44.4,46.0),(54.7,56.2),(79.8,82.0)])
+dips = "+".join(f"between(t,{a},{b})" for a,b in [(44.4,46.0),(54.7,56.2),(83.8,86.0)])
 fc=";".join(parts)+f";{''.join(vl)}amix=inputs={len(vl)}:normalize=0,apad[vox];[vox]asplit[vk][vm];"
-fc+=f"[1:a]aformat=channel_layouts=stereo,aresample=48000,volume=0.56,volume='if({dips},0.3,1)':eval=frame[bg0];"
+fc+=f"[1:a]aformat=channel_layouts=stereo,aresample=48000,volume=0.75,volume='if({dips},0.3,1)':eval=frame[bg0];"
 fc+=f"[bg0]{''.join(el)}amix=inputs={1+len(el)}:normalize=0[bg];"
 fc+="[bg][vk]sidechaincompress=threshold=0.02:ratio=8:attack=10:release=400[duck];"
 fc+="[duck][vm]amix=inputs=2:normalize=0:duration=first,loudnorm=I=-16:TP=-1.5:LRA=14[a]"

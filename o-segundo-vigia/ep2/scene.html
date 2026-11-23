@@ -4,7 +4,7 @@
 <canvas id="gl" width="1080" height="1920" style="display:none"></canvas>
 <canvas id="out" width="1080" height="1920"></canvas>
 <script>
-const W = 1080, H = 1920, FPS = 30, TOTAL = 2565, INTRO = 75; // EP2: 88 s
+const W = 1080, H = 1920, FPS = 30, TOTAL = 2715, INTRO = 75; // EP2: 93 s
 const S = t => Math.round((t - 2.5) * 30); // segundos do vídeo final -> frame do motor
 const FONT = '"Inter Display"';
 
@@ -341,7 +341,8 @@ function build() {
 }
 
 /* ---------- timeline (EP2) ---------- */
-const FL1 = [S(41.0), S(41.9)], FL2 = [S(79.0), S(80.3)], FL3 = [S(36.0), S(36.7)], DARK = S(80.3), END_CARD = S(82.6);
+const FL1 = [S(41.0), S(41.9)], FL2 = [S(83.0), S(84.3)], FL3 = [S(36.0), S(36.7)], DARK = S(84.3), END_CARD = S(86.6);
+const BACK = S(82.6); // o vulto volta na CAM 04
 const GHOST_IN = S(36.0), GHOST_OUT = S(72.0);
 function clockMin(f) { return 0; }
 function gateOpen(f) { return -0.55 * (1 - ease(seg(f, S(7.4), S(8.9)))); }
@@ -353,11 +354,11 @@ function lockSwing(f) {
 function radioTalk(f) { return (f >= S(26.2) && f < S(31.5)) || (f >= S(34.6) && f < S(35.6)); }
 let CCTV_PASS = false;
 function ghostState(f) { // EP2: ele só existe nas câmeras, atrás do Caio
-  if (!CCTV_PASS || f < GHOST_IN || f >= GHOST_OUT) return { vis: false };
+  if (!CCTV_PASS || !((f >= GHOST_IN && f < GHOST_OUT) || (f >= BACK && f < DARK))) return { vis: false };
   const lean = ease(seg(f, S(45.3), S(48.5))), reach = ease(seg(f, S(55.6), S(57.6)));
   return { vis: true, x: 0.36, z: 0.98 - 0.12 * lean, yaw: Math.PI + 0.12, tilt: 0.15 + 0.25 * lean + Math.sin(f * 0.05) * 0.03, nod: 0.08 + 0.35 * lean, arm: -1.45 * reach };
 }
-function glitch(f) { const w = (a, b) => f >= S(a) && f < S(b); return w(24.0, 26.0) ? 0.55 + 0.45 * hash(Math.floor(f / 2)) : (w(36.0, 36.7) || w(72.0, 72.5)) ? 0.9 : 0; }
+function glitch(f) { const w = (a, b) => f >= S(a) && f < S(b); return w(24.0, 26.0) ? 0.55 + 0.45 * hash(Math.floor(f / 2)) : (w(36.0, 36.7) || w(72.0, 72.5) || w(82.6, 83.0)) ? 0.9 : 0; }
 function paperUp(f) { if (f <= S(6.9)) return 1 - ease(seg(f, S(6.0), S(6.9))); return -1; }
 function paperPose(f) {
   const u = paperUp(f); if (u < 0) return null; const down = 1 - u;
@@ -410,13 +411,14 @@ const KF = [
   [S(64.6), LOCKD[0], LOCKD[1], 16], [S(67.8), LOCKD[0], LOCKD[1], 14],
   [S(68.6), GATE[0], GATE[1] - 0.06, 62], [S(71.8), GATE[0] + 0.01, GATE[1] - 0.06, 56],
   [S(72.7), TV04[0], TV04[1], 9.5], [S(75.9), TV04[0], TV04[1], 8.5],
-  [S(76.8), 0.02, -0.38, 70], [TOTAL, 0.03, -0.38, 64],
+  [S(76.8), 0.02, -0.38, 70], [S(79.0), 0.025, -0.36, 66],
+  [S(81.4), TVAIM[0], TVAIM[1] - 0.01, 30], [S(83.0), TV04[0], TV04[1], 11], [TOTAL, TV04[0], TV04[1], 10],
 ];
 function camAt(f) {
   let i = 0; while (i < KF.length - 2 && f >= KF[i + 1][0]) i++;
   const a = KF[i], b = KF[i + 1]; const t = ease(seg(f, a[0], b[0]));
   let yaw = lerp(a[1], b[1], t), pitch = lerp(a[2], b[2], t), fov = lerp(a[3], b[3], t);
-  const shake = (f >= S(60.2) && f < S(63.4)) ? 1.2 : (f >= S(79.0) && f < S(80.3)) ? 0.6 : 0;
+  const shake = (f >= S(60.2) && f < S(63.4)) ? 1.2 : (f >= S(83.0) && f < S(84.3)) ? 0.6 : 0;
   yaw += 0.006 * Math.sin(f * 0.071) + 0.004 * Math.sin(f * 0.13 + 1) + shake * (hash(f) - .5) * 0.04;
   pitch += 0.005 * Math.sin(f * 0.093 + 2) + 0.003 * Math.sin(f * 0.21) + shake * (hash(f + 9) - .5) * 0.04;
   return { yaw, pitch, fov, roll: 0.01 * Math.sin(f * 0.05) };
@@ -426,7 +428,7 @@ function lampLevel(f, idx) {
   const fl = (a, b) => f >= a && f < b;
   if (fl(...FL1) || fl(...FL3)) return hash(Math.floor(f / 2) + idx * 3) > 0.5 ? 1 : 0.05;
   if (fl(...FL2)) return hash(Math.floor(f / 2) * 1.7 + idx) > 0.55 ? 0.9 : 0.02;
-  if (idx >= 1 && f >= GHOST_IN && f < GHOST_OUT) return 0.75 + 0.2 * Math.sin(f * 0.6) * (hash(Math.floor(f / 4)) > 0.7 ? 1 : 0);
+  if (idx >= 1 && ((f >= GHOST_IN && f < GHOST_OUT) || f >= BACK)) return 0.75 + 0.2 * Math.sin(f * 0.6) * (hash(Math.floor(f / 4)) > 0.7 ? 1 : 0);
   return 1;
 }
 
@@ -451,7 +453,7 @@ const SUBS = [
   [S(68.6), S(71.8), 'Eu tranquei. Eu tenho certeza.', '#ffffff'],
   [S(73.4), S(75.9), '...ele sumiu?', '#ffffff', false, 1500],
   [S(76.6), S(78.9), 'Acabou.', '#ffffff'],
-  [S(80.6), S(82.2), 'Olha pra mim.', '#FFD21F'],
+  [S(84.6), S(86.2), 'Olha pra mim.', '#FFD21F'],
 ];
 function wrap(x, text, maxW) { const ws = text.split(' '); const lines = []; let cur = ''; for (const w of ws) { const t = cur ? cur + ' ' + w : w; if (x.measureText(t).width > maxW && cur) { lines.push(cur); cur = w; } else cur = t; } if (cur) lines.push(cur); return lines; }
 function drawOverlay(x, f) {
