@@ -235,18 +235,24 @@ const T3: React.FC<ShotProps> = ({f, a, t}) => {
     </>
   );
 };
-/* 6–8 — a preguiça demora 3 dias e deita em cima de você */
+/* 6–8 — a preguiça demora 3 dias e deita em cima de você (menino deitado na cama) */
 const T6: React.FC<ShotProps> = ({f, a, t}) => {
   const k = clamp((f - PREGUICA6) / 120);
-  const lie = f >= CIMA7 - 4 ? easeInOut(clamp((f - CIMA7 + 4) / 18)) : 0;
+  const lie = f >= CIMA7 - 4 ? easeInOut(clamp((f - CIMA7 + 4) / 14)) : 0;
+  const climb = f >= CIMA7 - 4;
   return (
     <>
-      <Cam pos={[0.4, 1.9, 4.8]} look={[0, 0.9, -0.4]} fov={56} f={f} a={lie > 0 ? CIMA7 - 4 : a} />
+      <Cam pos={[1.2, 3.3, 3.4]} look={[0, 0.8, -0.7]} fov={54} f={f} a={lie > 0 ? CIMA7 - 4 : a} />
       <Room />
-      <Sloth p={[lerp(2.6, 1.3, k) - lie * 1.6, 0, 0.2 + lie * 0.2]} rotY={-1.2 + lie * 1.2} s={0.9} t={t} lie={lie} blink={0.6} reach={f >= DIAS7 ? 0.3 : 0} />
-      <group scale={[1, 1 - lie * 0.6, 1]} position={[-0.3, 0, 0.4]}>
-        <PBoy id="t6" a={a} f={f} look={PJ} pose={(fr) => ({...idle(fr), pos: [0, 0, 0], rotY: 0.6, eyeWide: 1, mouthOpen: lie > 0 ? 0.7 : 0, brow: 1})} />
+      {/* menino deitado, cabeça no travesseiro */}
+      <group position={[0, BED_TOP + 0.02, 0.35]} rotation={[-Math.PI / 2, 0, 0]}>
+        <PBoy id="t6" a={a} f={f} look={PJ} pose={(fr) => ({...idle(fr), pos: [0, 0, 0], rotY: 0, eyeWide: fr >= CIMA7 ? 1 : 0.5, mouthOpen: fr >= CIMA7 ? 0.7 : 0, brow: fr >= CIMA7 ? 1 : 0, head: [fr >= DIAS7 && fr < CIMA7 ? -0.3 : 0, fr >= DIAS7 && fr < CIMA7 ? -0.5 : 0, 0]})} />
       </group>
+      {climb ? (
+        <Sloth p={[lerp(1.2, 0, lie), BED_TOP + 0.05 + lie * 0.25, lerp(0.2, 0.78, lie)]} rotY={lerp(-1.2, 0, lie)} s={0.85} t={t} lie={lie} blink={0.7} reach={0.2} />
+      ) : (
+        <Sloth p={[lerp(2.8, 1.3, k), 0, 0.2]} rotY={-1.3} s={0.85} t={t} blink={0.6} reach={f >= DIAS7 ? 0.3 : 0} />
+      )}
     </>
   );
 };
