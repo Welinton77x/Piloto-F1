@@ -175,7 +175,7 @@ const CowHold: React.FC<{c: CowP; item: React.ReactNode; s?: number}> = ({c, ite
   );
 };
 const SUN: V3 = [2.5, 7.5, -14];
-const ICE_HAND = (melt = 0, flavor = "#ff9ec7") => <IceCream p={[0, 0.06, 0.06]} s={1.3} melt={melt} flavor={flavor} />;
+const ICE_HAND = (melt = 0, flavor = "#ff9ec7") => <IceCream p={[0, -0.02, 0.06]} r={[Math.PI, 0, 0]} s={1.3} melt={melt} flavor={flavor} />;
 const BANHISTAS = [NEIGHBORS[1], NEIGHBORS[3], NEIGHBORS[5]];
 
 /* praia (normal ou congelada) */
