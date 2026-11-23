@@ -157,7 +157,9 @@ const WHATS11 = at(11, "whatsapp");
 const CHEGA11 = at(11, "chega");
 const PISCAR11 = at(11, "piscar");
 const PARABENS12 = at(12, "parabens");
-const SEGUIR12 = at(12, "seguir");
+const SEGUIR12 = at(12, "segue");
+const AGORA12 = at(12, "agora");
+const CARDAPIO12 = at(12, "cardapio");
 const END_N = F(words[words.length - 1].e);
 
 /* ---------- física e utilidades ---------- */
@@ -361,6 +363,16 @@ const K11: React.FC<ShotProps> = ({f, a, t}) => {
     </>
   );
 };
+/* 12 — propaganda: a loja da Vibe */
+const KShop: React.FC<ShotProps> = ({f, a, t}) => (
+  <>
+    <Cam pos={[0.3, 2.0, 8.6]} look={[-0.2, 1.5, -0.5]} fov={54} f={f} a={a} />
+    <Street t={t} />
+    <VibeShop p={[-0.6, 0, -1.2]} rotY={0.15} s={1.1} />
+    <Sparkles p={[-0.6, 3.0, -0.2]} t={t} spread={1.6} n={8} />
+    <PBoy id="ks" a={a} f={f} item={CUP_IN_HAND} pose={(fr) => ({...idle(fr), pos: [1.0, hop(fr, a + 4, 14, 0.25), 0.8], rotY: -0.5, rShoulder: [-1.3, 0.4, 0], rElbow: -0.9, lShoulder: [-1.5, -0.6, 0.6], lElbow: -0.1, smile: 1, mouthOpen: 0.3})} />
+  </>
+);
 const SFoto: React.FC<ShotProps> = () => <Bg c="#1a0626" />;
 const phoneTex = () =>
   canvasTex("vibephone2", 440, 860, (c) => {
@@ -449,7 +461,8 @@ const SHOTS: Shot[] = [
   {from: L(10), Comp: K10},
   {from: PACOCA10 - 2, Comp: HPacoca},
   {from: L(11), Comp: K11},
-  {from: SEGUIR12 - 4, Comp: SFoto},
+  {from: AGORA12 - 2, Comp: KShop},
+  {from: CARDAPIO12 - 4, Comp: SFoto},
 ];
 
 const Scene: React.FC<{f: number}> = ({f}) => {
@@ -766,7 +779,7 @@ const PhoneUI: React.FC<{from: number; to: number; insta?: boolean}> = ({from, t
 };
 
 /* ======================= vídeo ======================= */
-const KEYS = new Set(["acai", "itumbiara", "geladeira", "ciumes", "pepino", "urso", "polar", "gelada", "consultor", "glacial", "derrete", "polo", "norte", "baleia", "ninho", "sensacao", "explosao", "nutella", "pombo-correio", "cardapio", "viciado", "morango", "sonhos", "desvio", "pombistico", "vo", "patinete", "copo", "tentacao", "bio", "fila", "vibe", "gourmet", "volta", "pazes", "sonho", "pacoca", "whatsapp", "piscar", "parabens", "seguir", "arroba", "sempre"]);
+const KEYS = new Set(["acai", "itumbiara", "geladeira", "ciumes", "pepino", "urso", "polar", "gelada", "consultor", "glacial", "derrete", "polo", "norte", "baleia", "ninho", "sensacao", "explosao", "nutella", "pombo-correio", "cardapio", "viciado", "morango", "sonhos", "desvio", "pombistico", "vo", "patinete", "copo", "tentacao", "bio", "fila", "vibe", "gourmet", "volta", "pazes", "sonho", "pacoca", "whatsapp", "piscar", "parabens", "segue", "arroba", "verdade", "peca", "agora"]);
 const FXV = 0.3;
 const SND: React.FC<{src: string; from: number; dur?: number; v: number}> = ({src, from, dur = 60, v}) => (
   <Sequence from={Math.max(0, from)} durationInFrames={dur}>
@@ -799,7 +812,9 @@ export const VideoAcai2: React.FC = () => {
       <ProdLabel from={PACOCA10} to={L(11) - 2} text="SONHO DE PAÇOCA" />
       <Plaque from={WHATS11} to={PARABENS12 - 2} text={"📲 (64) 99252-0622"} x={540} y={420} size={60} />
       <Confetti from={PARABENS12} to={PARABENS12 + 60} />
-      <PhoneUI from={SEGUIR12 - 4} to={INSTA_TO} insta />
+      <Plaque from={AGORA12 + 6} to={CARDAPIO12 - 5} text={"📍 VIBE GOURMET AÇAÍ\nITUMBIARA-GO"} x={540} y={1420} size={56} />
+      <PhoneUI from={CARDAPIO12 - 4} to={SEGUIR12 - 2} />
+      <PhoneUI from={SEGUIR12 - 2} to={INSTA_TO} insta />
       <EndCard from={INSTA_TO} to={TOTAL_ACAI2} />
       <Watermark />
 
@@ -820,7 +835,8 @@ export const VideoAcai2: React.FC = () => {
       <SND src="sfx7/cash.mp3" from={CHEGA11} dur={30} v={FXV * 0.35} />
       <SND src="sfx7/confetti.mp3" from={PARABENS12} dur={50} v={FXV * 0.4} />
       <SND src="sfx9/yay.mp3" from={PARABENS12} dur={50} v={FXV * 0.3} />
-      <SND src="sfx2/click.mp3" from={SEGUIR12 + 22} dur={20} v={FXV * 0.8} />
+      <SND src="sfx2/click.mp3" from={SEGUIR12 + 24} dur={20} v={FXV * 0.8} />
+      <SND src="sfx2/click.mp3" from={CARDAPIO12 + 18} dur={20} v={FXV * 0.8} />
       <SND src="sfx12/tada.mp3" from={INSTA_TO} dur={40} v={FXV * 0.3} />
     </AbsoluteFill>
   );
