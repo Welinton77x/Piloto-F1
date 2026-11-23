@@ -263,7 +263,7 @@ const S3: React.FC<ShotProps> = ({f, a, t}) => {
       <Bg c="#dfe9f2" />
       <KitchenLights />
       <Lab t={t} />
-      {up > 0 && <AcaiCup p={[0, 0.9 + (1 - up) * -0.8, -1.3]} s={0.9 * up} r={[0, t * 0.8, 0]} glow={1} />}
+      {up > 0 && <AcaiCup p={[0, 0.9 + (1 - up) * -0.8, -1.3]} s={0.9 * up} r={[0, t * 0.8, 0]} glow={1} logo={false} />}
       {up > 0 && <Sparkles p={[0, 1.6, -1.3]} t={t} spread={1.2} />}
       <PBoy id="a3s" a={a} f={f} look={SCI} headExtra={<HeadGlasses />} item={<Lupa s={0.7} />} pose={(fr) => ({...idle(fr), pos: [-1.0, hop(fr, ACAI3, 14, 0.3), -0.3], rotY: 0.5, rShoulder: [-1.3, 0.4, 0], rElbow: -0.8, eyeWide: fr >= ACAI3 ? 1 : 0.4, mouthOpen: fr >= ACAI3 ? 0.6 : 0, brow: fr >= ACAI3 ? 1 : 0})} />
       <PBoy id="a3t" a={a} f={f} look={SCI2} headExtra={<HeadGlasses />} pose={(fr) => ({...idle(fr), pos: [1.0, hop(fr, ACAI3 + 3, 14, 0.3), -0.3], rotY: -0.5, eyeWide: fr >= CAUSA3 ? 1 : 0.4, mouthOpen: fr >= ACAI3 ? 0.6 : 0, ...(fr >= ACAI3 ? ARMS_UP : {lShoulder: [-1.0, -0.3, 0.1], lElbow: -1.6})})} />
@@ -277,7 +277,7 @@ const S3b: React.FC<ShotProps> = ({f, a, t}) => {
     <>
       <Cam pos={[0, 2.6, 9.6]} look={[0, 1.7, 0]} fov={58} f={f} a={a} />
       <Street t={t} />
-      <AcaiCup p={[0, 0, -0.8]} s={2.4} r={[0, Math.sin(t) * 0.2, 0]} glow={1} />
+      <AcaiCup p={[0, 0, -0.8]} s={2.4} r={[0, Math.sin(t) * 0.2, 0]} glow={1} logo={false} />
       {[0, 1, 2, 3, 4, 5].map((i) => {
         const dir = i % 2 ? 1 : -1;
         const x = dir * Math.max(1.3, 3.0 - k * 2.2 - (i >> 1) * 0.3);
@@ -297,13 +297,13 @@ const S6: React.FC<ShotProps> = ({f, a, t}) => {
     <>
       <Cam pos={[0, 1.6, 4.8]} look={[0, 1.35, 0]} fov={54} f={f} a={got ? EXPERIMENTAR6 : a} />
       <Street t={t} />
-      {!got && fly > 0 && <AcaiCup p={[lerp(3, 0.4, fly), 1.0 + Math.sin(fly * Math.PI) * 1.2, 0.6]} s={0.3} r={[0, 0, fly * 6]} />}
+      {!got && fly > 0 && <AcaiCup p={[lerp(3, 0.4, fly), 1.0 + Math.sin(fly * Math.PI) * 1.2, 0.6]} s={0.3} r={[0, 0, fly * 6]} logo={false} />}
       {got && <Sparkles p={[0, 1.4, 0.4]} t={t} />}
-      {got && <AcaiCup p={[0, 2.12 + Math.abs(Math.sin(tf(f - EXPERIMENTAR6) * 7)) * 0.35, 0.4]} s={0.34} r={[0, t * 2, 0]} glow={1} />}
+      {got && <AcaiCup p={[0, 0.86 + Math.abs(Math.sin(tf(f - EXPERIMENTAR6) * 7)) * 0.35, 0.78]} s={0.36} glow={1} logo={false} />}
       <PBoy id="a6" a={a} f={f} pose={(fr) => {
         if (fr < EXPERIMENTAR6) return {...idle(fr), pos: [0, 0, 0.4], rotY: 0, torso: [0.35, 0, 0], head: [0.3, 0, 0], eyeWide: 0, blink: 0.5, brow: -0.6, rShoulder: [0.1, 0, -0.1], lShoulder: [0.1, 0, 0.1]};
         const j = Math.abs(Math.sin(tf(fr - EXPERIMENTAR6) * 7)) * 0.35;
-        return {...idle(fr), pos: [0, j, 0.4], rotY: 0.15 * Math.sin(tf(fr) * 5), ...ARMS_UP, smile: 1, mouthOpen: 0.6, eyeWide: 0.6};
+        return {...idle(fr), pos: [0, j, 0.4], rShoulder: [-1.0, 0.45, 0.05], rElbow: -1.15, lShoulder: [-1.0, -0.45, -0.05], lElbow: -1.15, head: [0.25, 0, 0], smile: 1, mouthOpen: 0.6, eyeWide: 0.6};
       }} />
     </>
   );
@@ -313,7 +313,8 @@ const S7: React.FC<ShotProps> = ({f, a, t}) => (
   <>
     <Cam pos={[0, 1.4, 3.7]} look={[0, 1.1, 0]} fov={50} f={f} a={a} />
     <Street t={t} />
-    <PBoy id="a7" a={a} f={f} item={<BigPhone p={[0, 0.02, 0.06]} r={[-Math.PI / 2 + 0.2, Math.PI, 0]} s={0.42} screen={phoneTex()} key2="vibephone" />} pose={(fr) => ({...idle(fr), pos: [0, hop(fr, a + 4, 12, 0.15), 0.3], rotY: 0, rShoulder: [-1.2, 0.5, 0.05], rElbow: -1.2, smile: 1, eyeWide: 0.5, head: [0.1, -0.15, 0]})} />
+    <BigPhone p={[0.0, 1.08 + hop(f, a + 4, 12, 0.15), 0.78]} r={[-0.35, Math.PI, 0]} s={0.42} screen={phoneTex()} key2="vibephone" />
+    <PBoy id="a7" a={a} f={f} pose={(fr) => ({...idle(fr), pos: [0, hop(fr, a + 4, 12, 0.15), 0.3], rotY: 0, rShoulder: [-1.05, 0.45, 0.05], rElbow: -1.25, lShoulder: [-1.05, -0.45, -0.05], lElbow: -1.25, smile: 1, eyeWide: 0.5, head: [0.35, 0, 0]})} />
   </>
 );
 
