@@ -42,6 +42,7 @@ import {VideoSorvete, TOTAL_SORV} from "./VideoSorvete";
 import {VideoTrav2, TOTAL_TRAV2} from "./VideoTrav2";
 import {VideoFiltro, TOTAL_FILTRO} from "./VideoFiltro";
 import {VideoFuga2, TOTAL_FUGA2} from "./VideoFuga2";
+import {VideoCama, TOTAL_CAMA} from "./VideoCama";
 import {VideoChule, TOTAL_CHULE} from "./VideoChule";
 import {VideoMec, TOTAL_MEC} from "./VideoMec";
 import {VideoBolo, TOTAL_BOLO} from "./VideoBolo";
@@ -79,6 +80,7 @@ export const Root: React.FC = () => (
     <Composition id="Trav2" component={VideoTrav2} durationInFrames={TOTAL_TRAV2} fps={30} width={1080} height={1920} />
     <Composition id="Filtro" component={VideoFiltro} durationInFrames={TOTAL_FILTRO} fps={30} width={1080} height={1920} />
     <Composition id="Fuga2" component={VideoFuga2} durationInFrames={TOTAL_FUGA2} fps={30} width={1080} height={1920} />
+    <Composition id="Cama" component={VideoCama} durationInFrames={TOTAL_CAMA} fps={30} width={1080} height={1920} />
     <Composition id="ChulePreview" component={ChulePreview} durationInFrames={8} fps={30} width={1080} height={1920} />
     <Composition id="MecPreview" component={MecPreview} durationInFrames={6} fps={30} width={1080} height={1920} />
     <Composition id="Casamento" component={VideoCasamento} durationInFrames={TOTAL_CASA} fps={30} width={1080} height={1920} />
