@@ -1,3 +1,4 @@
+import {LowHead} from "./LowHead";
 import React, {useMemo} from "react";
 import * as THREE from "three";
 import {RoundedBoxGeometry} from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
@@ -31,6 +32,7 @@ export type ToyLook = {
   bareR?: boolean; // pé direito descalço (sem o chinelo)
   socks?: string; // só de meia (cor da meia), sem tênis
   browColor?: string; // cor da sobrancelha (vó: branca)
+  lowpoly?: boolean; // cabeça low-poly facetada (estilo da referência)
   kit?: string; // uniforme de futebol: short (cor de pants), meião desta cor até o joelho e chuteira com travas (cor de shoe)
 };
 
@@ -926,6 +928,8 @@ export const Toy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; lPa
           {arm(1, lShoulder, lElbow, lWrist, lPalmRef)}
           {/* cabeça */}
           <group position={[0, TORSO_TOP + 0.29, 0]} rotation={head} scale={0.875}>
+            {look.lowpoly ? <LowHead pose={pose} look={look} /> : (
+            <>
             <mesh scale={[1, 0.96, 0.94]} material={m.skin} castShadow>
               <sphereGeometry args={[0.32, 40, 30]} />
             </mesh>
@@ -1024,6 +1028,8 @@ export const Toy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>; lPa
                   <cylinderGeometry args={[0.3, 0.92, 2.3, 40, 1, true, 2.05, Math.PI * 2 - 4.1]} />
                 </mesh>
               </group>
+            )}
+            </>
             )}
             {headExtra}
           </group>
