@@ -18,7 +18,7 @@ export const sm = (() => {
     return m;
   };
 })();
-const texMat = (() => {
+export const texMat = (() => {
   const cache = new Map<string, THREE.MeshStandardMaterial>();
   return (key: string, tex: THREE.Texture, rough = 0.7, extra: Partial<THREE.MeshStandardMaterialParameters> = {}) => {
     let m = cache.get(key);

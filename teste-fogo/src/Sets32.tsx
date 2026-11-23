@@ -1,5 +1,5 @@
 import React from "react";
-import {sm, rbox} from "./Sets9";
+import {sm, rbox, texMat} from "./Sets9";
 import {V3} from "./Sets5";
 import {canvasTex} from "./util";
 
@@ -121,48 +121,73 @@ const SABOR: Record<Sabor, {cream: string; top: string}> = {
   morango: {cream: "#f6bfcc", top: "#e8262d"},
   pacoca: {cream: "#e8cf9a", top: "#b98a4e"},
 };
-export const Garrafinha: React.FC<{p?: V3; r?: V3; s?: number; sabor: Sabor; glow?: number}> = ({p = [0, 0, 0], r = [0, 0, 0], s = 1, sabor, glow = 0}) => {
+const marbleTex = (sabor: Sabor) =>
+  canvasTex("marble-" + sabor, 512, 1024, (c, r) => {
+    const cream = SABOR[sabor].cream;
+    c.fillStyle = "#3a0c3c";
+    c.fillRect(0, 0, 512, 1024);
+    c.lineCap = "round";
+    // faixas de creme onduladas (marmorizado)
+    for (let k = 0; k < 11; k++) {
+      const y0 = r() * 1024;
+      c.strokeStyle = cream;
+      c.lineWidth = 22 + r() * 50;
+      c.beginPath();
+      c.moveTo(-40, y0);
+      for (let x = 0; x <= 560; x += 70) c.lineTo(x, y0 + Math.sin(x / 90 + k) * (40 + r() * 60) + (r() - 0.5) * 40);
+      c.stroke();
+    }
+    // manchas de açaí por cima, pra quebrar o padrão
+    for (let k = 0; k < 18; k++) {
+      c.fillStyle = r() < 0.5 ? "#4a1450" : "#2e0830";
+      c.beginPath();
+      c.ellipse(r() * 512, r() * 1024, 20 + r() * 60, 15 + r() * 40, r() * 3, 0, Math.PI * 2);
+      c.fill();
+    }
+  }, [1, 1]);
+export const Garrafinha: React.FC<{p?: V3; r?: V3; s?: number; sabor: Sabor; glow?: number}> = ({p = [0, 0, 0], r = [0, 0, 0], s = 1, sabor}) => {
   const c = SABOR[sabor];
-  const acai = sm("#3a0c3c", 0.5, {emissive: "#4a1050", emissiveIntensity: 0.05 + glow * 0.1});
-  const cream = sm(c.cream, 0.5);
-  const shell = sm("#ffffff", 0.05, {transparent: true, opacity: 0.12});
+  const cream = sm(c.cream, 0.45);
+  const fill = texMat("marble-" + sabor, marbleTex(sabor));
+  const glass = sm("#ffffff", 0.05, {transparent: true, opacity: 0.18});
   return (
     <group position={p} rotation={r} scale={s}>
-      {/* recheio em camadas tortas (efeito marmorizado) */}
-      {Array.from({length: 9}, (_, i) => (
-        <mesh key={i} position={[0, 0.08 + i * 0.12, 0]} rotation={[0.35 * Math.sin(i * 1.7), i * 0.8, 0.35 * Math.cos(i * 2.3)]} material={i % 3 === 1 ? cream : acai}>
-          <cylinderGeometry args={[0.285, 0.285, 0.13, 24]} />
+      {/* recheio marmorizado */}
+      <mesh position={[0, 0.6, 0]} material={fill} castShadow>
+        <cylinderGeometry args={[0.3, 0.3, 1.16, 32]} />
+      </mesh>
+      {/* ombro da garrafa (creme) */}
+      <mesh position={[0, 1.25, 0]} material={cream}>
+        <cylinderGeometry args={[0.17, 0.3, 0.16, 32]} />
+      </mesh>
+      {/* gargalo cheio de creme */}
+      <mesh position={[0, 1.42, 0]} material={cream}>
+        <cylinderGeometry args={[0.165, 0.165, 0.2, 24]} />
+      </mesh>
+      {/* plástico transparente por fora */}
+      <mesh position={[0, 0.6, 0]} material={glass}>
+        <cylinderGeometry args={[0.315, 0.315, 1.2, 32, 1, true]} />
+      </mesh>
+      <mesh position={[0, 1.27, 0]} material={glass}>
+        <cylinderGeometry args={[0.185, 0.315, 0.16, 32, 1, true]} />
+      </mesh>
+      {/* rosca do gargalo */}
+      {[0, 1, 2].map((k) => (
+        <mesh key={k} position={[0, 1.38 + k * 0.05, 0]} material={sm("#ffffff", 0.1, {transparent: true, opacity: 0.45})}>
+          <torusGeometry args={[0.18, 0.008, 6, 24]} />
         </mesh>
       ))}
-      {/* manchas de creme na parede da garrafa (marmorizado) */}
-      {Array.from({length: 22}, (_, i) => {
-        const a = i * 2.39;
-        const y = 0.12 + ((i * 0.37) % 1) * 1.05;
-        return (
-          <mesh key={"b" + i} position={[Math.cos(a) * 0.295, y, Math.sin(a) * 0.295]} rotation={[0, -a + Math.PI / 2, 0.6 * Math.sin(i * 1.3)]} scale={[0.13 + (i % 3) * 0.04, 0.07 + (i % 2) * 0.05, 0.03]} material={i % 4 === 3 ? acai : cream}>
-            <sphereGeometry args={[1, 12, 8]} />
-          </mesh>
-        );
-      })}
-      {/* garrafa transparente: corpo, ombro e gargalo */}
-      <mesh position={[0, 0.62, 0]} material={shell}>
-        <cylinderGeometry args={[0.33, 0.33, 1.22, 24, 1, true]} />
+      {/* reflexo */}
+      <mesh position={[-0.17, 0.65, 0.26]} rotation={[0, -0.5, 0]}>
+        <planeGeometry args={[0.05, 0.95]} />
+        <meshBasicMaterial color="#ffffff" transparent opacity={0.35} />
       </mesh>
-      <mesh position={[0, 1.28, 0]} material={sm(c.cream, 0.5)}>
-        <cylinderGeometry args={[0.18, 0.31, 0.14, 24]} />
-      </mesh>
-      <mesh position={[0, 1.43, 0]} material={sm("#ffffff", 0.1, {transparent: true, opacity: 0.35})}>
-        <cylinderGeometry args={[0.18, 0.18, 0.18, 20, 1, true]} />
-      </mesh>
-      <mesh position={[0, 1.42, 0]} material={cream}>
-        <cylinderGeometry args={[0.17, 0.17, 0.16, 20]} />
-      </mesh>
-      {/* cobertura transbordando */}
-      <mesh position={[0, 1.53, 0]} scale={[1, 0.55, 1]} material={sm(c.top, 0.6)}>
-        <sphereGeometry args={[0.19, 16, 10, 0, Math.PI * 2, 0, Math.PI / 2]} />
+      {/* cobertura saindo pela boca */}
+      <mesh position={[0, 1.52, 0]} scale={[1, 0.6, 1]} material={sm(c.top, 0.6)}>
+        <sphereGeometry args={[0.175, 18, 10, 0, Math.PI * 2, 0, Math.PI / 2]} />
       </mesh>
       {sabor === "morango" && (
-        <group position={[0, 1.7, 0]} rotation={[Math.PI, 0, 0.2]}>
+        <group position={[0, 1.68, 0]} rotation={[Math.PI, 0, 0.2]}>
           <mesh material={sm("#e8262d", 0.35)}>
             <coneGeometry args={[0.1, 0.22, 10]} />
           </mesh>
@@ -172,15 +197,15 @@ export const Garrafinha: React.FC<{p?: V3; r?: V3; s?: number; sabor: Sabor; glo
         </group>
       )}
       {(sabor === "pacoca" || sabor === "ninho") &&
-        Array.from({length: 8}, (_, i) => (
-          <mesh key={i} position={[Math.cos(i * 0.8) * 0.1, 1.6 + (i % 3) * 0.02, Math.sin(i * 0.8) * 0.1]} material={sm(sabor === "pacoca" ? "#c99a5a" : "#fffdf5", 0.8)}>
-            <boxGeometry args={[0.05, 0.04, 0.05]} />
+        Array.from({length: 9}, (_, i) => (
+          <mesh key={i} position={[Math.cos(i * 0.8) * 0.09, 1.6 + (i % 3) * 0.015, Math.sin(i * 0.8) * 0.09]} rotation={[i, i * 2, 0]} material={sm(sabor === "pacoca" ? "#c99a5a" : "#fffdf5", 0.8)}>
+            <boxGeometry args={[0.045, 0.035, 0.045]} />
           </mesh>
         ))}
       {sabor === "nutella" &&
-        Array.from({length: 5}, (_, i) => (
-          <mesh key={i} position={[Math.cos(i * 1.3) * 0.17, 1.38 - (i % 2) * 0.12, Math.sin(i * 1.3) * 0.17]} material={sm("#4a2614", 0.3)}>
-            <capsuleGeometry args={[0.03, 0.18 + (i % 2) * 0.1, 4, 8]} />
+        Array.from({length: 4}, (_, i) => (
+          <mesh key={i} position={[Math.cos(i * 1.6) * 0.15, 1.5 - (i % 2) * 0.05, Math.sin(i * 1.6) * 0.15]} material={sm("#4a2614", 0.3)}>
+            <sphereGeometry args={[0.045, 10, 8]} />
           </mesh>
         ))}
     </group>
