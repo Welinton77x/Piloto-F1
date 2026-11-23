@@ -1,15 +1,17 @@
-// uso: node capa.mjs teste 900,1000,1040   |   node capa.mjs capa <frameDoMotor> saida.jpg
+// uso: node capa.mjs teste 900,1000,1040   |   node capa.mjs capa <frameDoMotor> saida.jpg ['{"tv":[u,v,fov],"sub":"texto","subCor":"#FFD21F"}']
 import { createRequire } from 'module'; const { chromium } = createRequire(process.cwd() + '/')('playwright');
 import fs from 'fs'; import path from 'path'; import { fileURLToPath } from 'url';
 const dir = path.dirname(fileURLToPath(import.meta.url));
-const [mode, arg, outFile] = process.argv.slice(2);
+const [mode, arg, outFile, optArg] = process.argv.slice(2);
+const opt = optArg ? JSON.parse(optArg) : {};
 const browser = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
 const page = await browser.newPage({ viewport: { width: 1080, height: 1920 } });
 page.on('pageerror', e => console.error('PAGE', e));
 await page.goto('file://' + path.join(dir, 'scene.html'));
 await page.evaluate(() => window.init());
 await page.evaluate(() => { window.drawOverlay = () => {}; }); // cena limpa, sem legendas
-const shot = async (F, cover) => page.evaluate(([F, cover]) => {
+const shot = async (F, cover) => page.evaluate(([F, cover, opt]) => {
+  if (opt.tv) { const a = aim(tvPoint(opt.tv[0], opt.tv[1])); window.camAt = () => ({ yaw: a[0], pitch: a[1], fov: opt.tv[2], roll: 0 }); }
   renderFrame(F);
   if (!cover) return document.getElementById('out').toDataURL('image/jpeg', 0.92).split(',')[1];
   const x = document.getElementById('out').getContext('2d'), W = 1080, H = 1920, FONT = '"Inter Display"';
@@ -24,13 +26,18 @@ const shot = async (F, cover) => page.evaluate(([F, cover]) => {
   x.fillStyle = '#c4161c'; x.beginPath(); x.roundRect(-hw/2, -50, hw, 100, 14); x.fill(); x.strokeStyle = '#fff'; x.lineWidth = 6; x.stroke();
   x.fillStyle = '#fff'; x.fillText('NÃO OLHE PRA TRÁS', 0, 4); x.restore();
   // título
+  if (opt.sub) { // subtítulo no estilo das legendas do vídeo
+    x.font = `900 62px ${FONT}`; const words = opt.sub.split(' '); const lines = []; let cur = '';
+    for (const w of words) { const t = cur ? cur + ' ' + w : w; if (x.measureText(t).width > 900 && cur) { lines.push(cur); cur = w; } else cur = t; } lines.push(cur);
+    lines.forEach((ln, i) => { const y = 1250 - (lines.length - 1 - i) * 76; x.lineWidth = 12; x.strokeStyle = '#000'; x.strokeText(ln, 540, y); x.fillStyle = opt.subCor || '#FFD21F'; x.fillText(ln, 540, y); });
+  }
   txt('O SEGUNDO', 1420, 104, '#ffffff', 18);
   txt('VIGIA', 1600, 260, '#FFD21F', 30);
   // pílula EP1
   x.font = `900 76px ${FONT}`; const tw = x.measureText('EP2').width + 80;
   x.fillStyle = '#fff'; x.beginPath(); x.roundRect(540 - tw/2, 1750, tw, 112, 22); x.fill(); x.fillStyle = '#111'; x.fillText('EP2', 540, 1809);
   return document.getElementById('out').toDataURL('image/jpeg', 0.94).split(',')[1];
-}, [F, cover]);
+}, [F, cover, opt]);
 if (mode === 'teste') { fs.mkdirSync(path.join(dir, 'stills'), { recursive: true }); for (const F of arg.split(',').map(Number)) fs.writeFileSync(path.join(dir, 'stills', `c${F}.jpg`), Buffer.from(await shot(F, false), 'base64')); }
 else fs.writeFileSync(outFile, Buffer.from(await shot(Number(arg), true), 'base64'));
 await browser.close();
