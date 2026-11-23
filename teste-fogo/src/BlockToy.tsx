@@ -2,21 +2,28 @@ import React from "react";
 import * as THREE from "three";
 import type {Pose} from "./Boy";
 import type {ToyLook} from "./Toy";
-import {sm, rbox} from "./Sets9";
+import {sm} from "./Sets9";
 
-/* Personagem "bloquinho" low-poly: cabeça de caixa, olhos de pontinho, corpo de caixa.
-   Mesma interface do Toy (pose / look / palmRef / lPalmRef / headExtra), mesma altura
-   (ombro em 1.27, cabeça ~1.65), então funciona nas cenas que já existem. */
+/* Personagem low-poly FACETADO (estilo "boneco de jogo antigo"):
+   cabeça grande facetada, olhos redondos pretos grandes, corpo e membros finos, sombreamento chapado.
+   Mesma interface do Toy (pose / look / palmRef / lPalmRef / headExtra) e mesmas alturas (ombro 1.27). */
 type V3 = [number, number, number];
+const flat = (c: string, r = 0.8) => sm(c, r, {flatShading: true});
 
 const Arm: React.FC<{side: 1 | -1; shoulder: V3; elbow: number; sleeve: THREE.Material; skin: THREE.Material; palmRef?: React.Ref<THREE.Object3D>}> = ({side, shoulder, elbow, sleeve, skin, palmRef}) => (
-  <group position={[0.3 * side, 1.27, 0]} rotation={shoulder}>
-    <mesh position={[0.02 * side, -0.14, 0]} geometry={rbox(0.15, 0.32, 0.15, 0.04)} material={sleeve} castShadow />
-    <group position={[0.02 * side, -0.3, 0]} rotation={[elbow, 0, 0]}>
-      <mesh position={[0, -0.13, 0]} geometry={rbox(0.14, 0.28, 0.14, 0.04)} material={sleeve} castShadow />
-      <group position={[0, -0.31, 0]}>
-        <mesh geometry={rbox(0.13, 0.12, 0.13, 0.04)} material={skin} castShadow />
-        <object3D ref={palmRef} position={[0, -0.04, 0]} />
+  <group position={[0.22 * side, 1.27, 0]} rotation={shoulder}>
+    <mesh position={[0, -0.15, 0]} material={sleeve} castShadow>
+      <cylinderGeometry args={[0.065, 0.06, 0.32, 6]} />
+    </mesh>
+    <group position={[0, -0.3, 0]} rotation={[elbow, 0, 0]}>
+      <mesh position={[0, -0.14, 0]} material={sleeve} castShadow>
+        <cylinderGeometry args={[0.06, 0.055, 0.3, 6]} />
+      </mesh>
+      <group position={[0, -0.33, 0]}>
+        <mesh scale={[1, 1.15, 0.8]} material={skin} castShadow>
+          <icosahedronGeometry args={[0.065, 0]} />
+        </mesh>
+        <object3D ref={palmRef} position={[0, -0.03, 0]} />
       </group>
     </group>
   </group>
@@ -28,9 +35,9 @@ export const BlockToy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>
     rotY = 0,
     head = [0, 0, 0],
     torso = [0, 0, 0],
-    rShoulder = [0, 0, -0.12],
+    rShoulder = [0, 0, -0.1],
     rElbow = -0.15,
-    lShoulder = [0, 0, 0.12],
+    lShoulder = [0, 0, 0.1],
     lElbow = -0.15,
     blink = 0,
     eyeWide = 0,
@@ -44,129 +51,150 @@ export const BlockToy: React.FC<{pose: Pose; palmRef?: React.Ref<THREE.Object3D>
     squash = 0,
   } = pose;
   const hoodie = look.hoodie ?? false;
-  const skin = sm(look.skin ?? "#e8b48a", 0.7);
-  const shirt = sm(look.shirt ?? (hoodie ? "#ffcd2e" : "#3a86ff"), 0.75);
-  const pants = sm(look.pants ?? "#2a4aa8", 0.8);
-  const hair = sm(look.hair ?? "#5a3a1e", 0.8);
-  const shoe = sm(look.shoe ?? "#ffffff", 0.5);
-  const sole = sm(look.sole ?? "#ff8a1f", 0.6);
-  const dark = sm("#101018", 0.3);
+  const skin = flat(look.skin ?? "#e8b48a", 0.75);
+  const shirt = flat(look.shirt ?? (hoodie ? "#ffcd2e" : "#3a86ff"), 0.8);
+  const pants = flat(look.pants ?? "#2a4aa8", 0.85);
+  const hairM = flat(look.hair ?? "#4a2e16", 0.85);
+  const shoe = flat(look.shoe ?? "#ffffff", 0.6);
+  const sole = flat(look.sole ?? "#ff8a1f", 0.6);
+  const black = sm("#0c0c10", 0.4);
   const legSwing = Math.sin(walk) * 0.55 * walkAmt;
   const bob = Math.abs(Math.sin(walk)) * 0.05 * walkAmt;
   const sq = 1 - squash * 0.12;
-  const eyeH = Math.max(0.12, 1 - blink) * (1 + eyeWide * 0.35);
+  const eyeH = Math.max(0.1, 1 - blink) * (1 + eyeWide * 0.3);
   const style = look.hairStyle ?? "bowl";
   const bald = style === "bald";
   return (
     <group position={[pos[0], pos[1] + bob, pos[2]]} rotation={[0, rotY, 0]} scale={[1 + squash * 0.06, sq, 1 + squash * 0.06]}>
-      {/* pernas */}
+      {/* pernas finas */}
       {[1, -1].map((sd) => {
         const sw = sd === 1 ? legSwing : -legSwing;
         return (
-          <group key={sd} position={[0.12 * sd, 0.74, 0]} rotation={[-legLift * 1.4 + sw, 0, 0]}>
-            <mesh position={[0, -0.18, 0]} geometry={rbox(0.19, 0.38, 0.2, 0.04)} material={pants} castShadow />
-            <group position={[0, -0.38, 0]} rotation={[legLift * 1.6, 0, 0]}>
-              <mesh position={[0, -0.14, 0]} geometry={rbox(0.18, 0.3, 0.19, 0.04)} material={pants} castShadow />
-              <mesh position={[0, -0.31, 0.04]} geometry={rbox(0.2, 0.1, 0.3, 0.04)} material={shoe} castShadow />
-              <mesh position={[0, -0.355, 0.04]} geometry={rbox(0.21, 0.035, 0.31, 0.015)} material={sole} />
+          <group key={sd} position={[0.09 * sd, 0.74, 0]} rotation={[-legLift * 1.4 + sw, 0, 0]}>
+            <mesh position={[0, -0.18, 0]} material={pants} castShadow>
+              <cylinderGeometry args={[0.075, 0.07, 0.38, 6]} />
+            </mesh>
+            <group position={[0, -0.37, 0]} rotation={[legLift * 1.6, 0, 0]}>
+              <mesh position={[0, -0.15, 0]} material={pants} castShadow>
+                <cylinderGeometry args={[0.068, 0.065, 0.32, 6]} />
+              </mesh>
+              {/* tênis */}
+              <mesh position={[0, -0.32, 0.05]} scale={[0.11, 0.07, 0.17]} material={shoe} castShadow>
+                <dodecahedronGeometry args={[1, 0]} />
+              </mesh>
+              <mesh position={[0, -0.37, 0.05]} material={sole}>
+                <boxGeometry args={[0.17, 0.03, 0.3]} />
+              </mesh>
             </group>
           </group>
         );
       })}
-      {/* tronco */}
+      {/* tronco magro */}
       <group position={[0, 0.74, 0]} rotation={torso}>
         <group scale={[1 + breathe * 0.015, 1 + breathe * 0.02, 1]}>
-          <mesh position={[0, 0.3, 0]} geometry={rbox(0.5, 0.62, 0.32, 0.06)} material={shirt} castShadow />
+          <mesh position={[0, 0.27, 0]} material={shirt} castShadow>
+            <cylinderGeometry args={[0.2, 0.17, 0.56, 6]} />
+          </mesh>
           {hoodie && (
             <>
-              {/* capuz nas costas */}
-              <mesh position={[0, 0.56, -0.17]} geometry={rbox(0.36, 0.16, 0.1, 0.04)} material={shirt} />
-              {/* bolso canguru */}
-              <mesh position={[0, 0.14, 0.165]} geometry={rbox(0.3, 0.14, 0.02, 0.02)} material={sm("#f0b818", 0.75)} />
-              {/* cordinhas */}
+              <mesh position={[0, 0.5, -0.12]} scale={[1, 0.55, 0.6]} material={shirt}>
+                <icosahedronGeometry args={[0.16, 0]} />
+              </mesh>
+              <mesh position={[0, 0.13, 0.155]} rotation={[-0.15, 0, 0]} material={flat("#e8b41a", 0.8)}>
+                <boxGeometry args={[0.2, 0.1, 0.02]} />
+              </mesh>
               {[-1, 1].map((sd) => (
-                <mesh key={sd} position={[0.06 * sd, 0.47, 0.165]} material={dark}>
-                  <boxGeometry args={[0.015, 0.14, 0.01]} />
+                <mesh key={sd} position={[0.045 * sd, 0.42, 0.18]} material={black}>
+                  <boxGeometry args={[0.014, 0.12, 0.01]} />
                 </mesh>
               ))}
             </>
           )}
-          {look.suit && <mesh position={[0, 0.42, 0.165]} geometry={rbox(0.14, 0.3, 0.01, 0.01)} material={sm("#ffffff", 0.6)} />}
-          {look.apron && <mesh position={[0, 0.2, 0.17]} geometry={rbox(0.42, 0.5, 0.02, 0.02)} material={sm("#f8f8f5", 0.6)} />}
+          {look.suit && <mesh position={[0, 0.4, 0.17]} material={flat("#ffffff", 0.6)}><boxGeometry args={[0.1, 0.26, 0.01]} /></mesh>}
+          {look.apron && <mesh position={[0, 0.2, 0.18]} material={flat("#f8f8f5", 0.6)}><boxGeometry args={[0.32, 0.46, 0.02]} /></mesh>}
         </group>
-        {/* braços (posição relativa ao corpo inteiro: compensa o 0.74) */}
         <group position={[0, -0.74, 0]}>
           <Arm side={-1} shoulder={rShoulder} elbow={rElbow} sleeve={shirt} skin={skin} palmRef={palmRef} />
           <Arm side={1} shoulder={lShoulder} elbow={lElbow} sleeve={shirt} skin={skin} palmRef={lPalmRef} />
         </group>
-        {/* cabeça de caixa */}
-        <group position={[0, 0.66, 0]} rotation={head}>
-          <mesh position={[0, 0.06, 0]} geometry={rbox(0.12, 0.08, 0.12, 0.02)} material={skin} />
-          <group position={[0, 0.36, 0]} scale={1.22}>
-            <mesh geometry={rbox(0.5, 0.48, 0.46, 0.07)} material={skin} castShadow />
-            {/* cabelo em bloco */}
+        {/* pescoço + cabeça grande facetada */}
+        <group position={[0, 0.58, 0]} rotation={head}>
+          <mesh position={[0, 0.05, 0]} material={skin}>
+            <cylinderGeometry args={[0.06, 0.07, 0.1, 6]} />
+          </mesh>
+          <group position={[0, 0.36, 0]}>
+            {/* crânio: cilindro de 8 lados levemente afunilado = facetado */}
+            <mesh rotation={[0, Math.PI / 8, 0]} material={skin} castShadow>
+              <cylinderGeometry args={[0.3, 0.27, 0.56, 8, 2]} />
+            </mesh>
+            <mesh position={[0, -0.29, 0]} rotation={[0, Math.PI / 8, 0]} material={skin}>
+              <cylinderGeometry args={[0.27, 0.2, 0.06, 8]} />
+            </mesh>
+            {/* cabelo em placas */}
             {!bald && (
               <>
-                <mesh position={[0, 0.22, -0.01]} geometry={rbox(0.54, 0.14, 0.5, 0.05)} material={hair} castShadow />
-                <mesh position={[0, 0.13, 0.215]} geometry={rbox(0.5, 0.08, 0.06, 0.03)} material={hair} />
-                <mesh position={[0, 0.05, -0.22]} geometry={rbox(0.54, 0.3, 0.08, 0.04)} material={hair} />
-                {[-1, 1].map((sd) => (
-                  <mesh key={sd} position={[0.255 * sd, 0.08, -0.04]} geometry={rbox(0.05, 0.22, 0.36, 0.02)} material={hair} />
-                ))}
-                {(style === "bun" || style === "ponytail" || style === "long") && <mesh position={[0, 0.2, -0.3]} geometry={rbox(0.2, 0.2, 0.16, 0.06)} material={hair} />}
-              </>
-            )}
-            {/* olhos de pontinho com brilho */}
-            {[-1, 1].map((sd) => (
-              <group key={sd} position={[0.11 * sd, 0.02, 0.232]}>
-                <mesh scale={[1, eyeH, 1]} material={dark}>
-                  <boxGeometry args={[0.085, 0.105, 0.02]} />
+                <mesh position={[0, 0.3, -0.01]} rotation={[0, Math.PI / 8, 0]} material={hairM} castShadow>
+                  <cylinderGeometry args={[0.31, 0.32, 0.12, 8]} />
                 </mesh>
-                {blink < 0.5 && (
-                  <mesh position={[0.015, 0.02 * eyeH, 0.011]} material={sm("#ffffff", 0.3)}>
-                    <boxGeometry args={[0.022, 0.022, 0.005]} />
+                <mesh position={[0, 0.25, 0.27]} rotation={[0.25, 0, 0]} material={hairM}>
+                  <boxGeometry args={[0.46, 0.1, 0.08]} />
+                </mesh>
+                <mesh position={[0, 0.05, -0.24]} rotation={[0, Math.PI / 8, 0]} material={hairM}>
+                  <cylinderGeometry args={[0.3, 0.29, 0.36, 8, 1, true, Math.PI * 0.55, Math.PI * 0.9]} />
+                </mesh>
+                {(style === "bun" || style === "ponytail" || style === "long") && (
+                  <mesh position={[0, 0.25, -0.32]} material={hairM}>
+                    <icosahedronGeometry args={[0.12, 0]} />
                   </mesh>
                 )}
-                {/* sobrancelha grossa */}
-                <mesh position={[0, 0.085 + brow * 0.025 + eyeWide * 0.01, 0.006]} rotation={[0, 0, (brow < 0 ? brow * 0.45 : brow * 0.15) * sd]} material={hair}>
-                  <boxGeometry args={[0.1, 0.028, 0.02]} />
+              </>
+            )}
+            {/* olhos redondos pretos grandes */}
+            {[-1, 1].map((sd) => (
+              <group key={sd} position={[0.12 * sd, 0.03, 0.272]}>
+                <mesh rotation={[Math.PI / 2, 0, 0]} scale={[1, 1, eyeH]} material={black}>
+                  <cylinderGeometry args={[0.072, 0.072, 0.02, 10]} />
                 </mesh>
-                {/* bochecha */}
-                <mesh position={[0.04 * sd, -0.07, -0.003]} material={sm("#ff8f8f", 0.6, {transparent: true, opacity: 0.5})}>
-                  <boxGeometry args={[0.06, 0.03, 0.01]} />
+                {/* sobrancelha grossa */}
+                <mesh position={[0, 0.115 + brow * 0.03 + eyeWide * 0.01, 0.004]} rotation={[0, 0, (brow < 0 ? brow * 0.45 : brow * 0.15) * sd]} material={hairM}>
+                  <boxGeometry args={[0.15, 0.04, 0.03]} />
                 </mesh>
               </group>
             ))}
+            {/* nariz */}
+            <mesh position={[0, -0.06, 0.285]} rotation={[0.2, 0, 0]} material={skin}>
+              <coneGeometry args={[0.04, 0.08, 4]} />
+            </mesh>
             {/* boca */}
             {mouthOpen > 0.05 ? (
-              <group position={[0, -0.12, 0.232]}>
-                <mesh material={sm("#5a1a1a", 0.6)}>
-                  <boxGeometry args={[0.1, 0.03 + mouthOpen * 0.08, 0.02]} />
+              <group position={[0, -0.17, 0.27]}>
+                <mesh material={sm("#5a1010", 0.6)}>
+                  <boxGeometry args={[0.13, 0.04 + mouthOpen * 0.1, 0.02]} />
                 </mesh>
-                <mesh position={[0, -0.01 - mouthOpen * 0.02, 0.006]} material={sm("#e0707a", 0.6)}>
-                  <boxGeometry args={[0.06, 0.02 + mouthOpen * 0.02, 0.01]} />
+                <mesh position={[0, -0.01 - mouthOpen * 0.025, 0.006]} material={sm("#e0505a", 0.6)}>
+                  <boxGeometry args={[0.09, 0.02 + mouthOpen * 0.025, 0.01]} />
                 </mesh>
               </group>
             ) : (
-              <group position={[0, -0.12, 0.232]}>
-                <mesh material={sm(look.lips ?? "#5a1a1a", 0.6)}>
-                  <boxGeometry args={[0.1 + smile * 0.03, 0.022, 0.015]} />
+              <group position={[0, -0.17, 0.27]}>
+                <mesh material={sm(look.lips ?? "#4a1a10", 0.6)}>
+                  <boxGeometry args={[0.11 + smile * 0.03, 0.025, 0.015]} />
                 </mesh>
                 {smile > 0.3 &&
                   [-1, 1].map((sd) => (
-                    <mesh key={sd} position={[0.06 * sd, 0.015, 0]} rotation={[0, 0, sd * 0.6]} material={sm(look.lips ?? "#5a1a1a", 0.6)}>
-                      <boxGeometry args={[0.03, 0.018, 0.015]} />
+                    <mesh key={sd} position={[0.065 * sd, 0.017, 0]} rotation={[0, 0, sd * 0.6]} material={sm(look.lips ?? "#4a1a10", 0.6)}>
+                      <boxGeometry args={[0.035, 0.022, 0.015]} />
                     </mesh>
                   ))}
               </group>
             )}
             {look.lashes &&
               [-1, 1].map((sd) => (
-                <mesh key={"l" + sd} position={[0.15 * sd, 0.07, 0.235]} rotation={[0, 0, sd * 0.5]} material={dark}>
-                  <boxGeometry args={[0.04, 0.012, 0.01]} />
+                <mesh key={"l" + sd} position={[0.19 * sd, 0.09, 0.27]} rotation={[0, 0, sd * 0.5]} material={black}>
+                  <boxGeometry args={[0.05, 0.014, 0.01]} />
                 </mesh>
               ))}
-            {headExtra && <group position={[0, -0.06, 0]}>{headExtra}</group>}
+            {headExtra && <group position={[0, -0.1, 0]}>{headExtra}</group>}
           </group>
         </group>
       </group>
