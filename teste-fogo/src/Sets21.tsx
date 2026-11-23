@@ -186,9 +186,9 @@ export const Cornet: React.FC<{p?: V3; r?: V3; s?: number}> = ({p = [0, 0, 0], r
 };
 
 /* ---------- urso (normal, de quatro) ---------- */
-export const Bear: React.FC<{p: V3; rotY?: number; s?: number; t?: number; eyes?: number; walk?: number; lie?: number; snore?: number; hug?: number}> = ({p, rotY = 0, s = 1, t = 0, eyes = 1, walk = 0, lie = 0, snore = 0, hug = 0}) => {
-  const fur = sm("#7a4a2a", 0.9);
-  const furL = sm("#a8744a", 0.9);
+export const Bear: React.FC<{p: V3; rotY?: number; s?: number; t?: number; eyes?: number; walk?: number; lie?: number; snore?: number; hug?: number; polar?: boolean}> = ({polar = false, p, rotY = 0, s = 1, t = 0, eyes = 1, walk = 0, lie = 0, snore = 0, hug = 0}) => {
+  const fur = sm(polar ? "#f2f1ea" : "#7a4a2a", 0.9);
+  const furL = sm(polar ? "#dcdad0" : "#a8744a", 0.9);
   const ph = t * 5;
   const breathe = 1 + 0.04 * Math.sin(t * 2) + snore * 0.05 * Math.sin(t * 3);
   return (
