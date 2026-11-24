@@ -19,7 +19,7 @@ import {BotaoDesfazer, Gato, Lustre, Trigo, CopoLeite} from "./Sets40";
 import {Captions, StageTitle, Confetti, Wd, clean} from "./Overlays";
 import {physics} from "./Physics";
 import {FPS, clamp, lerp, ramp, pop, easeInOut, easeOut, canvasTex, rng} from "./util";
-import W from "./timingBotao.json";
+import W from "./timingBotao2.json";
 
 const words = W as Wd[];
 const F = (sec: number) => Math.round(sec * FPS);
@@ -310,7 +310,7 @@ const B8: React.FC<ShotProps> = ({f, a, t}) => {
       <Lustre p={[0.6, 4.0, -0.6]} t={t} />
       <Sofa p={[-0.2, 0, -0.9]} rotY={0} color="#3cb3a5" />
       <Cow c={{pos: [-0.2, lerp(2.6, 0.45, fall * fall), -0.7], rotY: 0.2, arms: "up", armK: 1, t, mouth: 0.6, blink: 0, lean: fall < 1 ? 0.3 : 0}} s={0.8} />
-      <PBoy id="b8" a={a} f={f} pose={(fr) => ({...idle(fr), pos: [0.95, Math.max(0, 1.0 - clamp((fr - a) / 14) * 1.0), 0.5], rotY: -0.5, squash: fr >= a + 14 && fr < a + 22 ? 1 : 0, eyeWide: 1, mouthOpen: fr >= SEGUNDA8 ? 0.7 : 0.3, brow: 1, ...(fr >= SEGUNDA8 ? {rShoulder: [-0.5, 0, -0.9], rElbow: -2.1, lShoulder: [-0.5, 0, 0.9], lElbow: -2.1} : {})})} />
+      <PBoy id="b8" a={a} f={f} pose={(fr) => ({...idle(fr), pos: [0.95, Math.max(0, 1.0 - clamp((fr - a) / 14) * 1.0), 0.5], rotY: -0.5, squash: fr >= a + 14 && fr < a + 22 ? 0.3 * Math.sin(((fr - a - 14) / 8) * Math.PI) : 0, eyeWide: 1, mouthOpen: fr >= SEGUNDA8 ? 0.7 : 0.3, brow: 1, ...(fr >= SEGUNDA8 ? {rShoulder: [-0.5, 0, -0.9], rElbow: -2.1, lShoulder: [-0.5, 0, 0.9], lElbow: -2.1} : {})})} />
     </>
   );
 };
@@ -529,7 +529,7 @@ export const VideoBotao: React.FC = () => {
       <FollowCard from={FOLLOW_FROM} to={TOTAL_BOTAO - 1} tap={FOLLOW_TAP} />
 
       {/* ---------- áudio: som junto de cada onomatopeia ---------- */}
-      <Audio src={staticFile("vozbotao.mp3")} />
+      <Audio src={staticFile("vozbotao2.mp3")} />
       {cuts.map((c) => (
         <SND key={"w" + c} src="sfx7/whoosh.mp3" from={c - 3} dur={25} v={FXV * 0.12} />
       ))}
