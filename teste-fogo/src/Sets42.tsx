@@ -61,43 +61,96 @@ export const Banana: React.FC<{p: V3; r?: V3; s?: number; t?: number; peel?: boo
   );
 };
 
-/* ---------- geladeira demiurgo: gigante, 3 olhos, aura ---------- */
-export const Demiurgo: React.FC<{p: V3; s?: number; t?: number; blink?: number; mouth?: number; tired?: number; arms?: number}> = ({p, s = 1, t = 0, blink = 0, mouth = 0, tired = 0, arms = 0}) => {
-  const body = sm("#e8eef5", 0.35, {metalness: 0.2});
+/* ---------- demiurgo: cobra gigante com cabeça de leão ---------- */
+export const Demiurgo: React.FC<{p: V3; s?: number; t?: number; blink?: number; mouth?: number; tired?: number; arms?: number; rotY?: number}> = ({p, s = 1, t = 0, blink = 0, mouth = 0, tired = 0, arms = 0, rotY = 0}) => {
+  const scale = sm("#8fa69c", 0.55);
+  const belly = sm("#f2dfb8", 0.6);
+  const mane = sm("#c8842a", 0.85);
+  const mane2 = sm("#e0a040", 0.85);
+  const fur = sm("#e6c690", 0.75);
+  const sway = Math.sin(t * 1.6) * 0.06 + (arms > 0 ? Math.sin(t * 20) * 0.1 * arms : 0);
+  const droop = tired * 0.5;
+  /* pescoço em S: do rolo até a cabeça */
+  const neck = Array.from({length: 12}, (_, i) => {
+    const k = i / 11;
+    return [Math.sin(k * Math.PI * 1.2) * 0.35 + sway * k * 3, 0.45 + k * (1.7 - droop), -0.1 + Math.sin(k * Math.PI) * 0.25 - droop * k * 0.3] as V3;
+  });
+  const hp = neck[11];
   const eyeY = Math.max(0.08, 1 - blink - tired * 0.5);
   return (
-    <group position={p} scale={s}>
-      {/* aura */}
-      {[0, 1, 2].map((i) => (
-        <mesh key={i} position={[0, 1.2, -0.45 - i * 0.02]} rotation={[0, 0, t * (0.6 + i * 0.3) * (i % 2 ? -1 : 1)]} material={sm(["#b04aff", "#ff4ad8", "#4ad8ff"][i], 0.3, {emissive: ["#b04aff", "#ff4ad8", "#4ad8ff"][i], emissiveIntensity: 1.4, transparent: true, opacity: 0.55})}>
-          <torusGeometry args={[1.15 + i * 0.22, 0.04, 8, 6 + i]} />
-        </mesh>
-      ))}
-      <mesh position={[0, 1.2, 0]} geometry={rbox(1.2, 2.4, 0.8, 0.12)} material={body} castShadow />
-      <mesh position={[0, 1.62, 0.41]} geometry={rbox(1.14, 0.02, 0.02, 0.005)} material={sm("#b8c0cc", 0.4)} />
-      <mesh position={[0.45, 1.2, 0.43]} geometry={rbox(0.06, 0.6, 0.05, 0.02)} material={sm("#b8c0cc", 0.3, {metalness: 0.6})} />
-      {/* três olhos */}
-      {[-0.3, 0, 0.3].map((x, i) => (
-        <group key={i} position={[x, i === 1 ? 2.1 : 1.95, 0.42]}>
-          <mesh scale={[0.13, 0.13 * eyeY, 0.03]} material={sm("#ffffff", 0.3)}>
-            <sphereGeometry args={[1, 14, 10]} />
+    <group position={p} scale={s} rotation={[0, rotY, 0]}>
+      {/* aura suave */}
+      <mesh position={[0, 1.3, -0.6]} rotation={[0, 0, t * 0.4]} material={sm("#b04aff", 0.3, {emissive: "#b04aff", emissiveIntensity: 1.2, transparent: true, opacity: 0.35})}>
+        <torusGeometry args={[1.4, 0.04, 8, 7]} />
+      </mesh>
+      {/* rolos do corpo */}
+      <mesh position={[0, 0.17, 0]} rotation={[Math.PI / 2, 0, 0]} scale={[1, 1, 0.9]} material={scale} castShadow>
+        <torusGeometry args={[0.75, 0.2, 12, 28]} />
+      </mesh>
+      <mesh position={[0.05, 0.45, 0]} rotation={[Math.PI / 2, 0, 0.5]} scale={[1, 1, 0.9]} material={scale} castShadow>
+        <torusGeometry args={[0.5, 0.18, 12, 24]} />
+      </mesh>
+      {/* rabo (faz o six seven quando arms > 0) */}
+      <group position={[0.85, 0.15, 0.3]} rotation={[0, 0, -0.3 - arms * (0.8 + 0.5 * Math.sin(t * 22))]}>
+        {[0, 1, 2, 3].map((i) => (
+          <mesh key={i} position={[i * 0.16, i * 0.05, 0]} material={scale}>
+            <sphereGeometry args={[0.15 - i * 0.03, 10, 8]} />
           </mesh>
-          <mesh position={[Math.sin(t * 1.3 + i) * 0.03, 0, 0.025]} scale={[0.06, 0.06 * eyeY, 0.02]} material={sm("#7a2aff", 0.2, {emissive: "#7a2aff", emissiveIntensity: 1})}>
+        ))}
+      </group>
+      {neck.map((q, i) => (
+        <group key={i} position={q}>
+          <mesh scale={[0.2 - i * 0.004, 0.2, 0.2 - i * 0.004]} material={scale} castShadow>
+            <sphereGeometry args={[1, 12, 10]} />
+          </mesh>
+          <mesh position={[0, 0, 0.11]} scale={[0.15, 0.17, 0.1]} material={belly}>
             <sphereGeometry args={[1, 10, 8]} />
           </mesh>
         </group>
       ))}
-      <mesh position={[0, 1.4, 0.42]} scale={[0.25, 0.04 + 0.12 * mouth, 0.02]} material={sm("#2a1020", 0.5)}>
-        <sphereGeometry args={[1, 14, 8]} />
-      </mesh>
-      {/* bracinhos */}
-      {[-1, 1].map((sd) => (
-        <group key={sd} position={[0.62 * sd, 1.3, 0]} rotation={[-arms * 1.4 + (arms > 0 ? Math.sin(t * 22 + (sd > 0 ? 0 : Math.PI)) * 0.5 * arms : 0), 0, sd * 0.3]}>
-          <mesh position={[0, -0.3, 0]} material={body}>
-            <capsuleGeometry args={[0.06, 0.5, 4, 8]} />
-          </mesh>
-        </group>
-      ))}
+      {/* cabeça de leão */}
+      <group position={[hp[0], hp[1] + 0.25, hp[2] + 0.1]} rotation={[droop * 0.6, sway * 2, 0]}>
+        {Array.from({length: 22}, (_, i) => {
+          const a = (i / 22) * Math.PI * 2;
+          const r = 0.42 + (i % 2) * 0.08;
+          return (
+            <mesh key={i} position={[Math.cos(a) * r * 0.9, Math.sin(a) * r, -0.12]} rotation={[0, 0, a - Math.PI / 2]} material={i % 2 ? mane : mane2} castShadow>
+              <coneGeometry args={[0.15, 0.42, 6]} />
+            </mesh>
+          );
+        })}
+        <mesh position={[0, 0, -0.15]} scale={[0.5, 0.55, 0.3]} material={mane}>
+          <sphereGeometry args={[1, 16, 12]} />
+        </mesh>
+        <mesh scale={[0.3, 0.34, 0.3]} material={fur} castShadow>
+          <sphereGeometry args={[1, 16, 12]} />
+        </mesh>
+        {[-1, 1].map((sd) => (
+          <group key={sd}>
+            <mesh position={[0.2 * sd, 0.3, -0.02]} scale={[0.08, 0.08, 0.04]} material={fur}>
+              <sphereGeometry args={[1, 10, 8]} />
+            </mesh>
+            <mesh position={[0.12 * sd, 0.08, 0.26]} scale={[0.06, 0.05 * eyeY, 0.03]} material={sm("#e08a20", 0.3, {emissive: "#a05010", emissiveIntensity: 0.3})}>
+              <sphereGeometry args={[1, 10, 8]} />
+            </mesh>
+            <mesh position={[0.12 * sd, 0.08, 0.285]} scale={[0.025, 0.035 * eyeY, 0.01]} material={eyeM()}>
+              <sphereGeometry args={[1, 8, 6]} />
+            </mesh>
+            <mesh position={[0.12 * sd, 0.15, 0.27]} rotation={[0, 0, sd * -0.2 + tired * sd * 0.3]} material={sm("#8a5a20", 0.6)}>
+              <boxGeometry args={[0.12, 0.02, 0.02]} />
+            </mesh>
+          </group>
+        ))}
+        <mesh position={[0, -0.1, 0.22]} scale={[0.17, 0.13, 0.14]} material={sm("#f2e2c4", 0.7)}>
+          <sphereGeometry args={[1, 12, 10]} />
+        </mesh>
+        <mesh position={[0, -0.04, 0.34]} scale={[0.05, 0.035, 0.03]} material={sm("#c86a6a", 0.5)}>
+          <sphereGeometry args={[1, 8, 6]} />
+        </mesh>
+        <mesh position={[0, -0.18, 0.3]} scale={[0.08, 0.015 + 0.05 * mouth, 0.03]} material={sm("#3a1510", 0.5)}>
+          <sphereGeometry args={[1, 10, 8]} />
+        </mesh>
+      </group>
     </group>
   );
 };
