@@ -157,6 +157,7 @@ const PARABENS11 = at(11, "parabens");
 const FAMOSA11 = at(11, "famosa");
 const ASSISTENTE11 = at(11, "assistente");
 const SEGUE12 = at(12, "segue");
+const DEMIURGO12 = at(12, "demiurgo");
 
 /* ---------- física e utilidades ---------- */
 const tf = (fr: number) => fr / FPS;
@@ -407,6 +408,7 @@ const A12: React.FC<ShotProps> = ({f, a, t}) => (
     <pointLight position={[0, 2.2, 2.0]} intensity={8} distance={6} color="#ff3020" />
     <PBoy id="a12" a={a} f={f} pose={(fr) => ({...idle(fr), pos: [0, hop(fr, a, 10, 0.2) + Math.sin(tf(fr) * 40) * 0.01, 0.6], rotY: 0, torso: [0.15, 0, 0], brow: -1, eyeWide: 0.3, mouthOpen: 0.7, smile: 0, rShoulder: [-1.5, 0, -0.1], rElbow: 0, lShoulder: [0.1, 0, 0.6], lElbow: -1.6})} />
     <Vapor p={[0, 2.25, 0.6]} t={t} />
+    {f >= DEMIURGO12 - 4 && <Demiurgo p={[0.75, lerp(-2.5, 0, easeOut(clamp((f - DEMIURGO12 + 4) / 12))), -0.6]} s={0.75} t={t} mouth={0.8} />}
   </>
 );
 

@@ -10,4 +10,4 @@
 [proudly] Esse é o contrato bananístico!
 [amused] Você volta pelo portal, cai na mesma calçada... | [laughing] e escorrega de novo na mesma banana.
 [excited] Parabéns! Você voltou pra casa. | [mischievously] Mas agora a banana que você escorregou é famosa... | [laughing] e você é só o assistente dela.
-[angry] Agora segue o perfil!
+[angry] Agora segue o perfil... | [angry] senão o demiurgo vai aparecer no seu quarto hoje à noite!
