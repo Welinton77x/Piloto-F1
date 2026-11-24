@@ -261,7 +261,7 @@ const S2: React.FC<ShotProps> = ({f, a, t}) => {
       <group position={[x, 0, 0]} rotation={[0, -Math.PI / 2, 0]}>
         <Patinete p={[0, 0, 0]} s={1.3} t={t} />
         <Camelo p={[0, 0.2, -0.1]} s={1.1} t={t} walk={0} blink={blinkCurve(f)} />
-        <PBoy id="s2" a={a} f={f} pose={(fr) => ({...idle(fr), pos: [0, 0.85, -0.1], rotY: 1.2, legLift: 1, ...ARMS_UP, smile: 1, mouthOpen: 0.5, eyeWide: 0.6})} />
+        <PBoy id="s2" a={a} f={f} pose={(fr) => ({...idle(fr), pos: [0, 1.12, -0.05], rotY: 1.2, legLift: 1, ...ARMS_UP, smile: 1, mouthOpen: 0.5, eyeWide: 0.6})} />
       </group>
     </>
   );
@@ -337,11 +337,10 @@ const S8: React.FC<ShotProps> = ({f, a, t}) => {
     <>
       <Cam pos={[0, 2.6, 3.4]} look={[0, 0.8, -0.4]} fov={54} f={f} a={a} />
       <Quarto />
-      <Cama p={[0, 0, -0.3]} s={1} />
-      <group position={[-0.05, 0.6, 0.55]} rotation={[-Math.PI / 2, 0, 0]}>
+      <group position={[0, 0.98, 0.45]} rotation={[-Math.PI / 2, 0, 0]}>
         <PBoy id="s8" a={a} f={f} pose={(fr) => ({...idle(fr), pos: [0, 0, 0], rotY: 0, blink: fr >= MASTIGA8 ? 0 : 0.9, eyeWide: fr >= MASTIGA8 ? 1 : 0, brow: fr >= MASTIGA8 ? -1 : 0})} />
       </group>
-      <group position={[0.75, 0.62, -0.75]}>
+      <group position={[0.55, 0.76, -1.55]}>
         <Hen p={[0, chew * 0.06, 0]} rotY={-0.6} s={0.7} t={t} blink={blinkCurve(f)} />
         <Oculos p={[-0.04, 0.47 + chew * 0.06, 0.15]} s={0.65} />
       </group>
@@ -351,24 +350,23 @@ const S8: React.FC<ShotProps> = ({f, a, t}) => {
 /* 9 — PARABÉNS animado no quarto */
 const S9: React.FC<ShotProps> = ({f, a, t}) => (
   <>
-    <Cam pos={[0, 1.6, 4.4]} look={[0, 1.1, 0]} fov={54} f={f} a={a} punch={10} />
+    <Cam pos={[0, 1.6, 5.4]} look={[0, 1.1, 0.6]} fov={54} f={f} a={a} punch={10} />
     <Quarto />
-    <Cama p={[0.2, 0, -1.2]} s={1} />
-    <group position={[0.9, 0.62, -1.5]}>
+    <group position={[0.6, 0.76, -0.4]}>
       <Hen p={[0, Math.abs(Math.sin(t * 12)) * 0.05, 0]} rotY={-0.5} s={0.7} t={t} blink={blinkCurve(f)} />
       <Oculos p={[-0.04, 0.47, 0.15]} s={0.65} />
     </group>
-    <PBoy id="s9" a={a} f={f} pose={(fr) => ({...idle(fr), pos: [-0.2, Math.abs(Math.sin(tf(fr) * 7)) * 0.3, 0.4], rotY: 0.1, ...ARMS_UP, rShoulder: [-2.9, 0, -0.35 - 0.3 * Math.sin(tf(fr) * 14)], lShoulder: [-2.9, 0, 0.35 + 0.3 * Math.sin(tf(fr) * 14)], smile: 1, mouthOpen: 0.6, eyeWide: 0.5, squash: 0})} />
+    <PBoy id="s9" a={a} f={f} pose={(fr) => ({...idle(fr), pos: [-0.2, Math.abs(Math.sin(tf(fr) * 7)) * 0.3, 1.25], rotY: 0.1, ...ARMS_UP, rShoulder: [-2.9, 0, -0.35 - 0.3 * Math.sin(tf(fr) * 14)], lShoulder: [-2.9, 0, 0.35 + 0.3 * Math.sin(tf(fr) * 14)], smile: 1, mouthOpen: 0.6, eyeWide: 0.5, squash: 0})} />
   </>
 );
 /* 10 — furioso: AGORA SEGUE O PERFIL */
 const S10: React.FC<ShotProps> = ({f, a, t}) => (
   <>
-    <Cam pos={[0, 1.7, 3.6]} look={[0, 1.45, 0]} fov={52} f={f} a={a} punch={14} />
+    <Cam pos={[0, 1.7, 4.6]} look={[0, 1.45, 1.1]} fov={52} f={f} a={a} punch={14} />
     <Quarto />
-    <pointLight position={[0, 2.2, 1.5]} intensity={8} distance={6} color="#ff3020" />
-    <PBoy id="s10" a={a} f={f} pose={(fr) => ({...idle(fr), pos: [0, hop(fr, a, 10, 0.2) + Math.sin(tf(fr) * 40) * 0.01, 0.2], rotY: 0, torso: [0.15, 0, 0], brow: -1, eyeWide: 0.3, mouthOpen: 0.7, smile: 0, rShoulder: [-1.5, 0, -0.1], rElbow: 0, lShoulder: [0.1, 0, 0.6], lElbow: -1.6})} />
-    <Vapor p={[0, 2.25, 0.2]} t={t} />
+    <pointLight position={[0, 2.2, 2.5]} intensity={8} distance={6} color="#ff3020" />
+    <PBoy id="s10" a={a} f={f} pose={(fr) => ({...idle(fr), pos: [0, hop(fr, a, 10, 0.2) + Math.sin(tf(fr) * 40) * 0.01, 1.2], rotY: 0, torso: [0.15, 0, 0], brow: -1, eyeWide: 0.3, mouthOpen: 0.7, smile: 0, rShoulder: [-1.5, 0, -0.1], rElbow: 0, lShoulder: [0.1, 0, 0.6], lElbow: -1.6})} />
+    <Vapor p={[0, 2.25, 1.2]} t={t} />
   </>
 );
 
