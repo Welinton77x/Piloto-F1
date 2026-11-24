@@ -72,11 +72,21 @@ export const Patinete: React.FC<{p: V3; rotY?: number; s?: number; t?: number}> 
 );
 
 /* ---------- múmia ---------- */
-export const Mumia: React.FC<{p: V3; rotY?: number; s?: number; t?: number; arm?: number}> = ({p, rotY = 0, s = 1, t = 0, arm = 0}) => {
+export const Mumia: React.FC<{p: V3; rotY?: number; s?: number; t?: number; arm?: number; unravel?: number}> = ({p, rotY = 0, s = 1, t = 0, arm = 0, unravel = 0}) => {
   const band = sm("#ece2c6", 0.95);
   const band2 = sm("#d8ccaa", 0.95);
   return (
-    <group position={p} rotation={[0, rotY, 0]} scale={s}>
+    <group position={p} rotation={[0, rotY + unravel * t * 18, 0]} scale={s}>
+      {unravel > 0 &&
+        Array.from({length: 16}, (_, i) => {
+          const a = i * 0.7;
+          const r = 0.3 + i * 0.09 * unravel;
+          return (
+            <mesh key={"r" + i} position={[Math.cos(a) * r, 0.2 + i * 0.07, Math.sin(a) * r]} rotation={[0, -a, 0.3]} material={band}>
+              <boxGeometry args={[0.25, 0.08, 0.01]} />
+            </mesh>
+          );
+        })}
       {Array.from({length: 9}, (_, i) => (
         <mesh key={i} position={[0, 0.15 + i * 0.13, 0]} rotation={[0, 0, Math.sin(i * 2.3) * 0.12]} material={i % 2 ? band : band2} castShadow>
           <cylinderGeometry args={[i > 6 ? 0.2 : 0.22, i > 6 ? 0.2 : 0.22, 0.14, 12]} />
@@ -125,12 +135,19 @@ export const Domino: React.FC<{p: V3; s?: number}> = ({p, s = 1}) => (
 );
 
 /* ---------- óculos (para a galinha) ---------- */
-export const Oculos: React.FC<{p: V3; s?: number}> = ({p, s = 1}) => (
+export const Oculos: React.FC<{p: V3; s?: number; dark?: boolean}> = ({p, s = 1, dark = false}) => (
   <group position={p} scale={s}>
     {[-1, 1].map((sd) => (
-      <mesh key={sd} position={[0.07 * sd, 0, 0]} material={sm("#111118", 0.3)}>
-        <torusGeometry args={[0.055, 0.012, 6, 16]} />
-      </mesh>
+      <group key={sd}>
+        <mesh position={[0.07 * sd, 0, 0]} material={sm("#111118", 0.3)}>
+          <torusGeometry args={[0.055, 0.012, 6, 16]} />
+        </mesh>
+        {dark && (
+          <mesh position={[0.07 * sd, 0, 0]} material={sm("#08080c", 0.1)}>
+            <circleGeometry args={[0.055, 16]} />
+          </mesh>
+        )}
+      </group>
     ))}
     <mesh material={sm("#111118", 0.3)}>
       <boxGeometry args={[0.04, 0.012, 0.012]} />
@@ -195,5 +212,107 @@ export const Vapor: React.FC<{p: V3; t: number}> = ({p, t}) => (
         </mesh>
       );
     })}
+  </group>
+);
+
+/* ---------- flamingo (dança / vira abajur) ---------- */
+export const Flamingo: React.FC<{p: V3; rotY?: number; s?: number; t?: number; dance?: number; lamp?: number; blink?: number}> = ({p, rotY = 0, s = 1, t = 0, dance = 0, lamp = 0, blink = 0}) => {
+  const pink = sm("#ff7fae", 0.7);
+  const sway = Math.sin(t * 10) * 0.25 * dance;
+  return (
+    <group position={p} rotation={[0, rotY, sway * 0.5]} scale={s}>
+      {[-1, 1].map((sd) => (
+        <mesh key={sd} position={[0.05 * sd, 0.45, 0]} rotation={[0, 0, sd === 1 ? Math.max(0, Math.sin(t * 10)) * 0.6 * dance : 0]} material={sm("#e8608a", 0.6)}>
+          <cylinderGeometry args={[0.015, 0.015, 0.9, 6]} />
+        </mesh>
+      ))}
+      <group position={[0, 0.95, 0]} rotation={[0, 0, sway]}>
+        <mesh scale={[0.2, 0.17, 0.3]} material={pink} castShadow>
+          <sphereGeometry args={[1, 14, 10]} />
+        </mesh>
+        {[-1, 1].map((sd) => (
+          <mesh key={sd} position={[0.18 * sd, 0.03, -0.02]} rotation={[0, 0, sd * (0.4 + dance * 0.8 * Math.abs(Math.sin(t * 10)))]} scale={[0.04, 0.12, 0.2]} material={sm("#ff5a96", 0.7)}>
+            <sphereGeometry args={[1, 10, 8]} />
+          </mesh>
+        ))}
+        <mesh position={[0, 0.3, 0.2]} rotation={[-0.3, 0, 0]} material={pink}>
+          <capsuleGeometry args={[0.035, 0.42, 4, 8]} />
+        </mesh>
+        <group position={[0, 0.56, 0.3]}>
+          <mesh scale={[0.08, 0.08, 0.09]} material={pink}>
+            <sphereGeometry args={[1, 12, 10]} />
+          </mesh>
+          <mesh position={[0, -0.03, 0.1]} rotation={[1.9, 0, 0]} material={sm("#1a1a1a", 0.4)}>
+            <coneGeometry args={[0.03, 0.12, 6]} />
+          </mesh>
+          {[-1, 1].map((sd) => (
+            <mesh key={sd} position={[0.055 * sd, 0.02, 0.05]} scale={[0.015, 0.02 * Math.max(0.1, 1 - blink), 0.01]} material={sm("#101018", 0.3)}>
+              <sphereGeometry args={[1, 8, 6]} />
+            </mesh>
+          ))}
+          {lamp > 0 && (
+            <group position={[0, 0.12, 0]} scale={lamp}>
+              <mesh position={[0, 0.12, 0]} material={sm("#fff2c0", 0.5, {emissive: "#ffd870", emissiveIntensity: 1.2, side: 2})}>
+                <cylinderGeometry args={[0.12, 0.25, 0.25, 16, 1, true]} />
+              </mesh>
+              <pointLight position={[0, 0.05, 0]} intensity={6} distance={5} color="#ffd890" />
+            </group>
+          )}
+        </group>
+      </group>
+    </group>
+  );
+};
+
+/* ---------- bomba de posto de SUCO ---------- */
+export const BombaSuco: React.FC<{p: V3; rotY?: number}> = ({p, rotY = 0}) => (
+  <group position={p} rotation={[0, rotY, 0]}>
+    <mesh position={[0, 0.7, 0]} geometry={rbox(0.5, 1.4, 0.35, 0.05)} material={sm("#ff8a1f", 0.5)} castShadow />
+    <mesh position={[0, 1.0, 0.18]} geometry={rbox(0.36, 0.3, 0.02, 0.02)} material={sm("#1a1a22", 0.3)} />
+    <mesh position={[0, 1.55, 0]} material={sm("#ffb020", 0.5, {emissive: "#ff8a1f", emissiveIntensity: 0.3})}>
+      <sphereGeometry args={[0.2, 16, 12]} />
+    </mesh>
+    <mesh position={[0, 1.55, 0.17]} rotation={[0, 0, 0]} material={sm("#3cb04a", 0.6)}>
+      <coneGeometry args={[0.05, 0.1, 6]} />
+    </mesh>
+    <mesh position={[0.28, 0.8, 0.05]} rotation={[0, 0, 0.2]} material={sm("#222", 0.5)}>
+      <capsuleGeometry args={[0.02, 0.5, 4, 6]} />
+    </mesh>
+  </group>
+);
+
+/* ---------- chuva de pipoca ---------- */
+export const PipocaChuva: React.FC<{c: V3; t: number; n?: number; w?: number}> = ({c, t, n = 50, w = 4}) => (
+  <group position={c}>
+    {Array.from({length: n}, (_, i) => {
+      const x = ((i * 0.618) % 1) * w - w / 2;
+      const z = ((i * 0.381) % 1) * 2 - 1;
+      const y = 4 - ((t * 1.6 + i * 0.137) % 1) * 4.5;
+      return (
+        <mesh key={i} position={[x, y, z]} rotation={[i, i * 2, t * 3 + i]} material={sm("#fff6d0", 0.8)}>
+          <dodecahedronGeometry args={[0.06, 0]} />
+        </mesh>
+      );
+    })}
+  </group>
+);
+
+/* ---------- piscina ---------- */
+export const Piscina: React.FC<{p: V3; t?: number; splash?: number}> = ({p, t = 0, splash = 0}) => (
+  <group position={p}>
+    <mesh position={[0, 0.06, 0]} geometry={rbox(2.6, 0.12, 1.6, 0.04)} material={sm("#f2f2f2", 0.6)} receiveShadow />
+    <mesh position={[0, 0.13, 0]} rotation={[-Math.PI / 2, 0, 0]} material={sm("#3ab0e8", 0.15, {emissive: "#1a70a8", emissiveIntensity: 0.4})}>
+      <planeGeometry args={[2.4, 1.4]} />
+    </mesh>
+    {splash > 0 &&
+      Array.from({length: 14}, (_, i) => {
+        const a = (i / 14) * Math.PI * 2;
+        const r = 0.2 + splash * 0.7;
+        return (
+          <mesh key={i} position={[Math.cos(a) * r, 0.15 + Math.sin(splash * Math.PI) * (0.6 + (i % 3) * 0.2), Math.sin(a) * r * 0.6]} material={sm("#bfe8ff", 0.2, {transparent: true, opacity: 1 - splash})}>
+            <sphereGeometry args={[0.07, 8, 6]} />
+          </mesh>
+        );
+      })}
   </group>
 );
