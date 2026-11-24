@@ -238,7 +238,7 @@ const A2: React.FC<ShotProps> = ({f, a, t}) => {
     );
   return (
     <>
-      <Cam pos={[0, 1.8, 6.4]} look={[0, 1.6, 0]} fov={56} f={f} a={GELADEIRA2 - 4} punch={10} />
+      <Cam pos={[0, 2.0, 7.4]} look={[0, 2.0, 0]} fov={56} f={f} a={GELADEIRA2 - 4} punch={10} />
       <Cosmos t={t} />
       <Demiurgo p={[0.35, 0, -1.2]} s={1.4} t={t} blink={blinkCurve(f)} mouth={f >= CONTROLE2 ? 0.5 + 0.4 * Math.sin(t * 12) : 0.2} />
       {f >= CONTROLE2 && (
@@ -627,19 +627,11 @@ export const VideoBanana: React.FC = () => {
       ))}
       <SND src="sfx7/boing.mp3" from={BANANA0} dur={30} v={FXV * 0.5} />
       <SND src="sfx7/whoosh.mp3" from={ESCORREGOU0 - 8} dur={30} v={FXV * 0.5} />
-      <SND src="sfx20/airhorn.mp3" from={SIX0 - 3} dur={40} v={FXV * 0.6} />
-      <Sequence from={SIX0 - 2} durationInFrames={RACHOU1 - SIX0 + 4}>
-        <Audio src={staticFile("sfx20/hype.mp3")} volume={(fr) => FXV * 0.9 * Math.min(1, fr / 4, (RACHOU1 - SIX0 + 4 - fr) / 10)} />
-      </Sequence>
-      <Sequence from={DUELO6 + 4} durationInFrames={VENTILADOR6 - DUELO6 + 4}>
-        <Audio src={staticFile("sfx20/hype.mp3")} volume={(fr) => FXV * 0.9 * Math.min(1, fr / 4, (VENTILADOR6 - DUELO6 + 4 - fr) / 10)} />
-      </Sequence>
       <SND src="sfx3/crack.mp3" from={RACHOU1} dur={40} v={FXV * 0.6} />
       <SND src="sfx11/rocket.mp3" from={PORTAL1} dur={50} v={FXV * 0.4} />
       <SND src="sfx18/brilho.mp3" from={GELADEIRA2 - 2} dur={45} v={FXV * 0.5} />
       <SND src="sfx9/wobble.mp3" from={CABECA3 - 2} dur={50} v={FXV * 0.45} />
       <SND src="sfx20/lamp.mp3" from={PEIXES5} dur={30} v={FXV * 0.5} />
-      <SND src="sfx20/airhorn.mp3" from={DUELO6 + 4} dur={40} v={FXV * 0.6} />
       <SND src="sfx11/rocket.mp3" from={VOANDO6} dur={50} v={FXV * 0.4} />
       <SND src="sfx10/bonk.mp3" from={LUA7 - 2} dur={30} v={FXV * 0.8} />
       <SND src="sfx7/whoosh.mp3" from={POMBO7 - 6} dur={25} v={FXV * 0.4} />

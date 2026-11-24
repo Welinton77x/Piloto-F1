@@ -130,14 +130,14 @@ export const Demiurgo: React.FC<{p: V3; s?: number; t?: number; blink?: number; 
             <mesh position={[0.2 * sd, 0.3, -0.02]} scale={[0.08, 0.08, 0.04]} material={fur}>
               <sphereGeometry args={[1, 10, 8]} />
             </mesh>
-            <mesh position={[0.12 * sd, 0.08, 0.26]} scale={[0.06, 0.05 * eyeY, 0.03]} material={sm("#e08a20", 0.3, {emissive: "#a05010", emissiveIntensity: 0.3})}>
+            <mesh position={[0.12 * sd, 0.08, 0.26]} scale={[0.06, 0.05 * eyeY, 0.03]} material={sm("#ff3a1a", 0.3, {emissive: "#ff2000", emissiveIntensity: 1.2})}>
               <sphereGeometry args={[1, 10, 8]} />
             </mesh>
             <mesh position={[0.12 * sd, 0.08, 0.285]} scale={[0.025, 0.035 * eyeY, 0.01]} material={eyeM()}>
               <sphereGeometry args={[1, 8, 6]} />
             </mesh>
-            <mesh position={[0.12 * sd, 0.15, 0.27]} rotation={[0, 0, sd * -0.2 + tired * sd * 0.3]} material={sm("#8a5a20", 0.6)}>
-              <boxGeometry args={[0.12, 0.02, 0.02]} />
+            <mesh position={[0.11 * sd, 0.15 - tired * 0.02, 0.28]} rotation={[0, 0, sd * (0.55 - tired * 0.3)]} material={sm("#3a1a08", 0.6)}>
+              <boxGeometry args={[0.16, 0.045, 0.03]} />
             </mesh>
           </group>
         ))}
@@ -147,9 +147,19 @@ export const Demiurgo: React.FC<{p: V3; s?: number; t?: number; blink?: number; 
         <mesh position={[0, -0.04, 0.34]} scale={[0.05, 0.035, 0.03]} material={sm("#c86a6a", 0.5)}>
           <sphereGeometry args={[1, 8, 6]} />
         </mesh>
-        <mesh position={[0, -0.18, 0.3]} scale={[0.08, 0.015 + 0.05 * mouth, 0.03]} material={sm("#3a1510", 0.5)}>
+        <mesh position={[0, -0.19, 0.3]} scale={[0.11, 0.04 + 0.05 * mouth, 0.03]} material={sm("#3a0a0a", 0.5)}>
           <sphereGeometry args={[1, 10, 8]} />
         </mesh>
+        {[-1, 1].map((sd) => (
+          <mesh key={"d" + sd} position={[0.06 * sd, -0.15, 0.325]} rotation={[0, 0, Math.PI]} material={sm("#ffffff", 0.3)}>
+            <coneGeometry args={[0.02, 0.06, 4]} />
+          </mesh>
+        ))}
+        {[-1, 1].map((sd) => (
+          <mesh key={"r" + sd} position={[0.05 * sd, -0.07, 0.33]} rotation={[0, 0, sd * 0.6]} material={sm("#b8925a", 0.7)}>
+            <boxGeometry args={[0.07, 0.012, 0.01]} />
+          </mesh>
+        ))}
       </group>
     </group>
   );
