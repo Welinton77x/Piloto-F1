@@ -41,3 +41,11 @@
 - Verificado: `tsc --noEmit` sem erros; stills de todas as cenas revisados e corrigidos; quadros extraídos do próprio MP4 conferidos (título, DICA, pílulas, contador, fato, CROC, card com @professorpowerguido).
 - Não verificado: audição (o agente não ouve áudio).
 - Re-render: `npm install && npm run render` e depois `ffmpeg -i out/padaria-raw.mp4 -c:v copy -af loudnorm=I=-14:TP=-1.5:LRA=11 -c:a aac -b:a 192k -ar 48000 final/padaria-pao.mp4`.
+
+## Entrega v2 (comédia)
+- `final/padaria-pao-v2.mp4`: H.264 1080×1920, 30 fps, 1969 frames, 65,7 s, AAC 48 kHz 192 kbps.
+- Narração v2 gerada uma vez (11 falas, Will). Fala total ~50,8 s; cortes derivados da voz (s2→s3 com pausa de 0,2 s; mínimos para a ação caber em s1, s4, s5, s9, s10, s11).
+- Loudness: −14,6 LUFS integrado, pico −2,1 dBFS (loudnorm + limitador, pois o AAC passava do pico).
+- Verificado: `tsc --noEmit` sem erros; stills revisados e corrigidos (partida em plano aberto, vitrine escondida no close da câmera lenta, enquadramento do sonho, carimbo e fatia erguida, "DICA N" saindo após ~2,4 s); quadros extraídos do MP4 conferidos; áudio presente em todos os segundos.
+- Não verificado: audição.
+- Ajustes técnicos de enquadramento e posição em relação à tabela (mesmo conteúdo): partida com os jogadores nas pontas do balcão e câmera de frente; câmera lenta pelo lado do padeiro.
