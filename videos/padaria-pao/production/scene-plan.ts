@@ -264,7 +264,7 @@ export const scenes: ScenePlan[] = [
     camera: [{f: 0, target: [1.5, 2.2, 0.5], radius: 13, az: 15, el: 14}, {f: 90, target: [1.5, 2.2, 0.5], radius: 13, az: 25, el: 14}],
     objects: [],
     animations: [{target: "follow.state", from: "Seguir", to: "Seguindo ✓", unit: "state", f0: 40, f1: 41, fn: "set"}],
-    badges: [{kind: "follow", text: "@seucanal", f: 0}],
+    badges: [{kind: "follow", text: "@professorpowerguido", f: 0}],
     highlights: [], captions: "word-by-word",
     audioCues: [{kind: "sfx", name: "pop", f: 0, status: "planned"}, {kind: "sfx", name: "pop", f: 40, status: "planned"}],
     moods: {prof: [{f: 0, mood: "feliz"}]},

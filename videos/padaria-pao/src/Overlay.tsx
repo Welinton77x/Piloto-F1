@@ -125,9 +125,9 @@ const Follow: React.FC<{local: number}> = ({local}) => {
   const b = done ? pop(local, 40) : 0;
   return (
     <div style={{position: "absolute", left: W / 2, top: 560, transform: `translate(-50%, -50%) scale(${0.5 + 0.5 * k})`, opacity: Math.min(1, k * 2)}}>
-      <div style={{background: "#fff", borderRadius: 44, padding: "40px 60px 36px", textAlign: "center", boxShadow: "0 14px 34px rgba(0,0,0,0.22)", width: 460}}>
+      <div style={{background: "#fff", borderRadius: 44, padding: "40px 60px 36px", textAlign: "center", boxShadow: "0 14px 34px rgba(0,0,0,0.22)", minWidth: 460, whiteSpace: "nowrap"}}>
         <Img src={staticFile("avatar.png")} style={{width: 170, height: 170, borderRadius: 999, border: "6px solid #FFD21F", objectFit: "cover"}} />
-        <div style={{fontFamily, fontWeight: 900, fontSize: 46, color: "#1d1d1d", marginTop: 16}}>@seucanal</div>
+        <div style={{fontFamily, fontWeight: 900, fontSize: 46, color: "#1d1d1d", marginTop: 16}}>@professorpowerguido</div>
         <div style={{display: "inline-block", marginTop: 18, borderRadius: 999, padding: "14px 40px", background: done ? "#e9e9e9" : "#ff3b5c", transform: `scale(${1 + 0.12 * Math.sin(Math.PI * Math.min(1, b))})`}}>
           <span style={{fontFamily, fontWeight: 800, fontSize: 36, color: done ? "#444" : "#fff"}}>{done ? "Seguindo ✓" : "Seguir"}</span>
         </div>
