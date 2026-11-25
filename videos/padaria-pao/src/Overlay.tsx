@@ -3,9 +3,7 @@ import React from "react";
 import {AbsoluteFill, Img, spring, staticFile, useCurrentFrame, delayRender, continueRender} from "remotion";
 import * as THREE from "three";
 import {sceneAt, timing, FPS, planById, cutById} from "./data/timeline";
-import {cameraAt, L} from "./three/animate";
-// @ts-ignore módulo JS
-import {HOME_X} from "./three/world.js";
+import {cameraAt, L, anchorAt} from "./three/animate";
 
 // Montserrat (variável 700–900) servida localmente: o navegador do render não acessa o Google Fonts
 const fontFamily = "MontserratLocal";
@@ -25,23 +23,11 @@ const YELLOW = "#FFD21F";
 const DARK = "#161616";
 const TONE: Record<string, string> = {problem: "#e53935", solution: "#2fb84f", neutral: "#2f7df6", attention: "#ff8f1f"};
 
-const ANCHOR: Record<string, [number, number, number]> = {
-  basket: [0.55, 2.75, 0.1],
-  "prof.head": [3.1, 5.0, 1.15],
-  breadDark: [-1.6, 2.75, 0.35],
-  breadLight: [-0.7, 2.75, 0.35],
-  breadPale: [-1.15, 2.95, 0.35],
-  scale: [1.62, 2.75, 0.12],
-  priceTag: [1.25, 1.85, 0.63],
-  bagBig: [1.62, 3.5, 0.1],
-  breadSoft: [HOME_X - 0.3, 2.55, 0.35],
-  breadCrisp: [HOME_X - 0.2, 2.55, 0.4],
-};
-
 const stroke = (px: number): React.CSSProperties => ({WebkitTextStroke: `${px}px ${DARK}`, paintOrder: "stroke fill"});
 const pop = (f: number, f0: number) => (f < f0 ? 0 : spring({frame: f - f0, fps: FPS, config: {damping: 10, stiffness: 180, mass: 0.6}}));
 
 function project(frame: number, p: [number, number, number]) {
+  // projeta um ponto 3D com a pose de câmera deste frame
   const pose = cameraAt(frame);
   const cam = new THREE.PerspectiveCamera(pose.fov, W / H, 0.1, 200);
   cam.position.copy(pose.pos);
@@ -82,7 +68,7 @@ const Title: React.FC<{local: number}> = ({local}) => {
     <div style={{position: "absolute", top: 250, width: W, textAlign: "center", transform: `scale(${0.6 + 0.4 * k})`, opacity: out}}>
       <div style={txt}>Vai na padaria</div>
       <div style={txt}>
-        comprar um{" "}
+        comprar{" "}
         <span style={{background: YELLOW, borderRadius: 18, padding: "0 18px", display: "inline-block", transform: "rotate(-2deg)"}}>pão</span>?
       </div>
     </div>
@@ -97,9 +83,9 @@ const Dica: React.FC<{text: string; k: number; top?: number}> = ({text, k, top =
 
 const Pill: React.FC<{text: string; tone: string; x: number; y: number; k: number; big?: boolean}> = ({text, tone, x, y, k, big}) => (
   <div style={{position: "absolute", left: x, top: y, transform: `translate(-50%, -50%) scale(${0.4 + 0.6 * k})`, opacity: Math.min(1, k * 2)}}>
-    <div style={{display: "flex", alignItems: "center", gap: 16, background: "#fff", borderRadius: 999, padding: big ? "18px 34px" : "14px 28px", boxShadow: "0 8px 20px rgba(0,0,0,0.18)", whiteSpace: "nowrap"}}>
-      <div style={{width: big ? 26 : 22, height: big ? 26 : 22, borderRadius: 99, background: TONE[tone] ?? TONE.neutral}} />
-      <span style={{fontFamily, fontWeight: 800, fontSize: big ? 46 : 38, color: "#1d1d1d", letterSpacing: 0.5}}>{text}</span>
+    <div style={{display: "flex", alignItems: "center", gap: 16, background: "#fff", borderRadius: text.length > 26 ? 40 : 999, padding: big ? "18px 34px" : "14px 28px", boxShadow: "0 8px 20px rgba(0,0,0,0.18)", whiteSpace: text.length > 26 ? "normal" : "nowrap", width: text.length > 26 ? 640 : undefined}}>
+      <div style={{width: big ? 26 : 22, height: big ? 26 : 22, minWidth: big ? 26 : 22, borderRadius: 99, background: TONE[tone] ?? TONE.neutral}} />
+      <span style={{fontFamily, fontWeight: 800, fontSize: big ? 46 : 38, color: "#1d1d1d", letterSpacing: 0.5, lineHeight: 1.2}}>{text}</span>
     </div>
   </div>
 );
@@ -148,11 +134,13 @@ export const Overlay: React.FC = () => {
     if (b.out !== undefined && local >= L(id, b.out)) return;
     const k = pop(local, f0);
     if (b.kind === "title") items.push(<Title key={i} local={local} />);
-    if (b.kind === "dica") items.push(<Dica key={i} text={b.text} k={k} />);
+    if (b.kind === "dica" && local - f0 < 72) items.push(<Dica key={i} text={b.text} k={k * (1 - Math.max(0, Math.min(1, (local - f0 - 62) / 10)))} />);
     if (b.kind === "fact") items.push(<div key={i}><Pill text={b.text} tone={b.tone ?? "attention"} x={W / 2} y={330} k={k} big /></div>);
     if (b.kind === "follow") items.push(<Follow key={i} local={local - f0} />);
     if (!b.anchor) return;
-    const p = project(frame, ANCHOR[b.anchor]);
+    const a3 = anchorAt(b.anchor, frame);
+    if (!a3) return;
+    const p = project(frame, a3);
     const x = Math.max(300, Math.min(W - 300, p.x));
     let y = Math.max(hasTop ? 480 : 300, Math.min(1060, p.y - 40));
     if (b.kind === "pill") items.push(<Pill key={i} text={b.text} tone={b.tone ?? "neutral"} x={x} y={y} k={k} />);

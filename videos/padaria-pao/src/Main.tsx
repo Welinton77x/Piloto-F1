@@ -3,7 +3,7 @@ import {AbsoluteFill, Audio, Sequence, staticFile, interpolate} from "remotion";
 import {Scene3D} from "./Scene3D";
 import {Overlay} from "./Overlay";
 import {cuts, timing, planById, TOTAL, FPS} from "./data/timeline";
-import {L} from "./three/animate";
+import {L, rallyHits, smashImpact} from "./three/animate";
 
 // intervalos de fala (para abaixar a trilha sob a voz)
 const voice = cuts.filter((c) => c.voKey).map((c) => [c.voStart, c.voStart + Math.round(timing[c.voKey!].duration * FPS)]);
@@ -14,7 +14,8 @@ const musicVolume = (f: number) => {
   return base * fadeOut;
 };
 
-const SFX_VOL: Record<string, number> = {pop: 0.45, whoosh: 0.35, tsss: 0.35, plim: 0.5, croc: 0.8, tum: 0.7, confete: 0.45};
+const SFX_VOL: Record<string, number> = {pop: 0.45, whoosh: 0.35, tsss: 0.35, plim: 0.5, croc: 0.8, tum: 0.7, confete: 0.45, toc: 0.6, whooshlento: 0.5, aaah: 0.45, chuvapao: 0.6};
+const COMPUTED = new Set(["toc"]); // batidas da bolinha vêm da própria partida
 
 export const Main: React.FC = () => (
   <AbsoluteFill style={{background: "#cfe3f5"}}>
@@ -30,12 +31,20 @@ export const Main: React.FC = () => (
     )}
     {cuts.flatMap((c) =>
       planById[c.id].audioCues
-        .filter((a) => a.kind === "sfx")
+        .filter((a) => a.kind === "sfx" && !COMPUTED.has(a.name))
         .map((a, i) => (
           <Sequence key={c.id + i} from={c.start + L(c.id, a.f)} durationInFrames={60} layout="none">
             <Audio src={staticFile(`sfx/${a.name}.wav`)} volume={SFX_VOL[a.name] ?? 0.4} />
           </Sequence>
         )),
     )}
+    {rallyHits().map((f) => (
+      <Sequence key={"toc" + f} from={f} durationInFrames={15} layout="none">
+        <Audio src={staticFile("sfx/toc.wav")} volume={SFX_VOL.toc} />
+      </Sequence>
+    ))}
+    <Sequence from={cuts.find((c) => c.id === "s5")!.start + smashImpact()} durationInFrames={30} layout="none">
+      <Audio src={staticFile("sfx/tum.wav")} volume={0.6} />
+    </Sequence>
   </AbsoluteFill>
 );

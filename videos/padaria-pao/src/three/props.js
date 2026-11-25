@@ -204,7 +204,9 @@ export function makeBaker() {
     head.add(at(sphere(0.014, "#ffffff", {emissive: "#ffffff", ei: 0.6}), s * 0.2 + 0.02, 0.09, 0.565));
     const brow = at(rbox(0.16, 0.04, 0.04, 0.02, "#3a2416"), s * 0.2, 0.2, 0.52);
     brow.rotation.z = s * -0.08;
+    brow.userData.side = s;
     head.add(brow);
+    (head.userData.brows ??= []).push(brow);
     const ck = at(sphere(0.08, COLORS.cheek, {coat: 0}), s * 0.32, -0.12, 0.44);
     ck.scale.set(1, 0.65, 0.35);
     head.add(ck);
@@ -222,17 +224,24 @@ export function makeBaker() {
   smile.rotation.z = Math.PI;
   smile.position.set(0, -0.28, 0.52);
   head.add(smile);
+  const mouthO = at(sphere(0.07, "#3a1414"), 0, -0.3, 0.52);
+  mouthO.scale.set(0.9, 1.2, 0.4);
+  head.add(mouthO);
+  const mouthFlat = at(rbox(0.18, 0.035, 0.03, 0.015, "#3a1414"), 0, -0.28, 0.54);
+  head.add(mouthFlat);
   // cabelo castanho + chapéu de cozinheiro
   const hair = at(sphere(0.62, "#3a2416", {coat: 0.1}), 0, 0.12, -0.06);
   hair.scale.set(1.02, 0.75, 0.95);
   head.add(hair);
+  const hat = new THREE.Group();
+  head.add(hat);
   const band = at(mesh(new THREE.CylinderGeometry(0.52, 0.55, 0.25, 32), "#fbfbf8"), 0, 0.5, -0.02);
-  head.add(band);
+  hat.add(band);
   for (let i = 0; i < 6; i++) {
     const a = (i / 6) * Math.PI * 2;
-    head.add(at(sphere(0.3, "#ffffff", {coat: 0.2}), Math.cos(a) * 0.3, 0.82, Math.sin(a) * 0.3 - 0.02));
+    hat.add(at(sphere(0.3, "#ffffff", {coat: 0.2}), Math.cos(a) * 0.3, 0.82, Math.sin(a) * 0.3 - 0.02));
   }
-  head.add(at(sphere(0.36, "#ffffff", {coat: 0.2}), 0, 0.95, -0.02));
+  hat.add(at(sphere(0.36, "#ffffff", {coat: 0.2}), 0, 0.95, -0.02));
   // braços
   const arms = [1, -1].map((sx) => {
     const a = bakerArm(sx > 0 ? -1 : 1);
@@ -240,7 +249,18 @@ export function makeBaker() {
     body.add(a);
     return a;
   });
-  root.userData.parts = {body, head, arms};
+  const setMood = (m) => {
+    smile.visible = m === "feliz";
+    mouthO.visible = m === "surpreso";
+    mouthFlat.visible = m === "bravo";
+    for (const b of head.userData.brows) {
+      const sd = b.userData.side;
+      b.rotation.z = m === "bravo" ? sd * 0.4 : sd * -0.08;
+      b.position.y = m === "surpreso" ? 0.27 : m === "bravo" ? 0.17 : 0.2;
+    }
+  };
+  setMood("feliz");
+  root.userData.parts = {body, head, arms, hat, setMood};
   return root;
 }
 
@@ -268,4 +288,90 @@ export function makeBulb() {
   b.add(sphere(0.16, COLORS.bulb, {emissive: "#ffd23f", ei: 0.9, coat: 1}));
   b.add(at(mesh(new THREE.CylinderGeometry(0.075, 0.07, 0.12, 16), "#9aa0a8", {metal: 0.7}), 0, -0.18, 0));
   return b;
+}
+
+// ---------- peças da v2 (comédia) ----------
+/** Fatia de pão de forma (raquete). */
+export function makeSlice() {
+  const g = new THREE.Group();
+  const crust = at(rbox(0.6, 0.62, 0.08, 0.12, "#b9783a"), 0, 0, 0);
+  g.add(crust);
+  const crumb = at(rbox(0.5, 0.52, 0.09, 0.1, "#f6e2b8", {coat: 0}), 0, -0.01, 0);
+  g.add(crumb);
+  // topo arredondado de pão de forma
+  const top = at(mesh(new THREE.CylinderGeometry(0.3, 0.3, 0.08, 24, 1, false, 0, Math.PI), "#b9783a"), 0, 0.28, 0);
+  top.rotation.set(Math.PI / 2, 0, Math.PI / 2);
+  g.add(top);
+  return g;
+}
+
+export function makeBall() {
+  return sphere(0.085, "#ffffff", {emissive: "#ffffff", ei: 0.15, coat: 0.8});
+}
+
+/** Baguete longa (vira a rede no balcão). */
+export function makeBaguette(len = 1.3) {
+  const g = new THREE.Group();
+  const b = new THREE.Mesh(new THREE.CapsuleGeometry(0.11, len, 8, 20), new THREE.MeshPhysicalMaterial({color: C.bread, roughness: 0.6, clearcoat: 0.25}));
+  b.rotation.z = Math.PI / 2;
+  b.castShadow = true;
+  g.add(b);
+  for (let i = 0; i < 5; i++) {
+    const c = at(rbox(0.06, 0.03, 0.16, 0.01, "#f0d9a6"), -len / 2 + 0.15 + i * (len - 0.3) / 4, 0.1, 0);
+    c.rotation.y = 0.6;
+    g.add(c);
+  }
+  return g;
+}
+
+/** Sonho: doce redondo com açúcar e creme. */
+export function makeSonho() {
+  const g = new THREE.Group();
+  const body = sphere(0.3, "#d8954a");
+  body.scale.set(1, 0.72, 1);
+  g.add(body);
+  const cream = at(mesh(new THREE.TorusGeometry(0.29, 0.06, 10, 32), "#ffe07a", {coat: 0.6}), 0, 0, 0);
+  cream.rotation.x = Math.PI / 2;
+  g.add(cream);
+  for (let i = 0; i < 26; i++) {
+    const a = i * 2.39, r = 0.26 * Math.sqrt((i + 0.5) / 26);
+    g.add(at(sphere(0.022, "#ffffff", {coat: 0}), Math.cos(a) * r, 0.2 - r * 0.25, Math.sin(a) * r));
+  }
+  return g;
+}
+
+/** Raios de luz (leque girando) atrás do sonho. */
+export function makeRays() {
+  const g = new THREE.Group();
+  for (let i = 0; i < 12; i++) {
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(0.22, 2.2), new THREE.MeshBasicMaterial({color: "#fff3b0", transparent: true, opacity: 0.5, depthWrite: false, side: THREE.DoubleSide}));
+    m.position.y = 1.1;
+    const p = new THREE.Group();
+    p.rotation.z = (i / 12) * Math.PI * 2;
+    p.add(m);
+    g.add(p);
+  }
+  return g;
+}
+
+/** Brilho em estrela (óculos, sonho). */
+export function makeGlint() {
+  const g = new THREE.Group();
+  const m = new THREE.MeshBasicMaterial({color: "#ffffff", transparent: true, depthWrite: false});
+  for (const r of [0, Math.PI / 2, Math.PI / 4, -Math.PI / 4]) {
+    const p = new THREE.Mesh(new THREE.PlaneGeometry(r % (Math.PI / 2) ? 0.05 : 0.07, r % (Math.PI / 2) ? 0.3 : 0.55), m);
+    p.rotation.z = r;
+    g.add(p);
+  }
+  return g;
+}
+
+/** Bilhete do padeiro. */
+export function makeNote() {
+  const tex = textTexture(["REVANCHE.", "AMANHÃ, 6H.", "— PADEIRO"], {w: 512, h: 400, bg: "#fffaf0", color: "#c0392b", font: "900 74px MontserratLocal, Arial"});
+  const g = new THREE.Group();
+  const p = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 0.7), new THREE.MeshStandardMaterial({map: tex, roughness: 0.8, side: THREE.DoubleSide}));
+  p.castShadow = true;
+  g.add(p);
+  return g;
 }

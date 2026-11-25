@@ -1,7 +1,7 @@
 // Cenário persistente: padaria (origem) + mesa de casa (x = HOME_X). Monta tudo uma vez e devolve as referências.
 import * as THREE from "three";
 import {makeProfessor, mat, mesh, rbox, sphere, at} from "./professor.js";
-import {C, textTexture, labelPlane, makeBread, makeSplitBread, makePaperBag, makePlasticBag, makeBaker, makeTongs} from "./props.js";
+import {C, textTexture, labelPlane, makeBread, makeSplitBread, makePaperBag, makePlasticBag, makeBaker, makeTongs, makeSlice, makeBall, makeBaguette, makeSonho, makeRays, makeGlint, makeNote} from "./props.js";
 
 export const HOME_X = 40;
 export const COUNTER_TOP = 1.77;
@@ -389,5 +389,86 @@ export function buildWorld() {
   refs.bagHand.position.set(0, -0.72, 0.05);
   refs.bagPivot.add(refs.bagHand);
   refs.prof.userData.parts.arms[1].userData.grip.add(refs.bagPivot);
+  buildV2(world, refs);
   return {world, refs};
+}
+
+function buildV2(world, refs) {
+  const r = rng(33);
+  // raquetes de pão de forma
+  refs.profSlice = makeSlice();
+  refs.profSlice.position.set(0, -0.3, 0.12);
+  refs.prof.userData.parts.arms[1].userData.grip.add(refs.profSlice);
+  refs.bakerSlice = makeSlice();
+  refs.bakerSlice.position.set(0, -0.3, 0.12);
+  refs.baker.userData.parts.arms[1].userData.grip.add(refs.bakerSlice);
+  // bolinha + rastro
+  refs.ball = makeBall();
+  world.add(refs.ball);
+  refs.trail = Array.from({length: 7}, (_, i) => {
+    const t = new THREE.Mesh(new THREE.SphereGeometry(0.08, 12, 8), new THREE.MeshBasicMaterial({color: "#ffffff", transparent: true, opacity: 0.5 - i * 0.06, depthWrite: false}));
+    world.add(t);
+    return t;
+  });
+  // baguete-rede (atravessa o balcão)
+  refs.baguette = makeBaguette(1.25);
+  refs.baguette.rotation.y = Math.PI / 2;
+  world.add(refs.baguette);
+  // brilho nos óculos
+  refs.glint = makeGlint();
+  refs.glint.position.set(0.32, 0.18, 0.75);
+  refs.prof.userData.parts.head.add(refs.glint);
+  // farinha e papéis (tapa no balcão)
+  refs.flour = Array.from({length: 30}, () => {
+    const f = new THREE.Mesh(new THREE.SphereGeometry(0.09, 10, 8), new THREE.MeshStandardMaterial({color: "#fbfaf5", transparent: true, opacity: 0.85, depthWrite: false}));
+    f.userData.v = new THREE.Vector3((r() - 0.5) * 2.4, 1.2 + r() * 2.2, (r() - 0.3) * 1.6);
+    world.add(f);
+    return f;
+  });
+  refs.papers = Array.from({length: 6}, () => {
+    const pp = new THREE.Mesh(new THREE.PlaneGeometry(0.35, 0.45), new THREE.MeshStandardMaterial({color: "#ffffff", side: THREE.DoubleSide}));
+    pp.castShadow = true;
+    pp.userData = {v: new THREE.Vector3((r() - 0.5) * 3, 2 + r() * 2, (r() - 0.2) * 2), s: r() * 6};
+    world.add(pp);
+    return pp;
+  });
+  // sonho com raios de luz
+  refs.sonho = makeSonho();
+  world.add(refs.sonho);
+  refs.rays = makeRays();
+  world.add(refs.rays);
+  refs.sparkles = Array.from({length: 10}, (_, i) => {
+    const g = makeGlint();
+    g.scale.setScalar(0.5);
+    g.userData = {a: r() * Math.PI * 2, d: 0.45 + r() * 0.35, ph: r() * 6};
+    world.add(g);
+    return g;
+  });
+  // chuva de pão (60) — pousa no balcão ou no chão
+  refs.rain = Array.from({length: 60}, (_, i) => {
+    const b = makeBread(r() > 0.25 ? C.bread : C.breadDark, {scale: 0.85});
+    const x = -2.6 + r() * 6.2, z = -0.7 + r() * 2.6;
+    const onCounter = x > -2.2 && x < 2.2 && z > -0.6 && z < 0.6;
+    b.userData = {x, z, y: (onCounter ? 1.9 : 0.15) + Math.floor(r() * 3) * 0.16, t0: r(), rot: r() * Math.PI, tilt: (r() - 0.5) * 0.8};
+    world.add(b);
+    return b;
+  });
+  // montanha de pão na mesa da casa
+  refs.homePile = new THREE.Group();
+  refs.homePile.position.set(HOME_X, 0, 0);
+  world.add(refs.homePile);
+  for (let i = 0; i < 46; i++) {
+    const b = makeBread(r() > 0.3 ? C.bread : C.breadDark, {scale: 0.9});
+    const onTable = i < 30;
+    const a = r() * Math.PI * 2, rr = Math.sqrt(r());
+    if (onTable) b.position.set(Math.cos(a) * rr * 1.4 + 0.2, 1.75 + (1 - rr) * 0.55 + r() * 0.15, Math.sin(a) * rr * 0.7 - 0.2);
+    else b.position.set((r() - 0.5) * 4, 0.15 + r() * 0.1, 1.1 + r() * 0.8);
+    b.rotation.set((r() - 0.5) * 0.5, r() * Math.PI, (r() - 0.5) * 0.4);
+    refs.homePile.add(b);
+  }
+  refs.homeSonho = makeSonho();
+  refs.homeSonho.position.set(HOME_X - 0.2, 1.88, 0.55);
+  world.add(refs.homeSonho);
+  refs.note = makeNote();
+  world.add(refs.note);
 }

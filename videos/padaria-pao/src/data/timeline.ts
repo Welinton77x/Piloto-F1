@@ -7,9 +7,9 @@ type Word = {w: string; s: number; e: number};
 export const timing = timingJson as Record<string, {text: string; duration: number; words: Word[]}>;
 
 const LEAD = 0.25; // fala começa 0,25 s após o corte
-const GAP: Record<string, number> = {s7: 0.12}; // s7→s8 é a mesma frase
+const GAP: Record<string, number> = {s2: 0.2}; // s2 termina em "senha secreta:" e a s3 é a senha
 const DEFAULT_GAP = 0.55;
-const MIN: Record<string, number> = {s1: 4.9, s3: 6.4, s14: 3.0}; // tempo mínimo para a ação caber
+const MIN: Record<string, number> = {s1: 4.9, s4: 7.0, s5: 6.4, s9: 7.2, s10: 8.0, s11: 6.0}; // tempo mínimo para a ação caber
 
 export type Cut = {id: string; start: number; dur: number; voKey: string | null; voStart: number};
 export const cuts: Cut[] = (() => {

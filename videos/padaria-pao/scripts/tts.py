@@ -8,7 +8,7 @@ ROOT = Path(__file__).resolve().parent.parent
 VOICE = "r3KkFedJ4n8aabIZ0RFQ"  # Will - Social media
 MODEL = "eleven_multilingual_v2"
 src = (ROOT / "production/scene-plan.ts").read_text(encoding="utf-8")
-items = re.findall(r'voKey: "(s\d+)",\s*narration: "([^"]*)"', src)
+items = [(k, t.replace('\\"', '"')) for k, t in re.findall(r'voKey: "(s\d+)",\s*narration: "((?:[^"\\]|\\.)*)"', src)]
 timing_path = ROOT / "src/data/timing.json"
 timing = json.loads(timing_path.read_text()) if timing_path.exists() else {}
 

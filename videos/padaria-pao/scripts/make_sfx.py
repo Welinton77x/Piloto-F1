@@ -73,6 +73,32 @@ for k in range(26):
     x[s:s + L] += seg[: len(x) - s] * rng.uniform(0.3, 1)
 save("confete", x)
 
+# toc: bolinha de pingue-pongue
+tt = t(0.09)
+save("toc", (np.sin(2 * np.pi * 2300 * tt) * 0.6 + rng.standard_normal(len(tt)) * 0.4) * np.exp(-tt * 70))
+# whoosh lento (câmera lenta): ruído grave que desce
+tt = t(1.6)
+n = rng.standard_normal(len(tt))
+save("whooshlento", lowpass(n, 0.02) * np.sin(np.pi * tt / tt[-1]) ** 2 + 0.4 * np.sin(2 * np.pi * (90 - 40 * tt / tt[-1]) * tt) * np.sin(np.pi * tt / tt[-1]))
+# aaah: coro celestial (acorde com vibrato e ataque lento)
+tt = t(2.2)
+x = np.zeros(len(tt))
+for m in [64, 68, 71, 76]:
+    f0 = 440 * 2 ** ((m - 69) / 12)
+    vib = 1 + 0.006 * np.sin(2 * np.pi * 5.5 * tt)
+    for h, a in [(1, 1), (2, 0.35), (3, 0.15)]:
+        x += a * np.sin(2 * np.pi * f0 * h * np.cumsum(vib) / SR)
+save("aaah", x * np.minimum(1, tt * 2.5) * np.exp(-np.maximum(0, tt - 1.4) * 3))
+# chuvapao: pães caindo (baques abafados)
+tt = t(3.2)
+x = np.zeros(len(tt))
+for k in range(45):
+    st = int(rng.uniform(0.3, 3.0) * SR)
+    Lq = int(0.08 * SR)
+    th = np.sin(2 * np.pi * rng.uniform(140, 260) * np.arange(Lq) / SR) * np.exp(-np.arange(Lq) / (0.015 * SR))
+    x[st:st + Lq] += th[: len(x) - st] * rng.uniform(0.3, 1)
+save("chuvapao", x)
+
 # trilha: dedilhado leve (C G Am F) a 104 bpm, baixo e chocalho — 64 s
 BPM = 104
 beat = 60 / BPM
