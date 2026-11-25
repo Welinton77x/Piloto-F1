@@ -413,7 +413,7 @@ const M10: React.FC<ShotProps> = ({f, a, t}) => {
 /* 11 — furioso: AGORA SEGUE O PERFIL... senão o demiurgo contrata a sua outra meia */
 const M11: React.FC<ShotProps> = ({f, a, t}) => (
   <>
-    <Cam pos={[0, 1.7, 3.6]} look={[0, 1.45, 0.4]} fov={52} f={f} a={a} punch={14} />
+    <Cam pos={[0, 1.5, 4.6]} look={[0, 1.15, 0]} fov={54} f={f} a={a} punch={14} />
     <Lav t={t} />
     <pointLight position={[0, 2.2, 2.0]} intensity={8} distance={6} color="#ff3020" />
     {f >= DEMIURGO11 - 4 && <Demiurgo p={[0.75, lerp(-2.5, 0, easeOut(clamp((f - DEMIURGO11 + 4) / 12))), -0.6]} s={0.75} t={t} mouth={0.8} />}

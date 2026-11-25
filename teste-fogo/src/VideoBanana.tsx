@@ -403,7 +403,7 @@ const A11: React.FC<ShotProps> = ({f, a, t}) => {
 /* 12 — furioso: AGORA SEGUE O PERFIL */
 const A12: React.FC<ShotProps> = ({f, a, t}) => (
   <>
-    <Cam pos={[0, 1.7, 3.6]} look={[0, 1.45, 0.4]} fov={52} f={f} a={a} punch={14} />
+    <Cam pos={[0, 1.5, 4.6]} look={[0, 1.15, 0.2]} fov={54} f={f} a={a} punch={14} />
     <Street t={t} />
     <pointLight position={[0, 2.2, 2.0]} intensity={8} distance={6} color="#ff3020" />
     <PBoy id="a12" a={a} f={f} pose={(fr) => ({...idle(fr), pos: [0, hop(fr, a, 10, 0.2) + Math.sin(tf(fr) * 40) * 0.01, 0.6], rotY: 0, torso: [0.15, 0, 0], brow: -1, eyeWide: 0.3, mouthOpen: 0.7, smile: 0, rShoulder: [-1.5, 0, -0.1], rElbow: 0, lShoulder: [0.1, 0, 0.6], lElbow: -1.6})} />
