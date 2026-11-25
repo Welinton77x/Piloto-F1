@@ -1,6 +1,6 @@
 # production-status — "Vai na padaria comprar um pão?"
 
-- **Fase:** 2 EM ANDAMENTO.
+- **Fase:** 2 — **CONCLUÍDO** (2026-11-25). Vídeo final: `final/padaria-pao.mp4`.
 - **Aprovação:** roteiro v1 APROVADO pelo usuário em 2026-11-25 ("Aprovado, pode gerar o vídeo"), após escolher a voz Will. Créditos ElevenLabs para a narração autorizados.
 - **Roteiro:** v1 (2026-11-25), `production/roteiro.md` + `production/scene-plan.ts` (14 cenas, 1980 frames, 66 s).
 - **Referência:** vídeo enviado pelo usuário (62 s, 720×1280): cenário 3D único, legenda de uma palavra branca com contorno, palavra-chave amarela, título com caixa amarela, selos "DICA N", pílulas com bolinha colorida, card de seguir. Estilo reproduzido sem copiar marca, @ ou personagens.
@@ -34,3 +34,10 @@
 - Ajustes visuais feitos após conferir stills: enquadramentos (s1, s4, s10, s11, s12), Professor de frente nas cenas 7 e 10, Professor atrás da mesa na casa, carimbo refeito (face "A PESO ✓" para a câmera, menor), vidro da vitrine mais transparente.
 - Fonte Montserrat servida localmente (`public/fonts`), pois o navegador do render não acessa o Google Fonts. Navegador: Chromium headless já instalado (`--browser-executable`).
 - Efeitos e trilha: `scripts/make_sfx.py` (sintetizados).
+
+## Entrega
+- `final/padaria-pao.mp4`: H.264 1080×1920, 30 fps, 1816 frames, 60,6 s, AAC 48 kHz 192 kbps.
+- Loudness medido após normalização: −14,1 LUFS integrado, pico −1,4 dBFS. Áudio presente em todos os segundos (RMS por segundo entre −13 e −31 dB).
+- Verificado: `tsc --noEmit` sem erros; stills de todas as cenas revisados e corrigidos; quadros extraídos do próprio MP4 conferidos (título, DICA, pílulas, contador, fato, CROC, card com @professorpowerguido).
+- Não verificado: audição (o agente não ouve áudio).
+- Re-render: `npm install && npm run render` e depois `ffmpeg -i out/padaria-raw.mp4 -c:v copy -af loudnorm=I=-14:TP=-1.5:LRA=11 -c:a aac -b:a 192k -ar 48000 final/padaria-pao.mp4`.
