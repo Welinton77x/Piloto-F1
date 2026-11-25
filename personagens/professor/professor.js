@@ -302,14 +302,17 @@ function buildArm(side, {raise = 0, forward = 0, bend = 0, hold = null}) {
   const thumb = at(sphere(0.05, COLORS.skin), side * 0.09, -0.5, 0.08);
   thumb.scale.set(1, 1.4, 1);
   elbow.add(thumb);
-  if (hold === "point") {
-    const finger = at(capsule(0.035, 0.12, COLORS.skin), 0, -0.7, 0.03);
-    elbow.add(finger);
-  }
+  const finger = at(capsule(0.035, 0.12, COLORS.skin), 0, -0.7, 0.03);
+  finger.visible = hold === "point";
+  elbow.add(finger);
+  // ponto de encaixe para objetos na mão (saco, pegador...)
+  const grip = new THREE.Group();
+  grip.position.set(0, -0.62, 0.05);
+  elbow.add(grip);
   upper.rotation.z = side * -raise;
   upper.rotation.x = -forward;
   elbow.rotation.x = -bend;
-  shoulder.userData = {upper, elbow, side};
+  shoulder.userData = {upper, elbow, side, finger, grip};
   return shoulder;
 }
 
@@ -410,13 +413,21 @@ export function makeProfessor({pose = "idle", mood = "feliz"} = {}) {
   });
 
   // ---- cabeça ----
-  const head = buildHead(mood);
+  // uma cabeça por expressão; setMood() troca a visível
+  const head = new THREE.Group();
   head.position.set(0, 3.05, 0.02);
   head.scale.setScalar(1.08);
   if (pose === "walk") head.rotation.z = 0.05;
   if (mood === "pensativo") head.rotation.z = -0.12;
   body.add(head);
   parts.head = head;
+  parts.heads = {};
+  for (const m of Object.keys(MOODS)) {
+    const h = buildHead(m);
+    h.visible = m === mood;
+    head.add(h);
+    parts.heads[m] = h;
+  }
   body.add(at(mesh(new THREE.CylinderGeometry(0.16, 0.18, 0.2, 16), COLORS.skin), 0, 2.38, 0));
 
   if (pose === "walk") body.rotation.x = 0.05;
@@ -460,3 +471,19 @@ export class CoatPhysics {
     return {back: Math.max(-0.25, v("back")), L: {out: Math.max(0, v("Lout")), fwd: v("Lfwd")}, R: {out: Math.max(0, v("Rout")), fwd: v("Rfwd")}};
   }
 }
+
+/** Troca a expressão do rosto (feliz, surpreso, bravo, eureka, sereno, pensativo). */
+export function setMood(parts, mood) {
+  for (const [m, h] of Object.entries(parts.heads)) h.visible = m === mood;
+}
+
+/** Ajusta um braço: raise (abre para o lado), forward (para frente), bend (cotovelo), point (dedo). */
+export function setArm(arm, {raise = 0.08, forward = 0, bend = 0, point = false} = {}) {
+  const {upper, elbow, side, finger} = arm.userData;
+  upper.rotation.z = side * -raise;
+  upper.rotation.x = -forward;
+  elbow.rotation.x = -bend;
+  finger.visible = point;
+}
+
+export {mat, mesh, rbox, sphere, capsule, at};
