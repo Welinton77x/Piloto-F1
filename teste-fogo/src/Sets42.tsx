@@ -62,7 +62,7 @@ export const Banana: React.FC<{p: V3; r?: V3; s?: number; t?: number; peel?: boo
 };
 
 /* ---------- demiurgo: cobra gigante com cabeça de leão ---------- */
-export const Demiurgo: React.FC<{p: V3; s?: number; t?: number; blink?: number; mouth?: number; tired?: number; arms?: number; rotY?: number}> = ({p, s = 1, t = 0, blink = 0, mouth = 0, tired = 0, arms = 0, rotY = 0}) => {
+export const Demiurgo: React.FC<{p: V3; s?: number; t?: number; blink?: number; mouth?: number; tired?: number; arms?: number; rotY?: number; cry?: number}> = ({p, s = 1, t = 0, blink = 0, mouth = 0, tired = 0, arms = 0, rotY = 0, cry = 0}) => {
   const scale = sm("#8fa69c", 0.55);
   const belly = sm("#f2dfb8", 0.6);
   const mane = sm("#c8842a", 0.85);
@@ -144,6 +144,17 @@ export const Demiurgo: React.FC<{p: V3; s?: number; t?: number; blink?: number; 
         <mesh position={[0, -0.1, 0.22]} scale={[0.17, 0.13, 0.14]} material={sm("#f2e2c4", 0.7)}>
           <sphereGeometry args={[1, 12, 10]} />
         </mesh>
+        {cry > 0 &&
+          [-1, 1].flatMap((sd) =>
+            [0, 1, 2].map((i) => {
+              const k = (t * 1.5 + i / 3) % 1;
+              return (
+                <mesh key={sd + "t" + i} position={[0.14 * sd + sd * k * 0.05, 0.02 - k * 0.45, 0.3]} scale={[0.025, 0.035, 0.025]} material={sm("#6ac8ff", 0.1, {emissive: "#3a9aff", emissiveIntensity: 0.5, transparent: true, opacity: 1 - k * 0.6})}>
+                  <sphereGeometry args={[1, 8, 6]} />
+                </mesh>
+              );
+            }),
+          )}
         <mesh position={[0, -0.04, 0.34]} scale={[0.05, 0.035, 0.03]} material={sm("#c86a6a", 0.5)}>
           <sphereGeometry args={[1, 8, 6]} />
         </mesh>

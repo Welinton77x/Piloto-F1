@@ -48,6 +48,7 @@ import {VideoBotao, TOTAL_BOTAO} from "./VideoBotao";
 import {VideoSol, TOTAL_SOL} from "./VideoSol";
 import {VideoSol2, TOTAL_SOL2} from "./VideoSol2";
 import {VideoBanana, TOTAL_BANANA} from "./VideoBanana";
+import {VideoMeia, TOTAL_MEIA} from "./VideoMeia";
 import {VideoChule, TOTAL_CHULE} from "./VideoChule";
 import {VideoMec, TOTAL_MEC} from "./VideoMec";
 import {VideoBolo, TOTAL_BOLO} from "./VideoBolo";
@@ -90,6 +91,7 @@ export const Root: React.FC = () => (
     <Composition id="Sol" component={VideoSol} durationInFrames={TOTAL_SOL} fps={30} width={1080} height={1920} />
     <Composition id="Sol2" component={VideoSol2} durationInFrames={TOTAL_SOL2} fps={30} width={1080} height={1920} />
     <Composition id="Banana" component={VideoBanana} durationInFrames={TOTAL_BANANA} fps={30} width={1080} height={1920} />
+    <Composition id="Meia" component={VideoMeia} durationInFrames={TOTAL_MEIA} fps={30} width={1080} height={1920} />
     <Composition id="BlockTest" component={BlockTest} durationInFrames={30} fps={30} width={1080} height={1920} />
     <Composition id="ChulePreview" component={ChulePreview} durationInFrames={8} fps={30} width={1080} height={1920} />
     <Composition id="MecPreview" component={MecPreview} durationInFrames={6} fps={30} width={1080} height={1920} />
