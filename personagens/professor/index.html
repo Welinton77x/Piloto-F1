@@ -57,10 +57,10 @@ top.forEach((c, i) => {
   topScene.add(p);
 });
 const TH = 420, BH = H - TH;
-const th = 5.1, tw = th * W / TH;
+const th = 4.65, tw = th * W / TH;
 const topCam = new THREE.OrthographicCamera(-tw / 2, tw / 2, th / 2, -th / 2, 0.1, 100);
 topCam.position.set(0, 4.9, 20);
-topCam.lookAt(0, 2.2, 0);
+topCam.lookAt(0, 2.25, 0);
 
 // ---- linha de baixo: expressões em close ----
 const botScene = makeScene(false);

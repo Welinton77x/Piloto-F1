@@ -89,8 +89,8 @@ function draw(t) {
   P.head.rotation.z = Math.sin(phase) * 0.04 * walkAmt;
   setCoat(P, coat);
   // câmera acompanha o professor
-  cam.position.set(prof.position.x + 1.2, 3.0, prof.position.z + 11);
-  cam.lookAt(prof.position.x + 0.3, 2.0, prof.position.z);
+  cam.position.set(prof.position.x + 0.9, 2.9, prof.position.z + 8.3);
+  cam.lookAt(prof.position.x + 0.2, 2.1, prof.position.z);
   sun.position.set(prof.position.x - 5, 12, prof.position.z + 9);
   sun.target.position.set(prof.position.x, 0, prof.position.z);
   sun.target.updateMatrixWorld();
