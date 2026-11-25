@@ -569,16 +569,28 @@ const SND: React.FC<{src: string; from: number; dur?: number; v: number}> = ({sr
     <Audio src={staticFile(src)} volume={v} />
   </Sequence>
 );
-/* X vermelho grande / V verde de certinho */
-const Mark: React.FC<{from: number; to: number; ok?: boolean; x?: number; y?: number; size?: number}> = ({from, to, ok = false, x = 540, y = 760, size = 360}) => {
+/* X / V desenhados em cima do objeto (como na referência): traço que se desenha, com contorno escuro */
+const Mark: React.FC<{from: number; to: number; ok?: boolean; x?: number; y?: number; size?: number}> = ({from, to, ok = false, x = 540, y = 960, size = 240}) => {
   const f = useCurrentFrame();
   if (f < from || f > to) return null;
-  const k = Math.min(1, (f - from) / 6);
-  const s = (k < 1 ? 0.4 + k * 0.8 : 1.2 - Math.min(0.2, (f - from - 6) / 20)) * (1 - Math.max(0, (f - to + 5) / 5));
+  const d1 = Math.min(1, (f - from) / 5);
+  const d2 = Math.min(1, Math.max(0, (f - from - 4) / 5));
+  const fade = 1 - Math.max(0, (f - to + 5) / 5);
+  const col = ok ? "#2ecc40" : "#ff2a2a";
+  const line = (x1: number, y1: number, x2: number, y2: number, k: number, key: string) => (
+    <g key={key}>
+      <line x1={x1} y1={y1} x2={x1 + (x2 - x1) * k} y2={y1 + (y2 - y1) * k} stroke="#101018" strokeWidth={17} strokeLinecap="round" />
+      <line x1={x1} y1={y1} x2={x1 + (x2 - x1) * k} y2={y1 + (y2 - y1) * k} stroke={col} strokeWidth={10} strokeLinecap="round" />
+    </g>
+  );
   return (
-    <div style={{position: "absolute", left: x, top: y, transform: `translate(-50%,-50%) scale(${s}) rotate(${ok ? -6 : 0}deg)`, fontFamily, fontWeight: 900, fontSize: size, lineHeight: 1, color: ok ? "#2ecc40" : "#ff2020", WebkitTextStroke: "14px #ffffff", paintOrder: "stroke fill", filter: "drop-shadow(0 6px 0 rgba(0,0,0,0.35))"}}>
-      {ok ? "✔" : "✖"}
-    </div>
+    <svg style={{position: "absolute", left: x - size / 2, top: y - size / 2, opacity: fade}} width={size} height={size} viewBox="0 0 100 100">
+      <g transform="scale(1)" style={{}}>
+        {ok
+          ? [line(18, 55, 42, 78, d1, "a"), d2 > 0 && line(42, 78, 86, 22, d2, "b")]
+          : [line(18, 18, 82, 82, d1, "a"), d2 > 0 && line(82, 18, 18, 82, d2, "b")]}
+      </g>
+    </svg>
   );
 };
 const Angry: React.FC<{from: number}> = ({from}) => {
@@ -598,23 +610,23 @@ export const VideoMeia: React.FC = () => {
         <Scene f={f} />
       </ThreeCanvas>
 
-      <Mark from={NAO0} to={NAO0 + 40} />
+      <Mark from={NAO0} to={NAO0 + 40} x={620} y={1100} size={300} />
       <Ono from={PROMOVIDA0} to={L(1) - 2} text="PROMOVIDA! 🎉" size={110} color="#ffd21f" />
       <Ono from={PORTAL1} to={ESCRITORIO1 - 4} text="VUUUSH!" size={140} color="#e08aff" />
       <Plaque from={CONTRATA1} to={L(2) - 2} text={"🧦 MEIAS LTDA\nCONTRATANDO"} x={540} y={420} size={58} />
       <Ono from={CHOVE2} to={L(3) - 2} text="PLIC PLOC!" size={120} color="#7fd0ff" />
       <Ono from={CRACHA3} to={POTE3 - 4} text="TCHARAM!" size={120} color="#ffd21f" />
       <Ono from={FEIJAO3} to={L(4) - 2} text="FEIJÃO?!" size={140} color="#ffffff" />
-      <Mark from={FEIJAO4A} to={FEIJAO4B - 2} x={260} y={760} size={240} />
-      <Mark from={FEIJAO4B} to={FEIJAO4C - 2} x={460} y={760} size={240} />
-      <Mark from={FEIJAO4C} to={ULTIMO4 - 2} x={660} y={760} size={240} />
+      <Mark from={FEIJAO4A} to={ULTIMO4 - 2} x={200} y={990} size={190} />
+      <Mark from={FEIJAO4B} to={ULTIMO4 - 2} x={428} y={990} size={190} />
+      <Mark from={FEIJAO4C} to={ULTIMO4 - 2} x={652} y={990} size={190} />
       <Ono from={FLOCOS4} to={NINGUEM4 - 2} text="FLOCOS 😐" size={120} color="#9ad0f0" />
       <Ono from={NINGUEM4} to={L(5) - 2} text="COF COF!" size={120} color="#e8e8e8" />
       <Ono from={CENTRIFUGA5} to={CHEGA5 - 3} text="VRRRRRUM!" size={120} color="#7fd0ff" />
       <Ono from={CHEGA5} to={L(6) - 2} text="PLOP!" size={140} color="#e08aff" />
       <Ono from={FRENTE6} to={TRAS6 - 2} text="⬆ FRENTE?" size={100} color="#ffffff" />
       <Ono from={TRAS6} to={L(7) - 2} text="TRÁS? ⬇" size={100} color="#ffffff" />
-      <Mark from={FRENTE7} to={CHORA7 - 2} ok />
+      <Mark from={FRENTE7} to={CHORA7 - 2} ok x={610} y={960} size={240} />
       <Ono from={CHORA7} to={TREZE7 - 2} text="BUÁÁÁ!" size={150} color="#7fd0ff" />
       <BigNum from={TREZE7} to={L(8) - 2} text="13.000.000.000 ANOS" size={80} />
       <Ono from={QUARENTA8} to={L(9) - 2} text="+47 🧦" size={170} color="#ffd21f" />
