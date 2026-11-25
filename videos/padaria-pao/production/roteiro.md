@@ -15,7 +15,7 @@ Origem: escrito pelo agente a partir do tema do usuário. Status: **AGUARDANDO A
 | Protagonista | O **Professor** 3D (`personagens/professor`): cabelo branco, óculos, bigode, jaleco com física. **Sem boca mexendo**: só troca de expressão (feliz, surpreso, bravo, eureka, sereno) |
 | Coadjuvante | **Padeiro** no mesmo estilo de brinquedo: chapéu de cozinheiro, avental branco sobre camiseta laranja |
 | Cenário fixo | Uma padaria (diorama): balcão de madeira com faixa amarela "PADARIA", vitrine de vidro com pães, cesto de pães, balança digital, forno no fundo, prateleiras, janelão com prédios e céu azul, piso azul-acinzentado. Igual à sala da referência: um cenário só, a câmera passeia por ele |
-| Voz | **ElevenLabs**, voz **"Will – Social media"** (`r3KkFedJ4n8aabIZ0RFQ`, brasileira, jovem, descontraída e dinâmica), modelo `eleven_multilingual_v2`, velocidade 1,05. Uma geração por cena (13 falas, ~900 caracteres no total). **Usa créditos da sua conta: a aprovação deste roteiro autoriza esse gasto.** |
+| Voz | **ElevenLabs**, voz **"Will – Social media"** (`r3KkFedJ4n8aabIZ0RFQ`, brasileira, jovem, descontraída e dinâmica), modelo `eleven_multilingual_v2`, velocidade 1,05. Uma geração por cena (13 falas, ~780 caracteres no total). **Usa créditos da sua conta: a aprovação deste roteiro autoriza esse gasto.** |
 | Legendas | Igual à referência: **uma palavra por vez**, branca, contorno escuro, no centro da tela (~y 1240 px); palavra-chave em **amarelo** |
 | Gráficos | Título de abertura com palavra em caixa amarela; selo **"DICA N"** amarelo com contorno escuro no topo; **pílulas** brancas com bolinha colorida (vermelho = problema, verde = certo ✓, azul = informação); contador; selo **"FATO REAL · INMETRO"**; **card de seguir** no final |
 
@@ -58,10 +58,10 @@ Arquivo: `production/scene-plan.ts`, com todas as 14 cenas. Na Fase 2 ele vira `
 
 ## 4. Áudio e montagem
 
-**Narração completa (143 palavras):**
+**Narração completa (145 palavras):**
 Vai na padaria comprar um pão? Então presta atenção nessas quatro dicas. Primeiro: descubra o horário da fornada. Chegou fora de hora, só sobrou o pão de ontem. Na hora certa, o pão sai quentinho, estalando. Segundo: peça o seu ponto. Mais moreninho ou mais clarinho. O padeiro escolhe um por um pra você. Ninguém precisa levar pão branquelo pra casa. Terceiro: o pãozinho é vendido por peso, não por unidade. Fato real: pela regra do Inmetro, o pão francês só pode ser vendido a peso, com o preço do quilo bem à vista no balcão. Então, se pedir dez pães, quem decide o preço é a balança. Quarto: leve o pão no saco de papel. No plástico, o vapor fica preso e a casca amolece. No papel, o pão respira e continua crocante até o café. Pronto: agora você é o professor da padaria.
 
-- 143 palavras a ~160 palavras por minuto dá ~54 s de fala, mais pausas e o card final: cerca de 66 s.
+- 145 palavras a ~160 palavras por minuto dá ~54 s de fala, mais pausas e o card final: cerca de 66 s.
 - Os tempos acima são estimativas. Depois de gerar a voz, **os cortes passam a seguir a voz real**: cada fala começa ~0,25 s após o corte da cena, e as pausas entre falas ficam em 0,5–0,7 s. Legenda e animações ficam presas à palavra falada.
 - **Efeitos (feitos por código, sem direitos de terceiros):** "pop" nas pílulas e nos selos DICA; "whoosh" nos cortes; "tsss" do vapor do forno; "plim" da balança; "croc" ao partir o pão; "tum" do carimbo; confete no final.
 - **Trilha:** leve e alegre, feita por código, baixa durante a fala (−22 dB). Volume final normalizado em −14 LUFS.
