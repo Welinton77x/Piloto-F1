@@ -56,3 +56,11 @@
 - `final/padaria-pao-v2-musica-baixa.mp4`: trilha ~27 dB abaixo da voz e dos efeitos (medido). −14,6 LUFS, pico −2,0 dBFS.
 - `final/padaria-pao-v2-sem-musica.mp4`: só voz e efeitos. −14,6 LUFS, pico −1,6 dBFS.
 - Mesma imagem (1969 frames, 65,6 s).
+
+## v3 — narração animada (pedido do usuário: "falando de uma forma animada e engraçada")
+- Mesmas falas aprovadas; nova interpretação com `eleven_v3` (voz Will) e marcações de emoção (`scripts/tts.py`, dicionário DELIVERY; o script confere que as palavras são idênticas às aprovadas). Voz séria anterior guardada em `production/vo-v2-serio/`.
+- Usuário ouviu a prévia (`amostras-voz/narracao-animada.mp3`) e aprovou o tom ("Gostei deste tom").
+- Cortes re-derivados da nova voz: 2128 frames = 70,9 s.
+- `final/padaria-pao-v3-animado-musica-baixa.mp4`: 71,0 s, −14,5 LUFS, pico −2,8 dBFS.
+- `final/padaria-pao-v3-animado-sem-musica.mp4`: 70,9 s, −14,5 LUFS, pico −2,3 dBFS.
+- Verificado: 2128 frames 1080×1920 nos dois arquivos; quadros extraídos do MP4 conferidos (legendas sincronizadas com as falas). Não verificado: audição.
