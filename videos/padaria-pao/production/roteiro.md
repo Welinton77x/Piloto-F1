@@ -26,7 +26,7 @@ A v2 usa **essa fórmula com piadas próprias**. Não copia nenhuma fala, nenhum
 | Tom | Narrador sério e confiante dando conselhos ridículos (humor seco) |
 | Personagens | **Professor** (protagonista; a boca não mexe, só a expressão muda) e **Padeiro** (a "autoridade", como o sargento da referência; ganha expressões de bravo e surpreso) |
 | Cenário | A mesma padaria 3D da v1 (balcão "PADARIA", vitrine, balança, forno, prateleiras, janelão) + a mesa de casa no final |
-| Voz | ElevenLabs **Will** (`r3KkFedJ4n8aabIZ0RFQ`), já escolhida por você. Nova geração de ~850 caracteres: **gasta créditos; a aprovação autoriza** |
+| Voz | ElevenLabs **Will** (`r3KkFedJ4n8aabIZ0RFQ`), já escolhida por você. Nova geração de ~870 caracteres: **gasta créditos; a aprovação autoriza** |
 | Legendas e gráficos | Iguais à v1 (estilo da referência). Pílulas com as "falas" e "CÂMERA LENTA"; card **@professorpowerguido** no final |
 
 **Fato real usado:** o pão francês só pode ser vendido a peso, com o preço do quilo à vista (Portaria Inmetro 146/2006, mantida pela 181/2021). Fontes no fim.
@@ -64,7 +64,7 @@ A v2 usa **essa fórmula com piadas próprias**. Não copia nenhuma fala, nenhum
 
 ## 4. Áudio
 
-**Narração completa (~150 palavras):**
+**Narração completa (156 palavras):**
 Vai na padaria comprar pão? Então segue essas quatro dicas. Primeiro: ao entrar, não diga bom dia. Olhe fundo nos olhos do padeiro e fale a senha secreta: "O pão é francês, mas eu sou brasileiro." Ele vai saber que você é profissional. Segundo: se o pão vier clarinho, desafie o padeiro pra uma partida de pingue-pongue com pão de forma. Ele vai aceitar. Padeiro acorda antes do sol, não tem medo de nada. Terceiro: quando ele perguntar "mais alguma coisa?", responda: "só a felicidade". Ele vai te entregar um sonho. Que, convenhamos, é quase a mesma coisa. Quarto: suba na balança e peça o seu peso em pão. Parece loucura, mas o pão francês só pode ser vendido a peso. É regra do Inmetro, de verdade. Pronto: você saiu com setenta quilos de pão. E dentro do sonho tem um bilhete do padeiro pedindo revanche no pingue-pongue. E você, pede o pão moreninho ou clarinho?
 
 - **Voz:** Will, num tom mais sério e firme, para o contraste com o absurdo fazer graça.
