@@ -17,11 +17,12 @@ const musicVolume = (f: number) => {
 const SFX_VOL: Record<string, number> = {pop: 0.45, whoosh: 0.35, tsss: 0.35, plim: 0.5, croc: 0.8, tum: 0.7, confete: 0.45, toc: 0.6, whooshlento: 0.5, aaah: 0.45, chuvapao: 0.6};
 const COMPUTED = new Set(["toc"]); // batidas da bolinha vêm da própria partida
 
-export const Main: React.FC = () => (
+/** music: volume da trilha (1 = original da v2, 0.25 = bem baixa, 0 = sem trilha). */
+export const Main: React.FC<{music?: number}> = ({music = 0.25}) => (
   <AbsoluteFill style={{background: "#cfe3f5"}}>
     <Scene3D />
     <Overlay />
-    <Audio src={staticFile("sfx/trilha.wav")} volume={musicVolume} />
+    {music > 0 ? <Audio src={staticFile("sfx/trilha.wav")} volume={(f) => musicVolume(f) * music} /> : null}
     {cuts.map((c) =>
       c.voKey ? (
         <Sequence key={c.id} from={c.voStart} durationInFrames={Math.ceil(timing[c.voKey].duration * FPS) + 2} layout="none">

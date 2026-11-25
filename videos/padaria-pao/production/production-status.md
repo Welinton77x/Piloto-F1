@@ -49,3 +49,10 @@
 - Verificado: `tsc --noEmit` sem erros; stills revisados e corrigidos (partida em plano aberto, vitrine escondida no close da câmera lenta, enquadramento do sonho, carimbo e fatia erguida, "DICA N" saindo após ~2,4 s); quadros extraídos do MP4 conferidos; áudio presente em todos os segundos.
 - Não verificado: audição.
 - Ajustes técnicos de enquadramento e posição em relação à tabela (mesmo conteúdo): partida com os jogadores nas pontas do balcão e câmera de frente; câmera lenta pelo lado do padeiro.
+
+## Ajuste de áudio (pedido do usuário: "abaixa a música ... ou remova")
+- Música do vídeo de referência não usada (é de outro criador e vem misturada com a voz dele).
+- Trilha agora controlada pela prop `music` (padrão 0,25 = −12 dB em relação à v2). Só o áudio foi re-renderizado (`--codec=wav`) e juntado ao vídeo existente.
+- `final/padaria-pao-v2-musica-baixa.mp4`: trilha ~27 dB abaixo da voz e dos efeitos (medido). −14,6 LUFS, pico −2,0 dBFS.
+- `final/padaria-pao-v2-sem-musica.mp4`: só voz e efeitos. −14,6 LUFS, pico −1,6 dBFS.
+- Mesma imagem (1969 frames, 65,6 s).
