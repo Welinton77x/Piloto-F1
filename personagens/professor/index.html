@@ -1,0 +1,87 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Professor — folha de personagem</title>
+<style>html,body{margin:0;background:#cfe3f5;overflow:hidden}</style>
+<script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js","three/addons/":"./node_modules/three/examples/jsm/"}}</script>
+</head><body>
+<script type="module">
+import * as THREE from "three";
+import {RoomEnvironment} from "three/addons/environments/RoomEnvironment.js";
+import {makeProfessor} from "./professor.js";
+
+const W = 1600, H = 940;
+const renderer = new THREE.WebGLRenderer({antialias: true, preserveDrawingBuffer: true});
+renderer.setPixelRatio(window.devicePixelRatio);
+renderer.setSize(W, H);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+document.body.appendChild(renderer.domElement);
+
+const env = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture;
+function makeScene(withGround) {
+  const scene = new THREE.Scene();
+  scene.environment = env;
+  scene.environmentIntensity = 0.55;
+  scene.add(new THREE.HemisphereLight("#ffffff", "#9fb6cc", 1.2));
+  const sun = new THREE.DirectionalLight("#ffffff", 2.2);
+  sun.position.set(-5, 12, 9);
+  sun.castShadow = withGround;
+  sun.shadow.mapSize.set(4096, 4096);
+  Object.assign(sun.shadow.camera, {left: -14, right: 14, top: 10, bottom: -10, near: 1, far: 50});
+  sun.shadow.radius = 5;
+  scene.add(sun);
+  if (withGround) {
+    const ground = new THREE.Mesh(new THREE.PlaneGeometry(100, 100), new THREE.ShadowMaterial({opacity: 0.2}));
+    ground.rotation.x = -Math.PI / 2;
+    ground.receiveShadow = true;
+    scene.add(ground);
+  }
+  return scene;
+}
+
+// ---- linha de cima: giro completo + poses ----
+const topScene = makeScene(true);
+const top = [
+  {rot: 0, pose: "idle", mood: "feliz"},
+  {rot: -0.55, pose: "point", mood: "feliz"},
+  {rot: -Math.PI / 2, pose: "side", mood: "feliz"},
+  {rot: Math.PI, pose: "back", mood: "feliz"},
+  {rot: -0.5, pose: "walk", mood: "feliz"},
+  {rot: 0, pose: "eureka", mood: "surpreso"},
+];
+top.forEach((c, i) => {
+  const p = makeProfessor(c);
+  p.rotation.y = c.rot;
+  p.position.set((i - 2.5) * 2.95, 0, 0);
+  topScene.add(p);
+});
+const TH = 420, BH = H - TH;
+const th = 5.0, tw = th * W / TH;
+const topCam = new THREE.OrthographicCamera(-tw / 2, tw / 2, th / 2, -th / 2, 0.1, 100);
+topCam.position.set(0, 4.6, 20);
+topCam.lookAt(0, 1.85, 0);
+
+// ---- linha de baixo: expressões em close ----
+const botScene = makeScene(false);
+const moods = ["feliz", "surpreso", "bravo", "eureka", "sereno"];
+moods.forEach((m, i) => {
+  const p = makeProfessor({pose: "idle", mood: m});
+  p.position.set((i - 2) * 1.78, 0, i % 2 ? -0.3 : 0);
+  botScene.add(p);
+});
+const bw = 9.4, bh = bw * BH / W;
+const botCam = new THREE.OrthographicCamera(-bw / 2, bw / 2, bh / 2, -bh / 2, 0.1, 100);
+botCam.position.set(0, 2.75, 20);
+botCam.lookAt(0, 2.75, 0);
+
+renderer.setClearColor("#cfe3f5");
+renderer.clear();
+renderer.setScissorTest(true);
+renderer.autoClear = false;
+renderer.setViewport(0, BH, W, TH); renderer.setScissor(0, BH, W, TH);
+renderer.render(topScene, topCam);
+renderer.setViewport(0, 0, W, BH); renderer.setScissor(0, 0, W, BH);
+renderer.render(botScene, botCam);
+window.__done = true;
+</script></body></html>
