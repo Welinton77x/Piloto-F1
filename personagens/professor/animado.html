@@ -1,0 +1,113 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Professor — física do jaleco</title>
+<style>html,body{margin:0;background:#cfe3f5;overflow:hidden}</style>
+<script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js","three/addons/":"./node_modules/three/examples/jsm/"}}</script>
+</head><body>
+<script type="module">
+// Animação: o professor anda, para de repente e levanta os braços.
+// As abas do jaleco seguem a física de mola (CoatPhysics).
+// Abrir no navegador toca em tempo real; render-video.mjs chama window.frame(i).
+import * as THREE from "three";
+import {RoomEnvironment} from "three/addons/environments/RoomEnvironment.js";
+import {makeProfessor, setCoat, CoatPhysics} from "./professor.js";
+
+const W = 1280, H = 720, FPS = 30, DUR = 9;
+const renderer = new THREE.WebGLRenderer({antialias: true});
+renderer.setPixelRatio(window.devicePixelRatio);
+renderer.setSize(W, H);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+document.body.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color("#cfe3f5");
+scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture;
+scene.environmentIntensity = 0.55;
+scene.add(new THREE.HemisphereLight("#ffffff", "#9fb6cc", 1.2));
+const sun = new THREE.DirectionalLight("#ffffff", 2.2);
+sun.position.set(-5, 12, 9);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+Object.assign(sun.shadow.camera, {left: -10, right: 10, top: 10, bottom: -10, near: 1, far: 40});
+sun.shadow.radius = 5;
+scene.add(sun);
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(100, 100), new THREE.ShadowMaterial({opacity: 0.2}));
+ground.rotation.x = -Math.PI / 2;
+ground.receiveShadow = true;
+scene.add(ground);
+
+const prof = makeProfessor({pose: "idle", mood: "feliz"});
+const P = prof.userData.parts;
+scene.add(prof);
+const cam = new THREE.PerspectiveCamera(32, W / H, 0.1, 100);
+cam.position.set(0, 3.2, 13);
+cam.lookAt(0, 2.0, 0);
+
+const HEADING = 0.75; // anda na diagonal, em 3/4 para a câmera
+const smooth = (a, b, t) => {const x = Math.min(1, Math.max(0, (t - a) / (b - a))); return x * x * (3 - 2 * x);};
+// velocidade do passo ao longo do tempo: acelera, anda, freia de repente
+const speedAt = (t) => 1.7 * smooth(0.3, 1.0, t) * (1 - smooth(3.6, 3.9, t));
+
+const phys = new CoatPhysics();
+let simT = 0, dist = 0, phase = 0, lastV = 0;
+function simulateTo(t) {
+  const dt = 1 / (FPS * 4);
+  while (simT < t) {
+    simT += dt;
+    const v = speedAt(simT);
+    const acc = (v - lastV) / dt;
+    lastV = v;
+    dist += v * dt;
+    phase += v * dt * 3.2;
+    const walkAmt = Math.min(1, v / 1.7);
+    const swing = Math.sin(phase) * 0.45 * walkAmt;
+    const lift = smooth(4.8, 5.4, simT) * (1 - smooth(7.4, 8.0, simT));
+    const hop = Math.max(0, Math.sin(Math.PI * Math.min(1, Math.max(0, (simT - 5.0) / 0.5)))) * 0.25;
+    state = {v, swing, lift, hop, walkAmt};
+    state.coat = phys.step(dt, {vel: v, acc, lift, legL: -swing, legR: swing, twist: 0});
+  }
+}
+let state = {v: 0, swing: 0, lift: 0, hop: 0, walkAmt: 0, coat: phys.step(0, {})};
+
+function draw(t) {
+  simulateTo(t);
+  const {swing, lift, hop, walkAmt, coat} = state;
+  const startX = -2;
+  prof.rotation.y = HEADING;
+  prof.position.set(startX + Math.sin(HEADING) * dist, hop, -2 + Math.cos(HEADING) * dist);
+  P.hips[0].rotation.x = swing;
+  P.hips[1].rotation.x = -swing;
+  P.body.position.y = Math.abs(Math.cos(phase)) * 0.06 * walkAmt;
+  P.body.rotation.x = 0.06 * walkAmt;
+  P.arms.forEach((arm, i) => {
+    const {upper, elbow, side} = arm.userData;
+    upper.rotation.x = (i === 0 ? swing : -swing) * 0.9;
+    upper.rotation.z = side * -(0.08 + 2.4 * lift);
+    elbow.rotation.x = -(0.15 * walkAmt + 0.2 * lift);
+  });
+  P.head.rotation.z = Math.sin(phase) * 0.04 * walkAmt;
+  setCoat(P, coat);
+  // câmera acompanha o professor
+  cam.position.set(prof.position.x + 1.2, 3.0, prof.position.z + 11);
+  cam.lookAt(prof.position.x + 0.3, 2.0, prof.position.z);
+  sun.position.set(prof.position.x - 5, 12, prof.position.z + 9);
+  sun.target.position.set(prof.position.x, 0, prof.position.z);
+  sun.target.updateMatrixWorld();
+  renderer.render(scene, cam);
+}
+
+window.TOTAL = FPS * DUR;
+window.frame = (i) => draw(i / FPS);
+if (!location.search.includes("manual")) {
+  const t0 = performance.now();
+  const loop = () => {
+    const t = ((performance.now() - t0) / 1000) % DUR;
+    if (t < simT) {simT = 0; dist = 0; phase = 0; lastV = 0; phys.constructor.call(phys);}
+    draw(t);
+    requestAnimationFrame(loop);
+  };
+  loop();
+}
+window.__ready = true;
+</script></body></html>

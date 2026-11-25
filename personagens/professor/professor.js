@@ -24,8 +24,6 @@ export const COLORS = {
   pupil: "#111111",
   mouth: "#5a1f1f",
   tongue: "#ff7a85",
-  book: "#c0392b",
-  page: "#fff6df",
   bulb: "#ffe27a",
 };
 
@@ -304,14 +302,6 @@ function buildArm(side, {raise = 0, forward = 0, bend = 0, hold = null}) {
   const thumb = at(sphere(0.05, COLORS.skin), side * 0.09, -0.5, 0.08);
   thumb.scale.set(1, 1.4, 1);
   elbow.add(thumb);
-  if (hold === "book") {
-    const book = new THREE.Group();
-    book.position.set(0, -0.6, 0.12);
-    book.rotation.set(0.1, Math.PI / 2, 0);
-    book.add(rbox(0.5, 0.38, 0.1, 0.02, COLORS.book));
-    book.add(at(rbox(0.46, 0.34, 0.08, 0.01, COLORS.page), 0.03, 0, 0));
-    elbow.add(book);
-  }
   if (hold === "point") {
     const finger = at(capsule(0.035, 0.12, COLORS.skin), 0, -0.7, 0.03);
     elbow.add(finger);
@@ -319,100 +309,154 @@ function buildArm(side, {raise = 0, forward = 0, bend = 0, hold = null}) {
   upper.rotation.z = side * -raise;
   upper.rotation.x = -forward;
   elbow.rotation.x = -bend;
+  shoulder.userData = {upper, elbow, side};
   return shoulder;
 }
+
+// Ângulos das abas do jaleco em cada pose da folha (resultado "congelado" da física).
+const COAT_POSE = {
+  idle: {back: 0, L: {out: 0.03, fwd: 0}, R: {out: 0.03, fwd: 0}},
+  point: {back: 0.05, L: {out: 0.04, fwd: 0}, R: {out: 0.12, fwd: 0.05}},
+  side: {back: 0, L: {out: 0.03, fwd: 0}, R: {out: 0.03, fwd: 0}},
+  back: {back: 0, L: {out: 0.03, fwd: 0}, R: {out: 0.03, fwd: 0}},
+  walk: {back: 0.38, L: {out: 0.1, fwd: -0.22}, R: {out: 0.08, fwd: 0.12}},
+  eureka: {back: 0.18, L: {out: 0.3, fwd: 0.05}, R: {out: 0.3, fwd: 0.05}},
+};
+
+export const COAT_LEN = 1.08;
 
 export function makeProfessor({pose = "idle", mood = "feliz"} = {}) {
   const root = new THREE.Group();
   const body = new THREE.Group();
   root.add(body);
+  const parts = {body, hips: [], arms: [], flaps: {}};
 
-  // ---- pernas ----
+  // ---- pernas (mais longas: personagem mais alto) ----
   const legSwing = pose === "walk" ? 0.35 : 0;
-  for (const s of [-1, 1]) {
+  [-1, 1].forEach((s) => {
     const hip = new THREE.Group();
-    hip.position.set(s * 0.24, 1.05, 0);
+    hip.position.set(s * 0.24, 1.25, 0);
     hip.rotation.x = s * legSwing;
-    const leg = at(rbox(0.38, 0.9, 0.42, 0.12, COLORS.pants), 0, -0.47, 0);
-    hip.add(leg);
-    const shoe = at(rbox(0.42, 0.2, 0.62, 0.09, COLORS.shoe, {coat: 0.8, rough: 0.3}), 0, -0.95, 0.08);
-    hip.add(shoe);
-    const sole = at(rbox(0.44, 0.06, 0.64, 0.025, COLORS.sole), 0, -1.04, 0.08);
-    hip.add(sole);
+    hip.add(at(rbox(0.38, 1.1, 0.42, 0.12, COLORS.pants), 0, -0.57, 0));
+    hip.add(at(rbox(0.42, 0.2, 0.62, 0.09, COLORS.shoe, {coat: 0.8, rough: 0.3}), 0, -1.15, 0.08));
+    hip.add(at(rbox(0.44, 0.06, 0.64, 0.025, COLORS.sole), 0, -1.24, 0.08));
     body.add(hip);
-  }
+    parts.hips.push(hip);
+  });
 
   // ---- tronco: colete, camisa, gravata ----
   const torso = new THREE.Group();
-  torso.position.y = 1.0;
+  torso.position.y = 1.2;
   body.add(torso);
-  const vest = at(rbox(0.98, 1.0, 0.62, 0.2, COLORS.vest), 0, 0.68, 0);
-  torso.add(vest);
-  // botões do colete
+  torso.add(at(rbox(0.98, 1.0, 0.62, 0.2, COLORS.vest), 0, 0.68, 0));
   for (let i = 0; i < 4; i++) torso.add(at(sphere(0.03, "#22252b", {coat: 0.9}), 0.08, 0.95 - i * 0.16, 0.315));
-  // gola da camisa (V branco)
   for (const s of [-1, 1]) {
     const col = at(rbox(0.16, 0.26, 0.04, 0.02, COLORS.shirt), s * 0.1, 1.08, 0.3);
     col.rotation.z = s * 0.55;
     torso.add(col);
   }
-  const knot = at(rbox(0.11, 0.09, 0.06, 0.03, COLORS.tie), 0, 1.07, 0.33);
-  torso.add(knot);
-  const tie = at(rbox(0.13, 0.42, 0.04, 0.03, COLORS.tie), 0, 0.82, 0.325);
-  torso.add(tie);
+  torso.add(at(rbox(0.11, 0.09, 0.06, 0.03, COLORS.tie), 0, 1.07, 0.33));
+  torso.add(at(rbox(0.13, 0.42, 0.04, 0.03, COLORS.tie), 0, 0.82, 0.325));
   for (let i = 0; i < 6; i++) torso.add(at(sphere(0.012, COLORS.tieDot, {coat: 0}), ((i % 2) - 0.5) * 0.06, 0.98 - i * 0.07, 0.35));
 
-  // ---- jaleco (painéis abertos na frente) ----
+  // ---- jaleco: parte de cima fixa ----
   const coat = new THREE.Group();
   torso.add(coat);
-  const back = at(rbox(1.18, 1.5, 0.3, 0.14, COLORS.coat), 0, 0.42, -0.24);
-  coat.add(back);
+  coat.add(at(rbox(1.18, 1.0, 0.3, 0.14, COLORS.coat), 0, 0.67, -0.24));
   for (const s of [-1, 1]) {
-    const side = at(rbox(0.36, 1.5, 0.72, 0.14, COLORS.coat), s * 0.42, 0.42, 0.0);
-    coat.add(side);
-    // lapela
+    coat.add(at(rbox(0.36, 1.0, 0.72, 0.14, COLORS.coat), s * 0.42, 0.67, 0));
     const lap = at(rbox(0.13, 0.62, 0.05, 0.03, COLORS.coatShade), s * 0.27, 0.86, 0.37);
     lap.rotation.z = s * 0.2;
     coat.add(lap);
-    // bolso
-    coat.add(at(rbox(0.26, 0.24, 0.04, 0.03, COLORS.coatShade), s * 0.43, 0.06, 0.37));
-    // botão
-    coat.add(at(sphere(0.03, "#c7cbd0", {coat: 0.9}), s * 0.3, 0.42, 0.37));
+    coat.add(at(sphere(0.03, "#c7cbd0", {coat: 0.9}), s * 0.3, 0.45, 0.37));
+    coat.add(at(sphere(0.22, COLORS.coat), s * 0.55, 1.05, 0));
   }
-  // bolso do peito com caneta
   coat.add(at(rbox(0.2, 0.16, 0.04, 0.02, COLORS.coatShade), -0.43, 0.82, 0.37));
   coat.add(at(mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.2, 10), "#2d6cdf"), -0.38, 0.92, 0.38));
-  // fenda nas costas
-  coat.add(at(rbox(0.03, 0.55, 0.02, 0.01, COLORS.coatShade), 0, -0.05, -0.39));
-  // ombros arredondados
-  for (const s of [-1, 1]) coat.add(at(sphere(0.22, COLORS.coat), s * 0.55, 1.05, 0));
+
+  // ---- jaleco: abas soltas (articuladas na cintura, balançam com a física) ----
+  const L = COAT_LEN;
+  const back = new THREE.Group();
+  back.position.set(0, 0.28, -0.25);
+  back.add(at(rbox(1.16, L, 0.14, 0.06, COLORS.coat), 0, -L / 2 + 0.06, 0));
+  back.add(at(rbox(0.03, 0.5, 0.02, 0.01, COLORS.coatShade), 0, -L + 0.3, -0.075)); // fenda
+  back.add(at(rbox(0.7, 0.09, 0.03, 0.02, COLORS.coatShade), 0, 0.02, -0.08)); // meia-cinta
+  coat.add(back);
+  parts.flaps.back = back;
+  for (const s of [-1, 1]) {
+    const f = new THREE.Group();
+    f.position.set(s * 0.42, 0.28, 0.06);
+    f.add(at(rbox(0.36, L, 0.6, 0.08, COLORS.coat), 0, -L / 2 + 0.06, 0));
+    f.add(at(rbox(0.26, 0.24, 0.04, 0.03, COLORS.coatShade), 0, -0.4, 0.3)); // bolso
+    f.add(at(sphere(0.03, "#c7cbd0", {coat: 0.9}), -s * 0.12, -0.05, 0.3));
+    coat.add(f);
+    parts.flaps[s > 0 ? "L" : "R"] = f; // L = lado esquerdo do personagem (x+)
+  }
+  setCoat(parts, COAT_POSE[pose] ?? COAT_POSE.idle);
 
   // ---- braços ----
   const armCfg = {
     idle: [{raise: 0.08}, {raise: 0.08}],
     point: [{raise: 0.08}, {raise: 1.0, forward: 0.9, bend: 0.9, hold: "point"}],
-    walk: [{raise: 0.1, forward: -0.35, hold: "book", bend: 0.3}, {raise: 0.1, forward: 0.35}],
-    side: [{raise: 0.06, bend: 0.25, hold: "book"}, {raise: 0.06}],
+    walk: [{raise: 0.1, forward: -0.35, bend: 0.2}, {raise: 0.1, forward: 0.35, bend: 0.2}],
+    side: [{raise: 0.06}, {raise: 0.06}],
     eureka: [{raise: 2.5, bend: 0.2}, {raise: 2.5, bend: 0.2}],
   }[pose === "back" ? "idle" : pose] ?? [{raise: 0.08}, {raise: 0.08}];
-  // índice 0 = braço esquerdo do personagem (x positivo), 1 = direito (x negativo)
   [1, -1].forEach((sx, i) => {
-    const side = sx > 0 ? -1 : 1;
-    const arm = buildArm(side, armCfg[i]);
-    arm.position.set(sx * 0.66, 2.05, 0);
+    const arm = buildArm(sx > 0 ? -1 : 1, armCfg[i]);
+    arm.position.set(sx * 0.66, 2.25, 0);
     body.add(arm);
+    parts.arms.push(arm);
   });
 
   // ---- cabeça ----
   const head = buildHead(mood);
-  head.position.set(0, 2.85, 0.02);
+  head.position.set(0, 3.05, 0.02);
   head.scale.setScalar(1.08);
   if (pose === "walk") head.rotation.z = 0.05;
   if (mood === "pensativo") head.rotation.z = -0.12;
   body.add(head);
-  // pescoço
-  body.add(at(mesh(new THREE.CylinderGeometry(0.16, 0.18, 0.2, 16), COLORS.skin), 0, 2.18, 0));
+  parts.head = head;
+  body.add(at(mesh(new THREE.CylinderGeometry(0.16, 0.18, 0.2, 16), COLORS.skin), 0, 2.38, 0));
 
   if (pose === "walk") body.rotation.x = 0.05;
+  root.userData.parts = parts;
   return root;
+}
+
+/** Aplica ângulos às abas do jaleco: back (para trás), L/R.out (abre para o lado), L/R.fwd (para frente). */
+export function setCoat(parts, c) {
+  const {back, L, R} = parts.flaps;
+  back.rotation.x = c.back;
+  L.rotation.set(-c.L.fwd, 0, c.L.out);
+  R.rotation.set(-c.R.fwd, 0, -c.R.out);
+}
+
+/**
+ * Física simples do jaleco: cada aba é um pêndulo amortecido (mola + atrito)
+ * empurrado pela aceleração do corpo, pelo vento do movimento e pelas pernas.
+ */
+export class CoatPhysics {
+  constructor() {
+    this.s = {back: [0, 0], Lout: [0, 0], Lfwd: [0, 0], Rout: [0, 0], Rfwd: [0, 0]};
+  }
+  step(dt, {vel = 0, acc = 0, lift = 0, legL = 0, legR = 0, twist = 0}) {
+    const K = 38, C = 4.2; // rigidez e amortecimento
+    const target = {
+      back: Math.min(0.6, Math.max(-0.2, 0.32 * vel)) + 0.15 * lift,
+      Lout: 0.03 + 0.28 * lift + 0.05 * Math.abs(vel) + 0.1 * twist,
+      Rout: 0.03 + 0.28 * lift + 0.05 * Math.abs(vel) - 0.1 * twist,
+      Lfwd: 0.45 * Math.max(0, legL) - 0.12 * vel,
+      Rfwd: 0.45 * Math.max(0, legR) - 0.12 * vel,
+    };
+    const push = {back: 0.09 * acc, Lout: 0, Rout: 0, Lfwd: -0.06 * acc, Rfwd: -0.06 * acc};
+    for (const k in this.s) {
+      const st = this.s[k];
+      const a = -K * (st[0] - target[k]) - C * st[1] + push[k] * 60;
+      st[1] += a * dt;
+      st[0] += st[1] * dt;
+    }
+    const v = (k) => this.s[k][0];
+    return {back: Math.max(-0.25, v("back")), L: {out: Math.max(0, v("Lout")), fwd: v("Lfwd")}, R: {out: Math.max(0, v("Rout")), fwd: v("Rfwd")}};
+  }
 }

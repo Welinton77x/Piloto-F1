@@ -53,14 +53,14 @@ const top = [
 top.forEach((c, i) => {
   const p = makeProfessor(c);
   p.rotation.y = c.rot;
-  p.position.set((i - 2.5) * 2.95, 0, 0);
+  p.position.set((i - 2.5) * 2.75, 0, 0);
   topScene.add(p);
 });
 const TH = 420, BH = H - TH;
-const th = 5.0, tw = th * W / TH;
+const th = 5.1, tw = th * W / TH;
 const topCam = new THREE.OrthographicCamera(-tw / 2, tw / 2, th / 2, -th / 2, 0.1, 100);
-topCam.position.set(0, 4.6, 20);
-topCam.lookAt(0, 1.85, 0);
+topCam.position.set(0, 4.9, 20);
+topCam.lookAt(0, 2.2, 0);
 
 // ---- linha de baixo: expressões em close ----
 const botScene = makeScene(false);
@@ -72,8 +72,8 @@ moods.forEach((m, i) => {
 });
 const bw = 9.4, bh = bw * BH / W;
 const botCam = new THREE.OrthographicCamera(-bw / 2, bw / 2, bh / 2, -bh / 2, 0.1, 100);
-botCam.position.set(0, 2.75, 20);
-botCam.lookAt(0, 2.75, 0);
+botCam.position.set(0, 2.95, 20);
+botCam.lookAt(0, 2.95, 0);
 
 renderer.setClearColor("#cfe3f5");
 renderer.clear();
