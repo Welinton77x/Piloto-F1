@@ -1,0 +1,855 @@
+{
+ "s1": {
+  "text": "Vai cortar o cabelo? Então segue essas quatro dicas!",
+  "said": "[excited] Vai cortar o cabelo? Então segue essas quatro dicas!",
+  "model": "eleven_v3",
+  "duration": 3.161,
+  "words": [
+   {
+    "w": "Vai",
+    "s": 0.136,
+    "e": 0.16
+   },
+   {
+    "w": "cortar",
+    "s": 0.208,
+    "e": 0.48
+   },
+   {
+    "w": "o",
+    "s": 0.58,
+    "e": 0.68
+   },
+   {
+    "w": "cabelo?",
+    "s": 0.713,
+    "e": 1.2
+   },
+   {
+    "w": "Então",
+    "s": 1.26,
+    "e": 1.441
+   },
+   {
+    "w": "segue",
+    "s": 1.493,
+    "e": 1.76
+   },
+   {
+    "w": "essas",
+    "s": 1.8,
+    "e": 2.0
+   },
+   {
+    "w": "quatro",
+    "s": 2.08,
+    "e": 2.4
+   },
+   {
+    "w": "dicas!",
+    "s": 2.44,
+    "e": 3.12
+   }
+  ]
+ },
+ "s2": {
+  "text": "Primeiro: leve uma foto de referência. Mas não de um corte. Leve a foto de um leão.",
+  "said": "[excited] Primeiro: leve uma foto de referência. [whispers] Mas não de um corte. [excited] Leve a foto de um leão!",
+  "model": "eleven_v3",
+  "duration": 5.329,
+  "words": [
+   {
+    "w": "Primeiro:",
+    "s": 0.2,
+    "e": 0.4
+   },
+   {
+    "w": "leve",
+    "s": 0.464,
+    "e": 0.72
+   },
+   {
+    "w": "uma",
+    "s": 0.78,
+    "e": 0.96
+   },
+   {
+    "w": "foto",
+    "s": 1.024,
+    "e": 1.28
+   },
+   {
+    "w": "de",
+    "s": 1.307,
+    "e": 1.36
+   },
+   {
+    "w": "referência.",
+    "s": 1.413,
+    "e": 2.12
+   },
+   {
+    "w": "Mas",
+    "s": 2.37,
+    "e": 2.4
+   },
+   {
+    "w": "não",
+    "s": 2.46,
+    "e": 2.64
+   },
+   {
+    "w": "de",
+    "s": 2.693,
+    "e": 2.8
+   },
+   {
+    "w": "um",
+    "s": 2.827,
+    "e": 2.88
+   },
+   {
+    "w": "corte.",
+    "s": 2.92,
+    "e": 3.6
+   },
+   {
+    "w": "Leve",
+    "s": 3.827,
+    "e": 3.92
+   },
+   {
+    "w": "a",
+    "s": 3.96,
+    "e": 4.0
+   },
+   {
+    "w": "foto",
+    "s": 4.08,
+    "e": 4.4
+   },
+   {
+    "w": "de",
+    "s": 4.427,
+    "e": 4.48
+   },
+   {
+    "w": "um",
+    "s": 4.507,
+    "e": 4.56
+   },
+   {
+    "w": "leão!",
+    "s": 4.64,
+    "e": 5.28
+   }
+  ]
+ },
+ "s3": {
+  "text": "O barbeiro vai entender. E se um pato entrar, finge que é normal.",
+  "said": "[confident] O barbeiro vai entender. [excited] E se um pato entrar, finge que é normal. [laughs]",
+  "model": "eleven_v3",
+  "duration": 4.049,
+  "words": [
+   {
+    "w": "O",
+    "s": 0.072,
+    "e": 0.08
+   },
+   {
+    "w": "barbeiro",
+    "s": 0.12,
+    "e": 0.48
+   },
+   {
+    "w": "vai",
+    "s": 0.5,
+    "e": 0.56
+   },
+   {
+    "w": "entender.",
+    "s": 0.604,
+    "e": 1.08
+   },
+   {
+    "w": "E",
+    "s": 1.268,
+    "e": 1.281
+   },
+   {
+    "w": "se",
+    "s": 1.334,
+    "e": 1.441
+   },
+   {
+    "w": "um",
+    "s": 1.494,
+    "e": 1.601
+   },
+   {
+    "w": "pato",
+    "s": 1.661,
+    "e": 2.041
+   },
+   {
+    "w": "entrar,",
+    "s": 2.07,
+    "e": 2.481
+   },
+   {
+    "w": "finge",
+    "s": 2.521,
+    "e": 2.801
+   },
+   {
+    "w": "que",
+    "s": 2.821,
+    "e": 2.881
+   },
+   {
+    "w": "é",
+    "s": 2.921,
+    "e": 2.961
+   },
+   {
+    "w": "normal.",
+    "s": 3.007,
+    "e": 3.361
+   }
+  ]
+ },
+ "s4": {
+  "text": "Segundo: quando ele perguntar como vai ser, responda só: surpreenda-me.",
+  "said": "[excited] Segundo: quando ele perguntar como vai ser, responda só: [dramatic] surpreenda-me.",
+  "model": "eleven_v3",
+  "duration": 4.441,
+  "words": [
+   {
+    "w": "Segundo:",
+    "s": 0.136,
+    "e": 0.48
+   },
+   {
+    "w": "quando",
+    "s": 0.526,
+    "e": 0.8
+   },
+   {
+    "w": "ele",
+    "s": 0.82,
+    "e": 0.88
+   },
+   {
+    "w": "perguntar",
+    "s": 0.928,
+    "e": 1.36
+   },
+   {
+    "w": "como",
+    "s": 1.408,
+    "e": 1.6
+   },
+   {
+    "w": "vai",
+    "s": 1.64,
+    "e": 1.76
+   },
+   {
+    "w": "ser,",
+    "s": 1.84,
+    "e": 2.16
+   },
+   {
+    "w": "responda",
+    "s": 2.24,
+    "e": 2.72
+   },
+   {
+    "w": "só:",
+    "s": 2.827,
+    "e": 3.24
+   },
+   {
+    "w": "surpreenda-me.",
+    "s": 3.507,
+    "e": 4.407
+   }
+  ]
+ },
+ "s5": {
+  "text": "Pronto: ele entrou em pânico e o alarme da barbearia disparou.",
+  "said": "[panicked] Pronto: ele entrou em pânico e o alarme da barbearia disparou!",
+  "model": "eleven_v3",
+  "duration": 3.631,
+  "words": [
+   {
+    "w": "Pronto:",
+    "s": 0.22,
+    "e": 0.48
+   },
+   {
+    "w": "ele",
+    "s": 0.52,
+    "e": 0.64
+   },
+   {
+    "w": "entrou",
+    "s": 0.68,
+    "e": 0.96
+   },
+   {
+    "w": "em",
+    "s": 1.013,
+    "e": 1.12
+   },
+   {
+    "w": "pânico",
+    "s": 1.16,
+    "e": 1.52
+   },
+   {
+    "w": "e",
+    "s": 1.6,
+    "e": 1.68
+   },
+   {
+    "w": "o",
+    "s": 1.72,
+    "e": 1.76
+   },
+   {
+    "w": "alarme",
+    "s": 1.813,
+    "e": 2.16
+   },
+   {
+    "w": "da",
+    "s": 2.187,
+    "e": 2.24
+   },
+   {
+    "w": "barbearia",
+    "s": 2.3,
+    "e": 2.8
+   },
+   {
+    "w": "disparou!",
+    "s": 2.857,
+    "e": 3.6
+   }
+  ]
+ },
+ "s6": {
+  "text": "Terceiro: desafie o barbeiro pra um duelo de penteado usando garfos. Barbeiro nunca recusa um garfo.",
+  "said": "[excited] Terceiro: desafie o barbeiro pra um duelo de penteado usando garfos! [confident] Barbeiro nunca recusa um garfo.",
+  "model": "eleven_v3",
+  "duration": 6.034,
+  "words": [
+   {
+    "w": "Terceiro:",
+    "s": 0.136,
+    "e": 0.48
+   },
+   {
+    "w": "desafie",
+    "s": 0.58,
+    "e": 1.12
+   },
+   {
+    "w": "o",
+    "s": 1.16,
+    "e": 1.2
+   },
+   {
+    "w": "barbeiro",
+    "s": 1.24,
+    "e": 1.6
+   },
+   {
+    "w": "pra",
+    "s": 1.64,
+    "e": 1.76
+   },
+   {
+    "w": "um",
+    "s": 1.787,
+    "e": 1.84
+   },
+   {
+    "w": "duelo",
+    "s": 1.893,
+    "e": 2.16
+   },
+   {
+    "w": "de",
+    "s": 2.213,
+    "e": 2.32
+   },
+   {
+    "w": "penteado",
+    "s": 2.36,
+    "e": 2.88
+   },
+   {
+    "w": "usando",
+    "s": 2.926,
+    "e": 3.2
+   },
+   {
+    "w": "garfos!",
+    "s": 3.28,
+    "e": 3.84
+   },
+   {
+    "w": "Barbeiro",
+    "s": 4.145,
+    "e": 4.48
+   },
+   {
+    "w": "nunca",
+    "s": 4.547,
+    "e": 4.88
+   },
+   {
+    "w": "recusa",
+    "s": 4.94,
+    "e": 5.28
+   },
+   {
+    "w": "um",
+    "s": 5.307,
+    "e": 5.36
+   },
+   {
+    "w": "garfo.",
+    "s": 5.42,
+    "e": 6.0
+   }
+  ]
+ },
+ "s7": {
+  "text": "No meio do duelo, seu cabelo vira uma nuvem e chove na barbearia inteira.",
+  "said": "[excited] No meio do duelo, seu cabelo vira uma nuvem e chove na barbearia inteira! [laughs]",
+  "model": "eleven_v3",
+  "duration": 4.833,
+  "words": [
+   {
+    "w": "No",
+    "s": 0.107,
+    "e": 0.16
+   },
+   {
+    "w": "meio",
+    "s": 0.224,
+    "e": 0.48
+   },
+   {
+    "w": "do",
+    "s": 0.507,
+    "e": 0.56
+   },
+   {
+    "w": "duelo,",
+    "s": 0.613,
+    "e": 1.12
+   },
+   {
+    "w": "seu",
+    "s": 1.16,
+    "e": 1.28
+   },
+   {
+    "w": "cabelo",
+    "s": 1.333,
+    "e": 1.601
+   },
+   {
+    "w": "vira",
+    "s": 1.64,
+    "e": 1.76
+   },
+   {
+    "w": "uma",
+    "s": 1.8,
+    "e": 1.92
+   },
+   {
+    "w": "nuvem",
+    "s": 2.0,
+    "e": 2.32
+   },
+   {
+    "w": "e",
+    "s": 2.44,
+    "e": 2.56
+   },
+   {
+    "w": "chove",
+    "s": 2.64,
+    "e": 2.96
+   },
+   {
+    "w": "na",
+    "s": 2.987,
+    "e": 3.04
+   },
+   {
+    "w": "barbearia",
+    "s": 3.1,
+    "e": 3.6
+   },
+   {
+    "w": "inteira!",
+    "s": 3.664,
+    "e": 4.24
+   }
+  ]
+ },
+ "s8": {
+  "text": "Quarto: se ele reclamar da bagunça, diga que podia ser pior. Podia ser no espaço.",
+  "said": "[excited] Quarto: se ele reclamar da bagunça, diga que podia ser pior. [whispers] Podia ser no espaço.",
+  "model": "eleven_v3",
+  "duration": 5.486,
+  "words": [
+   {
+    "w": "Quarto:",
+    "s": 0.069,
+    "e": 0.4
+   },
+   {
+    "w": "se",
+    "s": 0.48,
+    "e": 0.64
+   },
+   {
+    "w": "ele",
+    "s": 0.68,
+    "e": 0.8
+   },
+   {
+    "w": "reclamar",
+    "s": 0.832,
+    "e": 1.2
+   },
+   {
+    "w": "da",
+    "s": 1.227,
+    "e": 1.28
+   },
+   {
+    "w": "bagunça,",
+    "s": 1.32,
+    "e": 1.92
+   },
+   {
+    "w": "diga",
+    "s": 1.98,
+    "e": 2.24
+   },
+   {
+    "w": "que",
+    "s": 2.26,
+    "e": 2.32
+   },
+   {
+    "w": "podia",
+    "s": 2.38,
+    "e": 2.72
+   },
+   {
+    "w": "ser",
+    "s": 2.76,
+    "e": 2.88
+   },
+   {
+    "w": "pior.",
+    "s": 2.92,
+    "e": 3.28
+   },
+   {
+    "w": "Podia",
+    "s": 3.875,
+    "e": 4.08
+   },
+   {
+    "w": "ser",
+    "s": 4.14,
+    "e": 4.32
+   },
+   {
+    "w": "no",
+    "s": 4.373,
+    "e": 4.48
+   },
+   {
+    "w": "espaço.",
+    "s": 4.56,
+    "e": 5.44
+   }
+  ]
+ },
+ "s9": {
+  "text": "Fato real: no espaço, os astronautas cortam o cabelo com uma máquina ligada a um aspirador, pros fios não saírem voando.",
+  "said": "[excited] Fato real: no espaço, os astronautas cortam o cabelo com uma máquina ligada a um aspirador, pros fios não saírem voando!",
+  "model": "eleven_v3",
+  "duration": 6.687,
+  "words": [
+   {
+    "w": "Fato",
+    "s": 0.072,
+    "e": 0.32
+   },
+   {
+    "w": "real:",
+    "s": 0.384,
+    "e": 0.88
+   },
+   {
+    "w": "no",
+    "s": 0.907,
+    "e": 0.96
+   },
+   {
+    "w": "espaço,",
+    "s": 1.029,
+    "e": 1.6
+   },
+   {
+    "w": "os",
+    "s": 1.653,
+    "e": 1.76
+   },
+   {
+    "w": "astronautas",
+    "s": 1.8,
+    "e": 2.32
+   },
+   {
+    "w": "cortam",
+    "s": 2.368,
+    "e": 2.64
+   },
+   {
+    "w": "o",
+    "s": 2.68,
+    "e": 2.72
+   },
+   {
+    "w": "cabelo",
+    "s": 2.773,
+    "e": 3.12
+   },
+   {
+    "w": "com",
+    "s": 3.16,
+    "e": 3.28
+   },
+   {
+    "w": "uma",
+    "s": 3.32,
+    "e": 3.44
+   },
+   {
+    "w": "máquina",
+    "s": 3.493,
+    "e": 3.84
+   },
+   {
+    "w": "ligada",
+    "s": 3.88,
+    "e": 4.16
+   },
+   {
+    "w": "a",
+    "s": 4.2,
+    "e": 4.24
+   },
+   {
+    "w": "um",
+    "s": 4.267,
+    "e": 4.32
+   },
+   {
+    "w": "aspirador,",
+    "s": 4.373,
+    "e": 5.12
+   },
+   {
+    "w": "pros",
+    "s": 5.168,
+    "e": 5.36
+   },
+   {
+    "w": "fios",
+    "s": 5.42,
+    "e": 5.6
+   },
+   {
+    "w": "não",
+    "s": 5.62,
+    "e": 5.68
+   },
+   {
+    "w": "saírem",
+    "s": 5.76,
+    "e": 6.08
+   },
+   {
+    "w": "voando!",
+    "s": 6.133,
+    "e": 6.64
+   }
+  ]
+ },
+ "s10": {
+  "text": "No fim, você sai careca, o pato sai de topete, e um leão entra pedindo o mesmo corte que o seu.",
+  "said": "[excited] No fim, você sai careca, [laughs] o pato sai de topete, e um leão entra pedindo o mesmo corte que o seu!",
+  "model": "eleven_v3",
+  "duration": 6.426,
+  "words": [
+   {
+    "w": "No",
+    "s": 0.069,
+    "e": 0.08
+   },
+   {
+    "w": "fim,",
+    "s": 0.14,
+    "e": 0.48
+   },
+   {
+    "w": "você",
+    "s": 0.528,
+    "e": 0.72
+   },
+   {
+    "w": "sai",
+    "s": 0.78,
+    "e": 0.96
+   },
+   {
+    "w": "careca,",
+    "s": 1.024,
+    "e": 1.6
+   },
+   {
+    "w": "o",
+    "s": 2.12,
+    "e": 2.16
+   },
+   {
+    "w": "pato",
+    "s": 2.26,
+    "e": 2.64
+   },
+   {
+    "w": "sai",
+    "s": 2.68,
+    "e": 2.8
+   },
+   {
+    "w": "de",
+    "s": 2.827,
+    "e": 2.88
+   },
+   {
+    "w": "topete,",
+    "s": 2.94,
+    "e": 3.68
+   },
+   {
+    "w": "e",
+    "s": 3.72,
+    "e": 3.76
+   },
+   {
+    "w": "um",
+    "s": 3.787,
+    "e": 3.84
+   },
+   {
+    "w": "leão",
+    "s": 3.92,
+    "e": 4.24
+   },
+   {
+    "w": "entra",
+    "s": 4.293,
+    "e": 4.56
+   },
+   {
+    "w": "pedindo",
+    "s": 4.62,
+    "e": 4.96
+   },
+   {
+    "w": "o",
+    "s": 5.04,
+    "e": 5.12
+   },
+   {
+    "w": "mesmo",
+    "s": 5.187,
+    "e": 5.52
+   },
+   {
+    "w": "corte",
+    "s": 5.56,
+    "e": 5.92
+   },
+   {
+    "w": "que",
+    "s": 5.94,
+    "e": 6.0
+   },
+   {
+    "w": "o",
+    "s": 6.04,
+    "e": 6.08
+   },
+   {
+    "w": "seu!",
+    "s": 6.14,
+    "e": 6.4
+   }
+  ]
+ },
+ "s11": {
+  "text": "E você, corta ou deixa crescer?",
+  "said": "[curious] E você, corta ou deixa crescer?",
+  "model": "eleven_v3",
+  "duration": 2.038,
+  "words": [
+   {
+    "w": "E",
+    "s": 0.07,
+    "e": 0.08
+   },
+   {
+    "w": "você,",
+    "s": 0.16,
+    "e": 0.72
+   },
+   {
+    "w": "corta",
+    "s": 0.768,
+    "e": 1.04
+   },
+   {
+    "w": "ou",
+    "s": 1.12,
+    "e": 1.28
+   },
+   {
+    "w": "deixa",
+    "s": 1.307,
+    "e": 1.52
+   },
+   {
+    "w": "crescer?",
+    "s": 1.568,
+    "e": 2.0
+   }
+  ]
+ }
+}
