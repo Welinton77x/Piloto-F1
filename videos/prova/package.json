@@ -1,0 +1,26 @@
+{
+  "name": "prova",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "studio": "remotion studio src/index.ts",
+    "render": "remotion render src/index.ts Prova out/prova-raw.mp4 --gl=angle --concurrency=4 --crf=17 --browser-executable=/opt/pw-browsers/chromium_headless_shell-1243/chrome-headless-shell-linux64/chrome-headless-shell",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@react-three/fiber": "9.3.0",
+    "@remotion/cli": "4.0.547",
+    "@remotion/google-fonts": "4.0.547",
+    "@remotion/media-utils": "4.0.547",
+    "@remotion/three": "4.0.547",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "remotion": "4.0.547",
+    "three": "0.170.0"
+  },
+  "devDependencies": {
+    "@types/react": "19.1.8",
+    "@types/three": "0.170.0",
+    "typescript": "5.8.3"
+  }
+}

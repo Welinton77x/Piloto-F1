@@ -7,7 +7,7 @@ export type Mood = "feliz" | "surpreso" | "bravo" | "eureka" | "sereno";
 export type CameraKey = {f: number; target: Vec3; radius: number; az: number; el: number; fov?: number};
 export type SceneObject = {id: string; kind: string; position?: Vec3; note?: string};
 export type Animation = {target: string; from: number | string; to: number | string; unit: "u3d" | "deg" | "frac" | "count" | "state" | "hz"; f0: number; f1: number; fn: "linear" | "easeOut" | "spring" | "sine" | "set" | "random"};
-export type Badge = {kind: "pill" | "title" | "card" | "fact" | "follow" | "notify"; tone?: "problem" | "solution" | "neutral" | "attention"; text: string; f: number; anchor?: string; out?: number};
+export type Badge = {kind: "pill" | "title" | "card" | "fact" | "follow" | "notify" | "dica" | "counter" | "fx"; tone?: "problem" | "solution" | "neutral" | "attention"; text: string; f: number; anchor?: string; out?: number};
 export type AudioCue = {kind: "sfx" | "music"; name: string; f: number; status: "planned" | "made"};
 export type ScenePlan = {
   id: string;
