@@ -1,6 +1,6 @@
 # production-status — "Isso vai cair na prova?"
 
-- **Fase:** v2 CONCLUÍDA e entregue (2026-11-26). **v3 (sem sentido): APROVADA pelo usuário em 2026-11-26 ("Pode fazer eu aprovo"); Fase 2 da v3 EM ANDAMENTO.** Créditos ElevenLabs para a narração autorizados.
+- **Fase:** v2 CONCLUÍDA e entregue (2026-11-26). **v3 (sem sentido): APROVADA pelo usuário em 2026-11-26 ("Pode fazer eu aprovo"); Fase 2 da v3 CONCLUÍDA.** Créditos ElevenLabs para a narração autorizados.
 - **v3:** pedido do usuário "o vídeo mais sem sentido" + voz da amostra enviada (Will – Deep, `CstacWqMhJQlnfLPxRG4`, `eleven_v4`, stability 0.5, similarity 0.75). Roteiro v2 arquivado em `roteiro-v2.md` / `scene-plan-v2.ts`.
 - **Aprovação:** roteiro v2 (sem fato real) APROVADO pelo usuário em 2026-11-26 ("Pode fazer, eu aprovo"). Créditos ElevenLabs para a narração autorizados.
 - **Roteiro:** v2 (2026-11-26), `production/roteiro.md` + `production/scene-plan.ts` (10 cenas, estimativa 2313 frames / 77,1 s). v2 = v1 sem o fato real (pedido do usuário); nova cena "estudando o intervalo / mapa mental do recreio".
@@ -15,3 +15,9 @@
 - Verificado: `tsc --noEmit` sem erros; stills de todas as cenas revisados e corrigidos (boné cobrindo os olhos, close do giz bloqueado por carteira, câmera da mesa do material, texto do quadro grande demais para o 9:16, close do Professor atrás da parede, Professor colado na câmera nas tomadas do lado do quadro); quadros extraídos do MP4 conferidos; áudio presente em todos os segundos menos o último (fade da música sob o card). Não verificado: audição.
 - Ajustes técnicos (mesmo conteúdo): nas tomadas que mostram o rosto dos alunos (câmera do lado do quadro) a parede do fundo e o Professor ficam ocultos; textos do quadro centralizados e menores; pílula "VAI CAIR NA PROVA?" com tempo ajustado para não sobrepor o título.
 - Render: `npm run render`; sem música: `npx remotion render src/index.ts Prova out/audio-0.wav --codec=wav --props='{"music":0}'` e juntar com ffmpeg.
+
+## Entrega v3 (sem sentido)
+- `final/prova-v3-sem-sentido-musica-baixa.mp4` (81,5 s, −14,2 LUFS, pico −2,5 dBFS) e `final/prova-v3-sem-sentido-sem-musica.mp4` (81,4 s, −14,2 LUFS, pico −2,7 dBFS). H.264 1080×1920, 30 fps, 2443 frames.
+- Voz: Will – Deep (`CstacWqMhJQlnfLPxRG4`), `eleven_v4`, stability 0.5, similarity 0.75 (igual à amostra do usuário). Narração v2 guardada em `production/vo-v2/`.
+- Pedidos do usuário durante a produção: nada cobrindo o rosto; termos pomposos como texto grande amarelo com contorno preto, sem caixa, acima do personagem (modelo "PASTEL SOLAR"); pílulas, crachás e prova no alto da tela.
+- Verificado: `tsc --noEmit`; stills de todas as cenas revisados e corrigidos (pílula atrasada, balão da janela cortado, aluno tapando a entrada do pato, pato e diretor colados na câmera nos closes de faroeste, câmera atrás da parede na cena da prova); quadros do MP4 conferidos; nenhum segundo silencioso. Não verificado: audição.
