@@ -24,6 +24,8 @@ Padrão dos vídeos, tirado das referências que o usuário enviou (vídeo do al
 - **Sem risadas, sem gritinhos, sem sussurros exagerados** (o narrador não ri da própria piada).
 - Medições: referência dos gatos 163 palavras/min, pausas de 0,38 s; referência do alistamento 157 palavras/min, pausas de 0,51 s.
 
+- **Ritmo:** o usuário pediu um pouco mais rápido; padrão = vídeo final acelerado em **1,1×** (imagem e áudio juntos, tom da voz preservado), ou voz gerada já nesse ritmo.
+
 ## Tela
 - **Nada cobrindo o rosto dos personagens** (pedido do usuário): os termos "pomposos" (ex.: "PÂNICO ACADÊMICO COLETIVO") aparecem como **o termo sozinho, grande, amarelo com contorno preto grosso, sem caixa e sem etiqueta "DEFINIÇÃO TÉCNICA"**, no alto da cena, acima da cabeça do personagem (modelo: o "PASTEL SOLAR" do exemplo do usuário); enquadrar a cena para o texto ficar no "céu" acima dele; pílulas, crachás e documentos também ficam no alto.
 - Legenda **uma palavra por vez**, branca, contorno escuro, no centro; palavra-chave em **amarelo**.

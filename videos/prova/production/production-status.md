@@ -21,3 +21,5 @@
 - Voz: Will – Deep (`CstacWqMhJQlnfLPxRG4`), `eleven_v4`, stability 0.5, similarity 0.75 (igual à amostra do usuário). Narração v2 guardada em `production/vo-v2/`.
 - Pedidos do usuário durante a produção: nada cobrindo o rosto; termos pomposos como texto grande amarelo com contorno preto, sem caixa, acima do personagem (modelo "PASTEL SOLAR"); pílulas, crachás e prova no alto da tela.
 - Verificado: `tsc --noEmit`; stills de todas as cenas revisados e corrigidos (pílula atrasada, balão da janela cortado, aluno tapando a entrada do pato, pato e diretor colados na câmera nos closes de faroeste, câmera atrás da parede na cena da prova); quadros do MP4 conferidos; nenhum segundo silencioso. Não verificado: audição.
+
+- **1,1× (pedido do usuário: "acelerar um pouquinho"):** `final/prova-v3-sem-sentido-musica-baixa-1.1x.mp4` e `final/prova-v3-sem-sentido-sem-musica-1.1x.mp4` — 74,0 s, 2221 frames a 30 fps, −14,3 LUFS; ffmpeg `setpts=PTS/1.1` + `atempo=1.1` (tom preservado).
