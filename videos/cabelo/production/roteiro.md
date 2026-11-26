@@ -17,7 +17,7 @@ Novidade: **muito mais coisa aleatória**, com bichos que aparecem do nada (um p
 | Tema | "Vai cortar o cabelo?": 4 dicas absurdas |
 | Formato | Vertical 1080 × 1920, 30 fps, ~70–75 s (os cortes seguem a voz real) |
 | Tom | Narrador **animado e engraçado**, no mesmo tom aprovado no vídeo da padaria |
-| Voz | ElevenLabs **Will**, modelo `eleven_v3`, com marcações de emoção (empolgado, sussurro, risada, dramático). ~950 caracteres: **gasta créditos; a aprovação autoriza** |
+| Voz | ElevenLabs **Will**, modelo `eleven_v3`, com marcações de emoção (empolgado, sussurro, risada, dramático). ~1050 caracteres com as marcações: **gasta créditos; a aprovação autoriza** |
 | Personagens | **Professor** (protagonista, cabelo branco maluco, boca parada, só a expressão muda); **Barbeiro** (a "autoridade": bigode, avental listrado, pente atrás da orelha; expressões feliz, surpreso, pânico); **Pato** (atravessa a cena do nada e volta no final); **Leão** (na foto de referência e no final); **Professor astronauta** (corte para o espaço) |
 | Cenário | **Barbearia** 3D: cadeira de barbeiro, espelho grande, poste listrado vermelho e branco, prateleira de produtos, janela com rua e prédios, piso xadrez. Mais um cenário rápido: **estação espacial** (corredor branco, janela com a Terra) |
 | Gráficos | Os mesmos do vídeo da padaria: legenda palavra a palavra (palavra-chave em amarelo), título com caixa amarela, "DICA N", pílulas com bolinha colorida, "CÂMERA LENTA", "FATO REAL", card **@professorpowerguido** |
@@ -69,7 +69,7 @@ Novidade: **muito mais coisa aleatória**, com bichos que aparecem do nada (um p
 
 ## 4. Áudio
 
-**Narração completa (~165 palavras):**
+**Narração completa (153 palavras):**
 Vai cortar o cabelo? Então segue essas quatro dicas! Primeiro: leve uma foto de referência. Mas não de um corte. Leve a foto de um leão. O barbeiro vai entender. E se um pato entrar, finge que é normal. Segundo: quando ele perguntar como vai ser, responda só: surpreenda-me. Pronto: ele entrou em pânico e o alarme da barbearia disparou. Terceiro: desafie o barbeiro pra um duelo de penteado usando garfos. Barbeiro nunca recusa um garfo. No meio do duelo, seu cabelo vira uma nuvem e chove na barbearia inteira. Quarto: se ele reclamar da bagunça, diga que podia ser pior. Podia ser no espaço. Fato real: no espaço, os astronautas cortam o cabelo com uma máquina ligada a um aspirador, pros fios não saírem voando. No fim, você sai careca, o pato sai de topete, e um leão entra pedindo o mesmo corte que o seu. E você, corta ou deixa crescer?
 
 - **Interpretação** (marcações do `eleven_v3`, no tom aprovado):
