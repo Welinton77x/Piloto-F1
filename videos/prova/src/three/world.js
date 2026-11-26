@@ -1,6 +1,7 @@
 // Sala de aula: quadro-negro (redesenhável), carteiras, 6 alunos, mesa do professor, material escolar com rosto.
 import * as THREE from "three";
 import {makeProfessor, mat, mesh, rbox, sphere, capsule, at, COLORS} from "./professor.js";
+import {makeDuck, makeBarber} from "./characters.js";
 
 export const BOARD = {x: 0, y: 3.5, z: -4.3, w: 7.0, h: 3.0};
 export const TDESK = {x: 2.9, z: -2.4};
@@ -378,6 +379,11 @@ export function buildWorld() {
     return h;
   });
   refs.clockHands = hands;
+  refs.clockFace = addFace(clock, 1.6, 0.08);
+  refs.clockFace.position.y = -0.18;
+  refs.clockSeven = sevenSticker(0.35);
+  refs.clockSeven.position.set(0.32, 0.32, 0.1);
+  clock.add(refs.clockSeven);
   // sinal da escola
   const bell = new THREE.Group();
   bell.position.set(-1.8, 6.7, Z + 0.25);
@@ -502,7 +508,156 @@ export function buildWorld() {
   });
   refs.students[ASKER].userData.parts.arms[1].userData.grip.add(refs.stamp);
   refs.sky = sky;
+  buildV3(world, refs);
   // peças da parede do fundo (somem quando a câmera fica "atrás do quadro")
   refs.backItems = world.children.filter((o) => o.position.z <= -4.0 && o.position.z > -6 && o !== refs.wifi);
   return {world, refs};
+}
+
+// ---------- v3 (sem sentido) ----------
+function sevenSticker(size = 0.3) {
+  const tex = canvasTex(128, 128, (g) => {
+    g.fillStyle = "#ffd21f";
+    g.beginPath();
+    g.arc(64, 64, 60, 0, Math.PI * 2);
+    g.fill();
+    g.lineWidth = 6;
+    g.strokeStyle = "#161616";
+    g.stroke();
+    g.fillStyle = "#e53935";
+    g.font = "900 92px MontserratLocal, Arial";
+    g.textAlign = "center";
+    g.textBaseline = "middle";
+    g.fillText("7", 64, 70);
+  });
+  return new THREE.Mesh(new THREE.PlaneGeometry(size, size), new THREE.MeshBasicMaterial({map: tex, transparent: true}));
+}
+
+function makeDino() {
+  const g = new THREE.Group();
+  const body = new THREE.Group();
+  g.add(body);
+  const chalkC = "#f6f4ee";
+  const torso = at(capsule(0.22, 0.35, chalkC), 0, 0.5, 0);
+  torso.rotation.x = Math.PI / 2 - 0.4;
+  body.add(torso);
+  const head = new THREE.Group();
+  head.position.set(0, 0.95, 0.25);
+  body.add(head);
+  head.add(sphere(0.22, chalkC));
+  const snout = at(sphere(0.16, chalkC), 0, -0.05, 0.18);
+  snout.scale.set(1, 0.8, 1.2);
+  head.add(snout);
+  const face = addFace(head, 0.6, 0.25);
+  face.position.y = 0.05;
+  const jaw = at(rbox(0.22, 0.05, 0.2, 0.02, "#d9d6cc"), 0, -0.15, 0.2);
+  head.add(jaw);
+  const tail = at(mesh(new THREE.ConeGeometry(0.16, 0.7, 12), chalkC), 0, 0.35, -0.5);
+  tail.rotation.x = -Math.PI / 2 - 0.3;
+  body.add(tail);
+  for (let i = 0; i < 5; i++) {
+    const sp = at(mesh(new THREE.ConeGeometry(0.05, 0.13, 6), "#ffd21f"), 0, 0.78 - i * 0.1, -0.05 - i * 0.12);
+    body.add(sp);
+  }
+  for (const s2 of [-1, 1]) {
+    body.add(at(capsule(0.08, 0.2, chalkC), s2 * 0.13, 0.15, 0.05));
+    const arm = at(capsule(0.04, 0.12, chalkC), s2 * 0.18, 0.62, 0.2);
+    arm.rotation.x = -0.8;
+    body.add(arm);
+  }
+  const tie = new THREE.Group();
+  tie.add(at(rbox(0.07, 0.05, 0.04, 0.02, "#2f6fb5"), 0, 0.72, 0.24));
+  tie.add(at(rbox(0.06, 0.2, 0.03, 0.02, "#2f6fb5"), 0, 0.6, 0.26));
+  body.add(tie);
+  g.userData = {body, head, face, jaw, tie};
+  return g;
+}
+
+function buildV3(world, refs) {
+  const r = rng(91);
+  // janela com rosto
+  const wf = new THREE.Group();
+  wf.position.set(-5.0, 4.3, -4.3);
+  world.add(wf);
+  for (const s2 of [-1, 1]) {
+    const e = at(sphere(0.32, "#ffffff", {coat: 0.5}), s2 * 0.6, 0.45, 0);
+    e.scale.set(1, 1.2, 0.3);
+    wf.add(e);
+    wf.add(at(sphere(0.16, "#161616"), s2 * 0.6, 0.42, 0.08));
+  }
+  const wm = at(sphere(0.35, "#5a1f1f"), 0, -0.55, 0);
+  wm.scale.set(1.3, 0.9, 0.3);
+  wf.add(wm);
+  refs.windowFace = wf;
+  refs.windowEyes = wf.children.slice(0, 4);
+  refs.windowMouth = wm;
+  // balão "TALVEZ" gigante da janela (mesma textura dos outros)
+  refs.bigTalvez = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 1.4), refs.talvez[0].material);
+  world.add(refs.bigTalvez);
+  // pato de gravata
+  refs.duck = makeDuck();
+  const D = refs.duck.userData.parts;
+  const tie = new THREE.Group();
+  tie.add(at(rbox(0.14, 0.1, 0.06, 0.03, "#e53935"), 0, 1.18, 0.62));
+  tie.add(at(rbox(0.12, 0.38, 0.05, 0.03, "#e53935"), 0, 0.95, 0.66));
+  D.body.add(tie);
+  const glasses = new THREE.Group();
+  for (const s2 of [-1, 1]) {
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(0.09, 0.015, 8, 20), mat("#161616"));
+    ring.position.set(s2 * 0.15, 0.1, 0.38);
+    glasses.add(ring);
+  }
+  D.head.add(glasses);
+  D.glasses = glasses;
+  world.add(refs.duck);
+  // holofote (cone de luz)
+  refs.spot = new THREE.Mesh(new THREE.ConeGeometry(1.4, 6.5, 24, 1, true), new THREE.MeshBasicMaterial({color: "#fff6c4", transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide}));
+  world.add(refs.spot);
+  // fumaça
+  refs.smoke = Array.from({length: 16}, () => {
+    const m = new THREE.Mesh(new THREE.SphereGeometry(0.3, 12, 8), new THREE.MeshStandardMaterial({color: "#f2f2f2", transparent: true, opacity: 0.7, depthWrite: false}));
+    m.userData = {d: new THREE.Vector3((r() - 0.5) * 2, r() * 1.2, (r() - 0.5) * 2), s: 0.6 + r() * 0.8};
+    world.add(m);
+    return m;
+  });
+  // adesivos "7" na testa dos alunos
+  refs.sevens = refs.students.map((st) => {
+    const s7 = sevenSticker(0.32);
+    s7.position.set(0, 0.28, 0.47);
+    st.userData.parts.head.add(s7);
+    return s7;
+  });
+  // dinossauro de giz
+  refs.dino = makeDino();
+  world.add(refs.dino);
+  // diretor (terno cinza por cima da roupa do barbeiro)
+  refs.director = makeBarber();
+  const jacket = at(rbox(1.25, 1.3, 0.8, 0.28, "#5a5f6a"), 0, 1.78, -0.02);
+  refs.director.userData.parts.pivot.add(jacket);
+  const lapel = at(rbox(0.35, 0.7, 0.05, 0.03, "#f4f4f4"), 0, 2.0, 0.39);
+  refs.director.userData.parts.pivot.add(lapel);
+  refs.director.userData.parts.pivot.add(at(rbox(0.1, 0.45, 0.04, 0.02, "#2b2f36"), 0, 1.95, 0.42));
+  const badge = at(rbox(0.32, 0.22, 0.03, 0.02, "#ffffff"), 0.3, 2.2, 0.42);
+  refs.director.userData.parts.pivot.add(badge);
+  world.add(refs.director);
+  // tabuleiro de xadrez + pães de queijo
+  const boardTex = canvasTex(256, 256, (g) => {
+    for (let i = 0; i < 8; i++) for (let j = 0; j < 8; j++) {
+      g.fillStyle = (i + j) % 2 ? "#3b2414" : "#f2e3c6";
+      g.fillRect(i * 32, j * 32, 32, 32);
+    }
+  });
+  refs.chess = new THREE.Group();
+  const cb = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.06, 1.1), new THREE.MeshStandardMaterial({map: boardTex, roughness: 0.6}));
+  cb.castShadow = true;
+  refs.chess.add(cb);
+  refs.paes = Array.from({length: 16}, (_, i) => {
+    const p = sphere(0.055, i < 8 ? "#e0a84a" : "#c98a30", {coat: 0.3});
+    p.scale.set(1, 0.8, 1);
+    const col = i % 8, row = i < 8 ? 0 : 7;
+    p.userData.rest = new THREE.Vector3(-0.48 + col * 0.137, 0.07, -0.48 + row * 0.137);
+    refs.chess.add(p);
+    return p;
+  });
+  world.add(refs.chess);
 }

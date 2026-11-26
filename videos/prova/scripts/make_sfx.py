@@ -160,6 +160,15 @@ save("crec", (n - lowpass(n, 0.3)) * np.exp(-tt * 40) + 0.4 * np.sin(2 * np.pi *
 tt = t(1.6)
 save("sinal", (np.sign(np.sin(2 * np.pi * 900 * tt)) * 0.35 + np.sin(2 * np.pi * 1800 * tt) * 0.3) * (0.6 + 0.4 * np.sign(np.sin(2 * np.pi * 22 * tt))) * np.minimum(1, (tt[-1] - tt) * 6))
 
+# rebobinar: chiado que sobe de tom (fita voltando)
+tt = t(2.0)
+f = 300 + 1400 * (tt / tt[-1]) ** 1.5
+save("rebobinar", 0.5 * np.sin(2 * np.pi * np.cumsum(f) / SR) * (0.6 + 0.4 * np.sign(np.sin(2 * np.pi * 14 * tt))) + 0.3 * (rng.standard_normal(len(tt))) * np.minimum(1, tt * 4))
+# puf: fumaça de transformação
+tt = t(0.6)
+n = rng.standard_normal(len(tt))
+save("puf", lowpass(n, 0.06) * np.exp(-tt * 7) + 0.4 * np.sin(2 * np.pi * (500 - 400 * tt / tt[-1]) * tt) * np.exp(-tt * 9))
+
 # trilha: dedilhado leve (C G Am F) a 104 bpm, baixo e chocalho — 64 s
 BPM = 104
 beat = 60 / BPM

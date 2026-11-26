@@ -144,6 +144,47 @@ const Notify: React.FC<{text: string; k: number}> = ({text, k}) => {
   );
 };
 
+const Cracha: React.FC<{text: string; k: number}> = ({text, k}) => {
+  const [role, sub] = text.split("|");
+  return (
+    <div style={{position: "absolute", left: W / 2, top: 440, transform: `translate(-50%, -50%) rotate(-3deg) scale(${0.5 + 0.5 * k})`, opacity: Math.min(1, k * 2)}}>
+      <div style={{background: "#1d3a8a", borderRadius: 30, padding: "22px 34px", width: 760, boxShadow: "0 14px 34px rgba(0,0,0,0.3)", border: "6px solid #fff"}}>
+        <div style={{fontFamily, fontWeight: 800, fontSize: 28, color: "#FFD21F", letterSpacing: 4}}>CRACHÁ OFICIAL · ESCOLA</div>
+        <div style={{display: "flex", gap: 24, alignItems: "center", marginTop: 12}}>
+          <div style={{width: 120, height: 140, borderRadius: 16, background: "#e9eef5", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 80}}>{role.startsWith("DIRETOR") ? "🦖" : "🦆"}</div>
+          <div>
+            <div style={{fontFamily, fontWeight: 900, fontSize: role.length > 14 ? 44 : 60, color: "#fff", lineHeight: 1.05}}>{role}</div>
+            <div style={{fontFamily, fontWeight: 700, fontSize: 32, color: "#cfe0ff", marginTop: 8}}>{sub}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const Exam: React.FC<{text: string; k: number}> = ({text, k}) => {
+  const [title, q, body] = text.split("|");
+  return (
+    <div style={{position: "absolute", left: W / 2, top: 520 + (1 - k) * 600, transform: "translate(-50%, -50%) rotate(2deg)", opacity: Math.min(1, k * 2)}}>
+      <div style={{background: "#fffdf6", borderRadius: 18, padding: "36px 46px", width: 800, boxShadow: "0 14px 34px rgba(0,0,0,0.3)", backgroundImage: "repeating-linear-gradient(#fffdf6 0 54px, #cfe0ff 54px 56px)"}}>
+        <div style={{fontFamily, fontWeight: 900, fontSize: 54, color: "#c0392b"}}>{title}</div>
+        <div style={{fontFamily, fontWeight: 800, fontSize: 34, color: "#1d1d1d", marginTop: 14}}>{q}</div>
+        <div style={{fontFamily, fontWeight: 900, fontSize: 52, color: "#1d1d1d", marginTop: 10, lineHeight: 1.15}}>{body}</div>
+        <div style={{height: 90}} />
+      </div>
+    </div>
+  );
+};
+
+const VHS: React.FC<{text: string; frame: number}> = ({text, frame}) => (
+  <AbsoluteFill>
+    <AbsoluteFill style={{background: "rgba(40,80,200,0.28)", mixBlendMode: "multiply"}} />
+    <AbsoluteFill style={{backgroundImage: "repeating-linear-gradient(rgba(255,255,255,0.07) 0 3px, transparent 3px 7px)"}} />
+    <div style={{position: "absolute", left: 0, right: 0, top: ((frame * 37) % 1920), height: 40, background: "rgba(255,255,255,0.18)"}} />
+    <div style={{position: "absolute", left: 90, top: 300, fontFamily: "'Courier New', monospace", fontWeight: 700, fontSize: 64, color: "#fff", textShadow: "3px 0 #ff2a6d, -3px 0 #2af0ff", opacity: frame % 30 < 22 ? 1 : 0.3}}>{text}</div>
+  </AbsoluteFill>
+);
+
 const Follow: React.FC<{local: number}> = ({local}) => {
   const k = pop(local, 0);
   const done = local >= 40;
@@ -165,7 +206,7 @@ export const Overlay: React.FC = () => {
   const frame = useCurrentFrame();
   const {id, local} = sceneAt(frame);
   const plan = planById[id];
-  const hasTop = plan.badges.some((b) => b.kind === "dica" || b.kind === "fact" || b.kind === "title" || b.kind === "card" || b.kind === "notify");
+  const hasTop = plan.badges.some((b) => b.kind === "dica" || b.kind === "fact" || b.kind === "title" || b.kind === "card" || b.kind === "notify" || b.kind === "badge" || b.kind === "exam" || b.kind === "vhs");
   const items: React.ReactNode[] = [];
   plan.badges.forEach((b, i) => {
     const f0 = L(id, b.f);
@@ -177,6 +218,8 @@ export const Overlay: React.FC = () => {
     if (b.kind === "fact") items.push(<div key={i}><Pill text={b.text} tone={b.tone ?? "attention"} x={W / 2} y={330} k={k} big /></div>);
     if (b.kind === "follow") items.push(<Follow key={i} local={local - f0} />);
     if (b.kind === "card") items.push(<InfoCard key={i} text={b.text} k={k} />);
+    if (b.kind === "badge") items.push(<Cracha key={i} text={b.text} k={k} />);
+    if (b.kind === "exam") items.push(<Exam key={i} text={b.text} k={k} />);
     if (b.kind === "notify") items.push(<Notify key={i} text={b.text} k={k} />);
     if (!b.anchor) return;
     const a3 = anchorAt(b.anchor, frame);
@@ -208,6 +251,8 @@ export const Overlay: React.FC = () => {
   const fx = screenFx(frame);
   return (
     <AbsoluteFill>
+      {(fx as any).sepia > 0 ? <AbsoluteFill style={{background: "#c89b5a", opacity: (fx as any).sepia, mixBlendMode: "color"}} /> : null}
+      {(fx as any).vhs > 0 ? <VHS text={plan.badges.find((b) => b.kind === "vhs")?.text ?? ""} frame={frame} /> : null}
       {fx.red > 0 ? <AbsoluteFill style={{background: "#ff1a1a", opacity: fx.red, mixBlendMode: "multiply"}} /> : null}
       {fx.white > 0 ? <AbsoluteFill style={{background: "#ffffff", opacity: fx.white}} /> : null}
       {items}

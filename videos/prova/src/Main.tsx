@@ -14,7 +14,7 @@ const musicVolume = (f: number) => {
   return base * fadeOut;
 };
 
-const SFX_VOL: Record<string, number> = {notificacao: 0.5, giz: 0.35, crec: 0.7, sinal: 0.35, rugido: 0.75, quack: 0.6, sirene: 0.35, tlim: 0.5, ventofaroeste: 0.45, chuva: 0.4, trovao: 0.7, aspirador: 0.3, pop: 0.45, whoosh: 0.35, tsss: 0.35, plim: 0.5, croc: 0.8, tum: 0.7, confete: 0.45, toc: 0.6, whooshlento: 0.5, aaah: 0.45, chuvapao: 0.6};
+const SFX_VOL: Record<string, number> = {rebobinar: 0.45, puf: 0.6, notificacao: 0.5, giz: 0.35, crec: 0.7, sinal: 0.35, rugido: 0.75, quack: 0.6, sirene: 0.35, tlim: 0.5, ventofaroeste: 0.45, chuva: 0.4, trovao: 0.7, aspirador: 0.3, pop: 0.45, whoosh: 0.35, tsss: 0.35, plim: 0.5, croc: 0.8, tum: 0.7, confete: 0.45, toc: 0.6, whooshlento: 0.5, aaah: 0.45, chuvapao: 0.6};
 const COMPUTED = new Set<string>();
 
 /** music: volume da trilha (1 = original da v2, 0.25 = bem baixa, 0 = sem trilha). */

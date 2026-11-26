@@ -9,7 +9,7 @@ export const timing = timingJson as Record<string, {text: string; duration: numb
 const LEAD = 0.25; // fala começa 0,25 s após o corte
 const GAP: Record<string, number> = {};
 const DEFAULT_GAP = 0.55;
-const MIN: Record<string, number> = {s1: 5.8, s3: 3.6, s6: 4.2, s7: 8.6, s9: 9.4, s10: 6.0}; // tempo mínimo para a ação caber
+const MIN: Record<string, number> = {s1: 7.6, s3: 7.4, s8: 8.4, s11: 6.4}; // tempo mínimo para a ação caber
 
 export type Cut = {id: string; start: number; dur: number; voKey: string | null; voStart: number};
 export const cuts: Cut[] = (() => {

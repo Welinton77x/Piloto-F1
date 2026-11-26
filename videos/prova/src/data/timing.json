@@ -2,1000 +2,953 @@
  "s1": {
   "text": "Se você for dar aula e um aluno perguntar se isso vai cair na prova, nunca responda: talvez.",
   "said": "Se você for dar aula e um aluno perguntar se isso vai cair na prova, nunca responda: talvez.",
-  "model": "eleven_multilingual_v2",
-  "duration": 5.016,
+  "model": "eleven_v4",
+  "duration": 7.079,
   "words": [
    {
     "w": "Se",
     "s": 0.0,
-    "e": 0.163
+    "e": 0.16
    },
    {
     "w": "você",
-    "s": 0.209,
-    "e": 0.395
+    "s": 0.2,
+    "e": 0.4
    },
    {
     "w": "for",
-    "s": 0.476,
-    "e": 0.615
+    "s": 0.48,
+    "e": 0.64
    },
    {
     "w": "dar",
-    "s": 0.673,
-    "e": 0.836
+    "s": 0.72,
+    "e": 0.8
    },
    {
     "w": "aula",
-    "s": 0.917,
-    "e": 1.242
+    "s": 0.88,
+    "e": 1.2
    },
    {
     "w": "e",
-    "s": 1.312,
-    "e": 1.347
+    "s": 1.28,
+    "e": 1.36
    },
    {
     "w": "um",
-    "s": 1.393,
-    "e": 1.451
+    "s": 1.4,
+    "e": 1.44
    },
    {
     "w": "aluno",
-    "s": 1.498,
-    "e": 1.707
+    "s": 1.52,
+    "e": 1.76
    },
    {
     "w": "perguntar",
-    "s": 1.753,
-    "e": 2.241
+    "s": 1.84,
+    "e": 2.32
    },
    {
     "w": "se",
-    "s": 2.287,
-    "e": 2.357
+    "s": 2.4,
+    "e": 2.56
    },
    {
     "w": "isso",
-    "s": 2.38,
-    "e": 2.531
+    "s": 2.64,
+    "e": 2.8
    },
    {
     "w": "vai",
-    "s": 2.554,
-    "e": 2.67
+    "s": 2.96,
+    "e": 3.12
    },
    {
     "w": "cair",
-    "s": 2.694,
-    "e": 2.844
+    "s": 3.2,
+    "e": 3.44
    },
    {
     "w": "na",
-    "s": 2.891,
-    "e": 2.972
+    "s": 3.52,
+    "e": 3.68
    },
    {
     "w": "prova,",
-    "s": 3.03,
-    "e": 3.413
+    "s": 3.8,
+    "e": 4.48
    },
    {
     "w": "nunca",
-    "s": 3.46,
-    "e": 3.773
+    "s": 4.64,
+    "e": 4.96
    },
    {
     "w": "responda:",
-    "s": 3.808,
-    "e": 4.296
+    "s": 5.04,
+    "e": 5.76
    },
    {
     "w": "talvez.",
-    "s": 4.319,
-    "e": 4.969
+    "s": 6.16,
+    "e": 7.12
    }
   ]
  },
  "s2": {
-  "text": "Porque o talvez se espalha. Em trinta segundos, a sala cria um grupo chamado resumão definitivo, com trinta e oito pessoas e nenhum resumo.",
-  "said": "Porque o talvez se espalha. Em trinta segundos, a sala cria um grupo chamado resumão definitivo, com trinta e oito pessoas e nenhum resumo.",
-  "model": "eleven_multilingual_v2",
-  "duration": 9.195,
+  "text": "Porque o talvez é contagioso. Em trinta segundos, a sala inteira fala talvez, inclusive a janela, que nem estava na aula.",
+  "said": "Porque o talvez é contagioso. Em trinta segundos, a sala inteira fala talvez, inclusive a janela, que nem estava na aula.",
+  "model": "eleven_v4",
+  "duration": 9.091,
   "words": [
    {
     "w": "Porque",
     "s": 0.0,
-    "e": 0.348
+    "e": 0.32
    },
    {
     "w": "o",
-    "s": 0.418,
-    "e": 0.464
+    "s": 0.36,
+    "e": 0.4
    },
    {
     "w": "talvez",
-    "s": 0.522,
-    "e": 1.057
+    "s": 0.48,
+    "e": 1.2
    },
    {
-    "w": "se",
-    "s": 1.115,
-    "e": 1.196
+    "w": "é",
+    "s": 1.28,
+    "e": 1.36
    },
    {
-    "w": "espalha.",
-    "s": 1.242,
-    "e": 1.974
+    "w": "contagioso.",
+    "s": 1.48,
+    "e": 2.44
    },
    {
     "w": "Em",
-    "s": 2.032,
-    "e": 2.148
+    "s": 2.64,
+    "e": 2.88
    },
    {
     "w": "trinta",
-    "s": 2.241,
-    "e": 2.554
+    "s": 2.92,
+    "e": 3.2
    },
    {
     "w": "segundos,",
-    "s": 2.601,
-    "e": 3.181
+    "s": 3.28,
+    "e": 3.92
    },
    {
     "w": "a",
-    "s": 3.297,
-    "e": 3.379
+    "s": 3.96,
+    "e": 4.0
    },
    {
     "w": "sala",
-    "s": 3.448,
-    "e": 3.727
+    "s": 4.16,
+    "e": 4.4
    },
    {
-    "w": "cria",
-    "s": 3.773,
-    "e": 3.959
+    "w": "inteira",
+    "s": 4.48,
+    "e": 5.04
    },
    {
-    "w": "um",
-    "s": 3.982,
-    "e": 4.029
+    "w": "fala",
+    "s": 5.12,
+    "e": 5.36
    },
    {
-    "w": "grupo",
-    "s": 4.075,
-    "e": 4.389
+    "w": "talvez,",
+    "s": 5.48,
+    "e": 6.16
    },
    {
-    "w": "chamado",
-    "s": 4.447,
-    "e": 4.911
+    "w": "inclusive",
+    "s": 6.48,
+    "e": 6.8
    },
    {
-    "w": "resumão",
-    "s": 4.957,
-    "e": 5.364
+    "w": "a",
+    "s": 6.827,
+    "e": 6.853
    },
    {
-    "w": "definitivo,",
-    "s": 5.41,
-    "e": 6.084
+    "w": "janela,",
+    "s": 6.88,
+    "e": 7.52
    },
    {
-    "w": "com",
-    "s": 6.2,
-    "e": 6.339
+    "w": "que",
+    "s": 7.6,
+    "e": 7.68
    },
    {
-    "w": "trinta",
-    "s": 6.455,
-    "e": 6.838
+    "w": "nem",
+    "s": 7.76,
+    "e": 7.92
    },
    {
-    "w": "e",
-    "s": 6.873,
-    "e": 6.896
+    "w": "estava",
+    "s": 8.04,
+    "e": 8.32
    },
    {
-    "w": "oito",
-    "s": 6.931,
-    "e": 7.094
+    "w": "na",
+    "s": 8.4,
+    "e": 8.48
    },
    {
-    "w": "pessoas",
-    "s": 7.117,
-    "e": 7.674
-   },
-   {
-    "w": "e",
-    "s": 7.802,
-    "e": 7.918
-   },
-   {
-    "w": "nenhum",
-    "s": 8.011,
-    "e": 8.44
-   },
-   {
-    "w": "resumo.",
-    "s": 8.475,
-    "e": 9.149
+    "w": "aula.",
+    "s": 8.6,
+    "e": 9.12
    }
   ]
  },
  "s3": {
-  "text": "Isso é chamado de pânico acadêmico coletivo.",
-  "said": "Isso é chamado de pânico acadêmico coletivo.",
-  "model": "eleven_multilingual_v2",
-  "duration": 2.534,
+  "text": "Isso é chamado de pânico acadêmico coletivo, e a única cura conhecida é um pato de gravata.",
+  "said": "Isso é chamado de pânico acadêmico coletivo, e a única cura conhecida é um pato de gravata.",
+  "model": "eleven_v4",
+  "duration": 6.609,
   "words": [
    {
     "w": "Isso",
     "s": 0.0,
-    "e": 0.267
+    "e": 0.28
    },
    {
     "w": "é",
-    "s": 0.302,
-    "e": 0.337
+    "s": 0.32,
+    "e": 0.4
    },
    {
     "w": "chamado",
-    "s": 0.36,
-    "e": 0.755
+    "s": 0.44,
+    "e": 0.88
    },
    {
     "w": "de",
-    "s": 0.813,
-    "e": 0.894
+    "s": 0.96,
+    "e": 1.04
    },
    {
     "w": "pânico",
-    "s": 0.964,
-    "e": 1.277
+    "s": 1.2,
+    "e": 1.6
    },
    {
     "w": "acadêmico",
-    "s": 1.312,
-    "e": 1.776
+    "s": 1.76,
+    "e": 2.24
    },
    {
-    "w": "coletivo.",
-    "s": 1.811,
-    "e": 2.508
+    "w": "coletivo,",
+    "s": 2.32,
+    "e": 3.28
+   },
+   {
+    "w": "e",
+    "s": 3.32,
+    "e": 3.36
+   },
+   {
+    "w": "a",
+    "s": 3.4,
+    "e": 3.44
+   },
+   {
+    "w": "única",
+    "s": 3.52,
+    "e": 3.84
+   },
+   {
+    "w": "cura",
+    "s": 3.92,
+    "e": 4.16
+   },
+   {
+    "w": "conhecida",
+    "s": 4.24,
+    "e": 4.8
+   },
+   {
+    "w": "é",
+    "s": 5.12,
+    "e": 5.2
+   },
+   {
+    "w": "um",
+    "s": 5.24,
+    "e": 5.28
+   },
+   {
+    "w": "pato",
+    "s": 5.44,
+    "e": 5.68
+   },
+   {
+    "w": "de",
+    "s": 5.76,
+    "e": 5.8
+   },
+   {
+    "w": "gravata.",
+    "s": 5.84,
+    "e": 6.64
    }
   ]
  },
  "s4": {
-  "text": "Nesse caso, o correto é escrever no quadro: tudo cai. Só que o giz quebra no meio da palavra, porque giz não trabalha sob pressão.",
-  "said": "Nesse caso, o correto é escrever no quadro: tudo cai. Só que o giz quebra no meio da palavra, porque giz não trabalha sob pressão.",
-  "model": "eleven_multilingual_v2",
-  "duration": 9.195,
+  "text": "Então você chama o pato. O pato corrige a prova em trinta segundos e dá nota sete pra todo mundo, inclusive pro relógio.",
+  "said": "Então você chama o pato. O pato corrige a prova em trinta segundos e dá nota sete pra todo mundo, inclusive pro relógio.",
+  "model": "eleven_v4",
+  "duration": 8.202,
   "words": [
    {
-    "w": "Nesse",
+    "w": "Então",
     "s": 0.0,
-    "e": 0.302
+    "e": 0.32
    },
    {
-    "w": "caso,",
-    "s": 0.348,
-    "e": 0.894
+    "w": "você",
+    "s": 0.4,
+    "e": 0.64
    },
    {
-    "w": "o",
-    "s": 1.068,
-    "e": 1.126
-   },
-   {
-    "w": "correto",
-    "s": 1.173,
-    "e": 1.614
-   },
-   {
-    "w": "é",
-    "s": 1.66,
-    "e": 1.683
-   },
-   {
-    "w": "escrever",
-    "s": 1.73,
-    "e": 2.101
-   },
-   {
-    "w": "no",
-    "s": 2.136,
-    "e": 2.206
-   },
-   {
-    "w": "quadro:",
-    "s": 2.252,
-    "e": 2.752
-   },
-   {
-    "w": "tudo",
-    "s": 3.077,
-    "e": 3.529
-   },
-   {
-    "w": "cai.",
-    "s": 3.611,
-    "e": 3.982
-   },
-   {
-    "w": "Só",
-    "s": 4.191,
-    "e": 4.331
-   },
-   {
-    "w": "que",
-    "s": 4.389,
-    "e": 4.458
+    "w": "chama",
+    "s": 0.72,
+    "e": 0.96
    },
    {
     "w": "o",
-    "s": 4.493,
-    "e": 4.528
+    "s": 1.04,
+    "e": 1.12
    },
    {
-    "w": "giz",
-    "s": 4.574,
-    "e": 4.807
+    "w": "pato.",
+    "s": 1.253,
+    "e": 1.68
    },
    {
-    "w": "quebra",
-    "s": 4.888,
-    "e": 5.248
+    "w": "O",
+    "s": 1.84,
+    "e": 1.92
    },
    {
-    "w": "no",
-    "s": 5.306,
-    "e": 5.41
+    "w": "pato",
+    "s": 2.0,
+    "e": 2.24
    },
    {
-    "w": "meio",
-    "s": 5.503,
-    "e": 5.735
+    "w": "corrige",
+    "s": 2.36,
+    "e": 2.64
    },
    {
-    "w": "da",
-    "s": 5.759,
-    "e": 5.84
+    "w": "a",
+    "s": 2.667,
+    "e": 2.693
    },
    {
-    "w": "palavra,",
-    "s": 5.898,
-    "e": 6.444
+    "w": "prova",
+    "s": 2.72,
+    "e": 3.04
    },
    {
-    "w": "porque",
-    "s": 6.56,
-    "e": 6.861
+    "w": "em",
+    "s": 3.16,
+    "e": 3.28
    },
    {
-    "w": "giz",
-    "s": 6.92,
-    "e": 7.245
+    "w": "trinta",
+    "s": 3.32,
+    "e": 3.6
    },
    {
-    "w": "não",
-    "s": 7.454,
-    "e": 7.639
+    "w": "segundos",
+    "s": 3.68,
+    "e": 4.24
    },
    {
-    "w": "trabalha",
-    "s": 7.674,
-    "e": 8.15
+    "w": "e",
+    "s": 4.32,
+    "e": 4.4
    },
    {
-    "w": "sob",
-    "s": 8.185,
-    "e": 8.336
+    "w": "dá",
+    "s": 4.44,
+    "e": 4.56
    },
    {
-    "w": "pressão.",
-    "s": 8.417,
-    "e": 9.149
+    "w": "nota",
+    "s": 4.68,
+    "e": 4.8
+   },
+   {
+    "w": "sete",
+    "s": 5.04,
+    "e": 5.36
+   },
+   {
+    "w": "pra",
+    "s": 5.44,
+    "e": 5.6
+   },
+   {
+    "w": "todo",
+    "s": 5.76,
+    "e": 6.0
+   },
+   {
+    "w": "mundo,",
+    "s": 6.08,
+    "e": 6.64
+   },
+   {
+    "w": "inclusive",
+    "s": 6.96,
+    "e": 7.28
+   },
+   {
+    "w": "pro",
+    "s": 7.36,
+    "e": 7.44
+   },
+   {
+    "w": "relógio.",
+    "s": 7.52,
+    "e": 8.24
    }
   ]
  },
  "s5": {
-  "text": "Aí o apagador pede férias, a caneta pede aumento, e o projetor só liga se você souber a senha do wi-fi.",
-  "said": "Aí o apagador pede férias, a caneta pede aumento, e o projetor só liga se você souber a senha do wi-fi.",
-  "model": "eleven_multilingual_v2",
-  "duration": 6.504,
+  "text": "O relógio fica tão feliz que começa a andar ao contrário, e a aula volta pra segunda-feira passada.",
+  "said": "O relógio fica tão feliz que começa a andar ao contrário, e a aula volta pra segunda-feira passada.",
+  "model": "eleven_v4",
+  "duration": 6.922,
   "words": [
    {
-    "w": "Aí",
+    "w": "O",
     "s": 0.0,
-    "e": 0.221
+    "e": 0.08
    },
    {
-    "w": "o",
-    "s": 0.244,
-    "e": 0.279
+    "w": "relógio",
+    "s": 0.2,
+    "e": 0.56
    },
    {
-    "w": "apagador",
-    "s": 0.313,
-    "e": 0.755
+    "w": "fica",
+    "s": 0.64,
+    "e": 0.8
    },
    {
-    "w": "pede",
-    "s": 0.813,
-    "e": 0.998
+    "w": "tão",
+    "s": 1.04,
+    "e": 1.2
    },
    {
-    "w": "férias,",
-    "s": 1.08,
-    "e": 1.614
+    "w": "feliz",
+    "s": 1.28,
+    "e": 1.76
+   },
+   {
+    "w": "que",
+    "s": 1.92,
+    "e": 2.0
+   },
+   {
+    "w": "começa",
+    "s": 2.08,
+    "e": 2.48
    },
    {
     "w": "a",
-    "s": 1.741,
-    "e": 1.8
+    "s": 2.52,
+    "e": 2.56
    },
    {
-    "w": "caneta",
-    "s": 1.846,
-    "e": 2.171
+    "w": "andar",
+    "s": 2.64,
+    "e": 2.8
    },
    {
-    "w": "pede",
-    "s": 2.218,
-    "e": 2.415
+    "w": "ao",
+    "s": 2.88,
+    "e": 2.96
    },
    {
-    "w": "aumento,",
-    "s": 2.438,
-    "e": 2.995
+    "w": "contrário,",
+    "s": 3.04,
+    "e": 3.92
    },
    {
     "w": "e",
-    "s": 3.111,
-    "e": 3.181
-   },
-   {
-    "w": "o",
-    "s": 3.216,
-    "e": 3.251
-   },
-   {
-    "w": "projetor",
-    "s": 3.297,
-    "e": 3.785
-   },
-   {
-    "w": "só",
-    "s": 3.866,
-    "e": 4.017
-   },
-   {
-    "w": "liga",
-    "s": 4.087,
-    "e": 4.377
-   },
-   {
-    "w": "se",
-    "s": 4.412,
-    "e": 4.47
-   },
-   {
-    "w": "você",
-    "s": 4.516,
-    "e": 4.69
-   },
-   {
-    "w": "souber",
-    "s": 4.76,
-    "e": 5.166
+    "s": 3.96,
+    "e": 4.0
    },
    {
     "w": "a",
-    "s": 5.213,
-    "e": 5.236
+    "s": 4.08,
+    "e": 4.12
    },
    {
-    "w": "senha",
-    "s": 5.317,
-    "e": 5.619
+    "w": "aula",
+    "s": 4.16,
+    "e": 4.48
    },
    {
-    "w": "do",
-    "s": 5.654,
-    "e": 5.735
+    "w": "volta",
+    "s": 4.72,
+    "e": 5.04
    },
    {
-    "w": "wi-fi.",
-    "s": 5.759,
-    "e": 6.455
+    "w": "pra",
+    "s": 5.12,
+    "e": 5.2
+   },
+   {
+    "w": "segunda-feira",
+    "s": 5.28,
+    "e": 6.08
+   },
+   {
+    "w": "passada.",
+    "s": 6.16,
+    "e": 6.96
    }
   ]
  },
  "s6": {
-  "text": "Esse procedimento é conhecido como greve do material escolar.",
-  "said": "Esse procedimento é conhecido como greve do material escolar.",
-  "model": "eleven_multilingual_v2",
-  "duration": 3.239,
+  "text": "Esse fenômeno é conhecido como recuperação temporal.",
+  "said": "Esse fenômeno é conhecido como recuperação temporal.",
+  "model": "eleven_v4",
+  "duration": 3.631,
   "words": [
    {
     "w": "Esse",
     "s": 0.0,
-    "e": 0.221
+    "e": 0.24
    },
    {
-    "w": "procedimento",
-    "s": 0.255,
-    "e": 0.859
+    "w": "fenômeno",
+    "s": 0.36,
+    "e": 0.88
    },
    {
     "w": "é",
-    "s": 0.906,
-    "e": 0.929
+    "s": 0.92,
+    "e": 0.96
    },
    {
     "w": "conhecido",
-    "s": 0.964,
-    "e": 1.382
+    "s": 1.04,
+    "e": 1.6
    },
    {
     "w": "como",
-    "s": 1.428,
-    "e": 1.602
+    "s": 1.72,
+    "e": 1.84
    },
    {
-    "w": "greve",
-    "s": 1.649,
-    "e": 1.985
+    "w": "recuperação",
+    "s": 1.92,
+    "e": 2.8
    },
    {
-    "w": "do",
-    "s": 2.02,
-    "e": 2.078
-   },
-   {
-    "w": "material",
-    "s": 2.125,
-    "e": 2.519
-   },
-   {
-    "w": "escolar.",
-    "s": 2.566,
-    "e": 3.204
+    "w": "temporal.",
+    "s": 2.88,
+    "e": 3.68
    }
   ]
  },
  "s7": {
-  "text": "Pra acabar com a greve, ofereça quinze minutos de intervalo. Mas cuidado: se eles aceitarem, o intervalo vira matéria de prova.",
-  "said": "Pra acabar com a greve, ofereça quinze minutos de intervalo. Mas cuidado: se eles aceitarem, o intervalo vira matéria de prova.",
-  "model": "eleven_multilingual_v2",
-  "duration": 7.654,
+  "text": "Na segunda-feira passada, você descobre que o giz era um dinossauro disfarçado o tempo todo.",
+  "said": "Na segunda-feira passada, você descobre que o giz era um dinossauro disfarçado o tempo todo.",
+  "model": "eleven_v4",
+  "duration": 6.191,
   "words": [
    {
-    "w": "Pra",
+    "w": "Na",
     "s": 0.0,
-    "e": 0.209
+    "e": 0.16
    },
    {
-    "w": "acabar",
-    "s": 0.232,
-    "e": 0.557
+    "w": "segunda-feira",
+    "s": 0.24,
+    "e": 0.72
    },
    {
-    "w": "com",
-    "s": 0.592,
-    "e": 0.662
+    "w": "passada,",
+    "s": 0.8,
+    "e": 1.52
    },
    {
-    "w": "a",
-    "s": 0.685,
-    "e": 0.708
+    "w": "você",
+    "s": 1.56,
+    "e": 1.76
    },
    {
-    "w": "greve,",
-    "s": 0.743,
-    "e": 1.173
+    "w": "descobre",
+    "s": 1.92,
+    "e": 2.24
    },
    {
-    "w": "ofereça",
-    "s": 1.324,
-    "e": 1.8
-   },
-   {
-    "w": "quinze",
-    "s": 1.858,
-    "e": 2.148
-   },
-   {
-    "w": "minutos",
-    "s": 2.194,
-    "e": 2.566
-   },
-   {
-    "w": "de",
-    "s": 2.601,
-    "e": 2.647
-   },
-   {
-    "w": "intervalo.",
-    "s": 2.67,
-    "e": 3.309
-   },
-   {
-    "w": "Mas",
-    "s": 3.483,
-    "e": 3.68
-   },
-   {
-    "w": "cuidado:",
-    "s": 3.727,
-    "e": 4.238
-   },
-   {
-    "w": "se",
-    "s": 4.481,
-    "e": 4.598
-   },
-   {
-    "w": "eles",
-    "s": 4.621,
-    "e": 4.795
-   },
-   {
-    "w": "aceitarem,",
-    "s": 4.865,
-    "e": 5.492
+    "w": "que",
+    "s": 2.32,
+    "e": 2.4
    },
    {
     "w": "o",
-    "s": 5.642,
-    "e": 5.689
+    "s": 2.44,
+    "e": 2.48
    },
    {
-    "w": "intervalo",
-    "s": 5.724,
-    "e": 6.235
+    "w": "giz",
+    "s": 2.56,
+    "e": 2.96
    },
    {
-    "w": "vira",
-    "s": 6.281,
-    "e": 6.478
+    "w": "era",
+    "s": 3.04,
+    "e": 3.12
    },
    {
-    "w": "matéria",
-    "s": 6.513,
-    "e": 6.815
+    "w": "um",
+    "s": 3.2,
+    "e": 3.28
    },
    {
-    "w": "de",
-    "s": 6.85,
-    "e": 6.92
+    "w": "dinossauro",
+    "s": 3.4,
+    "e": 4.08
    },
    {
-    "w": "prova.",
-    "s": 6.978,
-    "e": 7.616
+    "w": "disfarçado",
+    "s": 4.2,
+    "e": 4.8
+   },
+   {
+    "w": "o",
+    "s": 4.92,
+    "e": 5.04
+   },
+   {
+    "w": "tempo",
+    "s": 5.2,
+    "e": 5.52
+   },
+   {
+    "w": "todo.",
+    "s": 5.72,
+    "e": 6.24
    }
   ]
  },
  "s8": {
-  "text": "Agora a turma passa o intervalo estudando o intervalo, e alguém já fez um mapa mental do recreio.",
-  "said": "Agora a turma passa o intervalo estudando o intervalo, e alguém já fez um mapa mental do recreio.",
-  "model": "eleven_multilingual_v2",
-  "duration": 5.381,
+  "text": "Ele não aceita perder e desafia o diretor pra uma partida de xadrez usando pão de queijo como peças.",
+  "said": "Ele não aceita perder e desafia o diretor pra uma partida de xadrez usando pão de queijo como peças.",
+  "model": "eleven_v4",
+  "duration": 7.236,
   "words": [
    {
-    "w": "Agora",
+    "w": "Ele",
     "s": 0.0,
-    "e": 0.337
+    "e": 0.24
    },
    {
-    "w": "a",
-    "s": 0.372,
-    "e": 0.395
+    "w": "não",
+    "s": 0.4,
+    "e": 0.56
    },
    {
-    "w": "turma",
-    "s": 0.441,
-    "e": 0.662
+    "w": "aceita",
+    "s": 0.76,
+    "e": 1.12
    },
    {
-    "w": "passa",
-    "s": 0.708,
-    "e": 0.894
-   },
-   {
-    "w": "o",
-    "s": 0.917,
-    "e": 0.94
-   },
-   {
-    "w": "intervalo",
-    "s": 0.975,
-    "e": 1.463
-   },
-   {
-    "w": "estudando",
-    "s": 1.579,
-    "e": 2.09
-   },
-   {
-    "w": "o",
-    "s": 2.113,
-    "e": 2.136
-   },
-   {
-    "w": "intervalo,",
-    "s": 2.183,
-    "e": 2.74
+    "w": "perder",
+    "s": 1.2,
+    "e": 1.6
    },
    {
     "w": "e",
-    "s": 2.868,
-    "e": 2.961
+    "s": 1.84,
+    "e": 1.92
    },
    {
-    "w": "alguém",
-    "s": 3.007,
-    "e": 3.251
+    "w": "desafia",
+    "s": 2.04,
+    "e": 2.56
    },
    {
-    "w": "já",
-    "s": 3.297,
-    "e": 3.39
+    "w": "o",
+    "s": 2.6,
+    "e": 2.64
    },
    {
-    "w": "fez",
-    "s": 3.46,
-    "e": 3.68
+    "w": "diretor",
+    "s": 2.76,
+    "e": 3.12
    },
    {
-    "w": "um",
-    "s": 3.773,
-    "e": 3.843
+    "w": "pra",
+    "s": 3.2,
+    "e": 3.28
    },
    {
-    "w": "mapa",
-    "s": 3.889,
-    "e": 4.168
+    "w": "uma",
+    "s": 3.36,
+    "e": 3.44
    },
    {
-    "w": "mental",
-    "s": 4.214,
-    "e": 4.505
+    "w": "partida",
+    "s": 3.52,
+    "e": 3.92
    },
    {
-    "w": "do",
-    "s": 4.551,
-    "e": 4.598
+    "w": "de",
+    "s": 4.0,
+    "e": 4.08
    },
    {
-    "w": "recreio.",
-    "s": 4.644,
-    "e": 5.341
+    "w": "xadrez",
+    "s": 4.2,
+    "e": 4.64
+   },
+   {
+    "w": "usando",
+    "s": 4.8,
+    "e": 5.12
+   },
+   {
+    "w": "pão",
+    "s": 5.36,
+    "e": 5.52
+   },
+   {
+    "w": "de",
+    "s": 5.6,
+    "e": 5.76
+   },
+   {
+    "w": "queijo",
+    "s": 5.84,
+    "e": 6.16
+   },
+   {
+    "w": "como",
+    "s": 6.28,
+    "e": 6.4
+   },
+   {
+    "w": "peças.",
+    "s": 6.48,
+    "e": 7.28
    }
   ]
  },
  "s9": {
-  "text": "No dia da prova, o aluno que perguntou está na sua cadeira, de óculos e bigode, corrigindo as provas, porque foi o único que leu o plano de ensino.",
-  "said": "No dia da prova, o aluno que perguntou está na sua cadeira, de óculos e bigode, corrigindo as provas, porque foi o único que leu o plano de ensino.",
-  "model": "eleven_multilingual_v2",
-  "duration": 8.385,
+  "text": "O diretor perde, o dinossauro vira diretor, e o pato agora é coordenador pedagógico.",
+  "said": "O diretor perde, o dinossauro vira diretor, e o pato agora é coordenador pedagógico.",
+  "model": "eleven_v4",
+  "duration": 6.426,
   "words": [
    {
-    "w": "No",
+    "w": "O",
     "s": 0.0,
-    "e": 0.151
+    "e": 0.08
    },
    {
-    "w": "dia",
-    "s": 0.209,
-    "e": 0.337
+    "w": "diretor",
+    "s": 0.2,
+    "e": 0.48
    },
    {
-    "w": "da",
-    "s": 0.372,
-    "e": 0.464
-   },
-   {
-    "w": "prova,",
-    "s": 0.511,
-    "e": 1.01
+    "w": "perde,",
+    "s": 0.64,
+    "e": 1.36
    },
    {
     "w": "o",
-    "s": 1.045,
-    "e": 1.091
+    "s": 1.4,
+    "e": 1.44
    },
    {
-    "w": "aluno",
-    "s": 1.149,
-    "e": 1.393
+    "w": "dinossauro",
+    "s": 1.52,
+    "e": 2.16
    },
    {
-    "w": "que",
-    "s": 1.428,
-    "e": 1.498
+    "w": "vira",
+    "s": 2.24,
+    "e": 2.48
    },
    {
-    "w": "perguntou",
-    "s": 1.533,
-    "e": 2.113
-   },
-   {
-    "w": "está",
-    "s": 2.229,
-    "e": 2.519
-   },
-   {
-    "w": "na",
-    "s": 2.577,
-    "e": 2.659
-   },
-   {
-    "w": "sua",
-    "s": 2.775,
-    "e": 3.077
-   },
-   {
-    "w": "cadeira,",
-    "s": 3.111,
-    "e": 3.564
-   },
-   {
-    "w": "de",
-    "s": 3.611,
-    "e": 3.704
-   },
-   {
-    "w": "óculos",
-    "s": 3.796,
-    "e": 4.087
+    "w": "diretor,",
+    "s": 2.56,
+    "e": 3.36
    },
    {
     "w": "e",
-    "s": 4.133,
-    "e": 4.156
-   },
-   {
-    "w": "bigode,",
-    "s": 4.191,
-    "e": 4.656
-   },
-   {
-    "w": "corrigindo",
-    "s": 4.725,
-    "e": 5.236
-   },
-   {
-    "w": "as",
-    "s": 5.259,
-    "e": 5.317
-   },
-   {
-    "w": "provas,",
-    "s": 5.375,
-    "e": 5.84
-   },
-   {
-    "w": "porque",
-    "s": 5.933,
-    "e": 6.153
-   },
-   {
-    "w": "foi",
-    "s": 6.235,
-    "e": 6.42
+    "s": 3.4,
+    "e": 3.44
    },
    {
     "w": "o",
-    "s": 6.478,
-    "e": 6.502
+    "s": 3.48,
+    "e": 3.52
    },
    {
-    "w": "único",
-    "s": 6.583,
-    "e": 6.943
+    "w": "pato",
+    "s": 3.6,
+    "e": 3.92
    },
    {
-    "w": "que",
-    "s": 7.001,
-    "e": 7.082
+    "w": "agora",
+    "s": 4.0,
+    "e": 4.4
    },
    {
-    "w": "leu",
-    "s": 7.129,
-    "e": 7.268
+    "w": "é",
+    "s": 4.48,
+    "e": 4.64
    },
    {
-    "w": "o",
-    "s": 7.291,
-    "e": 7.314
+    "w": "coordenador",
+    "s": 4.8,
+    "e": 5.36
    },
    {
-    "w": "plano",
-    "s": 7.349,
-    "e": 7.593
-   },
-   {
-    "w": "de",
-    "s": 7.639,
-    "e": 7.709
-   },
-   {
-    "w": "ensino.",
-    "s": 7.744,
-    "e": 8.359
+    "w": "pedagógico.",
+    "s": 5.44,
+    "e": 6.48
    }
   ]
  },
  "s10": {
-  "text": "Moral da história: nunca diga talvez pra quem tem grupo no celular.",
-  "said": "Moral da história: nunca diga talvez pra quem tem grupo no celular.",
-  "model": "eleven_multilingual_v2",
-  "duration": 3.84,
+  "text": "No dia da prova, a única questão é: por que você disse talvez?",
+  "said": "No dia da prova, a única questão é: por que você disse talvez?",
+  "model": "eleven_v4",
+  "duration": 5.251,
+  "words": [
+   {
+    "w": "No",
+    "s": 0.0,
+    "e": 0.16
+   },
+   {
+    "w": "dia",
+    "s": 0.24,
+    "e": 0.32
+   },
+   {
+    "w": "da",
+    "s": 0.36,
+    "e": 0.4
+   },
+   {
+    "w": "prova,",
+    "s": 0.56,
+    "e": 1.2
+   },
+   {
+    "w": "a",
+    "s": 1.24,
+    "e": 1.28
+   },
+   {
+    "w": "única",
+    "s": 1.36,
+    "e": 1.6
+   },
+   {
+    "w": "questão",
+    "s": 1.68,
+    "e": 2.16
+   },
+   {
+    "w": "é:",
+    "s": 2.24,
+    "e": 2.56
+   },
+   {
+    "w": "por",
+    "s": 2.96,
+    "e": 3.12
+   },
+   {
+    "w": "que",
+    "s": 3.16,
+    "e": 3.2
+   },
+   {
+    "w": "você",
+    "s": 3.28,
+    "e": 3.52
+   },
+   {
+    "w": "disse",
+    "s": 3.6,
+    "e": 4.0
+   },
+   {
+    "w": "talvez?",
+    "s": 4.24,
+    "e": 5.28
+   }
+  ]
+ },
+ "s11": {
+  "text": "Moral da história: nunca diga talvez. Diga pato.",
+  "said": "Moral da história: nunca diga talvez. Diga pato.",
+  "model": "eleven_v4",
+  "duration": 4.676,
   "words": [
    {
     "w": "Moral",
     "s": 0.0,
-    "e": 0.348
+    "e": 0.32
    },
    {
     "w": "da",
-    "s": 0.406,
-    "e": 0.464
+    "s": 0.36,
+    "e": 0.4
    },
    {
     "w": "história:",
-    "s": 0.488,
-    "e": 0.987
+    "s": 0.48,
+    "e": 1.36
    },
    {
     "w": "nunca",
-    "s": 1.068,
-    "e": 1.428
+    "s": 1.52,
+    "e": 1.92
    },
    {
     "w": "diga",
-    "s": 1.486,
-    "e": 1.73
+    "s": 2.08,
+    "e": 2.32
    },
    {
-    "w": "talvez",
-    "s": 1.765,
-    "e": 2.171
+    "w": "talvez.",
+    "s": 2.4,
+    "e": 3.44
    },
    {
-    "w": "pra",
-    "s": 2.252,
-    "e": 2.392
+    "w": "Diga",
+    "s": 3.48,
+    "e": 3.76
    },
    {
-    "w": "quem",
-    "s": 2.45,
-    "e": 2.635
-   },
-   {
-    "w": "tem",
-    "s": 2.682,
-    "e": 2.798
-   },
-   {
-    "w": "grupo",
-    "s": 2.856,
-    "e": 3.1
-   },
-   {
-    "w": "no",
-    "s": 3.123,
-    "e": 3.193
-   },
-   {
-    "w": "celular.",
-    "s": 3.216,
-    "e": 3.808
+    "w": "pato.",
+    "s": 4.0,
+    "e": 4.72
    }
   ]
  }

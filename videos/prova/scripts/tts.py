@@ -1,17 +1,18 @@
 """Gera a narração com ElevenLabs (voz Will) + tempos por palavra.
 Uso: python3 scripts/tts.py   (cobra créditos a cada execução; pula falas que já existem)
 Lê as falas de production/scene-plan.ts; escreve public/vo/<voKey>.mp3 e src/data/timing.json."""
-import base64, json, re, subprocess, urllib.request
+import base64, json, os, re, subprocess, urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-VOICE = "r3KkFedJ4n8aabIZ0RFQ"  # Will - Social media
+VOICE = os.environ.get("ELEVENLABS_VOICE_ID", "CstacWqMhJQlnfLPxRG4")  # Will - Deep (amostra do usuário)
 import os
-MODEL = os.environ.get("ELEVENLABS_MODEL", "eleven_multilingual_v2")  # estilo B (guia do canal)
+MODEL = os.environ.get("ELEVENLABS_MODEL", "eleven_v4")  # amostra do usuário: Will - Deep, v4, s50 sim75
 # A fala com marcações de emoção vem do campo "delivery" do scene-plan (aprovado no roteiro).
 src = (ROOT / "production/scene-plan.ts").read_text(encoding="utf-8")
 STR = r'"((?:[^"\\]|\\.)*)"'
 found = re.findall(r'voKey: "(s\d+)".*?narration: ' + STR + r',\s*delivery: ' + STR, src, flags=re.S)
+found += [(k, t, t) for k, t in re.findall(r'voKey: "(s\d+)".*?same\(' + STR + r'\)', src, flags=re.S)]
 items = [(k, t.replace('\\"', '"')) for k, t, _ in found]
 DELIVERY = {k: d.replace('\\"', '"') for k, _, d in found}
 timing_path = ROOT / "src/data/timing.json"
@@ -42,7 +43,7 @@ for key, text in items:
     said = DELIVERY.get(key, text)
     plain = lambda x: re.sub(r"[^a-zà-ú ]", "", re.sub(r"\[[a-z]+\]", "", x.lower())).split()
     assert plain(said) == plain(text), f"{key}: a fala com marcações difere da aprovada"
-    vs = {"stability": 0.0, "similarity_boost": 0.8, "style": 0.8, "use_speaker_boost": True} if MODEL == "eleven_v3" else {"stability": 0.3, "similarity_boost": 0.8, "style": 0.75, "use_speaker_boost": True, "speed": 1.0}  # estilo B
+    vs = {"stability": 0.5, "similarity_boost": 0.75}  # igual à amostra do usuário
     body = {"text": said, "model_id": MODEL, "voice_settings": vs}
     req = urllib.request.Request(
         f"https://api.elevenlabs.io/v1/text-to-speech/{VOICE}/with-timestamps?output_format=mp3_44100_128",
