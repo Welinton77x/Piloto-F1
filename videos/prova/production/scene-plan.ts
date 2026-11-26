@@ -1,4 +1,4 @@
-// Plano de cenas v1 — "Isso vai cair na prova?" (AGUARDANDO APROVAÇÃO)
+// Plano de cenas v2 (sem fato real, a pedido do usuário) — "Isso vai cair na prova?" (AGUARDANDO APROVAÇÃO)
 // História em corrente (guia do canal). Frames a 30 fps, intervalos [início, fim); estimativas até existir a voz.
 
 export type VideoConfig = {width: number; height: number; fps: number; durationInFrames: number; theme: "sala-de-aula"; language: "pt-BR"};
@@ -15,8 +15,8 @@ export type ScenePlan = {
   durationInFrames: number;
   voKey: string | null;
   narration: string; // texto da legenda
-  delivery: string; // texto enviado à voz (igual à narração, exceto grafias de pronúncia)
-  set: "sala" | "grecia";
+  delivery: string; // texto enviado à voz (igual à narração)
+  set: "sala";
   camera: CameraKey[];
   objects: SceneObject[];
   animations: Animation[];
@@ -27,9 +27,8 @@ export type ScenePlan = {
   moods: {prof: {f: number; mood: Mood}[]; students?: {f: number; mood: "feliz" | "surpreso"}[]};
 };
 
-export const videoConfig: VideoConfig = {width: 1080, height: 1920, fps: 30, durationInFrames: 2451, theme: "sala-de-aula", language: "pt-BR"};
+export const videoConfig: VideoConfig = {width: 1080, height: 1920, fps: 30, durationInFrames: 2313, theme: "sala-de-aula", language: "pt-BR"};
 export const tts = {provider: "elevenlabs", voiceName: "Will - Social media", voiceId: "r3KkFedJ4n8aabIZ0RFQ", model: "eleven_multilingual_v2", settings: {stability: 0.3, similarity_boost: 0.8, style: 0.75, use_speaker_boost: true, speed: 1.0}} as const;
-export const pronunciation = {"scholé": "scolé"} as const;
 
 export const world: SceneObject[] = [
   {id: "room", kind: "sala-de-aula", note: "piso de madeira, parede creme, janela com prédios, relógio, mural"},
@@ -44,7 +43,6 @@ export const world: SceneObject[] = [
   {id: "projector", kind: "projetor-com-rosto"},
   {id: "clock", kind: "relogio-de-parede", position: [3.6, 6.2, -4.4]},
   {id: "bell", kind: "sinal-da-escola", position: [-3.6, 6.2, -4.4]},
-  {id: "greece", kind: "colunas+pergaminho", position: [80, 0, 0], note: "cenário do fato real"},
 ];
 
 export const scenes: ScenePlan[] = [
@@ -163,34 +161,22 @@ export const scenes: ScenePlan[] = [
     moods: {prof: [{f: 0, mood: "feliz"}], students: [{f: 0, mood: "feliz"}, {f: 200, mood: "surpreso"}]},
   },
   {
-    id: "s8", startFrame: 1602, durationInFrames: 168, voKey: "s8", set: "grecia",
-    narration: "Fato real: a palavra escola vem do grego scholé, que significava tempo livre.",
-    delivery: "Fato real: a palavra escola vem do grego scolé, que significava tempo livre.",
-    camera: [{f: 0, target: [0, 3.2, 0], radius: 14, az: -10, el: 8}, {f: 168, target: [0, 3.2, 0], radius: 10, az: 8, el: 6}],
-    objects: [{id: "scroll", kind: "pergaminho", note: "ΣΧΟΛΗ / tempo livre"}, {id: "columns", kind: "colunas-gregas", note: "3"}, {id: "toga", kind: "faixa-de-toga-no-professor"}],
+    id: "s8", startFrame: 1602, durationInFrames: 165, voKey: "s8", set: "sala",
+    narration: "Agora a turma passa o intervalo estudando o intervalo, e alguém já fez um mapa mental do recreio.",
+    delivery: "Agora a turma passa o intervalo estudando o intervalo, e alguém já fez um mapa mental do recreio.",
+    camera: [{f: 0, target: [0, 2.4, 1.6], radius: 16, az: -12, el: 18}, {f: 90, target: [0, 2.4, 1.6], radius: 14, az: 6, el: 18}, {f: 91, target: [0, 3.6, -4.2], radius: 10, az: 0, el: 4}, {f: 165, target: [0, 3.6, -4.2], radius: 9, az: 0, el: 4}],
+    objects: [{id: "books", kind: "livros-abertos", note: "nas 6 carteiras"}, {id: "mindmap", kind: "mapa-mental-no-quadro", note: "RECREIO → lanche, pega-pega, fila da cantina, bola"}],
     animations: [
-      {target: "columns.rise", from: 0, to: 1, unit: "frac", f0: 0, f1: 30, fn: "spring"},
-      {target: "scroll.unroll", from: 0, to: 1, unit: "frac", f0: 20, f1: 45, fn: "spring"},
+      {target: "students.read", from: 0, to: 1, unit: "frac", f0: 0, f1: 20, fn: "spring"},
+      {target: "mindmap.draw", from: 0, to: 1, unit: "frac", f0: 95, f1: 150, fn: "linear"},
     ],
-    badges: [{kind: "fact", tone: "attention", text: "FATO REAL · ETIMOLOGIA", f: 5}],
-    highlights: ["scholé", "livre", "escola"], captions: "word-by-word",
-    audioCues: [{kind: "sfx", name: "whooshlento", f: 0, status: "made"}, {kind: "sfx", name: "aaah", f: 30, status: "made"}],
-    moods: {prof: [{f: 0, mood: "surpreso"}]},
+    badges: [{kind: "pill", tone: "problem", text: "ESTUDANDO O INTERVALO", f: 20, anchor: "asker.head", out: 90}],
+    highlights: ["intervalo", "mapa", "recreio"], captions: "word-by-word",
+    audioCues: [{kind: "sfx", name: "whoosh", f: 0, status: "made"}, {kind: "sfx", name: "pop", f: 20, status: "made"}, {kind: "sfx", name: "giz", f: 95, status: "planned"}],
+    moods: {prof: [{f: 0, mood: "surpreso"}], students: [{f: 0, mood: "surpreso"}]},
   },
   {
-    id: "s9", startFrame: 1770, durationInFrames: 135, voKey: "s9", set: "sala",
-    narration: "Ou seja, tecnicamente, os alunos estavam certos o tempo todo.",
-    delivery: "Ou seja, tecnicamente, os alunos estavam certos o tempo todo.",
-    camera: [{f: 0, target: [0, 2.2, 1.6], radius: 16, az: -12, el: 18}, {f: 135, target: [0, 2.2, 1.6], radius: 14, az: 10, el: 18}],
-    objects: [{id: "sunglasses", kind: "oculos-escuros", note: "nos 6 alunos"}, {id: "juice", kind: "copos-de-suco"}, {id: "parasol", kind: "guarda-sol"}],
-    animations: [{target: "students.recline", from: 0, to: -25, unit: "deg", f0: 5, f1: 25, fn: "spring"}],
-    badges: [{kind: "pill", tone: "solution", text: "TECNICAMENTE ✓", f: 20, anchor: "asker.head"}],
-    highlights: ["tecnicamente", "certos"], captions: "word-by-word",
-    audioCues: [{kind: "sfx", name: "whoosh", f: 0, status: "made"}, {kind: "sfx", name: "pop", f: 20, status: "made"}],
-    moods: {prof: [{f: 0, mood: "sereno"}], students: [{f: 0, mood: "feliz"}]},
-  },
-  {
-    id: "s10", startFrame: 1905, durationInFrames: 345, voKey: "s10", set: "sala",
+    id: "s9", startFrame: 1767, durationInFrames: 345, voKey: "s9", set: "sala",
     narration: "No dia da prova, o aluno que perguntou está na sua cadeira, de óculos e bigode, corrigindo as provas, porque foi o único que leu o plano de ensino.",
     delivery: "No dia da prova, o aluno que perguntou está na sua cadeira, de óculos e bigode, corrigindo as provas, porque foi o único que leu o plano de ensino.",
     camera: [{f: 0, target: [3.6, 2.8, -1.0], radius: 14, az: -20, el: 10}, {f: 150, target: [2.6, 2.8, -2.2], radius: 9, az: -6, el: 8}, {f: 151, target: [3.8, 3.2, 0.4], radius: 6, az: -40, el: 2}, {f: 200, target: [3.8, 3.2, 0.4], radius: 5.5, az: -40, el: 2}, {f: 201, target: [2.4, 2.8, -2.4], radius: 8, az: 4, el: 8}, {f: 345, target: [2.4, 2.8, -2.4], radius: 7, az: -4, el: 8}],
@@ -209,7 +195,7 @@ export const scenes: ScenePlan[] = [
     moods: {prof: [{f: 0, mood: "feliz"}, {f: 151, mood: "surpreso"}]},
   },
   {
-    id: "s11", startFrame: 2250, durationInFrames: 201, voKey: "s11", set: "sala",
+    id: "s10", startFrame: 2112, durationInFrames: 201, voKey: "s10", set: "sala",
     narration: "Moral da história: nunca diga talvez pra quem tem grupo no celular.",
     delivery: "Moral da história: nunca diga talvez pra quem tem grupo no celular.",
     camera: [{f: 0, target: [0, 2.8, -0.4], radius: 20, az: -10, el: 12}, {f: 201, target: [0, 2.8, -0.4], radius: 24, az: 10, el: 14}],
@@ -232,6 +218,6 @@ export const scenes: ScenePlan[] = [
     f += s.durationInFrames;
   }
   if (f !== videoConfig.durationInFrames) throw new Error(`soma ${f} ≠ ${videoConfig.durationInFrames}`);
-  const plain = (x: string) => x.toLowerCase().replace("scolé", "scholé").replace(/[^a-zà-ú ]/g, "").split(/\s+/).filter(Boolean).join(" ");
+  const plain = (x: string) => x.toLowerCase().replace(/[^a-zà-ú ]/g, "").split(/\s+/).filter(Boolean).join(" ");
   for (const s of scenes) if (plain(s.delivery) !== plain(s.narration)) throw new Error(`cena ${s.id}: delivery difere da narração`);
 })();

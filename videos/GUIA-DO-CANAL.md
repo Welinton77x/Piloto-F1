@@ -11,7 +11,7 @@ Padrão dos vídeos, tirado das referências que o usuário enviou (vídeo do al
 - **Uma história só, em corrente de consequências**: "Se você fizer X… então acontece Y… e aí Z…". Cada passo é mais absurdo que o anterior, mas segue a "lógica" do anterior.
 - **Nomes técnicos sérios para absurdos**: "Isso é chamado de…", com termos de escritório, lei, ciência ou burocracia aplicados à bagunça (ex. da referência: "gestão felina de pessoas", "auditoria trabalhista de bigode", "convenção coletiva do sachê", "plano de carreira de sete vidas").
 - **Coisas aleatórias**: bichos e objetos que aparecem do nada, cortes inesperados, documentos e telas falsas na tela (convite de reunião, carteira de trabalho, planilha, crachá).
-- **Um fato real** encaixado na piada (sempre conferido em fonte).
+- **Sem fato real** por padrão: o usuário pediu para não usar ("Não precisa esse negócio de fato"). Só incluir se ele pedir; se incluir, conferir em fonte.
 - **Volta numa piada anterior no final**, com reviravolta ("Fui promovido. Você não.") e uma "moral" absurda; pode terminar com pergunta para quem assiste.
 - Pode usar "4 dicas" (referência do alistamento) ou a história em corrente sem numeração (referência dos gatos).
 
