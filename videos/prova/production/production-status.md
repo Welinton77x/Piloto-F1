@@ -1,6 +1,7 @@
 # production-status — "Isso vai cair na prova?"
 
-- **Fase:** 2 — **CONCLUÍDO** (2026-11-26).
+- **Fase:** v2 CONCLUÍDA e entregue (2026-11-26). **v3 (sem sentido): AGUARDANDO APROVAÇÃO — implementação e renderização da v3 não iniciadas.**
+- **v3:** pedido do usuário "o vídeo mais sem sentido" + voz da amostra enviada (Will – Deep, `CstacWqMhJQlnfLPxRG4`, `eleven_v4`, stability 0.5, similarity 0.75). Roteiro v2 arquivado em `roteiro-v2.md` / `scene-plan-v2.ts`.
 - **Aprovação:** roteiro v2 (sem fato real) APROVADO pelo usuário em 2026-11-26 ("Pode fazer, eu aprovo"). Créditos ElevenLabs para a narração autorizados.
 - **Roteiro:** v2 (2026-11-26), `production/roteiro.md` + `production/scene-plan.ts` (10 cenas, estimativa 2313 frames / 77,1 s). v2 = v1 sem o fato real (pedido do usuário); nova cena "estudando o intervalo / mapa mental do recreio".
 - **Origem:** usuário escolheu "roteiro novo no formato da história em corrente" (exemplo dos gatos); tema escolhido pelo agente (pode trocar).

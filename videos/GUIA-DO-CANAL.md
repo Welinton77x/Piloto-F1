@@ -8,6 +8,7 @@ Padrão dos vídeos, tirado das referências que o usuário enviou (vídeo do al
 - Um cenário 3D principal persistente, com a câmera passeando por ele; cortes rápidos para lugares aleatórios quando a piada pede.
 
 ## Como o narrador conta (o mais importante)
+- **Quanto mais sem sentido, melhor** (pedido do usuário): saltos absurdos e aleatórios, mas sempre narrados com seriedade, como se fossem consequência lógica do passo anterior.
 - **Uma história só, em corrente de consequências**: "Se você fizer X… então acontece Y… e aí Z…". Cada passo é mais absurdo que o anterior, mas segue a "lógica" do anterior.
 - **Nomes técnicos sérios para absurdos**: "Isso é chamado de…", com termos de escritório, lei, ciência ou burocracia aplicados à bagunça (ex. da referência: "gestão felina de pessoas", "auditoria trabalhista de bigode", "convenção coletiva do sachê", "plano de carreira de sete vidas").
 - **Coisas aleatórias**: bichos e objetos que aparecem do nada, cortes inesperados, documentos e telas falsas na tela (convite de reunião, carteira de trabalho, planilha, crachá).
@@ -16,7 +17,8 @@ Padrão dos vídeos, tirado das referências que o usuário enviou (vídeo do al
 - Pode usar "4 dicas" (referência do alistamento) ou a história em corrente sem numeração (referência dos gatos).
 
 ## Como a voz fala
-- Voz: ElevenLabs **Will** (`r3KkFedJ4n8aabIZ0RFQ`), **estilo B escolhido pelo usuário**: modelo `eleven_multilingual_v2`, `stability 0.3`, `similarity_boost 0.8`, `style 0.75`, `use_speaker_boost true`, `speed 1.0`, **sem marcações de emoção** (amostra: `amostras-estilo/estilo-B-v2-expressivo.mp3`).
+- **Voz atual (pedido em 2026-11-26): ElevenLabs "Will – Deep" (`CstacWqMhJQlnfLPxRG4`), modelo `eleven_v4`, stability 0.50, similarity 0.75** — amostra do usuário em `amostras-estilo/voz-will-deep-v4-usuario.mp3`.
+- Voz anterior: ElevenLabs **Will** (`r3KkFedJ4n8aabIZ0RFQ`), **estilo B escolhido pelo usuário**: modelo `eleven_multilingual_v2`, `stability 0.3`, `similarity_boost 0.8`, `style 0.75`, `use_speaker_boost true`, `speed 1.0`, **sem marcações de emoção** (amostra: `amostras-estilo/estilo-B-v2-expressivo.mp3`).
 - **Animada no tom, séria no conteúdo**: entonação que sobe e desce bastante (referência: ~105–250 Hz), falando o absurdo com convicção, como quem explica um procedimento oficial.
 - Ritmo **~160–165 palavras/min**, contínuo, com **pausas curtas (~0,4 s)** entre as frases e antes da parte absurda.
 - **Sem risadas, sem gritinhos, sem sussurros exagerados** (o narrador não ri da própria piada).
