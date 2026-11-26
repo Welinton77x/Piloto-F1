@@ -25,6 +25,7 @@ Padrão dos vídeos, tirado das referências que o usuário enviou (vídeo do al
 - Medições: referência dos gatos 163 palavras/min, pausas de 0,38 s; referência do alistamento 157 palavras/min, pausas de 0,51 s.
 
 ## Tela
+- **Nada cobrindo o rosto dos personagens** (pedido do usuário): definições técnicas e frases "pomposas" vão como **texto solto, sem caixa, no alto da tela**, acima do personagem; pílulas, crachás e documentos também ficam no alto.
 - Legenda **uma palavra por vez**, branca, contorno escuro, no centro; palavra-chave em **amarelo**.
 - Títulos/temas em amarelo com contorno; "DICA N" quando houver dicas (some em ~2,4 s).
 - Pílulas brancas com bolinha colorida (vermelho = problema/fala absurda, verde = "certo", azul = informação, laranja = "FATO REAL" / "CÂMERA LENTA").

@@ -111,16 +111,15 @@ const Counter: React.FC<{n: string; label: string; x: number; y: number; k: numb
   </div>
 );
 
+// Definição técnica: texto solto no topo da tela, sem caixa, acima dos personagens (pedido do usuário)
 const InfoCard: React.FC<{text: string; k: number}> = ({text, k}) => {
   const [label, ...rest] = text.split("|");
   return (
-    <div style={{position: "absolute", left: W / 2, top: 430, transform: `translate(-50%, -50%) rotate(-2deg) scale(${0.5 + 0.5 * k})`, opacity: Math.min(1, k * 2)}}>
-      <div style={{background: "#16213e", border: "8px solid #FFD21F", borderRadius: 30, padding: "26px 44px", textAlign: "center", boxShadow: "0 14px 34px rgba(0,0,0,0.3)", maxWidth: 820}}>
-        <div style={{fontFamily, fontWeight: 800, fontSize: 30, color: "#ffffff", letterSpacing: 4, marginBottom: 8}}>{label}</div>
-        {rest.map((r, i) => (
-          <div key={i} style={{fontFamily, fontWeight: 900, fontSize: i === 0 ? 64 : 44, color: i === 0 ? YELLOW : "#ffffff", lineHeight: 1.1}}>{r}</div>
-        ))}
-      </div>
+    <div style={{position: "absolute", left: 0, right: 0, top: 190, textAlign: "center", transform: `scale(${0.6 + 0.4 * k})`, opacity: Math.min(1, k * 2), padding: "0 70px"}}>
+      <div style={{fontFamily, fontWeight: 800, fontSize: 34, color: "#ffffff", letterSpacing: 5, ...stroke(8)}}>{label}</div>
+      {rest.map((r, i) => (
+        <div key={i} style={{fontFamily, fontWeight: 900, fontSize: 70, color: i === 0 ? YELLOW : "#ffffff", lineHeight: 1.08, ...stroke(12), textShadow: "0 6px 0 rgba(0,0,0,0.25)"}}>{r}</div>
+      ))}
     </div>
   );
 };
@@ -147,7 +146,7 @@ const Notify: React.FC<{text: string; k: number}> = ({text, k}) => {
 const Cracha: React.FC<{text: string; k: number}> = ({text, k}) => {
   const [role, sub] = text.split("|");
   return (
-    <div style={{position: "absolute", left: W / 2, top: 440, transform: `translate(-50%, -50%) rotate(-3deg) scale(${0.5 + 0.5 * k})`, opacity: Math.min(1, k * 2)}}>
+    <div style={{position: "absolute", left: W / 2, top: 330, transform: `translate(-50%, -50%) rotate(-3deg) scale(${(0.5 + 0.5 * k) * 0.85})`, opacity: Math.min(1, k * 2)}}>
       <div style={{background: "#1d3a8a", borderRadius: 30, padding: "22px 34px", width: 760, boxShadow: "0 14px 34px rgba(0,0,0,0.3)", border: "6px solid #fff"}}>
         <div style={{fontFamily, fontWeight: 800, fontSize: 28, color: "#FFD21F", letterSpacing: 4}}>CRACHÁ OFICIAL · ESCOLA</div>
         <div style={{display: "flex", gap: 24, alignItems: "center", marginTop: 12}}>
@@ -165,7 +164,7 @@ const Cracha: React.FC<{text: string; k: number}> = ({text, k}) => {
 const Exam: React.FC<{text: string; k: number}> = ({text, k}) => {
   const [title, q, body] = text.split("|");
   return (
-    <div style={{position: "absolute", left: W / 2, top: 520 + (1 - k) * 600, transform: "translate(-50%, -50%) rotate(2deg)", opacity: Math.min(1, k * 2)}}>
+    <div style={{position: "absolute", left: W / 2, top: 360 - (1 - k) * 600, transform: "translate(-50%, -50%) rotate(2deg) scale(0.85)", opacity: Math.min(1, k * 2)}}>
       <div style={{background: "#fffdf6", borderRadius: 18, padding: "36px 46px", width: 800, boxShadow: "0 14px 34px rgba(0,0,0,0.3)", backgroundImage: "repeating-linear-gradient(#fffdf6 0 54px, #cfe0ff 54px 56px)"}}>
         <div style={{fontFamily, fontWeight: 900, fontSize: 54, color: "#c0392b"}}>{title}</div>
         <div style={{fontFamily, fontWeight: 800, fontSize: 34, color: "#1d1d1d", marginTop: 14}}>{q}</div>
@@ -208,6 +207,7 @@ export const Overlay: React.FC = () => {
   const plan = planById[id];
   const hasTop = plan.badges.some((b) => b.kind === "dica" || b.kind === "fact" || b.kind === "title" || b.kind === "card" || b.kind === "notify" || b.kind === "badge" || b.kind === "exam" || b.kind === "vhs");
   const items: React.ReactNode[] = [];
+  let stackIdx = 0;
   plan.badges.forEach((b, i) => {
     const f0 = L(id, b.f);
     if (local < f0) return;
@@ -226,7 +226,9 @@ export const Overlay: React.FC = () => {
     if (!a3) return;
     const p = project(frame, a3);
     const x = Math.max(300, Math.min(W - 300, p.x));
-    let y = Math.max(hasTop ? 480 : 300, Math.min(1060, p.y - 40));
+    // no alto da tela, acima do personagem (não cobre o rosto); empilha se houver mais de uma
+    const topText = plan.badges.some((o) => (o.kind === "card" || o.kind === "title" || o.kind === "badge" || o.kind === "exam") && local >= L(id, o.f) && (o.out === undefined || local < L(id, o.out)));
+    let y = (topText ? 470 : 260) + 92 * stackIdx++;
     if (b.kind === "pill") items.push(<Pill key={i} text={b.text} tone={b.tone ?? "neutral"} x={x} y={y} k={k} />);
     if (b.kind === "fx" && b.text === "✖") items.push(<XMark key={i} x={x} y={y - 120} k={k} />);
     if (b.kind === "fx" && b.text !== "✖") {
