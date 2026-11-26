@@ -248,8 +248,8 @@ function makeBoard(world, refs) {
   world.add(board);
   world.add(at(box(BOARD.w, 0.08, 0.25, "#8a5a3a"), BOARD.x, BOARD.y - BOARD.h / 2 - 0.15, BOARD.z + 0.15));
   let last = "";
-  refs.setBoard = (state, p = 1) => {
-    const key = state + ":" + Math.round(p * 60);
+  refs.setBoard = (state, p = 1, text = "") => {
+    const key = state + ":" + Math.round(p * 60) + ":" + text;
     if (key === last) return;
     last = key;
     const g = cv.getContext("2d");
@@ -283,6 +283,31 @@ function makeBoard(world, refs) {
       writeC("Δ = b² − 4ac", 440, 70, Math.max(0, p * 2 - 1));
     }
     if (state === "tudo") writeC("TUDO C", 320, 200, p);
+    if (state === "def") {
+      // definição técnica escrita a giz (centro do quadro, cabe no 9:16)
+      const lines = text.split("|");
+      const total = lines.reduce((n, l) => n + l.length, 0) + 18;
+      let budget = Math.round(total * p);
+      const take = (s2) => {
+        const n = Math.max(0, Math.min(s2.length, budget));
+        budget -= s2.length;
+        return s2.slice(0, n);
+      };
+      g.font = "700 46px 'Comic Sans MS', MontserratLocal, Arial";
+      g.fillStyle = "#f6f6ee";
+      const lab = take("DEFINIÇÃO TÉCNICA:");
+      g.fillText(lab, C, 90);
+      if (lab.length === 18) {
+        g.lineWidth = 5;
+        g.beginPath();
+        g.moveTo(C - 230, 125);
+        g.lineTo(C + 230, 125);
+        g.stroke();
+      }
+      g.fillStyle = "#ffe066";
+      g.font = "900 104px 'Comic Sans MS', MontserratLocal, Arial";
+      lines.forEach((l, i) => g.fillText(take(l), C, 225 + i * 125));
+    }
     if (state === "prova") {
       writeC("MATÉRIA DA", 120, 90, Math.min(1, p * 3));
       writeC("PROVA:", 230, 90, Math.min(1, Math.max(0, p * 3 - 1)));

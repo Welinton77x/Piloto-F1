@@ -7,7 +7,7 @@ export type Mood = "feliz" | "surpreso" | "bravo" | "eureka" | "sereno";
 export type CameraKey = {f: number; target: Vec3; radius: number; az: number; el: number; fov?: number};
 export type SceneObject = {id: string; kind: string; position?: Vec3; note?: string};
 export type Animation = {target: string; from: number | string; to: number | string; unit: "u3d" | "deg" | "frac" | "count" | "state" | "hz" | "timescale"; f0: number; f1: number; fn: "linear" | "easeOut" | "spring" | "sine" | "set" | "random"};
-export type Badge = {kind: "pill" | "title" | "card" | "fact" | "follow" | "notify" | "badge" | "exam" | "vhs" | "dica" | "counter" | "fx"; tone?: "problem" | "solution" | "neutral" | "attention"; text: string; f: number; anchor?: string; out?: number};
+export type Badge = {kind: "board" | "pill" | "title" | "card" | "fact" | "follow" | "notify" | "badge" | "exam" | "vhs" | "dica" | "counter" | "fx"; tone?: "problem" | "solution" | "neutral" | "attention"; text: string; f: number; anchor?: string; out?: number};
 export type AudioCue = {kind: "sfx" | "music"; name: string; f: number; status: "planned" | "made"};
 export type ScenePlan = {
   id: string;
@@ -61,9 +61,9 @@ export const scenes: ScenePlan[] = [
     camera: [{f: 0, target: [-0.6, 2.2, -0.8], radius: 15, az: 0, el: 28}, {f: 120, target: [-0.6, 2.2, -0.8], radius: 14, az: 8, el: 28}, {f: 121, target: [5.2, 1.6, -0.6], radius: 8, az: -40, el: 10}, {f: 213, target: [4.8, 1.6, -0.6], radius: 7, az: -30, el: 10}],
     objects: [{id: "papers", kind: "folhas-voando"}, {id: "duck", kind: "pato-de-gravata"}, {id: "spot", kind: "holofote"}, {id: "smoke", kind: "fumaca"}],
     animations: [{target: "spot.opacity", from: 0, to: 0.5, unit: "frac", f0: 120, f1: 135, fn: "easeOut"}, {target: "duck.x", from: 6.5, to: 4.5, unit: "u3d", f0: 125, f1: 213, fn: "linear"}, {target: "time.scale", from: 0.4, to: 0.4, unit: "timescale", f0: 125, f1: 213, fn: "set"}],
-    badges: [{kind: "card", text: "DEFINIÇÃO TÉCNICA|PÂNICO ACADÊMICO COLETIVO", f: 10, out: 118}, {kind: "pill", tone: "solution", text: "CURA: PATO DE GRAVATA", f: 140, anchor: "duck"}],
+    badges: [{kind: "board", text: "PÂNICO|ACADÊMICO|COLETIVO", f: 42, out: 160}, {kind: "pill", tone: "solution", text: "CURA: PATO DE GRAVATA", f: 140, anchor: "duck"}],
     highlights: ["pânico", "pato", "gravata"], captions: "word-by-word",
-    audioCues: [{kind: "sfx", name: "pop", f: 10, status: "made"}, {kind: "sfx", name: "aaah", f: 122, status: "made"}, {kind: "sfx", name: "quack", f: 180, status: "made"}],
+    audioCues: [{kind: "sfx", name: "giz", f: 40, status: "made"}, {kind: "sfx", name: "aaah", f: 122, status: "made"}, {kind: "sfx", name: "quack", f: 180, status: "made"}],
     moods: {prof: [{f: 0, mood: "surpreso"}], students: [{f: 0, mood: "surpreso"}]},
   },
   {
@@ -94,9 +94,9 @@ export const scenes: ScenePlan[] = [
     camera: [{f: 0, target: [-1.4, 3.15, -3.0], radius: 9, az: 18, el: 6}, {f: 105, target: [-1.4, 3.15, -3.0], radius: 8, az: 8, el: 6}],
     objects: [{id: "sepia", kind: "filtro-sepia"}],
     animations: [{target: "sepia.amount", from: 0.3, to: 0.3, unit: "frac", f0: 0, f1: 105, fn: "set"}],
-    badges: [{kind: "card", text: "DEFINIÇÃO TÉCNICA|RECUPERAÇÃO TEMPORAL", f: 8}],
+    badges: [{kind: "board", text: "RECUPERAÇÃO|TEMPORAL", f: 51}],
     highlights: ["recuperação", "temporal"], captions: "word-by-word",
-    audioCues: [{kind: "sfx", name: "pop", f: 8, status: "made"}],
+    audioCues: [{kind: "sfx", name: "giz", f: 60, status: "made"}],
     moods: {prof: [{f: 0, mood: "surpreso"}]},
   },
   {

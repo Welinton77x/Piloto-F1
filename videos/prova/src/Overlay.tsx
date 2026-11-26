@@ -124,6 +124,15 @@ const InfoCard: React.FC<{text: string; k: number}> = ({text, k}) => {
   );
 };
 
+// Termo "pomposo": texto grande, amarelo, contorno preto grosso, no alto da cena, sem caixa (modelo "PASTEL SOLAR" do usuário)
+const TermText: React.FC<{text: string; k: number}> = ({text, k}) => (
+  <div style={{position: "absolute", left: 0, right: 0, top: 380, textAlign: "center", transform: `scale(${0.4 + 0.6 * k})`, opacity: Math.min(1, k * 2), padding: "0 60px"}}>
+    {text.split("|").map((l, i) => (
+      <div key={i} style={{fontFamily, fontWeight: 900, fontSize: 118, color: YELLOW, lineHeight: 1.0, ...stroke(20), textShadow: "0 8px 0 rgba(0,0,0,0.3)", letterSpacing: -1}}>{l}</div>
+    ))}
+  </div>
+);
+
 const Notify: React.FC<{text: string; k: number}> = ({text, k}) => {
   const [title, ...rest] = text.split("|");
   return (
@@ -218,6 +227,7 @@ export const Overlay: React.FC = () => {
     if (b.kind === "fact") items.push(<div key={i}><Pill text={b.text} tone={b.tone ?? "attention"} x={W / 2} y={330} k={k} big /></div>);
     if (b.kind === "follow") items.push(<Follow key={i} local={local - f0} />);
     if (b.kind === "card") items.push(<InfoCard key={i} text={b.text} k={k} />);
+    if (b.kind === "board") items.push(<TermText key={i} text={b.text} k={k} />);
     if (b.kind === "badge") items.push(<Cracha key={i} text={b.text} k={k} />);
     if (b.kind === "exam") items.push(<Exam key={i} text={b.text} k={k} />);
     if (b.kind === "notify") items.push(<Notify key={i} text={b.text} k={k} />);
