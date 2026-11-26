@@ -16,7 +16,7 @@ Padrão dos vídeos, tirado das referências que o usuário enviou (vídeo do al
 - Pode usar "4 dicas" (referência do alistamento) ou a história em corrente sem numeração (referência dos gatos).
 
 ## Como a voz fala
-- Voz: ElevenLabs **Will** (`r3KkFedJ4n8aabIZ0RFQ`).
+- Voz: ElevenLabs **Will** (`r3KkFedJ4n8aabIZ0RFQ`), **estilo B escolhido pelo usuário**: modelo `eleven_multilingual_v2`, `stability 0.3`, `similarity_boost 0.8`, `style 0.75`, `use_speaker_boost true`, `speed 1.0`, **sem marcações de emoção** (amostra: `amostras-estilo/estilo-B-v2-expressivo.mp3`).
 - **Animada no tom, séria no conteúdo**: entonação que sobe e desce bastante (referência: ~105–250 Hz), falando o absurdo com convicção, como quem explica um procedimento oficial.
 - Ritmo **~160–165 palavras/min**, contínuo, com **pausas curtas (~0,4 s)** entre as frases e antes da parte absurda.
 - **Sem risadas, sem gritinhos, sem sussurros exagerados** (o narrador não ri da própria piada).
