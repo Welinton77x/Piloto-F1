@@ -1,0 +1,46 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Avatar do Professor</title>
+<style>html,body{margin:0;background:#cfe3f5;overflow:hidden}</style>
+<script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js","three/addons/":"./node_modules/three/examples/jsm/"}}</script>
+</head><body>
+<script type="module">
+// Foto de perfil 1080×1080: rosto do Professor centralizado (cabe no recorte redondo do Instagram).
+import * as THREE from "three";
+import {RoomEnvironment} from "three/addons/environments/RoomEnvironment.js";
+import {makeProfessor} from "./professor.js";
+const S = 1080;
+const renderer = new THREE.WebGLRenderer({antialias: true, preserveDrawingBuffer: true});
+renderer.setPixelRatio(1);
+renderer.setSize(S, S);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.shadowMap.enabled = true;
+document.body.appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+// fundo: degradê azul claro com um círculo amarelo atrás da cabeça
+const cv = document.createElement("canvas");
+cv.width = cv.height = 1024;
+const g = cv.getContext("2d");
+const gr = g.createRadialGradient(512, 470, 60, 512, 512, 720);
+gr.addColorStop(0, "#ffe680");
+gr.addColorStop(0.42, "#ffd21f");
+gr.addColorStop(0.43, "#bfe0ff");
+gr.addColorStop(1, "#7fb8ec");
+g.fillStyle = gr;
+g.fillRect(0, 0, 1024, 1024);
+const bg = new THREE.CanvasTexture(cv);
+bg.colorSpace = THREE.SRGBColorSpace;
+scene.background = bg;
+scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture;
+scene.environmentIntensity = 0.6;
+scene.add(new THREE.HemisphereLight("#ffffff", "#9fb6cc", 1.1));
+const key = new THREE.DirectionalLight("#ffffff", 2.0);
+key.position.set(-3, 8, 10);
+scene.add(key);
+const prof = makeProfessor({pose: "idle", mood: "feliz"});
+scene.add(prof);
+const cam = new THREE.PerspectiveCamera(24, 1, 0.1, 100);
+cam.position.set(0.7, 3.35, 7.0);
+cam.lookAt(0, 3.05, 0);
+renderer.render(scene, cam);
+window.__done = true;
+</script></body></html>
